@@ -90,7 +90,7 @@ function boost() {
   if (AC.state === 'suspended') AC.resume();
   boosting = true;
   boostTimer = 8;
-  rocketVY = Math.max(rocketVY - 7, -14);
+  rocketVY = Math.max(rocketVY - 2.5, -4.5);
   playBoop();
 }
 window.addEventListener('keydown', e => { e.preventDefault(); boost(); });
@@ -142,25 +142,38 @@ function update(time) {
   lastTime = time;
   frameCount++;
 
-  const SPACING = Math.max(280, H * 0.7);
+  const SPACING = Math.max(350, H * 1.1);
   const MAX_ALT = 10.5 * SPACING;
 
   // Rocket on-screen physics (same as v1)
   if (boostTimer > 0) {
     boostTimer -= dt;
-    rocketVY -= 0.3 * dt;
+    rocketVY -= 0.1 * dt;
     spawnFlame(W/2, rocketY + 30*BU);
   } else boosting = false;
 
-  rocketVY += 0.18 * dt;
-  rocketVY = Math.max(-14, Math.min(rocketVY, 6));
+  rocketVY += 0.22 * dt;
+  rocketVY *= (rocketVY > 0) ? 0.993 : 0.985;
+  rocketVY = Math.max(-4.5, Math.min(rocketVY, 4.5));
   rocketY += rocketVY * dt;
-  if (rocketY < 60*BU) { rocketY = 60*BU; rocketVY = 1; }
-  if (rocketY > H - 40*BU) { rocketY = H - 40*BU; rocketVY = 0; }
+  // Smooth top edge damping — ease off going up
+  const topFade = Math.max(0, Math.min(1, (rocketY - H * 0.08) / (H * 0.25)));
+  if (rocketVY < 0) rocketVY *= topFade;
+  // Bottom: only slow down when actually near Earth
+  if (rocketVY > 0 && altitude < SPACING * 0.5) {
+    const botFade = Math.max(0, Math.min(1, (H * 0.92 - rocketY) / (H * 0.2)));
+    rocketVY *= botFade;
+  }
+  rocketY = Math.max(H * 0.08, Math.min(rocketY, H * 0.92));
 
-  // World scroll — fire = climb, no fire = drift back to Earth
-  if (boosting) altitude += 5 * dt;
-  altitude -= 0.6 * dt;
+  // World scroll — fire = climb, falling = scroll back
+  if (boosting) altitude += 4 * dt;
+  // When rocket is at the bottom, its fall speed drives the scroll back
+  if (rocketY >= H * 0.9 && rocketVY > 0) {
+    altitude -= rocketVY * 0.9 * dt;
+  } else {
+    altitude -= 0.35 * dt;
+  }
   if (altitude < 0) altitude = 0;
   if (altitude > MAX_ALT) altitude = MAX_ALT;
 
