@@ -188,8 +188,13 @@ rocketY = H * 0.55;
 rocketVY = 0;
 let boostAccum = 0, fallAccum = 0, heatNose = 0, heatTail = 0;
 
-// World altitude — fire pushes up, gravity pulls back to Earth
+// World altitude — velocity-based so thrust/gravity feel real
 let altitude = 0;
+let worldVY = 0;  // world velocity (positive = climbing)
+
+// Fixed world constants — same on every device
+const SPACING = 1000;       // distance between planets in world units
+const MAX_ALT = 10500;      // 10.5 * SPACING
 
 // Particles
 const particles = [];
@@ -231,9 +236,10 @@ canvas.addEventListener('touchstart', holdStart, {passive:false});
 canvas.addEventListener('touchend', holdEnd);
 canvas.addEventListener('touchcancel', holdEnd);
 
-// World-to-screen: rocket at H*0.45, world scrolls around it
+// World-to-screen: fixed scale so all devices progress at same speed
 function wts(worldY) {
-  return H * 0.6 - (worldY - altitude);
+  const scale = H / 900;  // screen pixels per world unit
+  return H * 0.6 - (worldY - altitude) * scale;
 }
 
 // Draw rocket
@@ -336,9 +342,6 @@ function update(time) {
   lastTime = time;
   frameCount++;
 
-  const SPACING = Math.max(350, H * 1.1);
-  const MAX_ALT = 10.5 * SPACING;
-
   // Hold-to-fire: keep boosting while touch/mouse is held
   if (holding) {
     boosting = true;
@@ -360,29 +363,21 @@ function update(time) {
   rocketVY *= (rocketVY > 0) ? 0.993 : 0.985;
   rocketVY = Math.max(-4.5, Math.min(rocketVY, 4.5));
 
-  // Progressive edge transfer — near edges, velocity smoothly
-  // shifts from screen movement into world scroll (no walls)
-  const pad = 120 * BU;                // rocket height + generous margin
-  const limitTop = pad;                 // rocket center never above this
-  const limitBot = H - pad;             // rocket center never below this
-  const edgeTop = limitTop + H * 0.18;  // transfer fades in over 18% of screen
-  const edgeBot = limitBot - H * 0.18;
-  let transfer = 0;
-  if (rocketVY < 0 && rocketY < edgeTop) {
-    const t = (edgeTop - rocketY) / (edgeTop - limitTop);
-    transfer = Math.min(1, t * t);
-  } else if (rocketVY > 0 && rocketY > edgeBot) {
-    const t = (rocketY - edgeBot) / (limitBot - edgeBot);
-    transfer = Math.min(1, t * t);
-  }
-  rocketY += rocketVY * (1 - transfer * 0.95) * dt;
-  altitude -= rocketVY * transfer * 0.9 * dt;
-  rocketY = Math.max(limitTop, Math.min(rocketY, limitBot));
+  // Screen movement — clamped to safe bounds
+  const pad = 120 * BU;
+  const limitTop = pad;
+  const limitBot = H - pad;
+  rocketY += rocketVY * dt;
+  if (rocketY < limitTop) { rocketY = limitTop; if (rocketVY < 0) rocketVY = 0; }
+  if (rocketY > limitBot) { rocketY = limitBot; if (rocketVY > 0) rocketVY = 0; }
 
-  // Base world scroll
-  if (boosting) altitude += 2.5 * dt;
-  altitude -= 0.25 * dt;
-  if (altitude < 0) altitude = 0;
+  // World velocity physics — screen-independent
+  if (boosting) worldVY += 0.22 * dt;   // thrust builds speed gradually
+  const grav = worldVY >= 0 ? 0.05 : 0.18;  // stronger pull when falling
+  worldVY -= grav * dt;
+  worldVY = Math.max(-6.5, Math.min(worldVY, 6.0));
+  altitude += worldVY * dt;
+  if (altitude <= 0) { altitude = 0; if (worldVY < 0) worldVY = 0; }
   if (altitude > MAX_ALT) altitude = MAX_ALT;
 
   // Heat glow — nose heats going up, tail heats falling down
