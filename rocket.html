@@ -5,20 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Rocket! 🚀</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    touch-action: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    background: #0a0a2e;
-  }
-  canvas {
-    display: block;
-    width: 100%; height: 100%;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#080822}
+canvas{display:block;width:100%;height:100%}
 </style>
 </head>
 <body>
@@ -26,369 +15,293 @@
 <script>
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
-
-let W, H;
+let W, H, BU;
 function resize() {
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
+  BU = Math.min(W, H) / 500;
+  if (BU < 0.7) BU = 0.7;
 }
 resize();
 window.addEventListener('resize', resize);
 
-// --- Audio (Web Audio API, no files needed) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// Audio
+const AC = new (window.AudioContext || window.webkitAudioContext)();
 function playBoop() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.connect(g); g.connect(AC.destination);
   o.type = 'sine';
-  o.frequency.setValueAtTime(600, audioCtx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-  g.gain.setValueAtTime(0.3, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-  o.start(); o.stop(audioCtx.currentTime + 0.2);
-}
-function playWhoosh() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  o.type = 'sawtooth';
-  o.frequency.setValueAtTime(150, audioCtx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
-  g.gain.setValueAtTime(0.15, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-  o.start(); o.stop(audioCtx.currentTime + 0.3);
+  o.frequency.setValueAtTime(500, AC.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1100, AC.currentTime + 0.12);
+  g.gain.setValueAtTime(0.25, AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01, AC.currentTime + 0.18);
+  o.start(); o.stop(AC.currentTime + 0.18);
 }
 
-// --- Stars ---
+// Stars
 const stars = [];
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 90; i++) {
   stars.push({
-    x: Math.random() * 3000,
-    y: Math.random() * 3000,
-    r: Math.random() * 2.5 + 0.5,
-    twinkle: Math.random() * Math.PI * 2,
-    speed: Math.random() * 0.02 + 0.01
+    x: Math.random() * 3000, y: Math.random() * 3000,
+    r: Math.random() * 2 + 0.5,
+    tw: Math.random() * 6.28, sp: Math.random() * 0.02 + 0.01,
+    par: Math.random() * 0.3 + 0.1
   });
 }
 
-// --- Rocket state ---
-let rocketX, rocketY, rocketVY, rocketAngle, rocketScale;
-let boosting = false;
-let boostTimer = 0;
+// 10 bodies — each at a fixed height in the world
+const bodies = [
+  {name:'Moon',    c:'#ddddaa', r:18},
+  {name:'Mars',    c:'#cc4422', r:24},
+  {name:'Jupiter', c:'#dd9944', r:48},
+  {name:'Saturn',  c:'#ddbb66', r:36, rings:true},
+  {name:'Neptune', c:'#4466cc', r:28},
+  {name:'Mercury', c:'#aaaaaa', r:16},
+  {name:'Venus',   c:'#eecc66', r:22},
+  {name:'Uranus',  c:'#77cccc', r:30},
+  {name:'Pluto',   c:'#bbaa88', r:11},
+  {name:'Sun',     c:'#ffdd44', r:52, glow:true},
+];
 
-function initRocket() {
-  rocketX = W / 2;
-  rocketY = H * 0.6;
-  rocketVY = 0;
-  rocketAngle = 0;
-  rocketScale = Math.min(W, H) / 500;
-}
-initRocket();
+// Rocket (moves on screen same as original)
+let rocketY, rocketVY, boosting = false, boostTimer = 0;
+rocketY = H * 0.55;
+rocketVY = 0;
 
-// --- Particles ---
+// World altitude — fire pushes up, gravity pulls back to Earth
+let altitude = 0;
+
+// Particles
 const particles = [];
 function spawnFlame(x, y) {
-  for (let i = 0; i < 6; i++) {
+  if (particles.length > 100) return;
+  for (let i = 0; i < 4; i++) {
     particles.push({
-      x: x + (Math.random() - 0.5) * 16 * rocketScale,
-      y: y,
-      vx: (Math.random() - 0.5) * 3,
-      vy: Math.random() * 4 + 2,
-      life: 1,
-      size: (Math.random() * 8 + 4) * rocketScale,
-      color: Math.random() > 0.5 ? '#ff6600' : '#ffcc00',
-      type: 'flame'
+      x: x + (Math.random()-0.5)*12*BU, y,
+      vx: (Math.random()-0.5)*2, vy: Math.random()*4+2,
+      life: 1, size: (Math.random()*6+3)*BU,
+      color: Math.random()>0.5 ? '#ff6600' : '#ffcc00'
     });
   }
 }
 
-// --- Celebratory sparkles when rocket reaches top ---
-function spawnSparkles(x, y) {
-  const colors = ['#ff0055', '#ffcc00', '#00ffcc', '#ff6600', '#aa55ff', '#55ff55', '#ff55aa', '#55aaff'];
-  for (let i = 0; i < 25; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 6 + 2;
-    particles.push({
-      x: x, y: y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      life: 1,
-      size: (Math.random() * 6 + 3) * rocketScale,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      type: 'sparkle'
-    });
-  }
-}
-
-// --- Clouds (decorative) ---
-const clouds = [];
-for (let i = 0; i < 5; i++) {
-  clouds.push({
-    x: Math.random() * 3000,
-    y: H * (0.55 + Math.random() * 0.35),
-    w: Math.random() * 200 + 100,
-    speed: Math.random() * 0.3 + 0.1
-  });
-}
-
-// --- Input handling ---
+// Input
 function boost() {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (AC.state === 'suspended') AC.resume();
   boosting = true;
   boostTimer = 8;
   rocketVY = Math.max(rocketVY - 7, -14);
   playBoop();
 }
+window.addEventListener('keydown', e => { e.preventDefault(); boost(); });
+canvas.addEventListener('mousedown', e => { e.preventDefault(); boost(); });
+canvas.addEventListener('touchstart', e => { e.preventDefault(); boost(); }, {passive:false});
 
-// Keyboard
-window.addEventListener('keydown', (e) => {
-  e.preventDefault();
-  boost();
-});
+// World-to-screen: rocket at H*0.45, world scrolls around it
+function wts(worldY) {
+  return H * 0.6 - (worldY - altitude);
+}
 
-// Mouse
-canvas.addEventListener('mousedown', (e) => {
-  e.preventDefault();
-  boost();
-});
-
-// Touch
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  boost();
-}, { passive: false });
-
-// --- Drawing helpers ---
-function drawRocket(x, y, scale, tilt) {
+// Draw rocket (same as original)
+function drawRocket(x, y, sc, tilt) {
   ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(tilt);
-  ctx.scale(scale, scale);
-
-  // Body
+  ctx.translate(x, y); ctx.rotate(tilt); ctx.scale(sc, sc);
   ctx.beginPath();
-  ctx.moveTo(0, -50);
-  ctx.bezierCurveTo(-15, -35, -18, 10, -18, 30);
-  ctx.lineTo(18, 30);
-  ctx.bezierCurveTo(18, 10, 15, -35, 0, -50);
-  ctx.closePath();
-  const bodyGrad = ctx.createLinearGradient(-18, -50, 18, 30);
-  bodyGrad.addColorStop(0, '#ffffff');
-  bodyGrad.addColorStop(0.5, '#e8e8e8');
-  bodyGrad.addColorStop(1, '#cccccc');
-  ctx.fillStyle = bodyGrad;
-  ctx.fill();
-  ctx.strokeStyle = '#999';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Nose cone (red)
+  ctx.moveTo(0,-50); ctx.bezierCurveTo(-15,-35,-18,10,-18,30);
+  ctx.lineTo(18,30); ctx.bezierCurveTo(18,10,15,-35,0,-50); ctx.closePath();
+  const bg = ctx.createLinearGradient(-18,-50,18,30);
+  bg.addColorStop(0,'#fff'); bg.addColorStop(0.5,'#e8e8e8'); bg.addColorStop(1,'#ccc');
+  ctx.fillStyle = bg; ctx.fill();
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5; ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(0, -50);
-  ctx.bezierCurveTo(-8, -42, -12, -30, -14, -22);
-  ctx.lineTo(14, -22);
-  ctx.bezierCurveTo(12, -30, 8, -42, 0, -50);
-  ctx.closePath();
+  ctx.moveTo(0,-50); ctx.bezierCurveTo(-8,-42,-12,-30,-14,-22);
+  ctx.lineTo(14,-22); ctx.bezierCurveTo(12,-30,8,-42,0,-50);
+  ctx.closePath(); ctx.fillStyle = '#ff3344'; ctx.fill();
+  ctx.beginPath(); ctx.arc(0,-5,9,0,6.28);
+  ctx.fillStyle = '#55ccff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(-2,-7,4,0,6.28);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   ctx.fillStyle = '#ff3344';
-  ctx.fill();
-
-  // Window
-  ctx.beginPath();
-  ctx.arc(0, -5, 9, 0, Math.PI * 2);
-  ctx.fillStyle = '#55ccff';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(-2, -7, 4, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fill();
-
-  // Fins
-  ctx.beginPath();
-  ctx.moveTo(-18, 20);
-  ctx.lineTo(-32, 38);
-  ctx.lineTo(-18, 30);
-  ctx.closePath();
-  ctx.fillStyle = '#ff3344';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(18, 20);
-  ctx.lineTo(32, 38);
-  ctx.lineTo(18, 30);
-  ctx.closePath();
-  ctx.fillStyle = '#ff3344';
-  ctx.fill();
-
-  // Stripe
-  ctx.beginPath();
-  ctx.moveTo(-16, 10);
-  ctx.lineTo(16, 10);
-  ctx.lineTo(17, 16);
-  ctx.lineTo(-17, 16);
-  ctx.closePath();
-  ctx.fillStyle = '#ff6600';
-  ctx.fill();
-
+  ctx.beginPath(); ctx.moveTo(-18,20); ctx.lineTo(-32,38); ctx.lineTo(-18,30); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(18,20); ctx.lineTo(32,38); ctx.lineTo(18,30); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-16,10); ctx.lineTo(16,10); ctx.lineTo(17,16); ctx.lineTo(-17,16);
+  ctx.closePath(); ctx.fillStyle = '#ff6600'; ctx.fill();
   ctx.restore();
 }
 
-function drawMoon(x, y, r) {
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = '#ffffcc';
-  ctx.shadowColor = '#ffffcc';
-  ctx.shadowBlur = 30;
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  // Craters
-  ctx.beginPath();
-  ctx.arc(x - r * 0.3, y - r * 0.2, r * 0.15, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(200,200,150,0.5)';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(x + r * 0.25, y + r * 0.25, r * 0.2, 0, Math.PI * 2);
-  ctx.fill();
+function lighten(hex, n) {
+  let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,r+n)},${Math.min(255,g+n)},${Math.min(255,b+n)})`;
 }
 
-// --- Main loop ---
-let lastTime = 0;
-let celebrateTimer = 0;
-let frameCount = 0;
+// Main loop
+let lastTime = 0, frameCount = 0;
 
 function update(time) {
   const dt = Math.min((time - lastTime) / 16.67, 3);
   lastTime = time;
   frameCount++;
 
-  // Recalc scale on every frame (for resize)
-  rocketScale = Math.min(W, H) / 500;
-  if (rocketScale < 0.8) rocketScale = 0.8;
+  const SPACING = Math.max(280, H * 0.7);
+  const MAX_ALT = 10.5 * SPACING;
 
-  // --- Sky gradient (darker at top, slightly lighter at bottom) ---
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-  skyGrad.addColorStop(0, '#050520');
-  skyGrad.addColorStop(0.6, '#0a0a3a');
-  skyGrad.addColorStop(1, '#1a1a5a');
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // --- Stars ---
-  for (const s of stars) {
-    s.twinkle += s.speed;
-    const alpha = 0.4 + Math.sin(s.twinkle) * 0.4;
-    ctx.beginPath();
-    ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,240,${alpha})`;
-    ctx.fill();
-  }
-
-  // --- Moon ---
-  drawMoon(W * 0.82, H * 0.12, Math.min(W, H) * 0.06);
-
-  // --- Clouds ---
-  for (const cloud of clouds) {
-    cloud.x += cloud.speed * dt;
-    if (cloud.x > W + cloud.w) cloud.x = -cloud.w;
-    ctx.beginPath();
-    const cy = cloud.y;
-    ctx.ellipse(cloud.x, cy, cloud.w * 0.5, 20, 0, 0, Math.PI * 2);
-    ctx.ellipse(cloud.x - cloud.w * 0.2, cy - 10, cloud.w * 0.3, 18, 0, 0, Math.PI * 2);
-    ctx.ellipse(cloud.x + cloud.w * 0.2, cy - 8, cloud.w * 0.25, 15, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    ctx.fill();
-  }
-
-  // --- Rocket physics ---
+  // Rocket on-screen physics (same as v1)
   if (boostTimer > 0) {
     boostTimer -= dt;
     rocketVY -= 0.3 * dt;
-    // Flames
-    spawnFlame(rocketX, rocketY + 30 * rocketScale);
-    playWhoosh; // visual only, whoosh already played on tap
-  } else {
-    boosting = false;
-  }
+    spawnFlame(W/2, rocketY + 30*BU);
+  } else boosting = false;
 
-  // Gravity (gentle)
   rocketVY += 0.18 * dt;
   rocketVY = Math.max(-14, Math.min(rocketVY, 6));
   rocketY += rocketVY * dt;
+  if (rocketY < 60*BU) { rocketY = 60*BU; rocketVY = 1; }
+  if (rocketY > H - 40*BU) { rocketY = H - 40*BU; rocketVY = 0; }
 
-  // Gentle wobble
-  rocketAngle = Math.sin(frameCount * 0.03) * 0.05 + (rocketVY * 0.015);
+  // World scroll — fire = climb, no fire = drift back to Earth
+  if (boosting) altitude += 5 * dt;
+  altitude -= 0.6 * dt;
+  if (altitude < 0) altitude = 0;
+  if (altitude > MAX_ALT) altitude = MAX_ALT;
 
-  // Keep rocket in bounds
-  if (rocketY < 60 * rocketScale) {
-    rocketY = 60 * rocketScale;
-    rocketVY = 1;
-    // Celebrate reaching the top!
-    if (celebrateTimer <= 0) {
-      spawnSparkles(rocketX, rocketY);
-      celebrateTimer = 30;
+  // === DRAW ===
+  ctx.fillStyle = '#080822';
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars (parallax with altitude)
+  for (const s of stars) {
+    s.tw += s.sp;
+    const a = 0.3 + Math.sin(s.tw) * 0.35;
+    const sx = s.x % W;
+    const sy = ((s.y + altitude * s.par) % H + H) % H;
+    ctx.beginPath(); ctx.arc(sx, sy, s.r, 0, 6.28);
+    ctx.fillStyle = `rgba(255,255,240,${a})`; ctx.fill();
+  }
+
+  // Earth (big curved surface at world height 0)
+  const earthSY = wts(0);
+  if (earthSY < H + 50) {
+    const eR = W * 3;
+    // Atmosphere glow
+    ctx.beginPath(); ctx.arc(W/2, earthSY + eR, eR + 6, 0, 6.28);
+    ctx.strokeStyle = 'rgba(100,180,255,0.3)'; ctx.lineWidth = 6; ctx.stroke();
+    // Earth body
+    ctx.beginPath(); ctx.arc(W/2, earthSY + eR, eR, 0, 6.28);
+    const eg = ctx.createRadialGradient(W/2 - eR*0.2, earthSY + eR*0.3, eR*0.1, W/2, earthSY + eR, eR);
+    eg.addColorStop(0, '#4488dd');
+    eg.addColorStop(0.3, '#33aa55');
+    eg.addColorStop(0.6, '#2288cc');
+    eg.addColorStop(1, '#0a2244');
+    ctx.fillStyle = eg; ctx.fill();
+    // "Earth" label
+    if (earthSY > H * 0.5) {
+      ctx.font = `bold ${Math.max(14, 20*BU)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText('Earth', W/2, earthSY - 8*BU);
     }
   }
-  if (rocketY > H - 40 * rocketScale) {
-    rocketY = H - 40 * rocketScale;
-    rocketVY = 0;
-  }
-  if (celebrateTimer > 0) celebrateTimer -= dt;
 
-  // Keep X centered-ish (gently drift back)
-  const targetX = W / 2;
-  rocketX += (targetX - rocketX) * 0.01 * dt;
+  // 10 planets at fixed world heights
+  const numF = Math.max(34, Math.min(70, W * 0.1));
+  const nameF = Math.max(14, Math.min(28, W * 0.045));
 
-  // --- Particles ---
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.life -= (p.type === 'flame' ? 0.04 : 0.015) * dt;
-    if (p.type === 'sparkle') p.vy += 0.15 * dt;
-    if (p.life <= 0) { particles.splice(i, 1); continue; }
-    ctx.globalAlpha = p.life;
-    ctx.beginPath();
-    if (p.type === 'sparkle') {
-      // Draw a little star
-      const s = p.size * p.life;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(frameCount * 0.1);
-      for (let j = 0; j < 4; j++) {
-        ctx.rotate(Math.PI / 2);
-        ctx.moveTo(0, 0);
-        ctx.lineTo(s * 0.3, s * 0.3);
-        ctx.lineTo(0, s);
-      }
-      ctx.fillStyle = p.color;
-      ctx.fill();
+  for (let i = 0; i < 10; i++) {
+    const wy = (i + 1) * SPACING;
+    const sy = wts(wy);
+    if (sy < -100 || sy > H + 100) continue;
+
+    const px = (i % 2 === 0) ? W * 0.22 : W * 0.78;
+    const b = bodies[i];
+    const r = b.r * BU;
+
+    // Sun glow
+    if (b.glow) {
+      const gg = ctx.createRadialGradient(px, sy, r*0.5, px, sy, r*2.5);
+      gg.addColorStop(0, 'rgba(255,220,60,0.35)');
+      gg.addColorStop(1, 'rgba(255,220,60,0)');
+      ctx.fillStyle = gg;
+      ctx.fillRect(px-r*2.5, sy-r*2.5, r*5, r*5);
+    }
+
+    // Planet body
+    ctx.beginPath(); ctx.arc(px, sy, r, 0, 6.28);
+    const pg = ctx.createRadialGradient(px-r*0.3, sy-r*0.3, r*0.1, px, sy, r);
+    pg.addColorStop(0, lighten(b.c, 50)); pg.addColorStop(1, b.c);
+    ctx.fillStyle = pg; ctx.fill();
+
+    // Saturn rings
+    if (b.rings) {
+      ctx.beginPath(); ctx.ellipse(px, sy, r*2, r*0.4, -0.25, 0, 6.28);
+      ctx.strokeStyle = '#ccbb77'; ctx.lineWidth = r*0.22; ctx.stroke();
+    }
+    // Jupiter bands
+    if (b.name === 'Jupiter') {
+      ctx.save(); ctx.beginPath(); ctx.arc(px, sy, r, 0, 6.28); ctx.clip();
+      ['#dd9944','#cc8833','#eebb55','#dd9944','#bb7733'].forEach((c,j) => {
+        ctx.fillStyle = c;
+        ctx.fillRect(px-r, sy-r+j*(2*r/5), 2*r, 2*r/5);
+      });
+      ctx.beginPath(); ctx.ellipse(px+r*0.3, sy+r*0.15, r*0.2, r*0.12, 0.2, 0, 6.28);
+      ctx.fillStyle = '#cc4433'; ctx.fill();
       ctx.restore();
-    } else {
-      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
     }
+    // Moon craters
+    if (b.name === 'Moon') {
+      ctx.beginPath(); ctx.arc(px-r*0.3, sy-r*0.2, r*0.17, 0, 6.28);
+      ctx.fillStyle = 'rgba(150,150,120,0.4)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(px+r*0.2, sy+r*0.3, r*0.2, 0, 6.28);
+      ctx.fillStyle = 'rgba(150,150,120,0.35)'; ctx.fill();
+    }
+    // Mars ice cap
+    if (b.name === 'Mars') {
+      ctx.beginPath(); ctx.arc(px, sy-r*0.65, r*0.35, 0, 6.28);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fill();
+    }
+
+    // Number (big, above planet)
+    const near = Math.abs(sy - rocketY) < 80;
+    const pulse = near ? 1 + Math.sin(frameCount*0.08)*0.08 : 1;
+    ctx.font = `bold ${Math.round(numF * pulse)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 4;
+    ctx.strokeText(String(i+1), px, sy - r - 10*BU);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(String(i+1), px, sy - r - 10*BU);
+
+    // Name (below planet)
+    ctx.font = `bold ${nameF}px sans-serif`;
+    ctx.fillStyle = b.c;
+    ctx.fillText(b.name, px, sy + r + nameF + 4*BU);
+  }
+
+  // Particles
+  for (let i = particles.length-1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.life -= 0.04*dt;
+    if (p.life <= 0) { particles.splice(i,1); continue; }
+    ctx.globalAlpha = p.life;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size*p.life, 0, 6.28);
+    ctx.fillStyle = p.color; ctx.fill();
     ctx.globalAlpha = 1;
   }
 
-  // --- Draw rocket ---
-  // Glow when boosting
+  // Rocket
+  const wobble = Math.sin(frameCount*0.03)*0.05 + rocketVY*0.015;
   if (boosting) {
-    ctx.save();
-    ctx.shadowColor = '#ff8800';
-    ctx.shadowBlur = 30 * rocketScale;
-    drawRocket(rocketX, rocketY, rocketScale, rocketAngle);
+    ctx.save(); ctx.shadowColor = '#ff8800'; ctx.shadowBlur = 25*BU;
+    drawRocket(W/2, rocketY, BU, wobble);
     ctx.restore();
   } else {
-    drawRocket(rocketX, rocketY, rocketScale, rocketAngle);
+    drawRocket(W/2, rocketY, BU, wobble);
   }
 
-  // --- Friendly text ---
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.font = `${Math.max(16, Math.min(24, W * 0.035))}px sans-serif`;
+  // Hint
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = `${Math.max(12, 14*BU)}px sans-serif`;
   ctx.textAlign = 'center';
-  const tapText = 'ontouchstart' in window ? 'Tap anywhere!' : 'Press any key or click!';
-  ctx.fillText(tapText, W / 2, H - 20);
+  ctx.fillText('ontouchstart' in window ? 'Tap!' : 'Press any key or click!', W/2, H - 14);
 
   requestAnimationFrame(update);
 }
