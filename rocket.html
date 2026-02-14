@@ -25,136 +25,152 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-// Audio — realistic rocket engine
+// Audio — warm rocket whoosh engine
 const AC = new (window.AudioContext || window.webkitAudioContext)();
 
-// Create noise buffer for engine rumble
-const noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
-const noiseData = noiseBuf.getChannelData(0);
-for (let i = 0; i < noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
+// Pre-warm: start context + sources on very first interaction (before game input)
+let engineReady = false;
+let whooshGain, hissGain, subGain, masterGain;
+let whooshFilter, hissFilter, hpf;
+let subOsc;
+let engineTarget = 0;
 
-// Engine sound graph (always running, gain-controlled)
-const noiseNode = AC.createBufferSource();
-noiseNode.buffer = noiseBuf;
-noiseNode.loop = true;
+function buildEngine() {
+  if (engineReady) return;
+  engineReady = true;
 
-// Low rumble filter
-const lpf = AC.createBiquadFilter();
-lpf.type = 'lowpass';
-lpf.frequency.value = 280;
-lpf.Q.value = 2.5;
+  // Noise buffer (2 sec loop)
+  const buf = AC.createBuffer(2, AC.sampleRate * 2, AC.sampleRate);
+  // Channel 0: brownish noise (warmer, less harsh than white)
+  const d0 = buf.getChannelData(0);
+  let b0 = 0;
+  for (let i = 0; i < d0.length; i++) {
+    b0 = (b0 + (Math.random() * 2 - 1) * 0.06) * 0.98;
+    d0[i] = b0 * 8;
+  }
+  // Channel 1: white noise for hiss layer
+  const d1 = buf.getChannelData(1);
+  for (let i = 0; i < d1.length; i++) d1[i] = Math.random() * 2 - 1;
 
-// Mid crackle filter
-const bpf = AC.createBiquadFilter();
-bpf.type = 'bandpass';
-bpf.frequency.value = 900;
-bpf.Q.value = 1.2;
+  // Whoosh layer: brown noise → lowpass → gain (warm rumble)
+  const whooshSrc = AC.createBufferSource();
+  whooshSrc.buffer = buf;
+  whooshSrc.loop = true;
+  whooshSrc.channelCount = 1;
+  whooshSrc.channelCountMode = 'explicit';
+  const whooshSplit = AC.createChannelSplitter(2);
+  whooshSrc.connect(whooshSplit);
 
-// Sub bass oscillator for deep thrust feel
-const subOsc = AC.createOscillator();
-subOsc.type = 'sawtooth';
-subOsc.frequency.value = 55;
+  whooshFilter = AC.createBiquadFilter();
+  whooshFilter.type = 'lowpass';
+  whooshFilter.frequency.value = 400;
+  whooshFilter.Q.value = 0.7;
 
-// Tremolo LFO for engine texture
-const lfo = AC.createOscillator();
-lfo.type = 'triangle';
-lfo.frequency.value = 18;
-const lfoGain = AC.createGain();
-lfoGain.gain.value = 0.3;
+  whooshGain = AC.createGain();
+  whooshGain.gain.value = 0;
 
-// Gain nodes
-const noiseGainLP = AC.createGain();
-const noiseGainBP = AC.createGain();
-const subGain = AC.createGain();
-const masterGain = AC.createGain();
+  whooshSplit.connect(whooshFilter, 0);
+  whooshFilter.connect(whooshGain);
 
-noiseGainLP.gain.value = 0;
-noiseGainBP.gain.value = 0;
-subGain.gain.value = 0;
-masterGain.gain.value = 0.45;
+  // Hiss layer: white noise → bandpass (airy jet whoosh)
+  hissFilter = AC.createBiquadFilter();
+  hissFilter.type = 'bandpass';
+  hissFilter.frequency.value = 2200;
+  hissFilter.Q.value = 0.5;
 
-// Wire up: noise → lowpass → gain, noise → bandpass → gain, sub osc → gain
-noiseNode.connect(lpf);
-lpf.connect(noiseGainLP);
+  hissGain = AC.createGain();
+  hissGain.gain.value = 0;
 
-const noiseMid = AC.createBufferSource();
-noiseMid.buffer = noiseBuf;
-noiseMid.loop = true;
-noiseMid.connect(bpf);
-bpf.connect(noiseGainBP);
+  whooshSplit.connect(hissFilter, 1);
+  hissFilter.connect(hissGain);
 
-subOsc.connect(subGain);
+  // Sub layer: gentle sine for body (not harsh sawtooth)
+  subOsc = AC.createOscillator();
+  subOsc.type = 'sine';
+  subOsc.frequency.value = 75;
 
-// LFO modulates master gain for texture
-lfo.connect(lfoGain);
-lfoGain.connect(masterGain.gain);
+  subGain = AC.createGain();
+  subGain.gain.value = 0;
+  subOsc.connect(subGain);
 
-// Mix to master
-noiseGainLP.connect(masterGain);
-noiseGainBP.connect(masterGain);
-subGain.connect(masterGain);
-masterGain.connect(AC.destination);
+  // Highpass to clean mud
+  hpf = AC.createBiquadFilter();
+  hpf.type = 'highpass';
+  hpf.frequency.value = 50;
 
-// Start all sources (they run forever, volume-controlled)
-let engineStarted = false;
-function ensureEngine() {
-  if (engineStarted) return;
-  engineStarted = true;
-  noiseNode.start();
-  noiseMid.start();
+  // Master
+  masterGain = AC.createGain();
+  masterGain.gain.value = 0.40;
+
+  whooshGain.connect(hpf);
+  hissGain.connect(hpf);
+  subGain.connect(hpf);
+  hpf.connect(masterGain);
+  masterGain.connect(AC.destination);
+
+  // Start everything now — sound controlled purely by gains
+  whooshSrc.start();
   subOsc.start();
-  lfo.start();
 }
 
-// Target gain for smooth ramping
-let engineTarget = 0;
-const ATTACK = 0.06;   // seconds to ramp up
-const RELEASE = 0.25;  // seconds to fade out
+// Pre-warm on ANY first interaction so there's zero lag on first game tap
+function preWarm() {
+  if (AC.state === 'suspended') AC.resume();
+  buildEngine();
+  document.removeEventListener('pointerdown', preWarm, true);
+  document.removeEventListener('keydown', preWarm, true);
+}
+document.addEventListener('pointerdown', preWarm, true);
+document.addEventListener('keydown', preWarm, true);
+
+const ATK = 0.04;   // 40ms attack — snappy
+const REL = 0.20;   // 200ms release — smooth fade
 
 function engineOn() {
   if (AC.state === 'suspended') AC.resume();
-  ensureEngine();
+  buildEngine();
   engineTarget = 1;
   const t = AC.currentTime;
-  noiseGainLP.gain.cancelScheduledValues(t);
-  noiseGainBP.gain.cancelScheduledValues(t);
+  whooshGain.gain.cancelScheduledValues(t);
+  hissGain.gain.cancelScheduledValues(t);
   subGain.gain.cancelScheduledValues(t);
-  noiseGainLP.gain.setTargetAtTime(0.55, t, ATTACK);
-  noiseGainBP.gain.setTargetAtTime(0.25, t, ATTACK);
-  subGain.gain.setTargetAtTime(0.18, t, ATTACK);
-  lpf.frequency.setTargetAtTime(320, t, ATTACK);
+  whooshGain.gain.setTargetAtTime(0.50, t, ATK);
+  hissGain.gain.setTargetAtTime(0.12, t, ATK);
+  subGain.gain.setTargetAtTime(0.10, t, ATK);
+  whooshFilter.frequency.setTargetAtTime(550, t, ATK);
 }
 
 function engineOff() {
+  if (!engineReady) return;
   engineTarget = 0;
   const t = AC.currentTime;
-  noiseGainLP.gain.cancelScheduledValues(t);
-  noiseGainBP.gain.cancelScheduledValues(t);
+  whooshGain.gain.cancelScheduledValues(t);
+  hissGain.gain.cancelScheduledValues(t);
   subGain.gain.cancelScheduledValues(t);
-  noiseGainLP.gain.setTargetAtTime(0, t, RELEASE);
-  noiseGainBP.gain.setTargetAtTime(0, t, RELEASE);
-  subGain.gain.setTargetAtTime(0, t, RELEASE);
-  lpf.frequency.setTargetAtTime(180, t, RELEASE);
+  whooshGain.gain.setTargetAtTime(0, t, REL);
+  hissGain.gain.setTargetAtTime(0, t, REL);
+  subGain.gain.setTargetAtTime(0, t, REL);
+  whooshFilter.frequency.setTargetAtTime(300, t, REL);
 }
 
-// Impulse punch — short burst layered on top for tap responsiveness
+// Impulse punch — instant snap for responsive taps
 function enginePunch() {
   if (AC.state === 'suspended') AC.resume();
-  ensureEngine();
+  buildEngine();
   const t = AC.currentTime;
-  // Snap gains high immediately for punch
-  noiseGainLP.gain.cancelScheduledValues(t);
-  noiseGainBP.gain.cancelScheduledValues(t);
+  whooshGain.gain.cancelScheduledValues(t);
+  hissGain.gain.cancelScheduledValues(t);
   subGain.gain.cancelScheduledValues(t);
-  noiseGainLP.gain.setValueAtTime(0.7, t);
-  noiseGainBP.gain.setValueAtTime(0.35, t);
-  subGain.gain.setValueAtTime(0.25, t);
-  lpf.frequency.setValueAtTime(450, t);
-  // Quick burst: high-frequency crackle
-  lpf.frequency.setTargetAtTime(320, t + 0.05, 0.08);
-  // Sub thump
-  subOsc.frequency.setValueAtTime(80, t);
-  subOsc.frequency.setTargetAtTime(55, t + 0.04, 0.06);
+  // Snap to peak immediately
+  whooshGain.gain.setValueAtTime(0.60, t);
+  hissGain.gain.setValueAtTime(0.18, t);
+  subGain.gain.setValueAtTime(0.14, t);
+  whooshFilter.frequency.setValueAtTime(700, t);
+  // Settle to sustain
+  whooshFilter.frequency.setTargetAtTime(550, t + 0.03, 0.06);
+  whooshGain.gain.setTargetAtTime(0.50, t + 0.03, 0.06);
+  hissGain.gain.setTargetAtTime(0.12, t + 0.03, 0.06);
+  subGain.gain.setTargetAtTime(0.10, t + 0.03, 0.06);
 }
 
 // Stars
