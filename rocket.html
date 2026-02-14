@@ -219,8 +219,26 @@ function update(time) {
     }
   }
 
+  // Big background numbers — centered, transparent, Star Trek credits style
+  const bigNumF = Math.max(200, Math.min(520, W * 0.7));
+  const bigNameF = Math.max(40, Math.min(100, W * 0.14));
+
+  for (let i = 0; i < 10; i++) {
+    const wy = (i + 1) * SPACING;
+    const sy = wts(wy);
+    if (sy < -200 || sy > H + 200) continue;
+    // Number
+    ctx.font = `bold ${bigNumF}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    ctx.fillText(String(i + 1), W / 2, sy + bigNumF * 0.35);
+    // Planet name
+    ctx.font = `bold ${bigNameF}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.09)';
+    ctx.fillText(bodies[i].name, W / 2, sy + bigNumF * 0.35 + bigNameF * 1.2);
+  }
+
   // 10 planets at fixed world heights
-  const numF = Math.max(34, Math.min(70, W * 0.1));
   const nameF = Math.max(14, Math.min(28, W * 0.045));
 
   for (let i = 0; i < 10; i++) {
@@ -275,16 +293,6 @@ function update(time) {
       ctx.beginPath(); ctx.arc(px, sy-r*0.65, r*0.35, 0, 6.28);
       ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fill();
     }
-
-    // Number (big, above planet)
-    const near = Math.abs(sy - rocketY) < 80;
-    const pulse = near ? 1 + Math.sin(frameCount*0.08)*0.08 : 1;
-    ctx.font = `bold ${Math.round(numF * pulse)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 4;
-    ctx.strokeText(String(i+1), px, sy - r - 10*BU);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(String(i+1), px, sy - r - 10*BU);
 
     // Name (below planet)
     ctx.font = `bold ${nameF}px sans-serif`;
