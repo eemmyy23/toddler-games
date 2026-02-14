@@ -86,16 +86,25 @@ function spawnFlame(x, y) {
 }
 
 // Input
+let holding = false;
+let holdBoopTimer = 0;
 function boost() {
   if (AC.state === 'suspended') AC.resume();
   boosting = true;
   boostTimer = 8;
   rocketVY = Math.max(rocketVY - 2.5, -4.5);
   playBoop();
+  holdBoopTimer = 12;
 }
+function holdStart(e) { e.preventDefault(); holding = true; boost(); }
+function holdEnd(e) { holding = false; }
 window.addEventListener('keydown', e => { e.preventDefault(); boost(); });
-canvas.addEventListener('mousedown', e => { e.preventDefault(); boost(); });
-canvas.addEventListener('touchstart', e => { e.preventDefault(); boost(); }, {passive:false});
+canvas.addEventListener('mousedown', holdStart);
+canvas.addEventListener('mouseup', holdEnd);
+canvas.addEventListener('mouseleave', holdEnd);
+canvas.addEventListener('touchstart', holdStart, {passive:false});
+canvas.addEventListener('touchend', holdEnd);
+canvas.addEventListener('touchcancel', holdEnd);
 
 // World-to-screen: rocket at H*0.45, world scrolls around it
 function wts(worldY) {
@@ -145,7 +154,16 @@ function update(time) {
   const SPACING = Math.max(350, H * 1.1);
   const MAX_ALT = 10.5 * SPACING;
 
-  // Rocket on-screen physics (same as v1)
+  // Hold-to-fire: keep boosting while touch/mouse is held
+  if (holding) {
+    boosting = true;
+    boostTimer = 4;
+    rocketVY = Math.max(rocketVY - 0.35 * dt, -4.5);
+    holdBoopTimer -= dt;
+    if (holdBoopTimer <= 0) { playBoop(); holdBoopTimer = 14; }
+  }
+
+  // Rocket on-screen physics
   if (boostTimer > 0) {
     boostTimer -= dt;
     rocketVY -= 0.1 * dt;
