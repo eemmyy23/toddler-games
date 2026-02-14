@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Rocket! 🚀</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background: #0a0a2e;
+  }
+  canvas {
+    display: block;
+    width: 100%; height: 100%;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// --- Audio (Web Audio API, no files needed) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playBoop() {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.type = 'sine';
+  o.frequency.setValueAtTime(600, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+  g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+  o.start(); o.stop(audioCtx.currentTime + 0.2);
+}
+function playWhoosh() {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(150, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+  g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+  o.start(); o.stop(audioCtx.currentTime + 0.3);
+}
+
+// --- Stars ---
+const stars = [];
+for (let i = 0; i < 120; i++) {
+  stars.push({
+    x: Math.random() * 3000,
+    y: Math.random() * 3000,
+    r: Math.random() * 2.5 + 0.5,
+    twinkle: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.02 + 0.01
+  });
+}
+
+// --- Rocket state ---
+let rocketX, rocketY, rocketVY, rocketAngle, rocketScale;
+let boosting = false;
+let boostTimer = 0;
+
+function initRocket() {
+  rocketX = W / 2;
+  rocketY = H * 0.6;
+  rocketVY = 0;
+  rocketAngle = 0;
+  rocketScale = Math.min(W, H) / 500;
+}
+initRocket();
+
+// --- Particles ---
+const particles = [];
+function spawnFlame(x, y) {
+  for (let i = 0; i < 6; i++) {
+    particles.push({
+      x: x + (Math.random() - 0.5) * 16 * rocketScale,
+      y: y,
+      vx: (Math.random() - 0.5) * 3,
+      vy: Math.random() * 4 + 2,
+      life: 1,
+      size: (Math.random() * 8 + 4) * rocketScale,
+      color: Math.random() > 0.5 ? '#ff6600' : '#ffcc00',
+      type: 'flame'
+    });
+  }
+}
+
+// --- Celebratory sparkles when rocket reaches top ---
+function spawnSparkles(x, y) {
+  const colors = ['#ff0055', '#ffcc00', '#00ffcc', '#ff6600', '#aa55ff', '#55ff55', '#ff55aa', '#55aaff'];
+  for (let i = 0; i < 25; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 6 + 2;
+    particles.push({
+      x: x, y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      size: (Math.random() * 6 + 3) * rocketScale,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      type: 'sparkle'
+    });
+  }
+}
+
+// --- Clouds (decorative) ---
+const clouds = [];
+for (let i = 0; i < 5; i++) {
+  clouds.push({
+    x: Math.random() * 3000,
+    y: H * (0.55 + Math.random() * 0.35),
+    w: Math.random() * 200 + 100,
+    speed: Math.random() * 0.3 + 0.1
+  });
+}
+
+// --- Input handling ---
+function boost() {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  boosting = true;
+  boostTimer = 8;
+  rocketVY = Math.max(rocketVY - 7, -14);
+  playBoop();
+}
+
+// Keyboard
+window.addEventListener('keydown', (e) => {
+  e.preventDefault();
+  boost();
+});
+
+// Mouse
+canvas.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  boost();
+});
+
+// Touch
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  boost();
+}, { passive: false });
+
+// --- Drawing helpers ---
+function drawRocket(x, y, scale, tilt) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(tilt);
+  ctx.scale(scale, scale);
+
+  // Body
+  ctx.beginPath();
+  ctx.moveTo(0, -50);
+  ctx.bezierCurveTo(-15, -35, -18, 10, -18, 30);
+  ctx.lineTo(18, 30);
+  ctx.bezierCurveTo(18, 10, 15, -35, 0, -50);
+  ctx.closePath();
+  const bodyGrad = ctx.createLinearGradient(-18, -50, 18, 30);
+  bodyGrad.addColorStop(0, '#ffffff');
+  bodyGrad.addColorStop(0.5, '#e8e8e8');
+  bodyGrad.addColorStop(1, '#cccccc');
+  ctx.fillStyle = bodyGrad;
+  ctx.fill();
+  ctx.strokeStyle = '#999';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Nose cone (red)
+  ctx.beginPath();
+  ctx.moveTo(0, -50);
+  ctx.bezierCurveTo(-8, -42, -12, -30, -14, -22);
+  ctx.lineTo(14, -22);
+  ctx.bezierCurveTo(12, -30, 8, -42, 0, -50);
+  ctx.closePath();
+  ctx.fillStyle = '#ff3344';
+  ctx.fill();
+
+  // Window
+  ctx.beginPath();
+  ctx.arc(0, -5, 9, 0, Math.PI * 2);
+  ctx.fillStyle = '#55ccff';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-2, -7, 4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fill();
+
+  // Fins
+  ctx.beginPath();
+  ctx.moveTo(-18, 20);
+  ctx.lineTo(-32, 38);
+  ctx.lineTo(-18, 30);
+  ctx.closePath();
+  ctx.fillStyle = '#ff3344';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(18, 20);
+  ctx.lineTo(32, 38);
+  ctx.lineTo(18, 30);
+  ctx.closePath();
+  ctx.fillStyle = '#ff3344';
+  ctx.fill();
+
+  // Stripe
+  ctx.beginPath();
+  ctx.moveTo(-16, 10);
+  ctx.lineTo(16, 10);
+  ctx.lineTo(17, 16);
+  ctx.lineTo(-17, 16);
+  ctx.closePath();
+  ctx.fillStyle = '#ff6600';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawMoon(x, y, r) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffcc';
+  ctx.shadowColor = '#ffffcc';
+  ctx.shadowBlur = 30;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  // Craters
+  ctx.beginPath();
+  ctx.arc(x - r * 0.3, y - r * 0.2, r * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,200,150,0.5)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x + r * 0.25, y + r * 0.25, r * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// --- Main loop ---
+let lastTime = 0;
+let celebrateTimer = 0;
+let frameCount = 0;
+
+function update(time) {
+  const dt = Math.min((time - lastTime) / 16.67, 3);
+  lastTime = time;
+  frameCount++;
+
+  // Recalc scale on every frame (for resize)
+  rocketScale = Math.min(W, H) / 500;
+  if (rocketScale < 0.8) rocketScale = 0.8;
+
+  // --- Sky gradient (darker at top, slightly lighter at bottom) ---
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, '#050520');
+  skyGrad.addColorStop(0.6, '#0a0a3a');
+  skyGrad.addColorStop(1, '#1a1a5a');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // --- Stars ---
+  for (const s of stars) {
+    s.twinkle += s.speed;
+    const alpha = 0.4 + Math.sin(s.twinkle) * 0.4;
+    ctx.beginPath();
+    ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,240,${alpha})`;
+    ctx.fill();
+  }
+
+  // --- Moon ---
+  drawMoon(W * 0.82, H * 0.12, Math.min(W, H) * 0.06);
+
+  // --- Clouds ---
+  for (const cloud of clouds) {
+    cloud.x += cloud.speed * dt;
+    if (cloud.x > W + cloud.w) cloud.x = -cloud.w;
+    ctx.beginPath();
+    const cy = cloud.y;
+    ctx.ellipse(cloud.x, cy, cloud.w * 0.5, 20, 0, 0, Math.PI * 2);
+    ctx.ellipse(cloud.x - cloud.w * 0.2, cy - 10, cloud.w * 0.3, 18, 0, 0, Math.PI * 2);
+    ctx.ellipse(cloud.x + cloud.w * 0.2, cy - 8, cloud.w * 0.25, 15, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fill();
+  }
+
+  // --- Rocket physics ---
+  if (boostTimer > 0) {
+    boostTimer -= dt;
+    rocketVY -= 0.3 * dt;
+    // Flames
+    spawnFlame(rocketX, rocketY + 30 * rocketScale);
+    playWhoosh; // visual only, whoosh already played on tap
+  } else {
+    boosting = false;
+  }
+
+  // Gravity (gentle)
+  rocketVY += 0.18 * dt;
+  rocketVY = Math.max(-14, Math.min(rocketVY, 6));
+  rocketY += rocketVY * dt;
+
+  // Gentle wobble
+  rocketAngle = Math.sin(frameCount * 0.03) * 0.05 + (rocketVY * 0.015);
+
+  // Keep rocket in bounds
+  if (rocketY < 60 * rocketScale) {
+    rocketY = 60 * rocketScale;
+    rocketVY = 1;
+    // Celebrate reaching the top!
+    if (celebrateTimer <= 0) {
+      spawnSparkles(rocketX, rocketY);
+      celebrateTimer = 30;
+    }
+  }
+  if (rocketY > H - 40 * rocketScale) {
+    rocketY = H - 40 * rocketScale;
+    rocketVY = 0;
+  }
+  if (celebrateTimer > 0) celebrateTimer -= dt;
+
+  // Keep X centered-ish (gently drift back)
+  const targetX = W / 2;
+  rocketX += (targetX - rocketX) * 0.01 * dt;
+
+  // --- Particles ---
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= (p.type === 'flame' ? 0.04 : 0.015) * dt;
+    if (p.type === 'sparkle') p.vy += 0.15 * dt;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life;
+    ctx.beginPath();
+    if (p.type === 'sparkle') {
+      // Draw a little star
+      const s = p.size * p.life;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(frameCount * 0.1);
+      for (let j = 0; j < 4; j++) {
+        ctx.rotate(Math.PI / 2);
+        ctx.moveTo(0, 0);
+        ctx.lineTo(s * 0.3, s * 0.3);
+        ctx.lineTo(0, s);
+      }
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.restore();
+    } else {
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // --- Draw rocket ---
+  // Glow when boosting
+  if (boosting) {
+    ctx.save();
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = 30 * rocketScale;
+    drawRocket(rocketX, rocketY, rocketScale, rocketAngle);
+    ctx.restore();
+  } else {
+    drawRocket(rocketX, rocketY, rocketScale, rocketAngle);
+  }
+
+  // --- Friendly text ---
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = `${Math.max(16, Math.min(24, W * 0.035))}px sans-serif`;
+  ctx.textAlign = 'center';
+  const tapText = 'ontouchstart' in window ? 'Tap anywhere!' : 'Press any key or click!';
+  ctx.fillText(tapText, W / 2, H - 20);
+
+  requestAnimationFrame(update);
+}
+
+requestAnimationFrame(update);
+</script>
+</body>
+</html>
