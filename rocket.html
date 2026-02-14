@@ -113,31 +113,35 @@ function buildEngine() {
   subOsc.start();
 }
 
-// Pre-warm on ANY first interaction so there's zero lag on first game tap
-function preWarm() {
-  if (AC.state === 'suspended') AC.resume();
-  buildEngine();
-  document.removeEventListener('pointerdown', preWarm, true);
-  document.removeEventListener('keydown', preWarm, true);
-}
-document.addEventListener('pointerdown', preWarm, true);
-document.addEventListener('keydown', preWarm, true);
-
-const ATK = 0.04;   // 40ms attack — snappy
 const REL = 0.20;   // 200ms release — smooth fade
 
-function engineOn() {
-  if (AC.state === 'suspended') AC.resume();
-  buildEngine();
+// Core: set gains (only call when AC is running)
+function fireEngineSound() {
   engineTarget = 1;
   const t = AC.currentTime;
   whooshGain.gain.cancelScheduledValues(t);
   hissGain.gain.cancelScheduledValues(t);
   subGain.gain.cancelScheduledValues(t);
-  whooshGain.gain.setTargetAtTime(0.50, t, ATK);
-  hissGain.gain.setTargetAtTime(0.12, t, ATK);
-  subGain.gain.setTargetAtTime(0.10, t, ATK);
-  whooshFilter.frequency.setTargetAtTime(550, t, ATK);
+  // Punch: snap to peak
+  whooshGain.gain.setValueAtTime(0.60, t);
+  hissGain.gain.setValueAtTime(0.18, t);
+  subGain.gain.setValueAtTime(0.14, t);
+  whooshFilter.frequency.setValueAtTime(700, t);
+  // Settle to sustain
+  whooshFilter.frequency.setTargetAtTime(550, t + 0.03, 0.06);
+  whooshGain.gain.setTargetAtTime(0.50, t + 0.03, 0.06);
+  hissGain.gain.setTargetAtTime(0.12, t + 0.03, 0.06);
+  subGain.gain.setTargetAtTime(0.10, t + 0.03, 0.06);
+}
+
+// Safe trigger: handles first-tap async resume
+function triggerEngine() {
+  buildEngine();
+  if (AC.state !== 'running') {
+    AC.resume().then(fireEngineSound);
+  } else {
+    fireEngineSound();
+  }
 }
 
 function engineOff() {
@@ -151,26 +155,6 @@ function engineOff() {
   hissGain.gain.setTargetAtTime(0, t, REL);
   subGain.gain.setTargetAtTime(0, t, REL);
   whooshFilter.frequency.setTargetAtTime(300, t, REL);
-}
-
-// Impulse punch — instant snap for responsive taps
-function enginePunch() {
-  if (AC.state === 'suspended') AC.resume();
-  buildEngine();
-  const t = AC.currentTime;
-  whooshGain.gain.cancelScheduledValues(t);
-  hissGain.gain.cancelScheduledValues(t);
-  subGain.gain.cancelScheduledValues(t);
-  // Snap to peak immediately
-  whooshGain.gain.setValueAtTime(0.60, t);
-  hissGain.gain.setValueAtTime(0.18, t);
-  subGain.gain.setValueAtTime(0.14, t);
-  whooshFilter.frequency.setValueAtTime(700, t);
-  // Settle to sustain
-  whooshFilter.frequency.setTargetAtTime(550, t + 0.03, 0.06);
-  whooshGain.gain.setTargetAtTime(0.50, t + 0.03, 0.06);
-  hissGain.gain.setTargetAtTime(0.12, t + 0.03, 0.06);
-  subGain.gain.setTargetAtTime(0.10, t + 0.03, 0.06);
 }
 
 // Stars
@@ -226,8 +210,7 @@ function boost() {
   boosting = true;
   boostTimer = 8;
   rocketVY = Math.max(rocketVY - 2.5, -4.5);
-  enginePunch();
-  engineOn();
+  triggerEngine();
 }
 function holdStart(e) { e.preventDefault(); holding = true; boost(); }
 function holdEnd(e) { holding = false; engineOff(); }
