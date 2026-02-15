@@ -549,6 +549,12 @@ function update(time) {
   const wobble = wobbleMix * (Math.sin(frameCount*0.03)*0.05 + rocketVY*0.015);
   drawRocket(W/2, rocketY, BU, wobble, heatNose, heatTail);
 
+  // Version
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.font = `${Math.max(10, 11*BU)}px sans-serif`;
+  ctx.textAlign = 'left';
+  ctx.fillText('v0.1', 8, Math.max(18, 16*BU));
+
   // Hint
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
   ctx.font = `${Math.max(12, 14*BU)}px sans-serif`;
@@ -560,7 +566,13 @@ function update(time) {
 
 requestAnimationFrame(update);
 
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// Register SW and auto-reload when a new version activates
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  });
+}
 
 // Install prompt
 (function() {
