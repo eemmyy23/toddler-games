@@ -153,11 +153,8 @@ function fireEngineSound() {
 // Safe trigger: build engine on first gesture, then resume + play
 function triggerEngine() {
   buildEngine();
-  if (AC.state !== 'running') {
-    AC.resume().then(fireEngineSound);
-  } else {
-    fireEngineSound();
-  }
+  AC.resume();        // no-op if already running; queues resume otherwise
+  fireEngineSound();  // schedule gains immediately — they apply once AC resumes
 }
 
 function engineOff() {
@@ -553,7 +550,7 @@ function update(time) {
   ctx.fillStyle = 'rgba(255,255,255,0.15)';
   ctx.font = `${Math.max(10, 11*BU)}px sans-serif`;
   ctx.textAlign = 'left';
-  ctx.fillText('v0.1', 8, Math.max(18, 16*BU));
+  ctx.fillText('v0.1.1', 8, Math.max(18, 16*BU));
 
   // Hint
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
