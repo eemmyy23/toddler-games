@@ -13,9 +13,20 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#080822}
 canvas{display:block;width:100%;height:100%}
+#install-bar{position:fixed;top:0;left:0;right:0;z-index:10;display:none;align-items:center;justify-content:center;gap:12px;padding:10px 16px;background:rgba(20,20,60,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.1);font-family:system-ui,sans-serif}
+#install-bar button{border:none;border-radius:8px;padding:8px 18px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation}
+#install-btn{background:#ff5533;color:#fff}
+#install-btn:active{background:#dd3311}
+#dismiss-btn{background:transparent;color:rgba(255,255,255,0.5);font-size:20px;padding:4px 10px;line-height:1}
+#install-msg{color:#eee;font-size:14px}
 </style>
 </head>
 <body>
+<div id="install-bar">
+  <span id="install-msg"></span>
+  <button id="install-btn">Install App</button>
+  <button id="dismiss-btn">&times;</button>
+</div>
 <canvas id="c"></canvas>
 <script>
 const canvas = document.getElementById('c');
@@ -251,6 +262,9 @@ canvas.addEventListener('mouseleave', holdEnd);
 canvas.addEventListener('touchstart', holdStart, {passive:false});
 canvas.addEventListener('touchend', holdEnd);
 canvas.addEventListener('touchcancel', holdEnd);
+// Block install-bar clicks from reaching game
+document.getElementById('install-bar').addEventListener('mousedown', function(e){e.stopPropagation();});
+document.getElementById('install-bar').addEventListener('touchstart', function(e){e.stopPropagation();}, {passive:false});
 
 // World-to-screen: fixed scale so all devices progress at same speed
 function wts(worldY) {
@@ -558,6 +572,60 @@ function update(time) {
 requestAnimationFrame(update);
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+// Install prompt
+(function() {
+  const bar = document.getElementById('install-bar');
+  const btn = document.getElementById('install-btn');
+  const msg = document.getElementById('install-msg');
+  const dismiss = document.getElementById('dismiss-btn');
+  let deferredPrompt = null;
+
+  // Don't show if already installed as PWA
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (navigator.standalone) return; // iOS standalone
+  if (sessionStorage.getItem('install-dismissed')) return;
+
+  // Chrome/Edge: capture the beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    msg.textContent = 'Install Rocket! on your device';
+    bar.style.display = 'flex';
+  });
+
+  // iOS Safari detection — no beforeinstallprompt, show manual hint
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && !navigator.standalone) {
+    setTimeout(function() {
+      if (deferredPrompt) return; // Chrome on iOS won't fire, but just in case
+      msg.innerHTML = 'Tap <strong>Share</strong> then <strong>Add to Home Screen</strong>';
+      btn.style.display = 'none';
+      bar.style.display = 'flex';
+    }, 1500);
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      bar.style.display = 'none';
+    });
+  });
+
+  dismiss.addEventListener('click', function(e) {
+    e.stopPropagation();
+    bar.style.display = 'none';
+    sessionStorage.setItem('install-dismissed', '1');
+  });
+
+  // Hide after successful install
+  window.addEventListener('appinstalled', function() {
+    bar.style.display = 'none';
+  });
+})();
 </script>
 </body>
 </html>
