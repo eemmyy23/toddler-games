@@ -113,6 +113,9 @@ function buildEngine() {
   subOsc.start();
 }
 
+// Build audio graph immediately — nodes ready, just needs resume on first tap
+buildEngine();
+
 const REL = 0.20;   // 200ms release — smooth fade
 
 // Core: set gains (only call when AC is running)
@@ -136,13 +139,21 @@ function fireEngineSound() {
 
 // Safe trigger: handles first-tap async resume
 function triggerEngine() {
-  buildEngine();
   if (AC.state !== 'running') {
     AC.resume().then(fireEngineSound);
   } else {
     fireEngineSound();
   }
 }
+
+// Pre-resume AC on any early interaction so it's ready when game starts
+function preWarm() {
+  AC.resume();
+  window.removeEventListener('pointerdown', preWarm);
+  window.removeEventListener('keydown', preWarm);
+}
+window.addEventListener('pointerdown', preWarm);
+window.addEventListener('keydown', preWarm);
 
 function engineOff() {
   if (!engineReady) return;
