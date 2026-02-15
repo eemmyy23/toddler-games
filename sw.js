@@ -1,4 +1,4 @@
-const CACHE = 'rocket-v1';
+const CACHE = 'rocket-v2';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/manifest.json',
@@ -20,8 +20,15 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// Network-first: always try to get fresh content, fall back to cache offline
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request)
+      .then(r => {
+        const clone = r.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return r;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
