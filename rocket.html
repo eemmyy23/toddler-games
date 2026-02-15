@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Rocket! 🚀</title>
+<link rel="icon" href="icon-192.png" type="image/png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080822">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,10 +42,8 @@ function resize() {
 resize();
 window.addEventListener('resize', resize);
 
-// Audio — warm rocket whoosh engine
-const AC = new (window.AudioContext || window.webkitAudioContext)();
-
-// Pre-warm: start context + sources on very first interaction (before game input)
+// Audio — warm rocket whoosh engine (created on first user gesture)
+let AC = null;
 let engineReady = false;
 let whooshGain, hissGain, subGain, masterGain;
 let whooshFilter, hissFilter, hpf;
@@ -53,6 +52,7 @@ let engineTarget = 0;
 
 function buildEngine() {
   if (engineReady) return;
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
   engineReady = true;
 
   // Noise buffer (2 sec loop)
@@ -129,9 +129,6 @@ function buildEngine() {
   subOsc.start();
 }
 
-// Build audio graph immediately — nodes ready, just needs resume on first tap
-buildEngine();
-
 const REL = 0.20;   // 200ms release — smooth fade
 
 // Core: set gains (only call when AC is running)
@@ -153,8 +150,9 @@ function fireEngineSound() {
   subGain.gain.setTargetAtTime(0.10, t + 0.03, 0.06);
 }
 
-// Safe trigger: handles first-tap async resume
+// Safe trigger: build engine on first gesture, then resume + play
 function triggerEngine() {
+  buildEngine();
   if (AC.state !== 'running') {
     AC.resume().then(fireEngineSound);
   } else {
@@ -162,17 +160,8 @@ function triggerEngine() {
   }
 }
 
-// Pre-resume AC on any early interaction so it's ready when game starts
-function preWarm() {
-  AC.resume();
-  window.removeEventListener('pointerdown', preWarm);
-  window.removeEventListener('keydown', preWarm);
-}
-window.addEventListener('pointerdown', preWarm);
-window.addEventListener('keydown', preWarm);
-
 function engineOff() {
-  if (!engineReady) return;
+  if (!engineReady || !AC) return;
   engineTarget = 0;
   const t = AC.currentTime;
   whooshGain.gain.cancelScheduledValues(t);
