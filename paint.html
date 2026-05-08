@@ -193,6 +193,7 @@ function playChime(yNorm) {
 
 // ====== PAINTING ======
 let painting = false;
+let mouseHeld = false; // left button held → stars-only mode (no paint)
 let lastX = -1, lastY = -1;
 let lastT = 0;
 let hue = Math.random() * 360;
@@ -231,26 +232,38 @@ function pointerMove(x, y) {
 
   if (dist < 0.5) return;
 
-  // Paint a smooth line of color blobs between last and current
-  const steps = Math.max(1, Math.ceil(dist / (4 * BU)));
-  for (let i = 1; i <= steps; i++) {
-    const t = i / steps;
-    const px = lastX + dx * t;
-    const py = lastY + dy * t;
-    paintBlob(px, py, speed);
-    hue = (hue + hueDrift) % 360;
-  }
+  if (mouseHeld) {
+    // Click-and-drag mode: stars only, no paint
+    const stars = Math.max(1, Math.ceil(dist / (12 * BU)));
+    for (let i = 1; i <= stars; i++) {
+      const t = i / stars;
+      const px = lastX + dx * t + (Math.random()-0.5) * 30 * BU;
+      const py = lastY + dy * t + (Math.random()-0.5) * 30 * BU;
+      sparkles.push(makeSparkle(px, py));
+    }
+    hue = (hue + hueDrift * dist * 0.5) % 360;
+  } else {
+    // Hover paint mode: smooth line of color blobs
+    const steps = Math.max(1, Math.ceil(dist / (4 * BU)));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const px = lastX + dx * t;
+      const py = lastY + dy * t;
+      paintBlob(px, py, speed);
+      hue = (hue + hueDrift) % 360;
+    }
 
-  // Random hue jumps for extra rainbow chaos
-  if (Math.random() < 0.04) {
-    hue = (hue + 60 + Math.random() * 90) % 360;
-    burstSparkles(x, y, 6, false);
-    playChime(y / H);
-  }
+    // Random hue jumps for extra rainbow chaos
+    if (Math.random() < 0.04) {
+      hue = (hue + 60 + Math.random() * 90) % 360;
+      burstSparkles(x, y, 6, false);
+      playChime(y / H);
+    }
 
-  // Occasional sparkle along the trail
-  if (Math.random() < 0.18) {
-    sparkles.push(makeSparkle(x + (Math.random()-0.5)*30*BU, y + (Math.random()-0.5)*30*BU));
+    // Occasional sparkle along the trail
+    if (Math.random() < 0.18) {
+      sparkles.push(makeSparkle(x + (Math.random()-0.5)*30*BU, y + (Math.random()-0.5)*30*BU));
+    }
   }
 
   // Add to brush halo trail
@@ -375,22 +388,40 @@ window.addEventListener('touchmove', e => {
 window.addEventListener('touchend', () => { pointerEnd(); lastX = -1; });
 window.addEventListener('touchcancel', () => { pointerEnd(); lastX = -1; });
 
-// First click anywhere also unlocks audio (Safari)
-window.addEventListener('mousedown', () => ensureAudio());
-
-// Clear button
-document.getElementById('clear-btn').addEventListener('click', e => {
-  e.stopPropagation();
+// Mouse buttons: left = stars-only mode, middle = reset canvas
+function resetCanvas() {
   pctx.clearRect(0, 0, W, H);
-  // Celebrate
-  for (let i = 0; i < 30; i++) {
-    sparkles.push(makeSparkle(W/2, H/2));
-    sparkles[sparkles.length-1].vx *= 3;
-    sparkles[sparkles.length-1].vy *= 3;
+  for (let i = 0; i < 40; i++) {
+    const s = makeSparkle(W/2, H/2);
+    s.vx *= 3; s.vy *= 3;
+    sparkles.push(s);
   }
   playChime(0.2);
   setTimeout(() => playChime(0.5), 80);
   setTimeout(() => playChime(0.8), 160);
+}
+window.addEventListener('mousedown', e => {
+  ensureAudio();
+  if (e.button === 1) {
+    e.preventDefault();
+    resetCanvas();
+  } else if (e.button === 0) {
+    mouseHeld = true;
+    burstSparkles(e.clientX, e.clientY, 16, true);
+    playChime(e.clientY / H);
+  }
+});
+window.addEventListener('mouseup', e => {
+  if (e.button === 0) mouseHeld = false;
+});
+// Suppress middle-click autoscroll cursor / right-click menu
+window.addEventListener('auxclick', e => e.preventDefault());
+window.addEventListener('contextmenu', e => e.preventDefault());
+
+// Clear button
+document.getElementById('clear-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  resetCanvas();
 });
 
 // Block install-bar from passing through
@@ -523,7 +554,7 @@ if ('serviceWorker' in navigator) {
 // Version label (tiny, bottom-left)
 window.addEventListener('load', () => {
   const v = document.createElement('div');
-  v.textContent = 'v0.1.0';
+  v.textContent = 'v0.2.0';
   v.style.cssText = 'position:fixed;bottom:6px;left:8px;color:rgba(255,255,255,0.25);font:11px sans-serif;pointer-events:none;z-index:4';
   document.body.appendChild(v);
 });
