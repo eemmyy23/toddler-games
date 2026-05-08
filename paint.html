@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Paint! 🎨</title>
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="manifest" href="manifest-paint.json">
+<meta name="theme-color" content="#000010">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#000010;cursor:none}
+canvas{display:block;width:100%;height:100%;position:absolute;top:0;left:0}
+#clear-btn{position:fixed;top:12px;right:12px;z-index:5;width:54px;height:54px;border-radius:50%;border:none;background:rgba(255,255,255,0.85);font-size:28px;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center}
+#clear-btn:active{background:#fff;transform:scale(0.92)}
+#install-bar{position:fixed;top:0;left:0;right:0;z-index:10;display:none;align-items:center;justify-content:center;gap:12px;padding:10px 16px;background:rgba(20,20,60,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.1);font-family:system-ui,sans-serif}
+#install-bar button{border:none;border-radius:8px;padding:8px 18px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation}
+#install-btn{background:#ff5533;color:#fff}
+#install-btn:active{background:#dd3311}
+#dismiss-btn{background:transparent;color:rgba(255,255,255,0.5);font-size:20px;padding:4px 10px;line-height:1}
+#install-msg{color:#eee;font-size:14px}
+</style>
+</head>
+<body>
+<div id="install-bar">
+  <span id="install-msg"></span>
+  <button id="install-btn">Install App</button>
+  <button id="dismiss-btn">&times;</button>
+</div>
+<canvas id="paint"></canvas>
+<canvas id="fx"></canvas>
+<button id="clear-btn" aria-label="Clear">🧽</button>
+<script>
+// Two canvases: paint (persistent strokes) + fx (sparkles, brush cursor)
+const paintCanvas = document.getElementById('paint');
+const fxCanvas = document.getElementById('fx');
+const pctx = paintCanvas.getContext('2d');
+const fctx = fxCanvas.getContext('2d');
+
+let W, H, BU;
+function resize() {
+  // Save existing painting before resize
+  const old = pctx.getImageData(0, 0, paintCanvas.width || 1, paintCanvas.height || 1);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  BU = Math.min(W, H) / 500;
+  if (BU < 0.7) BU = 0.7;
+  paintCanvas.width = W; paintCanvas.height = H;
+  fxCanvas.width = W; fxCanvas.height = H;
+  // Restore (best-effort: top-left aligned)
+  if (old.width > 1) pctx.putImageData(old, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ====== AUDIO ======
+let AC = null;
+let audioReady = false;
+let voiceGain, voiceOsc, voiceOsc2, voiceLfo, voiceLfoGain, voiceFilter, masterGain;
+let chimeGain;
+let voiceTarget = 0;
+
+// Pentatonic scale (C major pentatonic) so any pitch sounds happy
+const PENTATONIC = [
+  130.81, 146.83, 164.81, 196.00, 220.00, // C3 D3 E3 G3 A3
+  261.63, 293.66, 329.63, 392.00, 440.00, // C4 D4 E4 G4 A4
+  523.25, 587.33, 659.25, 783.99, 880.00, // C5 D5 E5 G5 A5
+  1046.50, 1174.66, 1318.51              // C6 D6 E6
+];
+
+function buildAudio() {
+  if (audioReady) return;
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  audioReady = true;
+
+  // Main voice — soft dual sine for a singing pad
+  voiceOsc = AC.createOscillator();
+  voiceOsc.type = 'sine';
+  voiceOsc.frequency.value = 440;
+
+  voiceOsc2 = AC.createOscillator();
+  voiceOsc2.type = 'triangle';
+  voiceOsc2.frequency.value = 440;
+  voiceOsc2.detune.value = 7; // subtle chorus
+
+  // Vibrato
+  voiceLfo = AC.createOscillator();
+  voiceLfo.type = 'sine';
+  voiceLfo.frequency.value = 5.5;
+  voiceLfoGain = AC.createGain();
+  voiceLfoGain.gain.value = 4;
+  voiceLfo.connect(voiceLfoGain);
+  voiceLfoGain.connect(voiceOsc.frequency);
+  voiceLfoGain.connect(voiceOsc2.frequency);
+
+  // Soft lowpass to keep it cute, not piercing
+  voiceFilter = AC.createBiquadFilter();
+  voiceFilter.type = 'lowpass';
+  voiceFilter.frequency.value = 2400;
+  voiceFilter.Q.value = 0.6;
+
+  voiceGain = AC.createGain();
+  voiceGain.gain.value = 0;
+
+  voiceOsc.connect(voiceFilter);
+  voiceOsc2.connect(voiceFilter);
+  voiceFilter.connect(voiceGain);
+
+  // Chime bus (for sparkle pings)
+  chimeGain = AC.createGain();
+  chimeGain.gain.value = 1;
+
+  masterGain = AC.createGain();
+  masterGain.gain.value = 0.35;
+
+  voiceGain.connect(masterGain);
+  chimeGain.connect(masterGain);
+  masterGain.connect(AC.destination);
+
+  voiceOsc.start();
+  voiceOsc2.start();
+  voiceLfo.start();
+}
+
+function snapToPentatonic(freq) {
+  let best = PENTATONIC[0], bd = Infinity;
+  for (const f of PENTATONIC) {
+    const d = Math.abs(Math.log(f) - Math.log(freq));
+    if (d < bd) { bd = d; best = f; }
+  }
+  return best;
+}
+
+function setVoice(yNorm, speed) {
+  if (!audioReady) return;
+  // y=0 (top) → high pitch; y=1 (bottom) → low pitch
+  const minF = 180, maxF = 1100;
+  const targetF = minF * Math.pow(maxF / minF, 1 - yNorm);
+  const snapped = snapToPentatonic(targetF);
+  const t = AC.currentTime;
+  voiceOsc.frequency.cancelScheduledValues(t);
+  voiceOsc2.frequency.cancelScheduledValues(t);
+  voiceOsc.frequency.setTargetAtTime(snapped, t, 0.04);
+  voiceOsc2.frequency.setTargetAtTime(snapped, t, 0.04);
+
+  const targetGain = Math.min(0.18, 0.04 + speed * 0.012);
+  voiceGain.gain.cancelScheduledValues(t);
+  voiceGain.gain.setTargetAtTime(targetGain, t, 0.05);
+  voiceTarget = 1;
+}
+
+function silenceVoice() {
+  if (!audioReady) return;
+  const t = AC.currentTime;
+  voiceGain.gain.cancelScheduledValues(t);
+  voiceGain.gain.setTargetAtTime(0, t, 0.15);
+  voiceTarget = 0;
+}
+
+function playChime(yNorm) {
+  if (!audioReady) return;
+  const t = AC.currentTime;
+  const baseF = snapToPentatonic(300 * Math.pow(3.5, 1 - yNorm));
+  const o = AC.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(baseF, t);
+  o.frequency.exponentialRampToValueAtTime(baseF * 1.5, t + 0.6);
+  const g = AC.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.18, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+  o.connect(g);
+  g.connect(chimeGain);
+  o.start(t);
+  o.stop(t + 0.6);
+
+  // Add a sparkle harmonic
+  const o2 = AC.createOscillator();
+  o2.type = 'sine';
+  o2.frequency.setValueAtTime(baseF * 2, t);
+  const g2 = AC.createGain();
+  g2.gain.setValueAtTime(0, t);
+  g2.gain.linearRampToValueAtTime(0.06, t + 0.02);
+  g2.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+  o2.connect(g2);
+  g2.connect(chimeGain);
+  o2.start(t);
+  o2.stop(t + 0.45);
+}
+
+// ====== PAINTING ======
+let painting = false;
+let lastX = -1, lastY = -1;
+let lastT = 0;
+let hue = Math.random() * 360;
+let hueDrift = 0.8 + Math.random() * 0.6; // degrees per pixel of motion
+let strokeUntil = 0; // timestamp until which we keep voice on after motion stops
+const sparkles = [];
+const trail = []; // recent brush positions for the cursor halo
+
+function ensureAudio() {
+  buildAudio();
+  if (AC && AC.state !== 'running') AC.resume();
+}
+
+function pointerStart(x, y) {
+  ensureAudio();
+  painting = true;
+  lastX = x; lastY = y;
+  lastT = performance.now();
+  // Big sparkle burst on first touch
+  burstSparkles(x, y, 14, true);
+  playChime(y / H);
+}
+
+function pointerMove(x, y) {
+  const now = performance.now();
+  if (!painting) {
+    // Mouse-only mode: paint just from movement (no click required)
+    if (lastX < 0) { lastX = x; lastY = y; lastT = now; }
+    painting = true;
+    ensureAudio();
+  }
+  const dx = x - lastX, dy = y - lastY;
+  const dist = Math.hypot(dx, dy);
+  const dt = Math.max(1, now - lastT);
+  const speed = dist / dt * 16; // pixels per frame-ish
+
+  if (dist < 0.5) return;
+
+  // Paint a smooth line of color blobs between last and current
+  const steps = Math.max(1, Math.ceil(dist / (4 * BU)));
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const px = lastX + dx * t;
+    const py = lastY + dy * t;
+    paintBlob(px, py, speed);
+    hue = (hue + hueDrift) % 360;
+  }
+
+  // Random hue jumps for extra rainbow chaos
+  if (Math.random() < 0.04) {
+    hue = (hue + 60 + Math.random() * 90) % 360;
+    burstSparkles(x, y, 6, false);
+    playChime(y / H);
+  }
+
+  // Occasional sparkle along the trail
+  if (Math.random() < 0.18) {
+    sparkles.push(makeSparkle(x + (Math.random()-0.5)*30*BU, y + (Math.random()-0.5)*30*BU));
+  }
+
+  // Add to brush halo trail
+  trail.push({x, y, t: now});
+  while (trail.length > 12) trail.shift();
+
+  setVoice(y / H, speed);
+  strokeUntil = now + 140;
+
+  lastX = x; lastY = y; lastT = now;
+}
+
+function pointerEnd() {
+  painting = false;
+  // voice silences naturally via the idle check in the render loop
+}
+
+function paintBlob(x, y, speed) {
+  const r = (8 + Math.min(18, speed * 0.6)) * BU;
+  // Soft fluffy color blob with radial gradient
+  const grd = pctx.createRadialGradient(x, y, 0, x, y, r);
+  grd.addColorStop(0, `hsla(${hue}, 95%, 65%, 0.95)`);
+  grd.addColorStop(0.55, `hsla(${(hue+25)%360}, 95%, 55%, 0.7)`);
+  grd.addColorStop(1, `hsla(${(hue+50)%360}, 95%, 50%, 0)`);
+  pctx.fillStyle = grd;
+  pctx.beginPath();
+  pctx.arc(x, y, r, 0, 6.2832);
+  pctx.fill();
+
+  // Crisp inner dot for richness
+  pctx.fillStyle = `hsla(${hue}, 100%, 75%, 0.9)`;
+  pctx.beginPath();
+  pctx.arc(x, y, r * 0.32, 0, 6.2832);
+  pctx.fill();
+}
+
+function makeSparkle(x, y) {
+  return {
+    x, y,
+    vx: (Math.random()-0.5) * 3,
+    vy: (Math.random()-0.5) * 3 - 0.5,
+    life: 1,
+    size: (3 + Math.random() * 5) * BU,
+    hue: Math.random() * 360,
+    spin: Math.random() * 6.28,
+    spinSpeed: (Math.random() - 0.5) * 0.3
+  };
+}
+
+function burstSparkles(x, y, n, big) {
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * 6.28 + Math.random() * 0.4;
+    const sp = (big ? 4 : 2.5) + Math.random() * 2;
+    sparkles.push({
+      x, y,
+      vx: Math.cos(ang) * sp,
+      vy: Math.sin(ang) * sp,
+      life: 1,
+      size: ((big ? 5 : 3) + Math.random() * 4) * BU,
+      hue: (hue + Math.random() * 360) % 360,
+      spin: Math.random() * 6.28,
+      spinSpeed: (Math.random() - 0.5) * 0.4
+    });
+  }
+}
+
+function drawSparkle(ctx, s) {
+  ctx.save();
+  ctx.translate(s.x, s.y);
+  ctx.rotate(s.spin);
+  ctx.globalAlpha = s.life;
+  ctx.fillStyle = `hsl(${s.hue}, 100%, 75%)`;
+  // 4-point star
+  ctx.beginPath();
+  const r1 = s.size, r2 = s.size * 0.35;
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * 6.2832;
+    const r = (i % 2 === 0) ? r1 : r2;
+    if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  ctx.closePath();
+  ctx.fill();
+  // Glow
+  ctx.globalAlpha = s.life * 0.5;
+  ctx.fillStyle = `hsla(${s.hue}, 100%, 85%, 0.7)`;
+  ctx.beginPath();
+  ctx.arc(0, 0, s.size * 0.6, 0, 6.2832);
+  ctx.fill();
+  ctx.restore();
+}
+
+// ====== INPUT ======
+// Mouse: paint on movement WITHOUT click
+window.addEventListener('mousemove', e => {
+  pointerMove(e.clientX, e.clientY);
+});
+window.addEventListener('mouseleave', () => {
+  pointerEnd();
+});
+window.addEventListener('mouseenter', e => {
+  // Reset last position so we don't draw a long line in from offscreen
+  lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+});
+
+// Touch: paint while finger is down (no click distinction)
+fxCanvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  pointerStart(t.clientX, t.clientY);
+}, { passive: false });
+paintCanvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  pointerStart(t.clientX, t.clientY);
+}, { passive: false });
+window.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  if (t) pointerMove(t.clientX, t.clientY);
+}, { passive: false });
+window.addEventListener('touchend', () => { pointerEnd(); lastX = -1; });
+window.addEventListener('touchcancel', () => { pointerEnd(); lastX = -1; });
+
+// First click anywhere also unlocks audio (Safari)
+window.addEventListener('mousedown', () => ensureAudio());
+
+// Clear button
+document.getElementById('clear-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  pctx.clearRect(0, 0, W, H);
+  // Celebrate
+  for (let i = 0; i < 30; i++) {
+    sparkles.push(makeSparkle(W/2, H/2));
+    sparkles[sparkles.length-1].vx *= 3;
+    sparkles[sparkles.length-1].vy *= 3;
+  }
+  playChime(0.2);
+  setTimeout(() => playChime(0.5), 80);
+  setTimeout(() => playChime(0.8), 160);
+});
+
+// Block install-bar from passing through
+document.getElementById('install-bar').addEventListener('mousedown', e => e.stopPropagation());
+document.getElementById('install-bar').addEventListener('touchstart', e => e.stopPropagation(), { passive: false });
+
+// ====== RENDER LOOP ======
+let cursorX = -100, cursorY = -100;
+window.addEventListener('mousemove', e => { cursorX = e.clientX; cursorY = e.clientY; });
+window.addEventListener('touchmove', e => {
+  const t = e.touches[0]; if (t) { cursorX = t.clientX; cursorY = t.clientY; }
+});
+
+function frame() {
+  const now = performance.now();
+
+  // Idle voice fade
+  if (now > strokeUntil && voiceTarget === 1) silenceVoice();
+
+  // Clear FX canvas (sparkles + cursor halo redraw each frame)
+  fctx.clearRect(0, 0, W, H);
+
+  // Brush halo trail
+  for (let i = 0; i < trail.length; i++) {
+    const tp = trail[i];
+    const age = (now - tp.t) / 300; // 0..1+
+    if (age > 1) continue;
+    const a = (1 - age) * 0.4;
+    fctx.beginPath();
+    fctx.arc(tp.x, tp.y, (10 + i * 1.2) * BU * (1 - age * 0.5), 0, 6.28);
+    fctx.fillStyle = `hsla(${(hue + i * 10) % 360}, 100%, 70%, ${a})`;
+    fctx.fill();
+  }
+
+  // Cursor — fluffy rainbow ring so kids see where the brush is
+  if (cursorX > -50) {
+    const pulse = 1 + Math.sin(now * 0.008) * 0.12;
+    const cr = 18 * BU * pulse;
+    fctx.save();
+    for (let i = 0; i < 6; i++) {
+      fctx.beginPath();
+      fctx.arc(cursorX, cursorY, cr - i * 1.5 * BU, 0, 6.28);
+      fctx.strokeStyle = `hsla(${(hue + i * 50) % 360}, 100%, 70%, 0.7)`;
+      fctx.lineWidth = 2 * BU;
+      fctx.stroke();
+    }
+    // Center white dot
+    fctx.beginPath();
+    fctx.arc(cursorX, cursorY, 3 * BU, 0, 6.28);
+    fctx.fillStyle = '#fff';
+    fctx.fill();
+    fctx.restore();
+  }
+
+  // Update + draw sparkles
+  for (let i = sparkles.length - 1; i >= 0; i--) {
+    const s = sparkles[i];
+    s.x += s.vx;
+    s.y += s.vy;
+    s.vy += 0.05; // gentle gravity
+    s.vx *= 0.985;
+    s.vy *= 0.985;
+    s.spin += s.spinSpeed;
+    s.life -= 0.012;
+    if (s.life <= 0) { sparkles.splice(i, 1); continue; }
+    drawSparkle(fctx, s);
+  }
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ====== PWA ======
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  });
+}
+
+(function() {
+  const bar = document.getElementById('install-bar');
+  const btn = document.getElementById('install-btn');
+  const msg = document.getElementById('install-msg');
+  const dismiss = document.getElementById('dismiss-btn');
+  let deferredPrompt = null;
+
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (navigator.standalone) return;
+  if (sessionStorage.getItem('install-dismissed')) return;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    msg.textContent = 'Install Paint! on your device';
+    bar.style.display = 'flex';
+  });
+
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && !navigator.standalone) {
+    setTimeout(function() {
+      if (deferredPrompt) return;
+      msg.innerHTML = 'Tap <strong>Share</strong> then <strong>Add to Home Screen</strong>';
+      btn.style.display = 'none';
+      bar.style.display = 'flex';
+    }, 1500);
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      bar.style.display = 'none';
+    });
+  });
+
+  dismiss.addEventListener('click', function(e) {
+    e.stopPropagation();
+    bar.style.display = 'none';
+    sessionStorage.setItem('install-dismissed', '1');
+  });
+
+  window.addEventListener('appinstalled', function() {
+    bar.style.display = 'none';
+  });
+})();
+
+// Version label (tiny, bottom-left)
+window.addEventListener('load', () => {
+  const v = document.createElement('div');
+  v.textContent = 'v0.1.0';
+  v.style.cssText = 'position:fixed;bottom:6px;left:8px;color:rgba(255,255,255,0.25);font:11px sans-serif;pointer-events:none;z-index:4';
+  document.body.appendChild(v);
+});
+</script>
+</body>
+</html>
