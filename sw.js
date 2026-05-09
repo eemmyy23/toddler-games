@@ -1,11 +1,13 @@
-const CACHE = 'toddler-v5';
+const CACHE = 'toddler-v6';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
   '/toddler-games/manifest.json',
   '/toddler-games/manifest-paint.json',
   '/toddler-games/icon-192.png',
-  '/toddler-games/icon-512.png'
+  '/toddler-games/icon-512.png',
+  '/toddler-games/paint-icon-192.png',
+  '/toddler-games/paint-icon-512.png'
 ];
 
 self.addEventListener('install', e => {

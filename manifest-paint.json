@@ -1,21 +1,25 @@
 {
+  "id": "/toddler-games/paint.html",
   "name": "Paint!",
   "short_name": "Paint",
   "start_url": "/toddler-games/paint.html",
+  "scope": "/toddler-games/",
   "display": "fullscreen",
   "orientation": "any",
   "background_color": "#000010",
   "theme_color": "#000010",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "paint-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "paint-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
