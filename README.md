@@ -10,6 +10,9 @@ Tiny, no-instructions web games for very small children. Each one is a single se
 - 🎨 **Paint!** — [eemmyy23.github.io/toddler-games/paint.html](https://eemmyy23.github.io/toddler-games/paint.html)
   Move the mouse — no clicking needed — to paint the canvas in rainbow colors. **Hold left-click** to spray stars instead of paint. **Middle-click** (or the sponge button) resets the canvas. Touch-drag paints the same way. Pitched musical voice follows the brush, with sparkle bursts and chime pings.
 
+- 🏙️ **Skyscraper!** — [eemmyy23.github.io/toddler-games/skyscraper.html](https://eemmyy23.github.io/toddler-games/skyscraper.html)
+  A crane swings a floor back and forth — press any key (or tap) to drop it. Every drop lands (off-center drops are pulled back), so the tower always grows. The sky goes day → sunset → night (windows light up) → space. Fireworks every 10 floors; the 🔄 button knocks the tower down to start again.
+
 ## Installing
 
 Each game is a Progressive Web App. Open the link, then use your browser's "Install" / "Add to Home Screen" prompt to run it fullscreen offline.
