@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Skyscraper! 🏙️</title>
+<link rel="icon" href="skyscraper-icon-192.png" type="image/png">
+<link rel="manifest" href="manifest-skyscraper.json">
+<meta name="theme-color" content="#5ec8ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Skyscraper!">
+<link rel="apple-touch-icon" href="skyscraper-icon-192.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;background:#5ec8ff}
+canvas{display:block;width:100%;height:100%;position:absolute;top:0;left:0}
+#reset-btn{position:fixed;top:12px;right:12px;z-index:5;width:54px;height:54px;border-radius:50%;border:none;background:rgba(255,255,255,0.85);font-size:28px;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center}
+#reset-btn:active{background:#fff;transform:scale(0.92)}
+#install-bar{position:fixed;top:0;left:0;right:0;z-index:10;display:none;align-items:center;justify-content:center;gap:12px;padding:10px 16px;background:rgba(20,20,60,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,0.1);font-family:system-ui,sans-serif}
+#install-bar button{border:none;border-radius:8px;padding:8px 18px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation}
+#install-btn{background:#ff5533;color:#fff}
+#install-btn:active{background:#dd3311}
+#dismiss-btn{background:transparent;color:rgba(255,255,255,0.5);font-size:20px;padding:4px 10px;line-height:1}
+#install-msg{color:#eee;font-size:14px}
+</style>
+</head>
+<body>
+<div id="install-bar">
+  <span id="install-msg"></span>
+  <button id="install-btn">Install App</button>
+  <button id="dismiss-btn">&times;</button>
+</div>
+<canvas id="game"></canvas>
+<button id="reset-btn" aria-label="New tower">🔄</button>
+<script>
+// Skyscraper! — any key / tap drops the swinging floor. Every drop lands (no fail state):
+// off-center drops are pulled halfway back so the tower always grows.
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+let W, H, DPR, BW, BH, GROUND;
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  BW = Math.min(W * 0.36, 230);
+  BH = BW * 0.42;
+  GROUND = H * 0.86;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = ['#ff5a5f','#ffb400','#3ec46d','#2d9cdb','#9b51e0','#ff7eb6','#00c2b8','#ff8c42'];
+// Pentatonic C major — every landing note sounds happy
+const NOTES = [261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99,880.00];
+
+// ====== STATE ======
+// Block x is stored in BW units relative to screen center, so resize keeps the tower intact.
+let blocks, hanging, falling, camY, camTarget, particles, debris, t, banner, colorIdx;
+function newGame() {
+  blocks = [];
+  falling = null;
+  camY = camTarget = 0;
+  particles = [];
+  banner = null;
+  colorIdx = 0;
+  spawnHanging(0);
+}
+function spawnHanging(delay) {
+  hanging = { color: COLORS[colorIdx++ % COLORS.length], lit: litPattern(), appear: -delay };
+}
+function litPattern() { const a = []; for (let i = 0; i < 8; i++) a.push(Math.random() < 0.6); return a; }
+debris = [];
+t = 0;
+newGame();
+
+// world height h (px above ground) -> screen y
+const sy = h => GROUND - h + camY;
+const sx = u => W / 2 + u * BW;
+const topX = () => blocks.length ? blocks[blocks.length - 1].x : 0;
+const swingX = () => Math.sin(t * 1.5) * 0.85;          // in BW units
+const hangY = () => Math.max(70, H * 0.2);               // screen y of hanging block top
+
+// ====== AUDIO ======
+let AC = null, master = null;
+function audio() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.4; master.connect(AC.destination);
+  }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(freq, start, dur, type, vol, endFreq) {
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, start);
+  if (endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, start + dur);
+  g.gain.setValueAtTime(0, start);
+  g.gain.linearRampToValueAtTime(vol, start + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+  o.connect(g); g.connect(master); o.start(start); o.stop(start + dur + 0.05);
+}
+function soundDrop() { if (!AC) return; tone(700, AC.currentTime, 0.35, 'sine', 0.12, 250); }
+function soundLand(n, perfect) {
+  if (!AC) return;
+  const now = AC.currentTime;
+  tone(120, now, 0.25, 'sine', 0.5, 50);                                     // thud
+  tone(NOTES[n % NOTES.length], now + 0.04, 0.5, 'triangle', 0.22);          // climbing note
+  if (perfect) tone(NOTES[(n + 4) % NOTES.length] * 2, now + 0.12, 0.6, 'sine', 0.12);
+}
+function soundFanfare() {
+  if (!AC) return;
+  const now = AC.currentTime;
+  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, now + 0.25 + i * 0.12, 0.6, 'triangle', 0.2));
+}
+function soundCrash() {
+  if (!AC) return;
+  const now = AC.currentTime;
+  for (let i = 0; i < 6; i++) tone(200 - i * 20, now + i * 0.07, 0.3, 'square', 0.06, 60);
+}
+
+// ====== INPUT ======
+function drop() {
+  audio();
+  if (falling || debris.length || hanging.appear < 0.1) return;
+  falling = { x: swingX(), y: hangY(), vy: 0, color: hanging.color, lit: hanging.lit };
+  hanging = null;
+  soundDrop();
+}
+window.addEventListener('keydown', e => { if (!e.repeat) drop(); });
+canvas.addEventListener('pointerdown', e => { e.preventDefault(); drop(); });
+document.getElementById('reset-btn').addEventListener('click', e => { e.stopPropagation(); audio(); demolish(); });
+
+function demolish() {
+  if (!blocks.length || debris.length) return;
+  soundCrash();
+  debris = blocks.map((b, i) => ({
+    x: sx(b.x), y: sy((i + 1) * BH), vx: (Math.random() - 0.5) * 10, vy: -Math.random() * 6,
+    rot: 0, vr: (Math.random() - 0.5) * 0.2, color: b.color, lit: b.lit
+  }));
+  blocks = []; falling = null; hanging = null;
+  setTimeout(() => { debris = []; newGame(); }, 1600);
+}
+
+// ====== LANDING ======
+function land(f) {
+  let off = f.x - topX();
+  const perfect = Math.abs(off) < 0.1;
+  off = Math.max(-0.35, Math.min(0.35, off * 0.5));      // forgiving: pull halfway back
+  let x = topX() + off;
+  x *= 0.75;                                             // gently drift back toward center
+  if (perfect) x = topX() * 0.75;
+  blocks.push({ x, color: f.color, lit: f.lit, squash: 1 });
+  const n = blocks.length;
+  const y = sy(n * BH) + BH;
+  burst(sx(x), y, perfect ? 24 : 12, perfect);
+  soundLand(n - 1, perfect);
+  camTarget = Math.max(0, n * BH - (GROUND - H * 0.55));
+  if (n % 10 === 0) {
+    banner = { n, life: 2.2 };
+    soundFanfare();
+    for (let i = 0; i < 5; i++) setTimeout(() => firework(W * (0.15 + Math.random() * 0.7), H * (0.15 + Math.random() * 0.3)), i * 220);
+  }
+  spawnHanging(0.2);
+}
+
+// ====== PARTICLES ======
+function burst(x, y, count, stars) {
+  for (let i = 0; i < count; i++) {
+    const a = Math.PI + Math.random() * Math.PI;
+    const s = 2 + Math.random() * 4;
+    particles.push({ x, y, vx: Math.cos(a) * s * 1.6, vy: Math.sin(a) * s, life: 1,
+      color: stars ? COLORS[i % COLORS.length] : 'rgba(255,255,255,0.8)', star: stars, size: 3 + Math.random() * 4 });
+  }
+}
+function firework(x, y) {
+  const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2, s = 3 + Math.random() * 3;
+    particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 1.3, color: c, star: true, size: 4 });
+  }
+  if (AC) tone(900 + Math.random() * 600, AC.currentTime, 0.3, 'sine', 0.08, 300);
+}
+
+// ====== DRAWING ======
+// Sky changes with height: day → sunset → night → space
+const SKY = [
+  [0,  ['#5ec8ff', '#c8f0ff']],
+  [15, ['#3f8fe0', '#ffd27a']],
+  [28, ['#5b3c9e', '#ff8a5c']],
+  [42, ['#141a4a', '#4a3a8a']],
+  [60, ['#02020f', '#0c0c2e']]
+];
+function lerpColor(a, b, k) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const r = ((pa >> 16) & 255) + (((pb >> 16) & 255) - ((pa >> 16) & 255)) * k;
+  const g = ((pa >> 8) & 255) + (((pb >> 8) & 255) - ((pa >> 8) & 255)) * k;
+  const bl = (pa & 255) + ((pb & 255) - (pa & 255)) * k;
+  return `rgb(${r | 0},${g | 0},${bl | 0})`;
+}
+function skyAt(level) {
+  for (let i = 0; i < SKY.length - 1; i++) {
+    const [l0, c0] = SKY[i], [l1, c1] = SKY[i + 1];
+    if (level <= l1) {
+      const k = Math.max(0, (level - l0) / (l1 - l0));
+      return [lerpColor(c0[0], c1[0], k), lerpColor(c0[1], c1[1], k), k + i];
+    }
+  }
+  const last = SKY[SKY.length - 1][1];
+  return [last[0], last[1], SKY.length - 1];
+}
+
+// Deterministic scenery so it doesn't flicker
+const rand = s => { const x = Math.sin(s * 12.9898) * 43758.5453; return x - Math.floor(x); };
+
+function drawSky() {
+  const level = camY / BH;
+  const [top, bottom, phase] = skyAt(level);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, top); g.addColorStop(1, bottom);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  // stars fade in from night on
+  const starA = Math.max(0, Math.min(1, phase - 2.3));
+  if (starA > 0) {
+    for (let i = 0; i < 120; i++) {
+      const x = rand(i) * W, y = ((rand(i + 500) * H * 2 + camY * 0.1) % (H * 1.2)) - H * 0.1;
+      const tw = 0.6 + 0.4 * Math.sin(t * 3 + i);
+      ctx.fillStyle = `rgba(255,255,255,${starA * tw})`;
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+  // sun (day) → moon (night), parallax
+  const sunY = H * 0.18 + camY * 0.05;
+  if (sunY < H + 60) {
+    ctx.fillStyle = phase < 2.5 ? 'rgba(255,230,90,0.95)' : 'rgba(240,240,255,0.95)';
+    ctx.beginPath(); ctx.arc(W * 0.18, sunY, 34, 0, Math.PI * 2); ctx.fill();
+  }
+  // clouds at fixed world heights, parallax 0.6
+  const cloudA = Math.max(0, 1 - Math.max(0, phase - 2.5));
+  if (cloudA > 0) {
+    for (let i = 0; i < 40; i++) {
+      const wy = 120 + i * 140;
+      const y = GROUND - wy + camY * 0.6;
+      if (y < -60 || y > H + 60) continue;
+      const x = ((rand(i + 99) * (W + 300) + t * (8 + rand(i) * 10)) % (W + 300)) - 150;
+      drawCloud(x, y, 0.7 + rand(i + 7) * 0.7, cloudA);
+    }
+  }
+  // planets once in space
+  const spaceA = Math.max(0, Math.min(1, phase - 3.2));
+  if (spaceA > 0) {
+    ctx.globalAlpha = spaceA;
+    ctx.fillStyle = '#e08850'; ctx.beginPath(); ctx.arc(W * 0.82, H * 0.3, 40, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#f5d3a0'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(W * 0.82, H * 0.3, 66, 14, -0.3, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+function drawCloud(x, y, s, a) {
+  ctx.fillStyle = `rgba(255,255,255,${0.85 * a})`;
+  ctx.beginPath();
+  ctx.arc(x, y, 22 * s, 0, Math.PI * 2);
+  ctx.arc(x + 26 * s, y - 10 * s, 28 * s, 0, Math.PI * 2);
+  ctx.arc(x + 56 * s, y, 22 * s, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawGround() {
+  const y = sy(0);
+  if (y > H + 10) return;
+  // little city silhouette
+  ctx.fillStyle = 'rgba(60,80,130,0.35)';
+  for (let i = 0; i < 14; i++) {
+    const w = W / 14, h = 30 + rand(i + 3) * 80;
+    if (Math.abs(i * w + w / 2 - W / 2) < BW) continue;
+    ctx.fillRect(i * w + 3, y - h, w - 6, h);
+  }
+  ctx.fillStyle = '#5bbf4a'; ctx.fillRect(0, y, W, H);
+  ctx.fillStyle = '#4aa83b'; ctx.fillRect(0, y, W, 8);
+  // foundation
+  ctx.fillStyle = '#8a8a8a'; ctx.fillRect(W / 2 - BW * 0.6, y - 6, BW * 1.2, 12);
+}
+
+function drawBlock(x, y, color, lit, night, squash) {
+  const w = BW, h = BH;
+  ctx.save();
+  ctx.translate(x, y + h);
+  ctx.scale(1 + (squash || 0) * 0.12, 1 - (squash || 0) * 0.12);
+  ctx.translate(-w / 2, -h);
+  ctx.fillStyle = color;
+  roundRect(0, 0, w, h, 6); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(0, h - 6, w, 6);   // floor line
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(0, 0, w, 5);  // top highlight
+  // 4 windows
+  const ww = w * 0.14, wh = h * 0.45, gap = (w - ww * 4) / 5;
+  for (let i = 0; i < 4; i++) {
+    const on = night > 0.5 ? lit[i] : false;
+    ctx.fillStyle = on ? '#ffe36b' : (night > 0.5 ? '#2a2f55' : '#bfe8ff');
+    roundRect(gap + i * (ww + gap), h * 0.22, ww, wh, 3); ctx.fill();
+  }
+  ctx.restore();
+}
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+function drawCrane(night) {
+  const hx = sx(swingX());
+  const jibY = 22;
+  // jib
+  ctx.fillStyle = '#ffc61a';
+  ctx.fillRect(0, jibY - 6, W, 12);
+  ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2;
+  for (let x = 0; x < W; x += 24) { ctx.beginPath(); ctx.moveTo(x, jibY - 6); ctx.lineTo(x + 12, jibY + 6); ctx.lineTo(x + 24, jibY - 6); ctx.stroke(); }
+  // trolley
+  ctx.fillStyle = '#444'; ctx.fillRect(hx - 16, jibY + 4, 32, 12);
+  if (!hanging) return;
+  const k = Math.min(1, Math.max(0, hanging.appear) / 0.3);   // lower in after spawning
+  const by = jibY + 16 + (hangY() - jibY - 16) * k;
+  ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(hx, jibY + 16); ctx.lineTo(hx, by - 10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(hx, by - 10); ctx.lineTo(hx - BW * 0.4, by); ctx.moveTo(hx, by - 10); ctx.lineTo(hx + BW * 0.4, by); ctx.stroke();
+  drawBlock(hx, by, hanging.color, hanging.lit, night, 0);
+}
+
+function drawRoofLight(night) {
+  if (!blocks.length) return;
+  const b = blocks[blocks.length - 1];
+  const x = sx(b.x), y = sy(blocks.length * BH);
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - 26); ctx.stroke();
+  const on = Math.sin(t * 5) > 0;
+  ctx.fillStyle = on ? '#ff3030' : '#802020';
+  ctx.beginPath(); ctx.arc(x, y - 28, 6, 0, Math.PI * 2); ctx.fill();
+  if (on && night > 0.3) {
+    ctx.fillStyle = 'rgba(255,60,60,0.25)';
+    ctx.beginPath(); ctx.arc(x, y - 28, 18, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function drawCounter() {
+  const n = blocks.length;
+  if (!n) return;
+  ctx.font = `bold ${Math.round(Math.min(W, H) * 0.09)}px system-ui, sans-serif`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.lineWidth = 6; ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.strokeText(n, 16, 46); ctx.fillStyle = '#fff'; ctx.fillText(n, 16, 46);
+  if (banner) {
+    const a = Math.min(1, banner.life);
+    const s = 1 + (2.2 - banner.life) * 0.15;
+    ctx.save();
+    ctx.globalAlpha = a; ctx.translate(W / 2, H * 0.42); ctx.scale(s, s);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = `bold ${Math.round(Math.min(W, H) * 0.22)}px system-ui, sans-serif`;
+    ctx.lineWidth = 10; ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.strokeText(banner.n, 0, 0); ctx.fillStyle = '#ffe36b'; ctx.fillText(banner.n, 0, 0);
+    ctx.restore();
+  }
+}
+
+function drawStar(x, y, r) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+    ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+  }
+  ctx.closePath(); ctx.fill();
+}
+
+// ====== LOOP ======
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  t += dt;
+  const f60 = dt * 60;
+
+  if (hanging) hanging.appear += dt;
+  camY += (camTarget - camY) * Math.min(1, dt * 4);
+  if (banner && (banner.life -= dt) <= 0) banner = null;
+
+  const night = Math.max(0, Math.min(1, (skyAt(camY / BH)[2] - 1.8)));
+
+  drawSky();
+  drawGround();
+  // tower (only draw visible floors)
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    const y = sy((i + 1) * BH);
+    if (b.squash > 0) b.squash = Math.max(0, b.squash - dt * 4);
+    if (y > H || y < -BH) continue;
+    drawBlock(sx(b.x), y, b.color, b.lit, night, b.squash);
+  }
+  drawRoofLight(night);
+
+  if (falling) {
+    falling.vy += 0.9 * f60;
+    falling.y += falling.vy * f60;
+    const landY = sy((blocks.length + 1) * BH);
+    if (falling.y >= landY) { const f = falling; falling = null; land(f); }
+    else drawBlock(sx(falling.x), falling.y, falling.color, falling.lit, night, 0);
+  }
+
+  for (let i = debris.length - 1; i >= 0; i--) {
+    const d = debris[i];
+    d.vy += 0.6 * f60; d.x += d.vx * f60; d.y += d.vy * f60; d.rot += d.vr * f60;
+    ctx.save(); ctx.translate(d.x, d.y + BH / 2); ctx.rotate(d.rot); ctx.translate(-d.x, -d.y - BH / 2);
+    drawBlock(d.x, d.y, d.color, d.lit, night, 0);
+    ctx.restore();
+  }
+  if (debris.length && camY > 0) camTarget = 0;
+
+  drawCrane(night);
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.vy += 0.15 * f60; p.x += p.vx * f60; p.y += p.vy * f60; p.vx *= 0.98;
+    p.life -= dt * 1.2;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.globalAlpha = Math.min(1, p.life);
+    ctx.fillStyle = p.color;
+    if (p.star) drawStar(p.x, p.y, p.size * 1.5);
+    else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+  }
+  ctx.globalAlpha = 1;
+
+  drawCounter();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ====== PWA ======
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    window.location.reload();
+  });
+}
+
+(function() {
+  const bar = document.getElementById('install-bar');
+  const btn = document.getElementById('install-btn');
+  const msg = document.getElementById('install-msg');
+  const dismiss = document.getElementById('dismiss-btn');
+  let deferredPrompt = null;
+
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (navigator.standalone) return;
+  if (sessionStorage.getItem('install-dismissed')) return;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    msg.textContent = 'Install Skyscraper! on your device';
+    bar.style.display = 'flex';
+  });
+
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && !navigator.standalone) {
+    setTimeout(function() {
+      if (deferredPrompt) return;
+      msg.innerHTML = 'Tap <strong>Share</strong> then <strong>Add to Home Screen</strong>';
+      btn.style.display = 'none';
+      bar.style.display = 'flex';
+    }, 1500);
+  }
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      bar.style.display = 'none';
+    });
+  });
+
+  dismiss.addEventListener('click', function(e) {
+    e.stopPropagation();
+    bar.style.display = 'none';
+    sessionStorage.setItem('install-dismissed', '1');
+  });
+
+  window.addEventListener('appinstalled', function() {
+    bar.style.display = 'none';
+  });
+})();
+
+// Version label (tiny, bottom-left)
+window.addEventListener('load', () => {
+  const v = document.createElement('div');
+  v.textContent = 'v0.1.0';
+  v.style.cssText = 'position:fixed;bottom:6px;left:8px;color:rgba(255,255,255,0.35);font:11px sans-serif;pointer-events:none;z-index:4';
+  document.body.appendChild(v);
+});
+</script>
+</body>
+</html>
