@@ -67,7 +67,27 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 #dismiss-btn{background:transparent;color:rgba(255,255,255,0.5);font-size:20px}
 #install-msg{color:#eee;font-size:14px}
 #ver{position:fixed;bottom:6px;left:8px;color:rgba(255,255,255,0.25);font:11px sans-serif;pointer-events:none;z-index:4}
-@media (max-width:440px){#bar{padding-left:8px;padding-right:8px;gap:4px}.tbtn{min-width:48px;padding:0 10px;font-size:20px}#stars{min-width:0;padding:0 2px;font-size:20px}}
+/* Count mode */
+#count{display:none;position:absolute;inset:0;top:130px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:0 10px 90px}
+@media (min-width:760px){#count{top:80px}}
+#ctools{position:sticky;top:0;z-index:2;display:flex;justify-content:center;gap:10px;padding:6px 0 10px;background:linear-gradient(#251a5e 70%,transparent)}
+#ctools button{border:none;border-radius:30px;height:50px;padding:0 18px;font:inherit;font-size:24px;font-weight:700;color:#fff;background:rgba(255,255,255,0.15);cursor:pointer;touch-action:manipulation}
+#ctools button.on{background:#ffcc33;color:#3a2a8a}
+.crow{display:flex;align-items:center;gap:12px;margin:0 auto 10px;max-width:900px;padding:8px 12px;border-radius:24px;background:rgba(255,255,255,0.07);cursor:pointer;transition:background .2s,transform .2s}
+.crow.active{background:rgba(255,204,51,0.22);transform:scale(1.02)}
+.cnum{flex:0 0 auto;width:1.6em;text-align:center;font-size:56px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,0.25)}
+.citems{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;font-size:34px;line-height:1.1;min-height:60px}
+.citem{display:inline-block;transition:transform .2s,filter .2s;filter:grayscale(.35) brightness(.8)}
+.citem.lit{filter:none;transform:scale(1.35) translateY(-6px)}
+.citem.done{filter:none}
+.hand{width:84px;height:100px}
+.hand .f{fill:#f1c9a5;stroke:#b07c5a;stroke-width:2;transition:fill .2s}
+.hand .f.lit{fill:#ffcc33}
+.hand .f.done{fill:#ffe08a}
+.cword{margin-left:auto;font-size:22px;font-weight:700;opacity:.8;padding-left:8px}
+@media (max-width:440px){.cnum{font-size:44px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:81px}.cword{display:none}}
+@media (max-width:759px){#stars{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;height:42px;line-height:42px;min-width:0;padding:0 4px;font-size:20px}}
+@media (max-width:440px){#bar{padding-left:8px;padding-right:8px;gap:4px}.tbtn{min-width:44px;padding:0 8px;font-size:20px}.flag{width:50px}#flags{gap:10px}}
 </style>
 </head>
 <body>
@@ -75,9 +95,10 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <div class="group">
     <button class="tbtn on" id="m-learn" aria-label="Learn">📖</button>
     <button class="tbtn" id="m-play" aria-label="Play">🎈</button>
+    <button class="tbtn" id="m-count" aria-label="Count">🧮</button>
   </div>
   <div id="stars">⭐ 0</div>
-  <div class="group">
+  <div class="group" id="setgrp">
     <button class="tbtn on" id="s-abc">ABC</button>
     <button class="tbtn" id="s-123">123</button>
   </div>
@@ -99,6 +120,14 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
     <div id="choices"></div>
   </div>
 </div>
+<div id="count">
+  <div id="ctools">
+    <button id="c-obj" class="on" aria-label="Objects">🍓</button>
+    <button id="c-hand" aria-label="Fingers">✋</button>
+    <button id="c-all" aria-label="Count all">▶ 1→10</button>
+  </div>
+  <div id="crows"></div>
+</div>
 <button class="nav" id="prev" aria-label="Previous">◀</button>
 <button class="nav" id="next" aria-label="Next">▶</button>
 <canvas id="fx"></canvas>
@@ -108,7 +137,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.3.1</div>
+<div id="ver">v0.4.0</div>
 
 <script>
 // ====== DATA ======
@@ -183,7 +212,7 @@ function buildSets(code) {
   const numbers = L.nums.map((w, i) => ({
     ch: String(i + 1), key: i === 9 ? '0' : String(i + 1), word: w, pic: NUMPICS[i], n: i + 1,
     hue: ((i + 1) * 36) % 360, name: w,
-    say: `${w}. ${L.nums.slice(0, i + 1).join(', ')}!`
+    say: `${w}!`
   }));
   return { abc: letters, num: numbers };
 }
@@ -422,10 +451,110 @@ function render() {
   document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
   document.documentElement.lang = LANGS[lang].html;
   $('learn').style.display = mode === 'learn' ? 'flex' : 'none';
+  $('m-count').classList.toggle('on', mode === 'count');
+  $('setgrp').style.visibility = mode === 'count' ? 'hidden' : 'visible';
   $('play').style.display = mode === 'play' ? 'flex' : 'none';
+  $('count').style.display = mode === 'count' ? 'block' : 'none';
+  $('stage').style.display = mode === 'count' ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
-  if (mode === 'learn') showLearn(started); else { target = null; newRound(); }
+  stopCount();
+  if (mode === 'learn') showLearn(started);
+  else if (mode === 'play') { target = null; newRound(); }
+  else renderCount();
 }
+// ====== COUNT MODE ======
+// One page with 1–10; tap a row to count it aloud item by item (objects or fingers).
+let countStyle = store.get('cstyle', 'obj'); // 'obj' | 'hand'
+let countTimers = [];
+function stopCount() {
+  countTimers.forEach(clearTimeout); countTimers = [];
+  document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
+  document.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
+}
+function sayNow(text) { // queue a short utterance without cancelling the previous one
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  if (voice) u.voice = voice;
+  u.lang = voice ? voice.lang : LANGS[lang].tts;
+  u.rate = 1; u.pitch = 1.25;
+  speechSynthesis.speak(u);
+}
+// Hand SVG: thumb first (as counted in RO/DE), then index, middle, ring, pinky. raised = how many are up.
+const FINGERS = [ // [x, y-top when raised, width, height when raised]
+  [4, 44, 14, 34],  // thumb (left side, lower)
+  [22, 6, 13, 52], [37, 2, 13, 56], [52, 6, 13, 52], [67, 16, 12, 42]
+];
+function handSVG(raised) {
+  let f = '';
+  FINGERS.forEach(([x, y, w, h], i) => {
+    const up = i < raised;
+    if (i === 0) { // thumb: sticks out at an angle when up, tucked away (hidden) when down
+      if (up) f += `<rect class="f cf" x="6" y="30" width="15" height="46" rx="7.5" transform="rotate(-32 14 76)"/>`;
+      return;
+    }
+    const yy = up ? y : 50, hh = up ? h : 12;
+    f += `<rect class="f${up ? ' cf' : ''}" x="${x}" y="${yy}" width="${w}" height="${hh + 14}" rx="${w / 2}"/>`;
+  });
+  return `<svg class="hand" viewBox="-14 0 98 100">${f}<rect class="f" x="18" y="52" width="62" height="44" rx="16"/></svg>`;
+}
+function renderCount() {
+  $('c-obj').classList.toggle('on', countStyle === 'obj');
+  $('c-hand').classList.toggle('on', countStyle === 'hand');
+  const nums = SETS.num;
+  $('crows').innerHTML = nums.map(it => {
+    let items;
+    if (countStyle === 'obj') items = Array.from({ length: it.n }, () => `<span class="citem cu">${it.pic}</span>`).join('');
+    else items = it.n <= 5 ? handSVG(it.n) : handSVG(5) + handSVG(it.n - 5);
+    return `<div class="crow" data-n="${it.n}"><div class="cnum" style="color:hsl(${it.hue},90%,65%)">${it.ch}</div>` +
+           `<div class="citems">${items}</div><div class="cword">${it.word}</div></div>`;
+  }).join('');
+  document.querySelectorAll('.crow').forEach(r => r.addEventListener('click', () => { ensureAudio(); countRow(+r.dataset.n); }));
+}
+const STEP = 750;
+// Count one row: highlight + say each item. Returns duration in ms.
+function countRow(n, startAt = 0, finale = true) {
+  if (startAt === 0) { stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  const row = document.querySelector(`.crow[data-n="${n}"]`);
+  if (!row) return 0;
+  const units = [...row.querySelectorAll(countStyle === 'obj' ? '.cu' : '.cf')];
+  units.forEach(u => u.classList.remove('lit', 'done'));
+  const words = LANGS[lang].nums;
+  countTimers.push(setTimeout(() => {
+    document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
+    row.classList.add('active');
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, startAt));
+  units.forEach((u, i) => countTimers.push(setTimeout(() => {
+    units.forEach(x => x.classList.remove('lit'));
+    u.classList.add('lit', 'done');
+    sayNow(words[i]); sfx.pop();
+  }, startAt + 300 + i * STEP)));
+  const end = startAt + 300 + n * STEP;
+  if (finale) countTimers.push(setTimeout(() => {
+    units.forEach(x => x.classList.remove('lit'));
+    const r = row.querySelector('.cnum').getBoundingClientRect();
+    confetti(r.left + r.width / 2, r.top + r.height / 2, 30, 7);
+    sfx.right();
+    sayNow(`${words[n - 1]}!`);
+  }, end));
+  return end + (finale ? 900 : 0);
+}
+// Count all rows 1→10: one number per row ("one", "two", …) — not counting each row from one.
+function countAll() {
+  stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel();
+  const words = LANGS[lang].nums;
+  document.querySelectorAll('.citem,.f').forEach(e => e.classList.remove('done'));
+  words.forEach((w, i) => countTimers.push(setTimeout(() => {
+    const row = document.querySelector(`.crow[data-n="${i + 1}"]`);
+    document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
+    row.classList.add('active');
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.querySelectorAll('.cu,.cf').forEach(e => e.classList.add('done'));
+    sayNow(w); sfx.pop();
+  }, i * 1000)));
+  countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, words.length * 1000));
+}
+
 function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
 function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
 function setLang(l) {
@@ -450,6 +579,10 @@ function tapBtn(id, fn) {
 }
 tapBtn('m-learn', () => setMode('learn'));
 tapBtn('m-play', () => setMode('play'));
+tapBtn('m-count', () => setMode('count'));
+tapBtn('c-obj', () => { countStyle = 'obj'; store.set('cstyle', 'obj'); stopCount(); sfx.pop(); renderCount(); });
+tapBtn('c-hand', () => { countStyle = 'hand'; store.set('cstyle', 'hand'); stopCount(); sfx.pop(); renderCount(); });
+tapBtn('c-all', () => countAll());
 tapBtn('s-abc', () => setSet('abc'));
 tapBtn('s-123', () => setSet('num'));
 tapBtn('prev', () => step(-1));
@@ -474,6 +607,11 @@ addEventListener('keydown', e => {
   if (k === 'arrowleft')  { if (mode === 'learn') step(-1); return; }
   if (e.repeat) return;
   const isLetter = /^\p{L}$/u.test(k), isDigit = /^[0-9]$/.test(k);
+  if (mode === 'count') {
+    if (isDigit) { ensureAudio(); countRow(k === '0' ? 10 : +k); }
+    else if (k === ' ' || k === 'enter') { e.preventDefault(); ensureAudio(); countAll(); }
+    return;
+  }
   if (!isLetter && !isDigit) {
     if (k === ' ' || k === 'enter') { e.preventDefault(); if (mode === 'learn') step(1); else speak(askLine()); }
     return;
