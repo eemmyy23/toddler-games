@@ -1,4 +1,4 @@
-const CACHE = 'toddler-v15';
+const CACHE = 'toddler-v16';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
@@ -32,7 +32,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' }) // revalidate with server: new deploys show on next load
       .then(r => {
         const clone = r.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
