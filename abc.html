@@ -139,7 +139,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.5.1</div>
+<div id="ver">v0.5.2</div>
 
 <script>
 // ====== DATA ======
@@ -182,8 +182,9 @@ const LANGS = {
       ['ge','Geantă','👜'],['gi','Girafă','🦒'],['ghe','Gheață','🧊'],['ghi','Ghiozdan','🎒']
     ],
     // Spoken as the SOUND (bă, că, fă), not the alphabet name (be, ce, fe)
-    spell: c => ({ A:'a', Ă:'ă', Â:'â', E:'e', I:'i', Î:'î', O:'o', U:'u', K:'că', Q:'chiu', W:'dublu v', X:'ics', Y:'i grec' })[c]
-               || c.toLocaleLowerCase('ro') + 'ă',
+    // School sound form from DOOM (bî, cî, dî …); vowels as-is; k/q/w/x/y by name
+    spell: c => ({ A:'a', Ă:'ă', Â:'â', E:'e', I:'i', Î:'î', O:'o', U:'u', K:'ca', Q:'chiu', W:'dublu ve', X:'ics', Y:'i grec' })[c]
+               || c.toLocaleLowerCase('ro') + 'î',
     sayLetter: (c, w, like) => like ? `${c}, ca în ${w}!` : `${c}, de la ${w}!`,
     showWord: (w, like) => like ? `ca în ${w}` : w,
     find: 'Găsește',
