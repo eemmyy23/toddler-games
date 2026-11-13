@@ -140,14 +140,14 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.5.4</div>
+<div id="ver">v0.5.5</div>
 
 <script>
 // ====== DATA ======
 // Letter rows: [letter, word, emoji, like?]  like=true → letter is inside the word, not first ("X like in fox")
 const LANGS = {
   en: {
-    tts: 'en-US', html: 'en',
+    tts: 'en-US', html: 'en', langName: 'English',
     letters: [
       ['A','Apple','🍎'],['B','Ball','⚽'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Elephant','🐘'],
       ['F','Fish','🐟'],['G','Grapes','🍇'],['H','House','🏠'],['I','Ice cream','🍦'],['J','Juice','🧃'],
@@ -166,7 +166,7 @@ const LANGS = {
     wow: n => `Well done! You have ${n} stars!`
   },
   ro: {
-    tts: 'ro-RO', html: 'ro',
+    tts: 'ro-RO', html: 'ro', langName: 'Română',
     letters: [
       ['A','Albină','🐝'],['Ă','mașină','🚗',1],['Â','câine','🐕',1],['B','Banană','🍌'],['C','Cal','🐴'],
       ['D','Delfin','🐬'],['E','Elefant','🐘'],['F','Fluture','🦋'],['G','Gunoi','🗑️'],['H','Hipopotam','🦛'],
@@ -195,7 +195,7 @@ const LANGS = {
     wow: n => `Bravo! Ai ${n} ${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}steluțe!`
   },
   de: {
-    tts: 'de-DE', html: 'de',
+    tts: 'de-DE', html: 'de', langName: 'Deutsch',
     letters: [
       ['A','Apfel','🍎'],['Ä','Ähre','🌾'],['B','Ball','⚽'],['C','Clown','🤡'],['D','Delfin','🐬'],
       ['E','Elefant','🐘'],['F','Fisch','🐟'],['G','Gurke','🥒'],['H','Haus','🏠'],['I','Igel','🦔'],
@@ -607,7 +607,7 @@ function countAll() {
 function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
 function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
 function setLang(l) {
-  if (l === lang) { sfx.pop(); render(); return; } // tap current flag → repeat
+  if (l === lang) { sfx.pop(); render(); announceLang(); return; } // tap current flag → repeat
   const oldLearn = items()[idx], oldTarget = target, oldOpts = curOpts;
   const scroll = $('count').scrollTop;
   lang = l; store.set('lang', l); SETS = buildSets(l); pickVoice();
@@ -629,6 +629,14 @@ function setLang(l) {
   if (!keepRound) target = null;
   sfx.pop(); render(); keepRound = false;
   if (mode === 'count') $('count').scrollTop = scroll;
+  announceLang();
+}
+// Say the language name in that language, then the current item ("Română. a, de la albină!")
+function announceLang() {
+  const name = LANGS[lang].langName;
+  if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
+  else if (mode === 'play' && target) speak(`${name}. ${askLine()}`, 250);
+  else speak(`${name}!`, 120);
 }
 document.querySelectorAll('.flag').forEach(f =>
   f.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); setLang(f.dataset.lang); }));
