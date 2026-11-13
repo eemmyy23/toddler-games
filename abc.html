@@ -77,15 +77,16 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 #ctools button.on{background:#ffcc33;color:#3a2a8a}
 .crow{display:flex;align-items:center;gap:12px;margin:0 auto 10px;max-width:900px;padding:8px 12px;border-radius:24px;background:rgba(255,255,255,0.07);cursor:pointer;transition:background .2s,transform .2s}
 .crow.active{background:rgba(255,204,51,0.22);transform:scale(1.02)}
-.cnum{flex:0 0 auto;width:1.6em;text-align:center;font-size:56px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,0.25)}
+.cnum{flex:0 0 auto;width:96px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.cdig{font-size:56px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,0.25)}
 .citems{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;font-size:34px;line-height:1.1;min-height:60px}
 .citem{display:inline-block;text-align:center}
 .citems.obj{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 10px;align-items:center}
 .hand{width:84px;height:96px;filter:drop-shadow(0 3px 0 rgba(0,0,0,0.22))}
 .crow.active .citem,.crow.active .hand{animation:wig .7s ease}
 @keyframes wig{30%{transform:translateY(-10px) rotate(-6deg)}60%{transform:translateY(-4px) rotate(5deg)}}
-.cword{margin-left:auto;font-size:22px;font-weight:700;opacity:.8;padding-left:8px}
-@media (max-width:440px){.cnum{font-size:44px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}.cword{display:none}}
+.cword{font-size:20px;font-weight:700;color:#fff;opacity:.9;white-space:nowrap}
+@media (max-width:440px){.cnum{width:76px}.cdig{font-size:44px}.cword{font-size:17px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}}
 @media (max-width:759px){#stars{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;height:42px;line-height:42px;min-width:0;padding:0 4px;font-size:20px}}
 @media (max-width:440px){#bar{padding-left:8px;padding-right:8px;gap:4px}.tbtn{min-width:44px;padding:0 8px;font-size:20px}.flag{width:50px}#flags{gap:10px}}
 @media (max-width:340px){.tbtn{min-width:40px;padding:0 6px}.group:not(#flags){gap:3px;padding:4px}}
@@ -139,7 +140,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.5.3</div>
+<div id="ver">v0.5.4</div>
 
 <script>
 // ====== DATA ======
@@ -572,8 +573,8 @@ function renderCount() {
     const items = countStyle === 'obj'
       ? Array.from({ length: it.n }, () => `<span class="citem">${it.pic}</span>`).join('')
       : it.n <= 5 ? handSVG(it.n, false) : handSVG(5, false) + handSVG(it.n - 5, true);
-    return `<div class="crow" data-n="${it.n}"><div class="cnum" style="color:hsl(${it.hue},90%,65%)">${it.ch}</div>` +
-           `<div class="citems${countStyle === 'obj' ? ' obj' : ''}">${items}</div><div class="cword">${it.word}</div></div>`;
+    return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:hsl(${it.hue},90%,65%)">${it.ch}</div><div class="cword">${it.word}</div></div>` +
+           `<div class="citems${countStyle === 'obj' ? ' obj' : ''}">${items}</div></div>`;
   }).join('');
   document.querySelectorAll('.crow').forEach(r => r.addEventListener('click', () => { ensureAudio(); countRow(+r.dataset.n); }));
 }
