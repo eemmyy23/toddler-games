@@ -77,15 +77,13 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 .crow.active{background:rgba(255,204,51,0.22);transform:scale(1.02)}
 .cnum{flex:0 0 auto;width:1.6em;text-align:center;font-size:56px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,0.25)}
 .citems{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;font-size:34px;line-height:1.1;min-height:60px}
-.citem{display:inline-block;transition:transform .2s,filter .2s;filter:grayscale(.35) brightness(.8)}
-.citem.lit{filter:none;transform:scale(1.35) translateY(-6px)}
-.citem.done{filter:none}
-.hand{width:84px;height:100px}
-.hand .f{fill:#f1c9a5;stroke:#b07c5a;stroke-width:2;transition:fill .2s}
-.hand .f.lit{fill:#ffcc33}
-.hand .f.done{fill:#ffe08a}
+.citem{display:inline-block;text-align:center}
+.citems.obj{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 10px;align-items:center}
+.hand{width:84px;height:96px;filter:drop-shadow(0 3px 0 rgba(0,0,0,0.22))}
+.crow.active .citem,.crow.active .hand{animation:wig .7s ease}
+@keyframes wig{30%{transform:translateY(-10px) rotate(-6deg)}60%{transform:translateY(-4px) rotate(5deg)}}
 .cword{margin-left:auto;font-size:22px;font-weight:700;opacity:.8;padding-left:8px}
-@media (max-width:440px){.cnum{font-size:44px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:81px}.cword{display:none}}
+@media (max-width:440px){.cnum{font-size:44px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}.cword{display:none}}
 @media (max-width:759px){#stars{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;height:42px;line-height:42px;min-width:0;padding:0 4px;font-size:20px}}
 @media (max-width:440px){#bar{padding-left:8px;padding-right:8px;gap:4px}.tbtn{min-width:44px;padding:0 8px;font-size:20px}.flag{width:50px}#flags{gap:10px}}
 </style>
@@ -137,7 +135,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.4.1</div>
+<div id="ver">v0.4.2</div>
 
 <script>
 // ====== DATA ======
@@ -477,13 +475,13 @@ function mapItem(it, list) {
   return list.find(x => x.ch === it.ch) || list.find(x => x.ch === base) || null;
 }
 // ====== COUNT MODE ======
-// One page with 1–10; tap a row to count it aloud item by item (objects or fingers).
+// One page with 1–10 as objects or fingers. Tap a row → says that number once.
+// ▶ 1→10 → goes row by row saying each number.
 let countStyle = store.get('cstyle', 'obj'); // 'obj' | 'hand'
 let countTimers = [];
 function stopCount() {
   countTimers.forEach(clearTimeout); countTimers = [];
   document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
-  document.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
 }
 function sayNow(text) { // queue a short utterance without cancelling the previous one
   if (!('speechSynthesis' in window)) return;
@@ -493,80 +491,72 @@ function sayNow(text) { // queue a short utterance without cancelling the previo
   u.rate = 1; u.pitch = 1.25;
   speechSynthesis.speak(u);
 }
-// Hand SVG: thumb first (as counted in RO/DE), then index, middle, ring, pinky. raised = how many are up.
-const FINGERS = [ // [x, y-top when raised, width, height when raised]
-  [4, 44, 14, 34],  // thumb (left side, lower)
-  [22, 6, 13, 52], [37, 2, 13, 56], [52, 6, 13, 52], [67, 16, 12, 42]
-];
-function handSVG(raised) {
-  let f = '';
-  FINGERS.forEach(([x, y, w, h], i) => {
-    const up = i < raised;
-    if (i === 0) { // thumb: sticks out at an angle when up, tucked away (hidden) when down
-      if (up) f += `<rect class="f cf" x="6" y="30" width="15" height="46" rx="7.5" transform="rotate(-32 14 76)"/>`;
-      return;
+// Cartoon hand, seen from the child's side (back of the hand): LEFT hand has the thumb on the right;
+// the RIGHT hand is its mirror image, so both thumbs point inward.
+// Raise order: index, middle, ring, little, thumb last (1 = index … 5 = thumb).
+const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6';
+const FING = { // left hand: little finger on the left, index next to the thumb
+  little: { x: 13, w: 13, top: 34 },
+  ring:   { x: 28, w: 14, top: 18 },
+  middle: { x: 44, w: 14, top: 10 },
+  index:  { x: 60, w: 14, top: 18 }
+};
+const ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
+function handSVG(raised, right) {
+  const up = new Set(ORDER.slice(0, raised));
+  let g = '';
+  for (const [name, f] of Object.entries(FING)) {
+    if (up.has(name)) {
+      g += `<rect x="${f.x}" y="${f.top}" width="${f.w}" height="${80 - f.top}" rx="${f.w / 2}" fill="${SKIN}"/>` +
+           `<ellipse cx="${f.x + f.w / 2}" cy="${f.top + 7}" rx="${f.w * 0.3}" ry="4.5" fill="${NAIL}"/>`;
+    } else { // folded: rounded knuckle peeking over the palm
+      g += `<rect x="${f.x}" y="48" width="${f.w}" height="24" rx="${f.w / 2}" fill="${SHADE}"/>`;
     }
-    const yy = up ? y : 50, hh = up ? h : 12;
-    f += `<rect class="f${up ? ' cf' : ''}" x="${x}" y="${yy}" width="${w}" height="${hh + 14}" rx="${w / 2}"/>`;
-  });
-  return `<svg class="hand" viewBox="-14 0 98 100">${f}<rect class="f" x="18" y="52" width="62" height="44" rx="16"/></svg>`;
+  }
+  g += `<rect x="10" y="54" width="68" height="58" rx="22" fill="${SKIN}"/>`; // palm
+  g += up.has('thumb')
+    ? `<rect x="68" y="50" width="16" height="44" rx="8" fill="${SKIN}" transform="rotate(32 76 92)"/>` +
+      `<ellipse cx="76" cy="57" rx="4.5" ry="4" fill="${NAIL}" transform="rotate(32 76 92)"/>`
+    : `<rect x="34" y="76" width="42" height="15" rx="7.5" fill="${SHADE}"/>`; // thumb tucked across the palm
+  const flip = right ? ' transform="translate(106 0) scale(-1 1)"' : '';
+  return `<svg class="hand" viewBox="0 0 106 120" aria-label="${right ? 'right' : 'left'} hand"><g${flip}>${g}</g></svg>`;
 }
 function renderCount() {
   $('c-obj').classList.toggle('on', countStyle === 'obj');
   $('c-hand').classList.toggle('on', countStyle === 'hand');
-  const nums = SETS.num;
-  $('crows').innerHTML = nums.map(it => {
-    let items;
-    if (countStyle === 'obj') items = Array.from({ length: it.n }, () => `<span class="citem cu">${it.pic}</span>`).join('');
-    else items = it.n <= 5 ? handSVG(it.n) : handSVG(5) + handSVG(it.n - 5);
+  $('crows').innerHTML = SETS.num.map(it => {
+    const items = countStyle === 'obj'
+      ? Array.from({ length: it.n }, () => `<span class="citem">${it.pic}</span>`).join('')
+      : it.n <= 5 ? handSVG(it.n, false) : handSVG(5, false) + handSVG(it.n - 5, true);
     return `<div class="crow" data-n="${it.n}"><div class="cnum" style="color:hsl(${it.hue},90%,65%)">${it.ch}</div>` +
-           `<div class="citems">${items}</div><div class="cword">${it.word}</div></div>`;
+           `<div class="citems${countStyle === 'obj' ? ' obj' : ''}">${items}</div><div class="cword">${it.word}</div></div>`;
   }).join('');
   document.querySelectorAll('.crow').forEach(r => r.addEventListener('click', () => { ensureAudio(); countRow(+r.dataset.n); }));
 }
-const STEP = 750;
-// Count one row: highlight + say each item. Returns duration in ms.
-function countRow(n, startAt = 0, finale = true) {
-  if (startAt === 0) { stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+function lightRow(n) {
   const row = document.querySelector(`.crow[data-n="${n}"]`);
-  if (!row) return 0;
-  const units = [...row.querySelectorAll(countStyle === 'obj' ? '.cu' : '.cf')];
-  units.forEach(u => u.classList.remove('lit', 'done'));
-  const words = LANGS[lang].nums;
-  countTimers.push(setTimeout(() => {
-    document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
-    row.classList.add('active');
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, startAt));
-  units.forEach((u, i) => countTimers.push(setTimeout(() => {
-    units.forEach(x => x.classList.remove('lit'));
-    u.classList.add('lit', 'done');
-    sayNow(words[i]); sfx.pop();
-  }, startAt + 300 + i * STEP)));
-  const end = startAt + 300 + n * STEP;
-  if (finale) countTimers.push(setTimeout(() => {
-    units.forEach(x => x.classList.remove('lit'));
-    const r = row.querySelector('.cnum').getBoundingClientRect();
-    confetti(r.left + r.width / 2, r.top + r.height / 2, 30, 7);
-    sfx.right();
-    sayNow(`${words[n - 1]}!`);
-  }, end));
-  return end + (finale ? 900 : 0);
+  if (!row) return null;
+  document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
+  void row.offsetWidth; row.classList.add('active');
+  row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return row;
 }
-// Count all rows 1→10: one number per row ("one", "two", …) — not counting each row from one.
+// Tap one row: just say that number.
+function countRow(n) {
+  stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel();
+  const row = lightRow(n); if (!row) return;
+  const r = row.querySelector('.cnum').getBoundingClientRect();
+  confetti(r.left + r.width / 2, r.top + r.height / 2, 24, 6);
+  sfx.pop();
+  sayNow(LANGS[lang].nums[n - 1]);
+}
+// ▶ 1→10: one number per row.
 function countAll() {
   stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel();
-  const words = LANGS[lang].nums;
-  document.querySelectorAll('.citem,.f').forEach(e => e.classList.remove('done'));
-  words.forEach((w, i) => countTimers.push(setTimeout(() => {
-    const row = document.querySelector(`.crow[data-n="${i + 1}"]`);
-    document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
-    row.classList.add('active');
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    row.querySelectorAll('.cu,.cf').forEach(e => e.classList.add('done'));
-    sayNow(w); sfx.pop();
+  LANGS[lang].nums.forEach((w, i) => countTimers.push(setTimeout(() => {
+    lightRow(i + 1); sayNow(w); sfx.pop();
   }, i * 1000)));
-  countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, words.length * 1000));
+  countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, 10 * 1000));
 }
 
 function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
