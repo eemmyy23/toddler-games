@@ -1,7 +1,11 @@
-const CACHE = 'toddler-v6';
+const CACHE = 'toddler-v7';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
+  '/toddler-games/abc.html',
+  '/toddler-games/manifest-abc.json',
+  '/toddler-games/abc-icon-192.png',
+  '/toddler-games/abc-icon-512.png',
   '/toddler-games/manifest.json',
   '/toddler-games/manifest-paint.json',
   '/toddler-games/icon-192.png',
