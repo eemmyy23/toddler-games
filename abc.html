@@ -135,7 +135,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.4.2</div>
+<div id="ver">v0.4.3</div>
 
 <script>
 // ====== DATA ======
@@ -172,6 +172,9 @@ const LANGS = {
       ['Z','Zebră','🦓']
     ],
     nums: ['unu','doi','trei','patru','cinci','șase','șapte','opt','nouă','zece'],
+    // Spoken as the SOUND (bă, că, fă), not the alphabet name (be, ce, fe)
+    spell: c => ({ A:'a', Ă:'ă', Â:'â', E:'e', I:'i', Î:'î', O:'o', U:'u', K:'că', Q:'chiu', W:'dublu v', X:'ics', Y:'i grec' })[c]
+               || c.toLocaleLowerCase('ro') + 'ă',
     sayLetter: (c, w, like) => like ? `${c}, ca în ${w}!` : `${c}, de la ${w}!`,
     showWord: (w, like) => like ? `ca în ${w}` : w,
     find: 'Găsește',
@@ -205,7 +208,8 @@ function buildSets(code) {
   const L = LANGS[code];
   const letters = L.letters.map(([ch, w, pic, like], i, a) => ({
     ch, key: ch.toLocaleLowerCase(L.tts), pic, hue: (i * 360 / a.length) | 0,
-    word: L.showWord(w, like), say: L.sayLetter(ch, w, like), name: ch
+    word: L.showWord(w, like), say: L.sayLetter(L.spell ? L.spell(ch) : ch, w.toLocaleLowerCase(L.tts), like),
+    name: L.spell ? L.spell(ch) : ch
   }));
   const numbers = L.nums.map((w, i) => ({
     ch: String(i + 1), key: i === 9 ? '0' : String(i + 1), word: w, pic: NUMPICS[i], n: i + 1,
