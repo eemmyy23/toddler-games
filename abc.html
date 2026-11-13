@@ -139,7 +139,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.5.0</div>
+<div id="ver">v0.5.1</div>
 
 <script>
 // ====== DATA ======
@@ -162,7 +162,7 @@ const LANGS = {
     ask: (kind, name, small) => kind !== 'num' ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
     thats: n => `That's ${n}.`,
     cheers: ['Yay!', 'Great job!', 'You did it!', 'Super!', 'Hooray!'],
-    wow: n => `Wow! ${n} stars!`
+    wow: n => `Well done! You have ${n} stars!`
   },
   ro: {
     tts: 'ro-RO', html: 'ro',
@@ -190,7 +190,7 @@ const LANGS = {
     ask: (kind, name, small) => kind === 'grp' ? `Găsește grupul ${name}!` : kind === 'abc' ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
     thats: n => `Aceasta e ${n}.`,
     cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
-    wow: n => `Uau! ${n} stele!`
+    wow: n => `Bravo! Ai ${n} ${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}steluțe!`
   },
   de: {
     tts: 'de-DE', html: 'de',
@@ -209,7 +209,7 @@ const LANGS = {
     ask: (kind, name, small) => kind !== 'num' ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
     thats: n => `Das ist ${n}.`,
     cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
-    wow: n => `Wow! ${n} Sterne!`
+    wow: n => `Super! Du hast ${n} Sterne!`
   }
 };
 const NUMPICS = ['🌞','🐥','🐟','🍓','⭐','🎈','🐞','🍪','🚗','🦋'];
@@ -447,7 +447,7 @@ function choose(it, el) {
     if (big) {
       sfx.fanfare();
       for (let k = 0; k < 5; k++) setTimeout(() => confetti(Math.random() * W, H * 0.3 + Math.random() * H * 0.3, 60, 12), k * 180);
-      speak(`${LANGS[lang].wow(stars)} ${target.name}!`, 100);
+      speak(LANGS[lang].wow(stars), 100);
     } else {
       sfx.right();
       const cheers = LANGS[lang].cheers;
@@ -684,7 +684,7 @@ render();
 
 // ====== PWA ======
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
   navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
 }
 (function () {
