@@ -137,7 +137,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.4.0</div>
+<div id="ver">v0.4.1</div>
 
 <script>
 // ====== DATA ======
@@ -384,8 +384,14 @@ function newRound() {
   locked = false;
   target = pickTarget();
   const others = shuffle(items().filter(it => it !== target)).slice(0, nChoices() - 1);
-  const opts = shuffle([target, ...others]);
+  curOpts = shuffle([target, ...others]);
   round = pickRound();
+  drawRound();
+}
+let curOpts = [];
+function drawRound() {
+  locked = false;
+  const opts = curOpts;
   const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : target.ch; // capital in prompt → small-letter rounds match B → b
   $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${shown}</b>`;
   const box = $('choices');
@@ -443,6 +449,7 @@ function updateStars() {
 }
 
 // ====== MODE / SET SWITCHING ======
+let keepRound = false;
 function render() {
   $('m-learn').classList.toggle('on', mode === 'learn');
   $('m-play').classList.toggle('on', mode === 'play');
@@ -459,8 +466,15 @@ function render() {
   $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
   stopCount();
   if (mode === 'learn') showLearn(started);
-  else if (mode === 'play') { target = null; newRound(); }
+  else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
   else renderCount();
+}
+// Same item in another language: exact letter, else its base letter (Ș→S, Ä→A, ß→S); numbers by value.
+function mapItem(it, list) {
+  if (!it) return null;
+  if (it.n) return list.find(x => x.n === it.n) || null;
+  const base = it.ch === 'ß' ? 'S' : it.ch.normalize('NFD').replace(/\p{M}/gu, '');
+  return list.find(x => x.ch === it.ch) || list.find(x => x.ch === base) || null;
 }
 // ====== COUNT MODE ======
 // One page with 1–10; tap a row to count it aloud item by item (objects or fingers).
@@ -558,8 +572,27 @@ function countAll() {
 function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
 function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
 function setLang(l) {
+  if (l === lang) { sfx.pop(); render(); return; } // tap current flag → repeat
+  const oldLearn = items()[idx], oldTarget = target, oldOpts = curOpts;
+  const scroll = $('count').scrollTop;
   lang = l; store.set('lang', l); SETS = buildSets(l); pickVoice();
-  loadIdx(); target = null; streak = 0; sfx.pop(); render();
+  const list = items();
+  // Learn: stay on the same letter/number
+  const li = list.indexOf(mapItem(oldLearn, list));
+  if (li >= 0) { idx = li; store.set(idxKey(), idx); } else loadIdx();
+  // Play: keep the same question + bubbles, just re-ask in the new language
+  keepRound = false;
+  if (mode === 'play' && oldTarget) {
+    const t = mapItem(oldTarget, list), o = oldOpts.map(x => mapItem(x, list));
+    if (t && o.every(Boolean) && new Set(o).size === o.length) {
+      target = t; curOpts = o;
+      if (round.lower && t.key === t.ch) round.lower = false;
+      keepRound = true;
+    }
+  }
+  if (!keepRound) target = null;
+  sfx.pop(); render(); keepRound = false;
+  if (mode === 'count') $('count').scrollTop = scroll;
 }
 document.querySelectorAll('.flag').forEach(f =>
   f.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); setLang(f.dataset.lang); }));
