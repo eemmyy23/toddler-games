@@ -54,6 +54,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 .bub{--s:min(30vh,40vw);width:var(--s);height:var(--s);border-radius:50%;border:none;font:inherit;font-weight:900;font-size:calc(var(--s)*0.6);color:#fff;cursor:pointer;touch-action:manipulation;box-shadow:inset -8px -10px 0 rgba(0,0,0,0.18),inset 8px 8px 0 rgba(255,255,255,0.25),0 8px 20px rgba(0,0,0,0.35);animation:float 3s ease-in-out infinite;text-shadow:0 4px 0 rgba(0,0,0,0.2)}
 .n3 .bub{--s:min(26vh,28vw)}
 .n4 .bub{--s:min(22vh,21vw)}
+@media (orientation:portrait){#choices.n4{display:grid;grid-template-columns:repeat(2,auto)}#choices.n4 .bub{--s:min(22vh,36vw)}}
 @keyframes float{50%{transform:translateY(-10px)}}
 .bub.wrong{animation:shake .45s}
 @keyframes shake{20%{transform:translateX(-14px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
@@ -107,7 +108,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.2.0</div>
+<div id="ver">v0.3.0</div>
 
 <script>
 // ====== DATA ======
@@ -127,7 +128,7 @@ const LANGS = {
     sayLetter: (c, w, like) => like ? `${c}. ${c}, like in ${w}!` : `${c}. ${c} is for ${w}!`,
     showWord: (w, like) => like ? `like in ${w}` : w,
     find: 'Find',
-    ask: (isAbc, name) => isAbc ? `Find the letter ${name}!` : `Find the number ${name}!`,
+    ask: (isAbc, name, small) => isAbc ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
     thats: n => `That's ${n}.`,
     cheers: ['Yay!', 'Great job!', 'You did it!', 'Super!', 'Hooray!'],
     wow: n => `Wow! ${n} stars!`
@@ -147,7 +148,7 @@ const LANGS = {
     sayLetter: (c, w, like) => like ? `${c}. ${c}, ca în ${w}!` : `${c}. ${c}, de la ${w}!`,
     showWord: (w, like) => like ? `ca în ${w}` : w,
     find: 'Găsește',
-    ask: (isAbc, name) => isAbc ? `Găsește litera ${name}!` : `Găsește numărul ${name}!`,
+    ask: (isAbc, name, small) => isAbc ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
     thats: n => `Aceasta e ${n}.`,
     cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
     wow: n => `Uau! ${n} stele!`
@@ -166,7 +167,7 @@ const LANGS = {
     sayLetter: (c, w) => `${c}. ${c} wie ${w}!`,
     showWord: (w, like) => like ? `wie ${w}` : w,
     find: 'Finde',
-    ask: (isAbc, name) => isAbc ? `Finde den Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
+    ask: (isAbc, name, small) => isAbc ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
     thats: n => `Das ist ${n}.`,
     cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
     wow: n => `Wow! ${n} Sterne!`
@@ -338,21 +339,34 @@ function pickTarget() {
 }
 const wk = it => lang + ':' + it.ch;
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function askLine() { return LANGS[lang].ask(setName === 'abc', target.name); }
+// Round variety: letters may be lowercase; prompt may be the symbol, voice only (hidden), or (numbers) the written word
+let round = { lower: false, prompt: 'glyph' };
+const face = it => round.lower ? it.key : it.ch;
+function askLine() { return LANGS[lang].ask(setName === 'abc', target.name, round.lower); }
+function pickRound() {
+  const abc = setName === 'abc';
+  const lower = abc && target.key !== target.ch && Math.random() < 0.5;
+  const r = Math.random();
+  const prompt = abc ? (r < 0.6 ? 'glyph' : 'voice') : (r < 0.4 ? 'glyph' : r < 0.7 ? 'word' : 'voice');
+  return { lower, prompt };
+}
 
 function newRound() {
   locked = false;
   target = pickTarget();
   const others = shuffle(items().filter(it => it !== target)).slice(0, nChoices() - 1);
   const opts = shuffle([target, ...others]);
-  $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${target.ch}</b>`;
+  round = pickRound();
+  const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : face(target);
+  $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${shown}</b>`;
   const box = $('choices');
   box.className = 'n' + opts.length;
   box.innerHTML = '';
   opts.forEach((it, i) => {
     const b = document.createElement('button');
     b.className = 'bub';
-    b.textContent = it.ch;
+    b.textContent = face(it);
+    b.dataset.ch = it.ch;
     b.style.background = `radial-gradient(circle at 35% 30%, hsl(${it.hue},95%,72%), hsl(${it.hue},85%,48%))`;
     b.style.animationDelay = (i * 0.4) + 's';
     b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
@@ -472,7 +486,7 @@ addEventListener('keydown', e => {
   if (i < 0) return;
   if (mode === 'learn') { idx = i; sfx.pop(); showLearn(); confetti(W / 2, H / 2, 24, 7); }
   else {
-    const btn = [...document.querySelectorAll('.bub')].find(b => b.textContent === list[i].ch);
+    const btn = [...document.querySelectorAll('.bub')].find(b => b.dataset.ch === list[i].ch);
     choose(list[i], btn || null);
   }
 });
