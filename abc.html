@@ -108,7 +108,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.3.0</div>
+<div id="ver">v0.3.1</div>
 
 <script>
 // ====== DATA ======
@@ -357,7 +357,7 @@ function newRound() {
   const others = shuffle(items().filter(it => it !== target)).slice(0, nChoices() - 1);
   const opts = shuffle([target, ...others]);
   round = pickRound();
-  const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : face(target);
+  const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : target.ch; // capital in prompt → small-letter rounds match B → b
   $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${shown}</b>`;
   const box = $('choices');
   box.className = 'n' + opts.length;
