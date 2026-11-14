@@ -20,7 +20,7 @@
   --bg0:#090c1f; --bg1:#11163a; --card:#1a2050; --card2:#232a63; --line:rgba(255,255,255,.07);
   --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16);
   --font:'Fredoka',ui-rounded,'Nunito','Segoe UI',system-ui,sans-serif;
-  --r:22px; --top:122px; --bot:calc(78px + env(safe-area-inset-bottom));
+  --r:22px; --top:122px; --bot:calc(70px + min(env(safe-area-inset-bottom), 8px));
   --shadow:0 6px 18px rgba(0,0,0,.35);
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -45,15 +45,18 @@ button{font-family:var(--font)}
 #flags{gap:6px}
 .flag{border:none;background:transparent;border-radius:999px;width:52px;height:44px;font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
 .flag.on{opacity:1;filter:none;background:var(--amber-soft);box-shadow:inset 0 0 0 2px var(--amber)}
-#stars{margin-left:auto;background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
+#gridbtn{margin-left:auto;width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+body[data-mode=play] #gridbtn,body[data-mode=count] #gridbtn{display:none}
+body[data-mode=play] #stars,body[data-mode=count] #stars{margin-left:auto}
+#stars{background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
 #setgrp{margin:0 auto}
 body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count] .brk,body[data-mode=read] .brk{display:none}
 .tbtn{border:none;border-radius:999px;min-width:64px;height:46px;padding:0 16px;font-size:21px;font-weight:600;color:var(--text);background:transparent;cursor:pointer;touch-action:manipulation}
 .tbtn.on{background:var(--amber);color:var(--amber-ink)}
 
 /* Bottom tab bar, like a regular app */
-#tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;height:var(--bot);padding:6px 8px env(safe-area-inset-bottom);display:flex;justify-content:space-around;align-items:flex-start;background:rgba(13,17,44,.94);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
-.tab{flex:1;max-width:120px;height:64px;border:none;border-radius:20px;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;touch-action:manipulation}
+#tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;height:var(--bot);padding:4px 8px min(env(safe-area-inset-bottom), 8px);display:flex;justify-content:space-around;align-items:flex-start;background:rgba(13,17,44,.94);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+.tab{flex:1;max-width:120px;height:62px;border:none;border-radius:20px;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;touch-action:manipulation}
 .tab .ti{font-size:28px;line-height:1;filter:saturate(.75)}
 .tab .tl{font-size:13px;font-weight:600}
 .tab.on{background:var(--amber-soft);color:var(--amber)}
@@ -129,6 +132,18 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 .rt.word{flex:0 1 auto;padding:0 26px;font-size:36px;height:64px;color:var(--amber)}
 .rt.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-4px) scale(1.06)}
 .rsep{align-self:center;color:var(--muted);font-size:26px}
+.rc{border:none;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--text);border-radius:999px;height:52px;padding:0 16px 0 10px;font-size:20px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);white-space:nowrap;transition:transform .15s,background .15s,box-shadow .15s}
+.rc .rce{font-size:26px;letter-spacing:-2px}
+.rc.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-3px)}
+#rC{gap:10px}
+#index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
+#index.open{display:flex}
+#ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
+#ixclose{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--text);font-size:24px;cursor:pointer;touch-action:manipulation}
+#ixgrid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;align-content:start;padding-bottom:20px}
+.ix{height:84px;border:none;border-radius:18px;background:var(--card);color:var(--text);font-size:38px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;line-height:1.15;padding-top:2px}
+.ix small{font-size:14px;font-weight:500;color:var(--muted)}
+.ix.on{box-shadow:inset 0 0 0 2px var(--amber);background:var(--card2)}
 #rnav{position:fixed;left:0;right:0;bottom:calc(var(--bot) + 12px);z-index:4;display:none;justify-content:space-between;align-items:center;padding:0 12px}
 #rnav .nav{position:static}
 #rnav .nav b{font-size:36px}
@@ -151,7 +166,8 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 }
 @media (max-height:700px){
   #glyph{font-size:min(24vh,42vw)}
-  .rt{height:46px;font-size:26px}.rt.word{height:52px}#rpic{font-size:11vh}
+  .rt{height:42px;font-size:24px}.rt.word{height:46px;font-size:28px}#rpic{font-size:9vh}.rc{height:44px;font-size:17px}.rc .rce{font-size:20px}
+  #read{gap:1vh}
   .ex .ep{font-size:30px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -166,6 +182,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
     <button class="flag" data-lang="ro" aria-label="Română">🇷🇴</button>
     <button class="flag" data-lang="de" aria-label="Deutsch">🇩🇪</button>
   </div>
+  <button id="gridbtn" aria-label="Index"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg></button>
   <div id="stars">⭐ 0</div>
   <div class="brk"></div>
   <div class="group" id="setgrp">
@@ -203,6 +220,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="rplay" aria-label="Play">▶</button>
   <button class="nav" id="rnext" aria-label="Next word"></button>
 </div>
+<div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
 <nav id="tabs">
   <button class="tab" id="m-learn"><span class="ti">📖</span><span class="tl"></span></button>
   <button class="tab" id="m-play"><span class="ti">🎈</span><span class="tl"></span></button>
@@ -216,7 +234,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.6.0</div>
+<div id="ver">v0.6.1</div>
 
 <script>
 // ====== DATA ======
@@ -238,7 +256,12 @@ const LANGS = {
       Y: [['yarn','🧶']], Z: [['zero','0️⃣']]
     },
     // Reading words, split into syllables (same pictures/order in every language)
-    read: ['cow','house','moon','cat','dog','ba-na-na','ball','fish','sun','flow-er','ap-ple','bear','sheep','duck','car','milk','bun-ny','goat'],
+    read: ['cow','house','moon','cat','dog','ba-na-na','ball','fish','sun','flow-er','ap-ple','bear','sheep','duck','car','egg','bun-ny','goat'],
+    // Article + counting (one / two), same order as `read`
+    count: [['a cow','two cows'],['a house','two houses'],['a moon','two moons'],['a cat','two cats'],['a dog','two dogs'],
+      ['a banana','two bananas'],['a ball','two balls'],['a fish','two fish'],['a sun','two suns'],['a flower','two flowers'],
+      ['an apple','two apples'],['a bear','two bears'],['a sheep','two sheep'],['a duck','two ducks'],['a car','two cars'],
+      ['an egg','two eggs'],['a bunny','two bunnies'],['a goat','two goats']],
     letters: [
       ['A','Apple','🍎'],['B','Ball','⚽'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Elephant','🐘'],
       ['F','Fish','🐟'],['G','Grapes','🍇'],['H','House','🏠'],['I','Ice cream','🍦'],['J','Juice','🧃'],
@@ -271,7 +294,11 @@ const LANGS = {
       U: [['umbrelă','☂️'],['unicorn','🦄']], V: [['vacă','🐄'],['vulpe','🦊']], Y: [['yo-yo','🪀']],
       Z: [['zmeu','🪁'],['zar','🎲']]
     },
-    read: ['va-că','ca-să','lu-nă','pi-si-că','câi-ne','ba-na-nă','min-ge','peș-te','soa-re','floa-re','măr','urs','oa-ie','ra-ță','ma-și-nă','lap-te','ie-pu-re','ca-pră'],
+    read: ['va-că','ca-să','lu-nă','pi-si-că','câi-ne','ba-na-nă','min-ge','peș-te','soa-re','floa-re','măr','urs','oa-ie','ra-ță','ma-și-nă','ou','ie-pu-re','ca-pră'],
+    count: [['o vacă','două vaci'],['o casă','două case'],['o lună','două luni'],['o pisică','două pisici'],['un câine','doi câini'],
+      ['o banană','două banane'],['o minge','două mingi'],['un pește','doi pești'],['un soare','doi sori'],['o floare','două flori'],
+      ['un măr','două mere'],['un urs','doi urși'],['o oaie','două oi'],['o rață','două rațe'],['o mașină','două mașini'],
+      ['un ou','două ouă'],['un iepure','doi iepuri'],['o capră','două capre']],
     letters: [
       ['A','Albină','🐝'],['Ă','mașină','🚗',1],['Â','câine','🐕',1],['B','Banană','🍌'],['C','Cal','🐴'],
       ['D','Delfin','🐬'],['E','Elefant','🐘'],['F','Fluture','🦋'],['G','Gunoi','🗑️'],['H','Hipopotam','🦛'],
@@ -312,7 +339,12 @@ const LANGS = {
       ß: [['Strauß','💐',1]], T: [['Tomate','🍅'],['Teddy','🧸']], U: [['Ufo','🛸']], Ü: [['Tür','🚪',1]],
       V: [['Vulkan','🌋']], W: [['Wolke','☁️'],['Wurm','🪱']], Y: [['Yoga','🧘']], Z: [['Zug','🚂'],['Zitrone','🍋']]
     },
-    read: ['Kuh','Haus','Mond','Kat-ze','Hund','Ba-na-ne','Ball','Fisch','Son-ne','Blu-me','Ap-fel','Bär','Schaf','En-te','Au-to','Milch','Ha-se','Zie-ge'],
+    read: ['Kuh','Haus','Mond','Kat-ze','Hund','Ba-na-ne','Ball','Fisch','Son-ne','Blu-me','Ap-fel','Bär','Schaf','En-te','Au-to','Ei','Ha-se','Zie-ge'],
+    // der / die / das shows the gender; then counting
+    count: [['die Kuh','zwei Kühe'],['das Haus','zwei Häuser'],['der Mond','zwei Monde'],['die Katze','zwei Katzen'],['der Hund','zwei Hunde'],
+      ['die Banane','zwei Bananen'],['der Ball','zwei Bälle'],['der Fisch','zwei Fische'],['die Sonne','zwei Sonnen'],['die Blume','zwei Blumen'],
+      ['der Apfel','zwei Äpfel'],['der Bär','zwei Bären'],['das Schaf','zwei Schafe'],['die Ente','zwei Enten'],['das Auto','zwei Autos'],
+      ['das Ei','zwei Eier'],['der Hase','zwei Hasen'],['die Ziege','zwei Ziegen']],
     letters: [
       ['A','Apfel','🍎'],['Ä','Ähre','🌾'],['B','Ball','⚽'],['C','Clown','🤡'],['D','Delfin','🐬'],
       ['E','Elefant','🐘'],['F','Fisch','🐟'],['G','Gurke','🥒'],['H','Haus','🏠'],['I','Igel','🦔'],
@@ -332,7 +364,7 @@ const LANGS = {
   }
 };
 const NUMPICS = ['🌞','🐥','🐟','🍓','⭐','🎈','🐞','🍪','🚗','🦋'];
-const READ_PICS = ['🐄','🏠','🌙','🐱','🐶','🍌','⚽','🐟','☀️','🌸','🍎','🐻','🐑','🦆','🚗','🥛','🐰','🐐'];
+const READ_PICS = ['🐄','🏠','🌙','🐱','🐶','🍌','⚽','🐟','☀️','🌸','🍎','🐻','🐑','🦆','🚗','🥚','🐰','🐐'];
 // Night palette for letters/bubbles: soft pastels that read well on dark navy
 const INK = ['#ff8f87','#ffb36b','#f2d06b','#93d98f','#6fd3c4','#7fb4ff','#b49cff','#f38fc4'];
 const ink = h => INK[Math.round(h / 45) % 8];
@@ -659,7 +691,7 @@ function render() {
   $('count').style.display = mode === 'count' ? 'block' : 'none';
   $('stage').style.display = mode === 'count' ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
-  stopCount(); readTok++;
+  stopCount(); readTok++; closeIndex();
   if (mode === 'learn') showLearn(started);
   else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
   else if (mode === 'read') renderRead(started);
@@ -699,7 +731,9 @@ function renderRead(sayIt = true) {
     `<div class="rrow" id="rU">${upper}</div>` +
     `<div class="rrow" id="rL">${lower}</div>` +
     `<div class="rrow syl" id="rS">${syls}</div>` +
-    `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>`;
+    `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
+    `<div class="rrow" id="rC">` + LANGS[lang].count[readIdx].map((ph, i) =>
+      `<button class="rc" data-say="${esc(ph)}"><span class="rce">${pic.repeat(i + 1)}</span><span>${esc(ph)}</span></button>`).join('') + `</div>`;
   const n = READ_PICS.length;
   $('rprev').innerHTML = `‹ <b>${READ_PICS[(readIdx - 1 + n) % n]}</b>`;
   $('rnext').innerHTML = `<b>${READ_PICS[(readIdx + 1) % n]}</b> ›`;
@@ -713,7 +747,7 @@ function lightTile(el) {
 $('read').addEventListener('pointerdown', e => {
   const el = e.target.closest('[data-say]'); if (!el) return;
   e.stopPropagation(); firstTouch(); readTok++;
-  lightTile(el.classList.contains('rt') ? el : null);
+  lightTile(el.classList.contains('rt') || el.classList.contains('rc') ? el : null);
   sfx.pop(); speak(el.dataset.say, 60);
 });
 // ▶: spell in capitals letter by letter → small letters (whole word) → syllables → whole word
@@ -734,10 +768,36 @@ async function playRead() {
   if (!alive()) return; await wait(300);
   const w = document.querySelector('#rW .rt'); lightTile(w);
   sfx.right(); await speak(word, 350);
+  if (!alive()) return; await wait(300);
+  // article + counting: "un câine", "doi câini"
+  for (const el of document.querySelectorAll('#rC .rc')) {
+    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(250);
+  }
   if (!alive()) return;
   const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
   setTimeout(() => { if (alive()) lightTile(null); }, 800);
 }
+// ====== INDEX: all pictures (Read) or all letters/numbers (Learn) on one grid ======
+function openIndex() {
+  let html = '';
+  if (mode === 'read') {
+    const t = LANGS[lang].tts;
+    html = READ_PICS.map((p, i) => `<button class="ix${i === readIdx ? ' on' : ''}" data-i="${i}">${p}<small>${esc(capFirst(LANGS[lang].read[i].replace(/-/g, ''), t))}</small></button>`).join('');
+  } else {
+    html = items().map((it, i) => `<button class="ix${i === idx ? ' on' : ''}" data-i="${i}"><span style="color:${ink(it.hue)}">${esc(it.ch)}</span>${it.pic ? `<small>${it.pic}</small>` : ''}</button>`).join('');
+  }
+  $('ixgrid').innerHTML = html;
+  $('index').classList.add('open');
+  const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
+  sfx.pop();
+}
+function closeIndex() { $('index').classList.remove('open'); }
+$('ixgrid').addEventListener('click', e => {
+  const b = e.target.closest('.ix'); if (!b) return;
+  firstTouch(); closeIndex();
+  if (mode === 'read') { readIdx = +b.dataset.i; readTok++; sfx.pop(); renderRead(true); }
+  else { idx = +b.dataset.i; sfx.pop(); showLearn(true); }
+});
 function readStep(d) {
   const n = READ_PICS.length;
   readIdx = (readIdx + d + n) % n; readTok++;
@@ -890,6 +950,8 @@ tapBtn('m-read', () => setMode('read'));
 tapBtn('rprev', () => readStep(-1));
 tapBtn('rnext', () => readStep(1));
 tapBtn('rplay', () => playRead());
+tapBtn('gridbtn', () => openIndex());
+tapBtn('ixclose', () => closeIndex());
 tapBtn('c-obj', () => { countStyle = 'obj'; store.set('cstyle', 'obj'); stopCount(); sfx.pop(); renderCount(); });
 tapBtn('c-hand', () => { countStyle = 'hand'; store.set('cstyle', 'hand'); stopCount(); sfx.pop(); renderCount(); });
 tapBtn('c-all', () => countAll());
