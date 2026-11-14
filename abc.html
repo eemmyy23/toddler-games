@@ -6,109 +6,172 @@
 <title>ABC 123! 🔤</title>
 <link rel="icon" href="abc-icon-192.png" type="image/png">
 <link rel="manifest" href="manifest-abc.json">
-<meta name="theme-color" content="#1b1446">
+<meta name="theme-color" content="#090c1f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ABC 123!">
 <link rel="apple-touch-icon" href="abc-icon-192.png">
 <style>
+/* Fredoka (OFL), self-hosted so it works offline */
+@font-face{font-family:'Fredoka';font-weight:400 700;font-display:swap;src:url(fonts/fredoka-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Fredoka';font-weight:400 700;font-display:swap;src:url(fonts/fredoka-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+/* Night theme: deep navy, warm muted accents, no white surfaces (bedtime / tent friendly) */
+:root{
+  --bg0:#090c1f; --bg1:#11163a; --card:#1a2050; --card2:#232a63; --line:rgba(255,255,255,.07);
+  --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16);
+  --font:'Fredoka',ui-rounded,'Nunito','Segoe UI',system-ui,sans-serif;
+  --r:22px; --top:122px; --bot:calc(78px + env(safe-area-inset-bottom));
+  --shadow:0 6px 18px rgba(0,0,0,.35);
+}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-family:"Comic Sans MS","Chalkboard SE","Baloo 2",system-ui,sans-serif;color:#fff}
+body{color:var(--text);font-family:var(--font);background:var(--bg0);
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%,rgba(255,240,200,.55),transparent 60%),
+    radial-gradient(1.5px 1.5px at 78% 9%,rgba(255,240,200,.45),transparent 60%),
+    radial-gradient(1px 1px at 46% 31%,rgba(255,240,200,.4),transparent 60%),
+    radial-gradient(1px 1px at 88% 44%,rgba(255,240,200,.35),transparent 60%),
+    radial-gradient(1.5px 1.5px at 22% 66%,rgba(255,240,200,.3),transparent 60%),
+    radial-gradient(ellipse at 50% 0%,#1b2156 0%,transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg0))}
+body[data-mode=count],body[data-mode=read]{--top:70px}
+button{font-family:var(--font)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
 
-/* Top bar */
-#bar{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;padding:max(10px,env(safe-area-inset-top)) 12px 6px;gap:8px}
-#flags{order:-1;flex-basis:100%;justify-content:center;background:none;padding:0;gap:14px}
-.flag{border:none;background:rgba(255,255,255,0.12);border-radius:14px;width:58px;height:42px;font-size:28px;line-height:1;cursor:pointer;touch-action:manipulation;opacity:.55;transition:opacity .15s,transform .15s}
-.flag.on{opacity:1;background:rgba(255,204,51,0.9);transform:scale(1.12);box-shadow:0 3px 10px rgba(0,0,0,0.3)}
-@media (min-width:760px){#flags{order:0;flex-basis:auto}}
-.group{display:flex;gap:6px;background:rgba(255,255,255,0.12);border-radius:40px;padding:5px}
-.tbtn{border:none;border-radius:32px;min-width:58px;height:50px;padding:0 14px;font:inherit;font-size:22px;font-weight:700;color:#fff;background:transparent;cursor:pointer;touch-action:manipulation}
-.tbtn.on{background:#ffcc33;color:#3a2a8a;box-shadow:0 3px 10px rgba(0,0,0,0.3)}
-#stars{font-size:22px;font-weight:700;padding:0 10px;min-width:70px;text-align:center}
+/* Top bar: flags + stars, then the set switcher */
+#bar{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 8px;padding:max(10px,env(safe-area-inset-top)) 12px 6px}
+.brk{flex-basis:100%;height:0}
+.group{display:flex;gap:6px;background:var(--card);border-radius:999px;padding:5px;box-shadow:var(--shadow)}
+#flags{gap:6px}
+.flag{border:none;background:transparent;border-radius:999px;width:52px;height:44px;font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
+.flag.on{opacity:1;filter:none;background:var(--amber-soft);box-shadow:inset 0 0 0 2px var(--amber)}
+#stars{margin-left:auto;background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
+#setgrp{margin:0 auto}
+body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count] .brk,body[data-mode=read] .brk{display:none}
+.tbtn{border:none;border-radius:999px;min-width:64px;height:46px;padding:0 16px;font-size:21px;font-weight:600;color:var(--text);background:transparent;cursor:pointer;touch-action:manipulation}
+.tbtn.on{background:var(--amber);color:var(--amber-ink)}
 
-#stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:130px 12px 110px}
-@media (min-width:760px){#stage{padding-top:80px}}
+/* Bottom tab bar, like a regular app */
+#tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;height:var(--bot);padding:6px 8px env(safe-area-inset-bottom);display:flex;justify-content:space-around;align-items:flex-start;background:rgba(13,17,44,.94);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
+.tab{flex:1;max-width:120px;height:64px;border:none;border-radius:20px;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;touch-action:manipulation}
+.tab .ti{font-size:28px;line-height:1;filter:saturate(.75)}
+.tab .tl{font-size:13px;font-weight:600}
+.tab.on{background:var(--amber-soft);color:var(--amber)}
+.tab.on .ti{filter:none;transform:scale(1.08)}
 
-/* Learn mode */
-#learn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:2vh}
-#glyph{font-size:min(42vh,62vw);line-height:1;font-weight:900;cursor:pointer;text-shadow:0 8px 0 rgba(0,0,0,0.25);transition:transform .15s}
-#glyph.grp{font-size:min(28vh,30vw)}
-#choices.grp .bub{font-size:calc(var(--s)*0.34)}
-#glyph small{font-size:0.45em;opacity:0.85;margin-left:0.08em}
-#glyph.pop{animation:pop .45s ease}
-@keyframes pop{0%{transform:scale(.5) rotate(-8deg)}60%{transform:scale(1.12) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
-#word{font-size:min(7vh,9vw);font-weight:700;text-align:center;min-height:1.2em}
-#pics{font-size:min(8vh,10vw);text-align:center;max-width:94vw;line-height:1.2;min-height:1.2em;letter-spacing:.05em}
-#pics span{display:inline-block;animation:bob 1.6s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-8%)}}
-.nav{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));z-index:4;min-width:120px;height:80px;padding:0 18px;border-radius:40px;border:none;background:rgba(255,255,255,0.18);color:#fff;font:inherit;font-size:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}
-.nav b{font-size:46px;font-weight:900;vertical-align:middle;text-shadow:0 3px 0 rgba(0,0,0,0.25)}
-.nav:active{background:rgba(255,255,255,0.35)}
-#prev{left:10px}#next{right:10px}
+#stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) 12px calc(var(--bot) + 12px)}
+body[data-mode=learn] #stage{padding-bottom:calc(var(--bot) + 100px)}
+body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 
-/* Play mode */
+/* Learn */
+#learn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:1.6vh}
+#glyph{font-size:min(28vh,46vw);line-height:1.1;font-weight:700;cursor:pointer;text-shadow:0 6px 0 rgba(0,0,0,.35);transition:transform .15s}
+#glyph.grp{font-size:min(22vh,26vw)}
+#glyph small{font-size:.5em;opacity:.85;margin-left:.06em}
+#glyph.pop{animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+#word{font-size:min(6vh,8vw);font-weight:600;text-align:center;min-height:1.2em}
+#pics{font-size:min(7vh,9vw);text-align:center;max-width:94vw;line-height:1.2;min-height:1.2em;letter-spacing:.05em}
+#pics span{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6%)}}
+#examples{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:640px}
+.ex{border:none;background:var(--card);border-radius:var(--r);min-width:96px;padding:10px 12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text);cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);transition:transform .15s,background .15s}
+.ex .ep{font-size:40px;line-height:1.1}
+.ex .ew{font-size:19px;font-weight:500;white-space:nowrap}
+.ex .ew b{font-weight:700}
+.ex.lit{background:var(--card2);transform:translateY(-4px) scale(1.04)}
+.nav{position:fixed;bottom:calc(var(--bot) + 12px);z-index:4;min-width:112px;height:72px;padding:0 18px;border-radius:999px;border:none;background:var(--card);color:var(--muted);font-size:24px;cursor:pointer;touch-action:manipulation;white-space:nowrap;box-shadow:var(--shadow)}
+.nav b{font-size:40px;font-weight:700;vertical-align:middle}
+.nav:active{background:var(--card2)}
+#prev{left:12px}#next{right:12px}
+
+/* Play */
 #play{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:4vh}
-#ask{font-size:min(6vh,8vw);font-weight:700;display:flex;align-items:center;gap:.4em;cursor:pointer}
-#ask b{display:inline-block;background:#ffcc33;color:#3a2a8a;border-radius:.3em;padding:0 .3em}
+#ask{font-size:min(5.5vh,7.5vw);font-weight:600;display:flex;align-items:center;gap:.4em;cursor:pointer;background:var(--card);padding:.25em .4em .25em .6em;border-radius:999px;box-shadow:var(--shadow)}
+#ask b{display:inline-block;background:var(--amber);color:var(--amber-ink);border-radius:.4em;padding:0 .35em;font-weight:700}
 #choices{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:min(4vw,4vh);max-width:96vw}
-.bub{--s:min(30vh,40vw);width:var(--s);height:var(--s);border-radius:50%;border:none;font:inherit;font-weight:900;font-size:calc(var(--s)*0.6);color:#fff;cursor:pointer;touch-action:manipulation;box-shadow:inset -8px -10px 0 rgba(0,0,0,0.18),inset 8px 8px 0 rgba(255,255,255,0.25),0 8px 20px rgba(0,0,0,0.35);animation:float 3s ease-in-out infinite;text-shadow:0 4px 0 rgba(0,0,0,0.2)}
-.n3 .bub{--s:min(26vh,28vw)}
-.n4 .bub{--s:min(22vh,21vw)}
-@media (orientation:portrait){#choices.n4{display:grid;grid-template-columns:repeat(2,auto)}#choices.n4 .bub{--s:min(22vh,36vw)}}
-@keyframes float{50%{transform:translateY(-10px)}}
-.bub.wrong{animation:shake .45s}
-@keyframes shake{20%{transform:translateX(-14px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+.bub{--s:min(28vh,40vw);--c:#7fb4ff;width:var(--s);height:var(--s);border-radius:50%;border:none;font-weight:700;font-size:calc(var(--s)*.56);color:#14183a;cursor:pointer;touch-action:manipulation;
+  background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--c) 70%,#fff) 0%,var(--c) 45%,color-mix(in srgb,var(--c) 72%,#000) 100%);
+  box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 -8px 0 rgba(0,0,0,.12);animation:float 4s ease-in-out infinite}
+.n3 .bub{--s:min(25vh,28vw)}
+.n4 .bub{--s:min(21vh,21vw)}
+@media (orientation:portrait){#choices.n4{display:grid;grid-template-columns:repeat(2,auto)}#choices.n4 .bub{--s:min(21vh,36vw)}}
+#choices.grp .bub{font-size:calc(var(--s)*.34)}
+@keyframes float{50%{transform:translateY(-6px)}}
+.bub.wrong{animation:wobble .5s}
+@keyframes wobble{25%{transform:rotate(-7deg)}50%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}}
 .bub.right{animation:burst .5s forwards}
-@keyframes burst{50%{transform:scale(1.25)}100%{transform:scale(0);opacity:0}}
+@keyframes burst{50%{transform:scale(1.2)}100%{transform:scale(0);opacity:0}}
 
-#install-bar{position:fixed;bottom:0;left:0;right:0;z-index:10;display:none;align-items:center;justify-content:center;gap:12px;padding:10px 16px;background:rgba(20,20,60,0.92);font-family:system-ui,sans-serif}
-#install-bar button{border:none;border-radius:8px;padding:8px 18px;font-size:15px;font-weight:600;cursor:pointer}
-#install-btn{background:#ff5533;color:#fff}
-#dismiss-btn{background:transparent;color:rgba(255,255,255,0.5);font-size:20px}
-#install-msg{color:#eee;font-size:14px}
-#ver{position:fixed;bottom:6px;left:8px;color:rgba(255,255,255,0.25);font:11px sans-serif;pointer-events:none;z-index:4}
-/* Count mode */
-#count{display:none;position:absolute;inset:0;top:130px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:0 10px 90px}
-@media (min-width:760px){#count{top:80px}}
-#ctools{position:sticky;top:0;z-index:2;display:flex;justify-content:center;gap:10px;padding:6px 0 10px;background:linear-gradient(#251a5e 70%,transparent)}
-#ctools button{border:none;border-radius:30px;height:50px;padding:0 18px;font:inherit;font-size:24px;font-weight:700;color:#fff;background:rgba(255,255,255,0.15);cursor:pointer;touch-action:manipulation}
-#ctools button.on{background:#ffcc33;color:#3a2a8a}
-.crow{display:flex;align-items:center;gap:12px;margin:0 auto 10px;max-width:900px;padding:8px 12px;border-radius:24px;background:rgba(255,255,255,0.07);cursor:pointer;transition:background .2s,transform .2s}
-.crow.active{background:rgba(255,204,51,0.22);transform:scale(1.02)}
-.cnum{flex:0 0 auto;width:96px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
-.cdig{font-size:56px;font-weight:900;line-height:1;text-shadow:0 4px 0 rgba(0,0,0,0.25)}
+/* Count */
+#count{display:none;position:absolute;left:0;right:0;top:var(--top);bottom:var(--bot);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:0 10px 20px}
+#ctools{position:sticky;top:0;z-index:2;display:flex;justify-content:center;gap:10px;padding:6px 0 12px;background:linear-gradient(var(--bg1) 75%,transparent)}
+#ctools button{border:none;border-radius:999px;height:52px;padding:0 20px;font-size:24px;font-weight:600;color:var(--text);background:var(--card);cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#ctools button.on{background:var(--amber);color:var(--amber-ink)}
+.crow{display:flex;align-items:center;gap:12px;margin:0 auto 10px;max-width:900px;padding:8px 12px;border-radius:var(--r);background:var(--card);cursor:pointer;transition:background .2s,transform .2s}
+.crow.active{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber);transform:scale(1.02)}
+.cnum{flex:0 0 auto;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.cdig{font-size:54px;font-weight:700;line-height:1}
 .citems{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;font-size:34px;line-height:1.1;min-height:60px}
 .citem{display:inline-block;text-align:center}
 .citems.obj{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 10px;align-items:center}
-.hand{width:84px;height:96px;filter:drop-shadow(0 3px 0 rgba(0,0,0,0.22))}
+.hand{width:84px;height:96px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))}
 .crow.active .citem,.crow.active .hand{animation:wig .7s ease}
-@keyframes wig{30%{transform:translateY(-10px) rotate(-6deg)}60%{transform:translateY(-4px) rotate(5deg)}}
-.cword{font-size:20px;font-weight:700;color:#fff;opacity:.9;white-space:nowrap}
-@media (max-width:440px){.cnum{width:76px}.cdig{font-size:44px}.cword{font-size:17px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}}
-@media (max-width:759px){#stars{position:absolute;top:max(10px,env(safe-area-inset-top));right:10px;height:42px;line-height:42px;min-width:0;padding:0 4px;font-size:20px}}
-@media (max-width:440px){#bar{padding-left:8px;padding-right:8px;gap:4px}.tbtn{min-width:44px;padding:0 8px;font-size:20px}.flag{width:50px}#flags{gap:10px}}
-@media (max-width:340px){.tbtn{min-width:40px;padding:0 6px}.group:not(#flags){gap:3px;padding:4px}}
+@keyframes wig{30%{transform:translateY(-8px) rotate(-5deg)}60%{transform:translateY(-3px) rotate(4deg)}}
+.cword{font-size:19px;font-weight:600;color:var(--text);opacity:.9;white-space:nowrap}
+
+/* Read: word → letters, small letters, syllables, whole word */
+#read{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:1.6vh}
+#rpic{font-size:min(14vh,24vw);line-height:1.1;cursor:pointer}
+.rrow{display:flex;flex-wrap:nowrap;justify-content:center;gap:6px;max-width:100%}
+.rt{border:none;flex:0 1 54px;min-width:34px;height:58px;border-radius:16px;background:var(--card);color:var(--text);font-size:32px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);transition:transform .15s,background .15s,box-shadow .15s}
+.rrow.syl .rt{flex:0 1 auto;min-width:72px;padding:0 16px}
+.rt.word{flex:0 1 auto;padding:0 26px;font-size:36px;height:64px;color:var(--amber)}
+.rt.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-4px) scale(1.06)}
+.rsep{align-self:center;color:var(--muted);font-size:26px}
+#rnav{position:fixed;left:0;right:0;bottom:calc(var(--bot) + 12px);z-index:4;display:none;justify-content:space-between;align-items:center;padding:0 12px}
+#rnav .nav{position:static}
+#rnav .nav b{font-size:36px}
+#rplay{width:76px;height:76px;border-radius:50%;border:none;background:var(--amber);color:var(--amber-ink);font-size:34px;cursor:pointer;touch-action:manipulation;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+
+#install-bar{position:fixed;top:0;left:0;right:0;z-index:10;display:none;align-items:center;justify-content:center;gap:12px;padding:10px 16px;background:var(--card);color:var(--text)}
+#install-bar button{border:none;border-radius:999px;padding:8px 18px;font-size:15px;font-weight:600;cursor:pointer}
+#install-btn{background:var(--amber);color:var(--amber-ink)}
+#dismiss-btn{background:transparent;color:var(--muted);font-size:20px}
+#install-msg{font-size:14px}
+#ver{position:fixed;bottom:calc(var(--bot) + 2px);right:8px;color:rgba(239,230,214,.25);font:11px sans-serif;pointer-events:none;z-index:4}
+
+@media (max-width:440px){
+  #bar{padding-left:8px;padding-right:8px}
+  .flag{width:46px}
+  .tbtn{min-width:56px;padding:0 12px;font-size:19px}
+  .cnum{width:76px}.cdig{font-size:44px}.cword{font-size:16px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}
+  .rt{height:52px;font-size:28px}.rt.word{font-size:32px;height:58px}
+  .ex{min-width:88px;padding:8px 10px 6px}.ex .ep{font-size:34px}.ex .ew{font-size:17px}
+}
+@media (max-height:700px){
+  #glyph{font-size:min(24vh,42vw)}
+  .rt{height:46px;font-size:26px}.rt.word{height:52px}#rpic{font-size:11vh}
+  .ex .ep{font-size:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 <div id="bar">
-  <div class="group">
-    <button class="tbtn on" id="m-learn" aria-label="Learn">📖</button>
-    <button class="tbtn" id="m-play" aria-label="Play">🎈</button>
-    <button class="tbtn" id="m-count" aria-label="Count">🧮</button>
-  </div>
-  <div id="stars">⭐ 0</div>
-  <div class="group" id="setgrp">
-    <button class="tbtn on" id="s-abc">ABC</button>
-    <button class="tbtn" id="s-123">123</button>
-    <button class="tbtn" id="s-grp" aria-label="Grupuri de litere">ghi</button>
-  </div>
   <div id="flags" class="group">
     <button class="flag" data-lang="en" aria-label="English">🇬🇧</button>
     <button class="flag" data-lang="ro" aria-label="Română">🇷🇴</button>
     <button class="flag" data-lang="de" aria-label="Deutsch">🇩🇪</button>
+  </div>
+  <div id="stars">⭐ 0</div>
+  <div class="brk"></div>
+  <div class="group" id="setgrp">
+    <button class="tbtn on" id="s-abc">ABC</button>
+    <button class="tbtn" id="s-123">123</button>
+    <button class="tbtn" id="s-grp" aria-label="Grupuri de litere">ghi</button>
   </div>
 </div>
 
@@ -117,11 +180,13 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
+    <div id="examples"></div>
   </div>
   <div id="play">
     <div id="ask"></div>
     <div id="choices"></div>
   </div>
+  <div id="read"></div>
 </div>
 <div id="count">
   <div id="ctools">
@@ -133,6 +198,17 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 </div>
 <button class="nav" id="prev" aria-label="Previous">◀</button>
 <button class="nav" id="next" aria-label="Next">▶</button>
+<div id="rnav">
+  <button class="nav" id="rprev" aria-label="Previous word"></button>
+  <button id="rplay" aria-label="Play">▶</button>
+  <button class="nav" id="rnext" aria-label="Next word"></button>
+</div>
+<nav id="tabs">
+  <button class="tab" id="m-learn"><span class="ti">📖</span><span class="tl"></span></button>
+  <button class="tab" id="m-play"><span class="ti">🎈</span><span class="tl"></span></button>
+  <button class="tab" id="m-count"><span class="ti">🧮</span><span class="tl"></span></button>
+  <button class="tab" id="m-read"><span class="ti">📚</span><span class="tl"></span></button>
+</nav>
 <canvas id="fx"></canvas>
 
 <div id="install-bar">
@@ -140,7 +216,7 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.5.5</div>
+<div id="ver">v0.6.0</div>
 
 <script>
 // ====== DATA ======
@@ -148,6 +224,21 @@ body{background:radial-gradient(ellipse at 50% 30%,#3a2a8a 0%,#1b1446 70%);font-
 const LANGS = {
   en: {
     tts: 'en-US', html: 'en', langName: 'English',
+    tabs: ['Learn', 'Play', 'Count', 'Read'],
+    // More example words per letter (shown under the letter, all tappable). [word, emoji, like?]
+    more: {
+      A: [['ant','🐜'],['airplane','✈️']], B: [['bear','🐻'],['banana','🍌']], C: [['car','🚗'],['cake','🎂']],
+      D: [['duck','🦆'],['drum','🥁']], E: [['egg','🥚'],['eagle','🦅']], F: [['frog','🐸'],['flower','🌸']],
+      G: [['goat','🐐'],['gift','🎁']], H: [['horse','🐴'],['hat','🎩']], I: [['island','🏝️'],['insect','🐛']],
+      J: [['jellyfish','🪼'],['jeans','👖']], K: [['kangaroo','🦘'],['key','🔑']], L: [['lemon','🍋'],['leaf','🍃']],
+      M: [['monkey','🐒'],['mouse','🐭']], N: [['nest','🪺'],['nut','🥜']], O: [['owl','🦉'],['orange','🍊']],
+      P: [['pig','🐷'],['pizza','🍕']], Q: [['question','❓']], R: [['rabbit','🐰'],['robot','🤖']],
+      S: [['snake','🐍'],['star','⭐']], T: [['tiger','🐯'],['train','🚂']], U: [['unicorn','🦄'],['up','⬆️']],
+      V: [['volcano','🌋'],['van','🚐']], W: [['watermelon','🍉'],['watch','⌚']], X: [['box','📦',1]],
+      Y: [['yarn','🧶']], Z: [['zero','0️⃣']]
+    },
+    // Reading words, split into syllables (same pictures/order in every language)
+    read: ['cow','house','moon','cat','dog','ba-na-na','ball','fish','sun','flow-er','ap-ple','bear','sheep','duck','car','milk','bun-ny','goat'],
     letters: [
       ['A','Apple','🍎'],['B','Ball','⚽'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Elephant','🐘'],
       ['F','Fish','🐟'],['G','Grapes','🍇'],['H','House','🏠'],['I','Ice cream','🍦'],['J','Juice','🧃'],
@@ -167,6 +258,20 @@ const LANGS = {
   },
   ro: {
     tts: 'ro-RO', html: 'ro', langName: 'Română',
+    tabs: ['Învață', 'Joacă', 'Numără', 'Citește'],
+    more: {
+      A: [['avion','✈️'],['ananas','🍍']], Ă: [['rață','🦆',1],['casă','🏠',1]], Â: [['pâine','🍞',1],['mână','✋',1]],
+      B: [['balon','🎈'],['broască','🐸']], C: [['casă','🏠'],['cocoș','🐓']], D: [['dinozaur','🦕'],['dovleac','🎃']],
+      E: [['elicopter','🚁']], F: [['floare','🌸'],['furculiță','🍴']], G: [['gogoașă','🍩'],['gură','👄']],
+      H: [['hamster','🐹'],['hartă','🗺️']], I: [['iarbă','🌿'],['insulă','🏝️']], Î: [['înger','👼']],
+      J: [['jaguar','🐆'],['jachetă','🧥']], K: [['kiwi','🥝'],['karate','🥋']], L: [['lămâie','🍋'],['lună','🌙']],
+      M: [['maimuță','🐒'],['mașină','🚗']], N: [['nas','👃']], O: [['oaie','🐑'],['ochelari','👓']],
+      P: [['pisică','🐱'],['pantof','👞']], R: [['rachetă','🚀'],['robot','🤖']], S: [['stea','⭐'],['sanie','🛷']],
+      Ș: [['șarpe','🐍'],['șosetă','🧦']], T: [['tigru','🐯'],['telefon','📱']], Ț: [['țânțar','🦟']],
+      U: [['umbrelă','☂️'],['unicorn','🦄']], V: [['vacă','🐄'],['vulpe','🦊']], Y: [['yo-yo','🪀']],
+      Z: [['zmeu','🪁'],['zar','🎲']]
+    },
+    read: ['va-că','ca-să','lu-nă','pi-si-că','câi-ne','ba-na-nă','min-ge','peș-te','soa-re','floa-re','măr','urs','oa-ie','ra-ță','ma-și-nă','lap-te','ie-pu-re','ca-pră'],
     letters: [
       ['A','Albină','🐝'],['Ă','mașină','🚗',1],['Â','câine','🐕',1],['B','Banană','🍌'],['C','Cal','🐴'],
       ['D','Delfin','🐬'],['E','Elefant','🐘'],['F','Fluture','🦋'],['G','Gunoi','🗑️'],['H','Hipopotam','🦛'],
@@ -196,6 +301,18 @@ const LANGS = {
   },
   de: {
     tts: 'de-DE', html: 'de', langName: 'Deutsch',
+    tabs: ['Lernen', 'Spielen', 'Zählen', 'Lesen'],
+    more: {
+      A: [['Affe','🐒'],['Auto','🚗']], Ä: [['Äpfel','🍎']], B: [['Bär','🐻'],['Banane','🍌']], C: [['Computer','💻']],
+      D: [['Drache','🐉'],['Dino','🦕']], E: [['Ente','🦆'],['Ei','🥚']], F: [['Frosch','🐸'],['Flugzeug','✈️']],
+      G: [['Gans','🪿'],['Geschenk','🎁']], H: [['Hund','🐶'],['Hase','🐰']], I: [['Insel','🏝️']], J: [['Jacke','🧥']],
+      K: [['Kuh','🐄'],['Kuchen','🍰']], L: [['Löffel','🥄'],['Leiter','🪜']], M: [['Maus','🐭'],['Milch','🥛']],
+      N: [['Nest','🪺'],['Nuss','🥜']], O: [['Ohr','👂'],['Orange','🍊']], Ö: [['Löwe','🦁',1]],
+      P: [['Pizza','🍕'],['Pferd','🐴']], R: [['Rakete','🚀'],['Roboter','🤖']], S: [['Sofa','🛋️'],['Socke','🧦']],
+      ß: [['Strauß','💐',1]], T: [['Tomate','🍅'],['Teddy','🧸']], U: [['Ufo','🛸']], Ü: [['Tür','🚪',1]],
+      V: [['Vulkan','🌋']], W: [['Wolke','☁️'],['Wurm','🪱']], Y: [['Yoga','🧘']], Z: [['Zug','🚂'],['Zitrone','🍋']]
+    },
+    read: ['Kuh','Haus','Mond','Kat-ze','Hund','Ba-na-ne','Ball','Fisch','Son-ne','Blu-me','Ap-fel','Bär','Schaf','En-te','Au-to','Milch','Ha-se','Zie-ge'],
     letters: [
       ['A','Apfel','🍎'],['Ä','Ähre','🌾'],['B','Ball','⚽'],['C','Clown','🤡'],['D','Delfin','🐬'],
       ['E','Elefant','🐘'],['F','Fisch','🐟'],['G','Gurke','🥒'],['H','Haus','🏠'],['I','Igel','🦔'],
@@ -215,12 +332,18 @@ const LANGS = {
   }
 };
 const NUMPICS = ['🌞','🐥','🐟','🍓','⭐','🎈','🐞','🍪','🚗','🦋'];
+const READ_PICS = ['🐄','🏠','🌙','🐱','🐶','🍌','⚽','🐟','☀️','🌸','🍎','🐻','🐑','🦆','🚗','🥛','🐰','🐐'];
+// Night palette for letters/bubbles: soft pastels that read well on dark navy
+const INK = ['#ff8f87','#ffb36b','#f2d06b','#93d98f','#6fd3c4','#7fb4ff','#b49cff','#f38fc4'];
+const ink = h => INK[Math.round(h / 45) % 8];
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
 function buildSets(code) {
   const L = LANGS[code];
   const letters = L.letters.map(([ch, w, pic, like], i, a) => ({
     ch, key: ch.toLocaleLowerCase(L.tts), pic, hue: (i * 360 / a.length) | 0,
     word: L.showWord(w, like), say: L.sayLetter(L.spell ? L.spell(ch) : ch, w.toLocaleLowerCase(L.tts), like),
-    name: L.spell ? L.spell(ch) : ch
+    name: L.spell ? L.spell(ch) : ch,
+    ex: [[w, pic, like], ...((L.more || {})[ch] || [])]
   }));
   const numbers = L.nums.map((w, i) => ({
     ch: String(i + 1), key: i === 9 ? '0' : String(i + 1), word: w, pic: NUMPICS[i], n: i + 1,
@@ -230,7 +353,8 @@ function buildSets(code) {
   const sets = { abc: letters, num: numbers };
   if (L.groups) sets.grp = L.groups.map(([g, w, pic], i, a) => ({
     ch: g, key: null, pic, hue: (i * 360 / a.length + 20) | 0, word: w,
-    say: L.sayLetter(g, w.toLocaleLowerCase(L.tts), false), name: g
+    say: L.sayLetter(g, w.toLocaleLowerCase(L.tts), false), name: g,
+    ex: [[w, pic, false]]
   }));
   return sets;
 }
@@ -246,7 +370,8 @@ function defaultLang() {
 }
 let lang = store.get('lang', defaultLang()); if (!LANGS[lang]) lang = 'en';
 let SETS = buildSets(lang);
-let mode = store.get('mode', 'learn');   // 'learn' | 'play'
+let mode = store.get('mode', 'learn');   // 'learn' | 'play' | 'count' | 'read'
+if (!['learn', 'play', 'count', 'read'].includes(mode)) mode = 'learn';
 let setName = store.get('set', 'abc');   // 'abc' | 'num' | 'grp' (letter groups, RO only)
 if (!SETS[setName]) setName = 'abc';
 let stars = store.get('stars', 0);
@@ -357,7 +482,7 @@ function loop() {
     if (p.life <= 0 || p.y > H + 40) { parts.splice(i, 1); continue; }
     fctx.save(); fctx.globalAlpha = Math.min(1, p.life * 1.5);
     fctx.translate(p.x, p.y); fctx.rotate(p.r);
-    fctx.fillStyle = `hsl(${p.hue},95%,62%)`;
+    fctx.fillStyle = INK[(p.hue / 45 | 0) % 8];
     if (p.star) drawStar(fctx, p.s); else fctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
     fctx.restore();
   }
@@ -371,14 +496,21 @@ function showLearn(sayIt = true) {
   const g = $('glyph');
   g.innerHTML = setName === 'abc' && it.key !== it.ch ? `${it.ch}<small>${it.key}</small>` : it.ch;
   g.classList.toggle('grp', setName === 'grp');
-  g.style.color = `hsl(${it.hue},90%,65%)`;
+  g.style.color = ink(it.hue);
   g.classList.remove('pop'); void g.offsetWidth; g.classList.add('pop');
   $('word').textContent = it.word;
   // Arrows show the neighbour they lead to
   const list = items(), L = list.length;
   const pv = list[(idx - 1 + L) % L], nx = list[(idx + 1) % L];
-  $('prev').innerHTML = `◀ <b style="color:hsl(${pv.hue},90%,70%)">${pv.ch}</b>`;
-  $('next').innerHTML = `<b style="color:hsl(${nx.hue},90%,70%)">${nx.ch}</b> ▶`;
+  $('prev').innerHTML = `‹ <b style="color:${ink(pv.hue)}">${pv.ch}</b>`;
+  $('next').innerHTML = `<b style="color:${ink(nx.hue)}">${nx.ch}</b> ›`;
+  // Letters/groups: several tappable example words under the letter, with the letter highlighted
+  const isNum = setName === 'num';
+  $('pics').style.display = $('word').style.display = isNum ? '' : 'none';
+  $('examples').innerHTML = isNum ? '' : it.ex.map(([w, pic], i) => {
+    const shown = lang === 'de' ? w : w.toLocaleLowerCase(LANGS[lang].tts);
+    return `<button class="ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${hl(shown, it.ch, ink(it.hue))}</span></button>`;
+  }).join('');
   // Numbers: show N items to count; letters: one picture
   const n = it.n || 1;
   $('pics').innerHTML = Array.from({ length: n }, (_, i) =>
@@ -386,6 +518,20 @@ function showLearn(sayIt = true) {
   store.set(idxKey(), idx);
   if (sayIt) speak(it.say, 120);
 }
+// Wrap the first occurrence of the letter/group in the word with its colour
+function hl(word, ch, color) {
+  const t = LANGS[lang].tts, i = word.toLocaleLowerCase(t).indexOf(ch.toLocaleLowerCase(t));
+  if (i < 0) return esc(word);
+  return esc(word.slice(0, i)) + `<b style="color:${color}">${esc(word.slice(i, i + ch.length))}</b>` + esc(word.slice(i + ch.length));
+}
+$('examples').addEventListener('pointerdown', e => {
+  const b = e.target.closest('.ex'); if (!b) return;
+  e.stopPropagation(); firstTouch();
+  const it = items()[idx], ex = it.ex[+b.dataset.i];
+  document.querySelectorAll('.ex.lit').forEach(x => x.classList.remove('lit'));
+  b.classList.add('lit'); setTimeout(() => b.classList.remove('lit'), 900);
+  sfx.pop(); speak(ex[0], 80);
+});
 function step(d) {
   const L = items().length;
   idx = (idx + d + L) % L;
@@ -441,7 +587,7 @@ function drawRound() {
     b.className = 'bub';
     b.textContent = face(it);
     b.dataset.ch = it.ch;
-    b.style.background = `radial-gradient(circle at 35% 30%, hsl(${it.hue},95%,72%), hsl(${it.hue},85%,48%))`;
+    b.style.setProperty('--c', ink(it.hue));
     b.style.animationDelay = (i * 0.4) + 's';
     b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
     box.appendChild(b);
@@ -495,8 +641,11 @@ function updateStars() {
 // ====== MODE / SET SWITCHING ======
 let keepRound = false;
 function render() {
-  $('m-learn').classList.toggle('on', mode === 'learn');
-  $('m-play').classList.toggle('on', mode === 'play');
+  document.body.dataset.mode = mode;
+  ['learn', 'play', 'count', 'read'].forEach((m, i) => {
+    $('m-' + m).classList.toggle('on', mode === m);
+    $('m-' + m).querySelector('.tl').textContent = LANGS[lang].tabs[i];
+  });
   $('s-abc').classList.toggle('on', setName === 'abc');
   $('s-123').classList.toggle('on', setName === 'num');
   $('s-grp').classList.toggle('on', setName === 'grp');
@@ -504,16 +653,95 @@ function render() {
   document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
   document.documentElement.lang = LANGS[lang].html;
   $('learn').style.display = mode === 'learn' ? 'flex' : 'none';
-  $('m-count').classList.toggle('on', mode === 'count');
-  $('setgrp').style.visibility = mode === 'count' ? 'hidden' : 'visible';
   $('play').style.display = mode === 'play' ? 'flex' : 'none';
+  $('read').style.display = mode === 'read' ? 'flex' : 'none';
+  $('rnav').style.display = mode === 'read' ? 'flex' : 'none';
   $('count').style.display = mode === 'count' ? 'block' : 'none';
   $('stage').style.display = mode === 'count' ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
-  stopCount();
+  stopCount(); readTok++;
   if (mode === 'learn') showLearn(started);
   else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
+  else if (mode === 'read') renderRead(started);
   else renderCount();
+}
+// ====== READ MODE ======
+// One word with its picture, shown 4 ways: CAPITALS letter by letter, small letters (first capital),
+// syllables, and the whole word. Every tile is tappable; ▶ plays it all in order.
+let readIdx = Math.min(store.get('ridx', 0), READ_PICS.length - 1);
+let readTok = 0;
+const capFirst = (w, t) => w.charAt(0).toLocaleUpperCase(t) + w.slice(1);
+function readData() {
+  const L = LANGS[lang], t = L.tts, syl = L.read[readIdx].split('-');
+  const word = syl.join('');
+  return { L, t, syl, word, pic: READ_PICS[readIdx], shown: capFirst(word, t) };
+}
+function letterSay(ch) { // how one letter is spoken (RO: school sounds bî, cî …; EN/DE: the letter)
+  const L = LANGS[lang], up = ch.toLocaleUpperCase(L.tts);
+  return L.spell ? L.spell(up) : up;
+}
+function letterInk(ch) {
+  const L = LANGS[lang], up = ch.toLocaleUpperCase(L.tts);
+  const it = SETS.abc.find(x => x.ch === up);
+  return it ? ink(it.hue) : 'var(--text)';
+}
+function renderRead(sayIt = true) {
+  const { t, syl, word, pic, shown } = readData();
+  const chars = Array.from(word);
+  const tile = (txt, say, cls = '', color = '') =>
+    `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
+  const upper = chars.map(c => tile(c.toLocaleUpperCase(t), letterSay(c), 'u', letterInk(c))).join('');
+  const lower = Array.from(shown).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
+  const syls = syl.map((sy, i) => (i ? '<span class="rsep">·</span>' : '') +
+    tile(i === 0 ? capFirst(sy, t) : sy, sy, 's', INK[(i * 3 + 4) % 8])).join('');
+  $('read').innerHTML =
+    `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
+    `<div class="rrow" id="rU">${upper}</div>` +
+    `<div class="rrow" id="rL">${lower}</div>` +
+    `<div class="rrow syl" id="rS">${syls}</div>` +
+    `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>`;
+  const n = READ_PICS.length;
+  $('rprev').innerHTML = `‹ <b>${READ_PICS[(readIdx - 1 + n) % n]}</b>`;
+  $('rnext').innerHTML = `<b>${READ_PICS[(readIdx + 1) % n]}</b> ›`;
+  store.set('ridx', readIdx);
+  if (sayIt) speak(word, 150);
+}
+function lightTile(el) {
+  document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit'));
+  if (el) el.classList.add('lit');
+}
+$('read').addEventListener('pointerdown', e => {
+  const el = e.target.closest('[data-say]'); if (!el) return;
+  e.stopPropagation(); firstTouch(); readTok++;
+  lightTile(el.classList.contains('rt') ? el : null);
+  sfx.pop(); speak(el.dataset.say, 60);
+});
+// ▶: spell in capitals letter by letter → small letters (whole word) → syllables → whole word
+async function playRead() {
+  const tok = ++readTok;
+  const alive = () => tok === readTok && mode === 'read';
+  const { word } = readData();
+  for (const el of document.querySelectorAll('#rU .rt')) {
+    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(150);
+  }
+  if (!alive()) return; await wait(300);
+  document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit'));
+  document.querySelectorAll('#rL .rt').forEach(x => x.classList.add('lit'));
+  await speak(word); if (!alive()) return; await wait(300);
+  for (const el of document.querySelectorAll('#rS .rt')) {
+    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(200);
+  }
+  if (!alive()) return; await wait(300);
+  const w = document.querySelector('#rW .rt'); lightTile(w);
+  sfx.right(); await speak(word, 350);
+  if (!alive()) return;
+  const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
+  setTimeout(() => { if (alive()) lightTile(null); }, 800);
+}
+function readStep(d) {
+  const n = READ_PICS.length;
+  readIdx = (readIdx + d + n) % n; readTok++;
+  sfx.pop(); renderRead(true);
 }
 // Same item in another language: exact letter, else its base letter (Ș→S, Ä→A, ß→S); numbers by value.
 function mapItem(it, list) {
@@ -573,7 +801,7 @@ function renderCount() {
     const items = countStyle === 'obj'
       ? Array.from({ length: it.n }, () => `<span class="citem">${it.pic}</span>`).join('')
       : it.n <= 5 ? handSVG(it.n, false) : handSVG(5, false) + handSVG(it.n - 5, true);
-    return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:hsl(${it.hue},90%,65%)">${it.ch}</div><div class="cword">${it.word}</div></div>` +
+    return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:${ink(it.hue)}">${it.ch}</div><div class="cword">${it.word}</div></div>` +
            `<div class="citems${countStyle === 'obj' ? ' obj' : ''}">${items}</div></div>`;
   }).join('');
   document.querySelectorAll('.crow').forEach(r => r.addEventListener('click', () => { ensureAudio(); countRow(+r.dataset.n); }));
@@ -636,6 +864,7 @@ function announceLang() {
   const name = LANGS[lang].langName;
   if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
   else if (mode === 'play' && target) speak(`${name}. ${askLine()}`, 250);
+  else if (mode === 'read') speak(`${name}. ${readData().word}`, 120);
   else speak(`${name}!`, 120);
 }
 document.querySelectorAll('.flag').forEach(f =>
@@ -657,6 +886,10 @@ function tapBtn(id, fn) {
 tapBtn('m-learn', () => setMode('learn'));
 tapBtn('m-play', () => setMode('play'));
 tapBtn('m-count', () => setMode('count'));
+tapBtn('m-read', () => setMode('read'));
+tapBtn('rprev', () => readStep(-1));
+tapBtn('rnext', () => readStep(1));
+tapBtn('rplay', () => playRead());
 tapBtn('c-obj', () => { countStyle = 'obj'; store.set('cstyle', 'obj'); stopCount(); sfx.pop(); renderCount(); });
 tapBtn('c-hand', () => { countStyle = 'hand'; store.set('cstyle', 'hand'); stopCount(); sfx.pop(); renderCount(); });
 tapBtn('c-all', () => countAll());
@@ -672,15 +905,20 @@ $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); speak(askLi
 let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
 $('stage').addEventListener('pointerup', e => {
-  if (sx == null || mode !== 'learn') return;
+  if (sx == null || (mode !== 'learn' && mode !== 'read')) return;
   const dx = e.clientX - sx; sx = null;
-  if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+  if (Math.abs(dx) > 50) (mode === 'read' ? readStep : step)(dx < 0 ? 1 : -1);
 });
 
 // Keyboard: type a letter/digit → it shows up (learn) or counts as an answer (play)
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
+  if (mode === 'read') {
+    if (k === 'arrowright') readStep(1); else if (k === 'arrowleft') readStep(-1);
+    else if (k === ' ' || k === 'enter') { e.preventDefault(); ensureAudio(); playRead(); }
+    return;
+  }
   if (k === 'arrowright') { if (mode === 'learn') step(1); return; }
   if (k === 'arrowleft')  { if (mode === 'learn') step(-1); return; }
   if (e.repeat) return;
