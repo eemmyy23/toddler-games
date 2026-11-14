@@ -1,4 +1,4 @@
-const CACHE = 'toddler-v20';
+const CACHE = 'toddler-v21';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
@@ -6,6 +6,8 @@ const ASSETS = [
   '/toddler-games/manifest-abc.json',
   '/toddler-games/abc-icon-192.png',
   '/toddler-games/abc-icon-512.png',
+  '/toddler-games/fonts/fredoka-latin.woff2',
+  '/toddler-games/fonts/fredoka-latin-ext.woff2',
   '/toddler-games/manifest.json',
   '/toddler-games/manifest-paint.json',
   '/toddler-games/icon-192.png',

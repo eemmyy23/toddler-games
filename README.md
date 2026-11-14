@@ -11,7 +11,12 @@ Tiny, no-instructions web games for very small children. Each one is a single se
   Move the mouse — no clicking needed — to paint the canvas in rainbow colors. **Hold left-click** to spray stars instead of paint. **Middle-click** (or the sponge button) resets the canvas. Touch-drag paints the same way. Pitched musical voice follows the brush, with sparkle bursts and chime pings.
 
 - 🔤 **ABC 123!** — [eemmyy23.github.io/toddler-games/abc.html](https://eemmyy23.github.io/toddler-games/abc.html)
-  **📖 Learn:** big letter (A a) or number with a picture ("A is for Apple", 5 → five strawberries to count), spoken aloud. Swipe, arrows, or type any key to jump to it. **🎈 Play:** "Find the B!" — tap the right bubble for confetti and a ⭐; wrong taps just wobble and repeat the question. Rounds mix: uppercase or **lowercase** bubbles, the target shown as symbol, **voice only** (👂, target hidden), or for numbers **written as a word** ("three" / "trei" / "drei"). Starts with 2 bubbles, grows to 3–4 on a streak; missed items come back more often. Big fanfare every 10 stars. **🧮 Count:** all numbers 1–10 on one page, as objects 🍓 (grouped 5 per row, like a ten-frame) or fingers ✋ (left + mirrored right hand; index first, thumb = 5). Tap a row (or type a digit) to hear that number; **▶ 1→10** says each number row by row. Switching the flag keeps the same letter/number/question. **ghi** (Romanian only): advanced letter groups ce, ci, che, chi, ge, gi, ghe, ghi in Learn and Play.
+  Letters and numbers in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, with a dark night theme and a bottom tab bar:
+  - **📖 Learn:** big letter (A a) with several tappable example words and pictures (letter highlighted in each word); numbers 1–10 with objects. RO letters are spoken as school sounds (bî, cî, zî). RO also has the **ghi** set (ce, ci, che, chi, ge, gi, ghe, ghi).
+  - **🎈 Play:** "Find the B!" bubbles, lowercase / voice-only / number-word rounds, stars.
+  - **🧮 Count:** 1–10 as objects (rows of 5) or mirrored hands, with the number word.
+  - **📚 Read:** a word with its picture shown as CAPITALS letter by letter, small letters, syllables (va · că) and the whole word; tap any tile to hear it, ▶ plays all.
+  Switching the flag keeps the same item and says it in the new language.
 
 ## Installing
 
