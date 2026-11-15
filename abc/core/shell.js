@@ -40,6 +40,21 @@ const APP = {
   screen: () => atHub ? 'hub' : mode === 'play' ? 'play' : tileOf().view,
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
   firstTouch, infoButton: c => infoFor(c) ? `<button class="infobtn" data-c="${esc(c)}">📖 ${esc(APP.ui().info)}</button>` : '',
+  // fit a screen's content between the top bar and the lowest fixed control above the tab bar (generic for every view):
+  // 1) optional compact class, 2) if still too tall, scale the whole block so it fits exactly (taps scale with it)
+  fit(el, compact) {
+    el.classList.remove(compact); el.style.transform = ''; el.style.transformOrigin = '';
+    const kids = [...el.children]; if (!kids.length) return;
+    const lim0 = $('bar').getBoundingClientRect().bottom + 4;
+    const low = ['rnav', 'prev', 'next'].map($).filter(e => e && e.style.display !== 'none' && getComputedStyle(e).display !== 'none');
+    const lim1 = Math.min($('tabs').getBoundingClientRect().top, ...low.map(e => e.getBoundingClientRect().top)) - 4;
+    const span = () => [Math.min(...kids.map(k => k.getBoundingClientRect().top)), Math.max(...kids.map(k => k.getBoundingClientRect().bottom))];
+    let [top, bot] = span();
+    if (top >= lim0 && bot <= lim1) return;
+    if (compact) { el.classList.add(compact); [top, bot] = span(); if (top >= lim0 && bot <= lim1) return; }
+    const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
+    el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
+  },
   addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.textContent = '⭐ ' + APP.stars; s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
 const tileOf = () => TILE[tileId];

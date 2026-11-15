@@ -71,7 +71,7 @@ Tile flags: `index: true` → ⊞ grid of all items (A–Z sections + side lette
 ## Checks
 ```
 node tools/check.js --fix      # after every change: checks content, rewrites abc/manifest.js
-node tools/fast.js [WxH]       # < 3 s, no server: layout of every hub × profile + 3 screenshots — after any CSS/markup edit
+node tools/fast.js            # ~2 s, no server: every screen × 7 sizes (320×480 → 1920×1080) — after any CSS/markup edit
 node tools/smoke.js [url] [WxH]  # full suite (minutes), needs the repo's parent folder served on :8765 — before a push
 ```
 CI runs check + smoke on every PR and on main (`.github/workflows/check.yml`).
@@ -79,3 +79,5 @@ CI runs check + smoke on every PR and on main (`.github/workflows/check.yml`).
 ## UI rule
 One class and one base style per component (e.g. `.ht` is the tile in every hub). No per-section or per-screen overrides;
 size comes from the content and shared tokens, so a new module looks right without new CSS.
+One content column: `--col` / `--gut` in `:root` place the top bar, every screen, the ‹ › arrows, the overlays and the tab bar.
+A screen too tall for the space calls `APP.fit(el, compactClass)` (compact first, then scale to fit) instead of its own sizing code.

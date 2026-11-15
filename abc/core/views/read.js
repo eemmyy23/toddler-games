@@ -42,12 +42,7 @@
     if (sayIt) speak(word, 150);
   }
   // small screens (e.g. 320×568): if the rows run under the ‹ ▶ › bar, switch to the compact layout
-  function fit() {
-    const el = $('read'); el.classList.remove('tight');
-    const over = () => { const first = el.firstElementChild, last = el.lastElementChild, nav = $('rnav'), bar = $('bar');
-      return !!last && nav.style.display !== 'none' && (last.getBoundingClientRect().bottom > nav.getBoundingClientRect().top - 4 || first.getBoundingClientRect().top < bar.getBoundingClientRect().bottom); };
-    if (over()) el.classList.add('tight');
-  }
+  const fit = () => APP.fit($('read'), 'tight');   // compact layout first, then scale to fit (shared rule, see APP.fit)
   $('read').addEventListener('pointerdown', e => {
     const el = e.target.closest('[data-say]'); if (!el) return;
     e.stopPropagation(); APP.firstTouch(); tok++;
