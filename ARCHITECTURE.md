@@ -62,7 +62,7 @@ tools/smoke.js              browser test: every language, every game, speech, of
 ## Contracts
 **LANG** (`grammar.js`) — required: `name, flag, bcp47, letters` (space-separated units, multi-character allowed), `forms(entry, word) → { sg: [a, the], pl: [two, the] } | null`.
 Optional: `dir`, `keepCase`, `spell(letter)`, `fold(text)` (search), `voices` (RegExp of preferred voice names), `checkForms(entry)` / `checkWord(entry)` → message.
-Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayLetter(name, word, inside)`, `groups`.
+Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayLetter(name, word, inside)`, `groups`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
 
 **WORDS** — `w(id, { w: 'va/că', … })`, `/` marks syllables. **INFO** — `i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })`. **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
 
@@ -73,7 +73,7 @@ Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
 `key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
-games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`.
+games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `sound` (items with the same sound are never choices in one round).
 
 **VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
