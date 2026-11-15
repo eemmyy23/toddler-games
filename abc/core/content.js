@@ -9,6 +9,7 @@ const CONTENT = {
       return { id: e.id, concept: e.id, pic: c.pic, w, syl, say: I18N.t(L.strings.exclaim, { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e };
     });
   },
+  exclaim: (code, name) => I18N.t(ABC.langs[code].strings.exclaim, { name }),
   _abc: {},
   alphabet(code) {
     if (this._abc[code]) return this._abc[code];
@@ -21,7 +22,7 @@ const CONTENT = {
   pic: id => ABC.art[id] ? `<svg class="art" viewBox="0 0 32 32" aria-hidden="true">${ABC.art[id]}</svg>` : ABC.conceptById[id].pic,
   the: x => x.forms && x.forms.sg ? x.forms.sg[1] : null,
   thing: (x, more) => Object.assign({ id: x.id, label: x.w, name: x.w, say: x.say, big: CONTENT.pic(x.id), word: x.w, nav: ABC.art[x.id] ? CONTENT.pic(x.id) : x.pic, pic: x.pic,
-    concept: x.id, the: CONTENT.the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? CONTENT.pic(x.id) : null, pictureBubble: true, prompt: x.w, plural: !!x.entry.plOnly, a: x.forms && x.forms.sg ? x.forms.sg[0] : null, g: x.entry.g }, more),
+    concept: x.id, the: CONTENT.the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? CONTENT.pic(x.id) : null, pictureBubble: true, prompt: x.w, plural: !!x.entry.plOnly, a: x.forms && x.forms.sg ? x.forms.sg[x.entry.unique ? 1 : 0] : null, g: x.entry.g }, more),
   set(code, spec, s) {
     const by = new Map(this.words(code).map(x => [x.id, x])), ex = ids => (ids || '').split(' ').map(i => by.get(i)).filter(Boolean).map(y => [y.w, y.pic, false]);
     return spec.map(e => by.get(e.id) && this.thing(by.get(e.id), Object.assign({ examples: ex(e.ex) }, e.sound ? { sound: e.sound } : {}, s && s.say && s.say[e.id] ? { say: s.say[e.id] } : {}))).filter(Boolean);

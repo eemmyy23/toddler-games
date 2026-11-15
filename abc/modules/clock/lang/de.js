@@ -1,5 +1,5 @@
 MSTRINGS('clock', 'de', {
-  tiles: { clock: ['Die Uhr', 'Wo ist drei Uhr?'], halves: ['Halb', 'Wo ist halb vier?'] },
+  tiles: { clock: ['Die Uhr', 'Finde die Uhrzeit'], halves: ['Halb', 'Finde halb'] },
   games: { where: 'Wo ist {name}?' },
   hours: ['ein Uhr', 'zwei Uhr', 'drei Uhr', 'vier Uhr', 'fünf Uhr', 'sechs Uhr', 'sieben Uhr', 'acht Uhr', 'neun Uhr', 'zehn Uhr', 'elf Uhr', 'zwölf Uhr'],
   halves: ['halb zwei', 'halb drei', 'halb vier', 'halb fünf', 'halb sechs', 'halb sieben', 'halb acht', 'halb neun', 'halb zehn', 'halb elf', 'halb zwölf', 'halb eins'],

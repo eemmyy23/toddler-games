@@ -1,5 +1,5 @@
 {
-  const SHOWN = 8, ALIKE = ['farm-animals birds', 'fruit vegetables food'];
+  const SHOWN = 8, ALIKE = ['farm-animals wild-animals birds bugs sea-animals', 'fruit vegetables food'];
   MODULE('categories', {
     section: 'disc', ages: [3, 7],
     build(code) {

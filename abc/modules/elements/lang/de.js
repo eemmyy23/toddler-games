@@ -10,7 +10,7 @@ MSTRINGS('elements', 'de', {
            B: 'Es steckt in hitzefestem Glas.',
            C: 'Alle Lebewesen enthalten Kohlenstoff, und Diamant ist reiner Kohlenstoff.',
            N: 'Der größte Teil der Luft, die wir atmen.',
-           O: 'Wir atmen ihn, um zu leben.',
+           O: 'Wir atmen ihn ein, um zu leben.',
            F: 'Fluorid in der Zahnpasta schützt die Zähne.',
            Ne: 'Es bringt Leuchtreklamen zum Leuchten.',
            Na: 'Mit Chlor bildet es Kochsalz.',

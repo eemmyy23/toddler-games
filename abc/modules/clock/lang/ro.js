@@ -1,5 +1,5 @@
 MSTRINGS('clock', 'ro', {
-  tiles: { clock: ['Ceasul', 'Unde e ora trei?'], halves: ['Și jumătate', 'Unde e trei și jumătate?'] },
+  tiles: { clock: ['Ceasul', 'Găsește ora'], halves: ['Și jumătate', 'Găsește ora și jumătate'] },
   games: { where: 'Unde e {name}?' },
   hours: ['ora unu', 'ora două', 'ora trei', 'ora patru', 'ora cinci', 'ora șase', 'ora șapte', 'ora opt', 'ora nouă', 'ora zece', 'ora unsprezece', 'ora douăsprezece'],
   halves: ['unu și jumătate', 'două și jumătate', 'trei și jumătate', 'patru și jumătate', 'cinci și jumătate', 'șase și jumătate',

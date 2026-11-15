@@ -213,7 +213,7 @@ C('music', '🎼');
 GROUP('farm-animals', 'cow sheep goat horse pig duck rooster hen chick goose rabbit dog cat kid lamb calf foal piglet duckling kitten');
 GROUP('wild-animals', 'bear elephant hippo lion fox zebra koala tiger monkey giraffe kangaroo jaguar hedgehog mouse snake frog');
 GROUP('birds', 'bird eagle owl penguin');
-GROUP('bugs', 'bee butterfly ant ladybird mosquito bug worm snail');
+GROUP('bugs', 'bee butterfly ant ladybird mosquito bug');
 GROUP('sea-animals', 'fish dolphin whale octopus jellyfish turtle');
 GROUP('fruit', 'apple banana grape pineapple kiwi lemon cherry watermelon orange strawberry');
 GROUP('vegetables', 'cucumber tomato pumpkin carrot potato');

@@ -1,5 +1,5 @@
 MSTRINGS('opposites', 'ro', {
-  tiles: { opposites: ['Contrarii', 'Care e mare?'] },
+  tiles: { opposites: ['Contrarii', 'Găsește contrariul'] },
   word: { big: 'mare', small: 'mic', hot: 'fierbinte', cold: 'rece', fast: 'repede', slow: 'încet', heavy: 'greu', light: 'ușor',
           floats: 'plutește', sinks: 'se scufundă', long: 'lung', short: 'scurt' },
   say: { big: 'Elefantul e mare!', small: 'Șoarecele e mic!', hot: 'Focul e fierbinte!', cold: 'Zăpada e rece!', fast: 'Jaguarul aleargă repede!',

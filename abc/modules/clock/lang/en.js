@@ -1,5 +1,5 @@
 MSTRINGS('clock', 'en', {
-  tiles: { clock: ['The clock', "Where is three o'clock?"], halves: ['Half past', 'Where is half past three?'] },
+  tiles: { clock: ['The clock', 'Find the time'], halves: ['Half past', 'Find half past'] },
   games: { where: 'Where is {name}?' },
   hours: ["one o'clock", "two o'clock", "three o'clock", "four o'clock", "five o'clock", "six o'clock", "seven o'clock", "eight o'clock",
           "nine o'clock", "ten o'clock", "eleven o'clock", "twelve o'clock"],

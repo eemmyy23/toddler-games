@@ -1,5 +1,5 @@
 MSTRINGS('numbers', 'ro', {
-  tiles: { digits: ['Cifre', 'Găsește cifra'], count: ['Numără', 'Câte sunt?'], teens: ['Numere 11–20', 'Găsește numărul'], tens: ['Zeci', 'Găsește zecile'], big: ['Numere mari', 'Găsește numărul mare'] },
+  tiles: { digits: ['Numere 1–10', 'Găsește numărul'], count: ['Numără', 'Câte sunt?'], teens: ['Numere 11–20', 'Găsește 11–20'], tens: ['Zeci', 'Găsește zecile'], big: ['Numere mari', 'Găsește numărul mare'] },
   bigNames: ['o sută', 'o mie', 'zece mii', 'o sută de mii', 'un milion', 'infinit'],
   bigSay: ['O sută! Zece grupe de zece.', 'O mie! Zece grupe de o sută.', 'Zece mii! Zece grupe de o mie.', 'O sută de mii! Zece grupe de zece mii.',
            'Un milion! O mie de mii. Ca să numeri până la un milion ți-ar trebui câteva săptămâni!',

@@ -1,5 +1,5 @@
 MSTRINGS('planets', 'en', {
-  tiles: { planets: ['The Solar System', 'Where is Mars?'] },
+  tiles: { planets: ['The Solar System', 'Find the planet'] },
   games: { where: 'Where is {the}?' },
   say: { sun: 'The Sun is the star in the middle of the Solar System. All the planets go around it.', mercury: 'Mercury is the smallest planet and the closest to the Sun.',
          venus: 'Venus is the hottest planet.', earth: 'The Earth is our home: it has water, air and life.', mars: 'Mars is the red planet.',

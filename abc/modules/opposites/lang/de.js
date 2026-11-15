@@ -1,5 +1,5 @@
 MSTRINGS('opposites', 'de', {
-  tiles: { opposites: ['Gegensätze', 'Was ist groß?'] },
+  tiles: { opposites: ['Gegensätze', 'Finde das Gegenteil'] },
   word: { big: 'groß', small: 'klein', hot: 'heiß', cold: 'kalt', fast: 'schnell', slow: 'langsam', heavy: 'schwer', light: 'leicht',
           floats: 'schwimmt', sinks: 'sinkt', long: 'lang', short: 'kurz' },
   say: { big: 'Der Elefant ist groß!', small: 'Die Maus ist klein!', hot: 'Das Feuer ist heiß!', cold: 'Der Schnee ist kalt!', fast: 'Der Jaguar läuft schnell!',

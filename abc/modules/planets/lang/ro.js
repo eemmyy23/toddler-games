@@ -1,5 +1,5 @@
 MSTRINGS('planets', 'ro', {
-  tiles: { planets: ['Sistemul solar', 'Unde e Marte?'] },
+  tiles: { planets: ['Sistemul solar', 'Găsește planeta'] },
   games: { where: 'Unde e {the}?' },
   say: { sun: 'Soarele e steaua din mijlocul sistemului solar. Toate planetele se învârt în jurul lui.', mercury: 'Mercur e cea mai mică planetă și cea mai apropiată de Soare.',
          venus: 'Venus e cea mai fierbinte planetă.', earth: 'Pământul e casa noastră: are apă, aer și viață.', mars: 'Marte e planeta roșie.',

@@ -1,5 +1,5 @@
 MSTRINGS('health', 'en', {
-  tiles: { clean: ['Germs and washing', 'Where is the soap?'], immune: ['The immune system', 'Who fights the germs?'] },
+  tiles: { clean: ['Germs and washing', 'What keeps us clean?'], immune: ['The immune system', 'Who fights the germs?'] },
   games: { where: 'Where is {the}?',
            which: { germ: 'What can make us ill?', blood: 'What carries white blood cells around the body?', fever: 'What shows the body is fighting germs?',
                     vaccine: 'What teaches the body to recognise a germ?', bandage: 'What keeps germs away from a cut?' } },

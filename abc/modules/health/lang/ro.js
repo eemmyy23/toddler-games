@@ -1,5 +1,5 @@
 MSTRINGS('health', 'ro', {
-  tiles: { clean: ['Microbi și curățenie', 'Unde e săpunul?'], immune: ['Sistemul imunitar', 'Cine luptă cu microbii?'] },
+  tiles: { clean: ['Microbi și curățenie', 'Ce ne ține curați?'], immune: ['Sistemul imunitar', 'Cine luptă cu microbii?'] },
   games: { where: 'Unde e {the}?',
            which: { germ: 'Ce ne poate îmbolnăvi?', blood: 'Ce duce globulele albe prin tot corpul?', fever: 'Ce arată că organismul luptă cu microbii?',
                     vaccine: 'Ce îl învață pe corp să recunoască un microb?', bandage: 'Ce ține microbii departe de o rană?' } },

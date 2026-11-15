@@ -3,5 +3,5 @@ MSTRINGS('colors', 'ro', {
   games: { colors: 'Unde e {name}?' },
   colors: { red: 'roșu', blue: 'albastru', yellow: 'galben', green: 'verde', orange: 'portocaliu', purple: 'mov',
             pink: 'roz', brown: 'maro', black: 'negru', white: 'alb', rainbow: 'curcubeu' },
-  rainbow: ['roșu', 'oranj', 'galben', 'verde', 'albastru', 'indigo', 'violet']
+  rainbow: ['roșu', 'portocaliu', 'galben', 'verde', 'albastru', 'indigo', 'violet']
 });
