@@ -152,7 +152,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await search('ziege')).includes('read:goat'), 'search "Ziege" (DE, any case) → capră');
   ok((await search('zwei'))[0] === 'digits:n2', 'search "zwei" → 2');
   const rot = await search('rot');
-  ok(rot[0] === 'colors:red' && !rot.includes('read:turtle'), `search "rot" → roșu first, no substring noise (${rot.join(' ')})`);
+  ok(rot[0].endsWith(':red') && rot.length === 1, `search "rot" → one result for roșu, no substring noise (${rot.join(' ')})`);
+  ok(await ev(() => [...document.querySelectorAll('.sr .link')].map(l => l.dataset.t).join()) === 'read,colors', 'roșu links to Citește and Culori');
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
   await ev(() => { document.querySelector('.sr').click(); });
   ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');

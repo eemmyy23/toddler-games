@@ -277,14 +277,17 @@ function runSearch() {
   if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
   const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; };
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
-    .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1])).slice(0, 40);
-  $('smeta').textContent = hits.length ? APP.t(U.search.results, { n: hits.length }) : U.search.none;
+    .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1]));
+  const groups = new Map();
+  for (const h of hits) { const k = h.x.it.concept || `${h.x.t.id}:${h.x.it.id}`; if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
+  const rows = [...groups.values()].slice(0, 40);
+  $('smeta').textContent = rows.length ? APP.t(U.search.results, { n: rows.length }) : U.search.none;
   const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };
-  $('sres').innerHTML = hits.map(({ x }) => {
+  $('sres').innerHTML = rows.map(([x, ...more]) => {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
-    return `<button class="sr" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
-      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>` +
-      `${tileIcon(x.t, 'srk')}</button>`;
+    const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
+    return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
+      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>${icons}</div>`;
   }).join('');
 }
 function openSearch() {
@@ -294,7 +297,7 @@ function openSearch() {
 const closeSearch = () => { $('search').hidden = true; $('sq').blur(); };
 $('sq').addEventListener('input', runSearch);
 $('sres').addEventListener('click', e => {
-  const b = e.target.closest('.sr'); if (!b) return; firstTouch(); closeSearch(); closeIndex();
+  const b = e.target.closest('.sr'); if (!b || e.target.closest('.link')) return; firstTouch(); closeSearch(); closeIndex();
   openTile(b.dataset.t, false, true); const i = APP.indexOf(b.dataset.id);
   if (i >= 0) { APP.idx = i; APP.saveIdx(); } view().show(true);
 });
