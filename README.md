@@ -11,20 +11,17 @@ Tiny, no-instructions web games for very small children. Each one is a single se
   Move the mouse — no clicking needed — to paint the canvas in rainbow colors. **Hold left-click** to spray stars instead of paint. **Middle-click** (or the sponge button) resets the canvas. Touch-drag paints the same way. Pitched musical voice follows the brush, with sparkle bursts and chime pings.
 
 - 🔤 **ABC 123!** — [eemmyy23.github.io/toddler-games/abc.html](https://eemmyy23.github.io/toddler-games/abc.html)
-  Letters and numbers in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, with a dark night theme and a bottom tab bar:
-  - **📖 Learn:** big letter (A a) with several tappable example words and pictures (letter highlighted in each word); numbers 1–10 with objects. RO letters are spoken as school sounds (bî, cî, zî). RO also has the **ghi** set (ce, ci, che, chi, ge, gi, ghe, ghi).
-  - **🎈 Play:** "Find the B!" bubbles, lowercase / voice-only / number-word rounds, stars.
-  - **🧮 Count:** 1–10 as objects (rows of 5) or mirrored hands, with the number word.
-  - **📚 Read:** a word with its picture shown as CAPITALS letter by letter, small letters, syllables (va · că) and the whole word; tap any tile to hear it, ▶ plays all.
-  Switching the flag keeps the same item and says it in the new language.
+  Numbers, letters, reading and colours in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, dark night theme, tabs **Numere · Litere · Descoperă · Joacă**:
+  - **🔢 Numbers:** digits 1–10 and a counting page (objects or hands, index finger first, thumb = 5).
+  - **🔤 Letters:** big letter with example words (RO school sounds bî, cî, zî; RO letter groups ce/ci/che/chi/ge/gi/ghe/ghi); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
+  - **🔎 Discover:** colours and a tappable rainbow; "What is it?" cards read aloud.
+  - **🎯 Play:** one game for every learn screen, paired automatically; stars.
+  Switching the flag keeps the same item (and the same question in a game). The three bikes next to the flags pick the age: balance bike 2–4 · training wheels 4–7 · mountain bike 7–12 (icons from Microsoft Fluent Emoji, MIT; people are never altered). Anyone can switch; a higher age only adds topics.
 
 ## Installing
 
 Each game is a Progressive Web App. Open the link, then use your browser's "Install" / "Add to Home Screen" prompt to run it fullscreen offline.
 
-## Adding words (ABC 123!)
+## Extending ABC 123!
 
-All words live in one dictionary, `WORDS` in `abc.html`: one row per picture, `[emoji, en, ro, de]`.
-Syllables are split with `/`, forms follow `|` (EN `a|plural`, RO `un/o|definite|plural`, DE `der/die/das|plural`); a leading `!` keeps the word out of first-letter examples.
-Defective nouns: plural `-` = no plural (milk, lapte, Milch; use article `-` for mass nouns), article `pl` = no singular (glasses, ochelari, blugi). Read then shows "— no plural" / "— nu are singular" in the table.
-A word added there appears automatically under its letter in Learn, in the RO letter groups, in Read (if it has forms) and in the index.
+Words, colours, info cards, languages and subjects are data. See [ARCHITECTURE.md](ARCHITECTURE.md) for the layout and step-by-step recipes, and run `node tools/check.js --fix` after any change (it checks the content and regenerates `abc/manifest.js`).

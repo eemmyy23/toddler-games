@@ -34,25 +34,34 @@ body{color:var(--text);font-family:var(--font);background:var(--bg0);
     radial-gradient(1.5px 1.5px at 22% 66%,rgba(255,240,200,.3),transparent 60%),
     radial-gradient(ellipse at 50% 0%,#1b2156 0%,transparent 60%),
     linear-gradient(180deg,var(--bg1),var(--bg0))}
-body[data-mode=count],body[data-mode=read]{--top:70px}
+body{--top:70px} /* one top row everywhere: flags · back · (index) · (stars) */
 button{font-family:var(--font)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
 
 /* Top bar: flags + stars, then the set switcher */
 #bar{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 8px;padding:max(10px,env(safe-area-inset-top)) 12px 6px}
-.brk{flex-basis:100%;height:0}
 .group{display:flex;gap:6px;background:var(--card);border-radius:999px;padding:5px;box-shadow:var(--shadow)}
 #flags{gap:6px}
 .flag{border:none;background:transparent;border-radius:999px;width:52px;height:44px;font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
 .flag.on{opacity:1;filter:none;background:var(--amber-soft);box-shadow:inset 0 0 0 2px var(--amber)}
-#gridbtn{margin-left:auto;width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
-body[data-mode=play] #gridbtn,body[data-mode=count] #gridbtn{display:none}
-body[data-mode=play] #stars,body[data-mode=count] #stars{margin-left:auto}
+#gridbtn{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#gridbtn,#barback{display:none}
+body:not([data-mode=play]) #stars{display:none}
+body.topic #barback{display:flex;margin-left:auto}
+body.idx #gridbtn{display:flex}
+#barback{height:54px;padding:0 14px;border:none;border-radius:999px;background:var(--card);color:var(--amber);font-size:22px;font-weight:600;align-items:center;gap:4px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
 #stars{background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
-#setgrp{margin:0 auto}
-body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count] .brk,body[data-mode=read] .brk{display:none}
-.tbtn{border:none;border-radius:999px;min-width:64px;height:46px;padding:0 16px;font-size:21px;font-weight:600;color:var(--text);background:transparent;cursor:pointer;touch-action:manipulation}
-.tbtn.on{background:var(--amber);color:var(--amber-ink)}
+#hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(92px,1fr);gap:12px;padding:4px 2px 8px}
+.ht{position:relative;border:none;border-radius:26px;background:var(--card);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);font-size:19px;font-weight:600;padding:8px;text-align:center;line-height:1.15}
+.ht .hp{font-size:48px;line-height:1}
+.hh{grid-column:1/-1;font-size:15px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 0;align-self:end}
+body[data-sec=play] #hub{grid-auto-rows:auto}
+body[data-sec=play] .ht{min-height:104px}
+#ask .objs{display:grid;grid-template-columns:repeat(5,auto);gap:4px 10px;font-size:min(6vh,9vw);line-height:1.1;cursor:default}
+#choices.wrd .bub{font-size:calc(var(--s)*.5)}
+.ht:active{background:var(--card2)}
+.ht.soon{opacity:.45;cursor:default}
+.ht .badge{position:absolute;top:8px;right:10px;font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:999px;padding:2px 8px}
 
 /* Bottom tab bar, like a regular app */
 #tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;height:var(--bot);padding:4px 8px min(env(safe-area-inset-bottom), 8px);display:flex;justify-content:space-around;align-items:flex-start;background:rgba(13,17,44,.94);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
@@ -63,13 +72,20 @@ body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count]
 .tab.on .ti{filter:none;transform:scale(1.08)}
 
 #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) 12px calc(var(--bot) + 12px)}
-body[data-mode=learn] #stage{padding-bottom:calc(var(--bot) + 100px)}
+body[data-mode=card] #stage{padding-bottom:calc(var(--bot) + 100px)}
 body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 
 /* Learn */
 #learn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:1.6vh}
 #glyph{font-size:min(28vh,46vw);line-height:1.1;font-weight:700;cursor:pointer;text-shadow:0 6px 0 rgba(0,0,0,.35);transition:transform .15s}
 #glyph.grp{font-size:min(22vh,26vw)}
+.sw{display:inline-block;width:min(30vh,52vw);height:min(30vh,52vw);border-radius:50%;box-shadow:inset 0 -10px 0 rgba(0,0,0,.15),0 10px 30px rgba(0,0,0,.45);border:3px solid rgba(255,255,255,.22);vertical-align:middle}
+.rbsvg{display:block;width:min(44vh,80vw);height:auto;overflow:visible}
+.rbb{fill:none;stroke-width:10.6}
+.part{cursor:pointer;transition:opacity .2s,filter .2s}
+#glyph.on .part{opacity:.28}
+#glyph.on .part.lit{opacity:1;filter:drop-shadow(0 0 5px rgba(255,255,255,.8))}
+.nav .dot{display:inline-block;width:40px;height:40px;border-radius:50%;vertical-align:middle;border:2px solid rgba(255,255,255,.25)}
 #glyph small{font-size:.5em;opacity:.85;margin-left:.06em}
 #glyph.pop{animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
@@ -130,7 +146,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 .rt{border:none;flex:0 1 54px;min-width:34px;height:58px;border-radius:16px;background:var(--card);color:var(--text);font-size:32px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);transition:transform .15s,background .15s,box-shadow .15s}
 .rrow.syl .rt{flex:0 1 auto;min-width:0;padding:0 min(16px,2.4vw);font-size:var(--sf,32px)}
 .rrow.let .rt{flex:0 0 var(--tw,54px);width:var(--tw,54px);min-width:0;font-size:var(--tf,32px)}
-.rt.word{flex:0 1 auto;padding:0 26px;font-size:36px;height:64px;color:var(--amber)}
+.rt.word{flex:0 0 auto;padding:0 26px;font-size:36px;height:64px;color:var(--amber)}
 .rt.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-4px) scale(1.06)}
 .rsep{align-self:center;color:var(--muted);font-size:26px}
 .rc{border:none;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--text);border-radius:999px;height:52px;padding:0 16px 0 10px;font-size:20px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);white-space:nowrap;transition:transform .15s,background .15s,box-shadow .15s}
@@ -142,6 +158,31 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:4px 8px;gap:0;border-radius:18px}
 #rC.tall .rce{font-size:18px}
 .rc.none{background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--muted);font-size:14px;justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.1;padding:0 8px}
+.infobtn{display:inline-block;border:none;margin-top:4px;height:48px;padding:0 20px;border-radius:999px;background:var(--card);color:var(--amber);font-size:19px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#info{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 14px 14px}
+#info.open{display:flex}
+#infohead{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+#infotitle{flex:1;font-size:24px;font-weight:700}
+#infoclose{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--text);font-size:24px;cursor:pointer}
+#infolist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:flex;flex-direction:column;gap:10px;max-width:640px;width:100%;margin:0 auto}
+.inf{border:none;display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);color:var(--text);border-radius:20px;padding:12px 16px;font-size:19px;font-weight:500;line-height:1.3;cursor:pointer;touch-action:manipulation;transition:background .2s,box-shadow .2s}
+.inf .ie{font-size:36px;flex:0 0 auto}
+.inf.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber)}
+#infofoot{display:flex;justify-content:center;padding-top:12px}
+#infoplay{width:72px;height:72px;border-radius:50%;border:none;background:var(--amber);color:var(--amber-ink);font-size:32px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+@media (max-height:700px){.inf{font-size:17px;padding:9px 12px}.inf .ie{font-size:28px}#infoplay{width:60px;height:60px}}
+.flag{position:relative}
+.flag .nv{display:none;position:absolute;right:-2px;bottom:-4px;font-size:14px;font-style:normal}
+.flag.novoice .nv{display:block}
+/* age profiles: three bikes in the middle of the bar (hubs only — inside a lesson the bar holds back/index/stars) */
+#ages{margin:0 auto;gap:4px}
+body.topic #ages{display:none}
+.age{border:none;background:transparent;border-radius:999px;width:50px;height:44px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;opacity:.45;filter:saturate(.6);transition:opacity .15s,background .15s}
+.age svg{width:34px;height:34px;display:block}
+.age small{font-size:10px;line-height:1;color:var(--muted);font-weight:600;margin-top:-3px}
+.age.on{opacity:1;filter:none;background:var(--amber-soft);box-shadow:inset 0 0 0 2px var(--amber)}
+.age.on small{color:var(--amber)}
+@media (max-width:350px){.age{width:40px;height:40px}.age svg{width:30px;height:30px}}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
 #ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
@@ -165,46 +206,42 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 @media (max-width:440px){
   #bar{padding-left:8px;padding-right:8px}
   .flag{width:46px}
-  .tbtn{min-width:56px;padding:0 12px;font-size:19px}
   .cnum{width:76px}.cdig{font-size:44px}.cword{font-size:16px}.citems{font-size:26px;min-height:48px}.hand{width:68px;height:78px}
-  .rt{height:52px;font-size:28px}.rt.word{font-size:32px;height:58px}
+  .rt{height:52px;font-size:28px}.rt.word{font-size:32px;height:58px;padding:0 16px}
   .ex{min-width:88px;padding:8px 10px 6px}.ex .ep{font-size:34px}.ex .ew{font-size:17px}
 }
 @media (max-height:700px){
+  .ht{font-size:17px;gap:4px}.ht .hp{font-size:36px}#hub{gap:10px}
   #glyph{font-size:min(24vh,42vw)}
   .rt{height:42px;font-size:24px}.rt.word{height:46px;font-size:28px}#rpic{font-size:9vh}.rc{height:44px;font-size:17px}.rc .rce{font-size:20px}
   #read{gap:1vh}
+  #read.tight{gap:4px}#read.tight #rpic{font-size:7vh}#read.tight .rt{height:36px;font-size:21px}#read.tight .rt.word{height:40px;font-size:25px}
+  #read.tight .rc{height:36px}#read.tight .rc .rce{display:none}#read.tight #rC.tall .rc{padding:2px 8px}
   .ex{flex-direction:row;gap:6px;padding:6px 12px 6px 8px;min-width:0}.ex .ep{font-size:26px}.ex .ew{font-size:16px}
   #examples{gap:8px}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
-@media (max-width:350px){.flag{width:40px;height:40px;font-size:22px}#gridbtn{width:46px;height:46px}#stars{height:46px;padding:0 10px;font-size:19px}#bar{gap:6px}}
+@media (max-width:350px){.flag{width:40px;height:40px;font-size:22px}#gridbtn{width:46px;height:46px}#stars{height:46px;padding:0 10px;font-size:19px}#bar{gap:6px}#barback{height:46px;padding:0 10px;font-size:19px}}
 </style>
 </head>
 <body>
 <div id="bar">
-  <div id="flags" class="group">
-    <button class="flag" data-lang="en" aria-label="English">🇬🇧</button>
-    <button class="flag" data-lang="ro" aria-label="Română">🇷🇴</button>
-    <button class="flag" data-lang="de" aria-label="Deutsch">🇩🇪</button>
-  </div>
+  <div id="flags" class="group"></div>
+  <div id="ages" class="group" role="radiogroup"></div>
+  <button id="barback" aria-label="Back"></button>
   <button id="gridbtn" aria-label="Index"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg></button>
   <div id="stars">⭐ 0</div>
-  <div class="brk"></div>
-  <div class="group" id="setgrp">
-    <button class="tbtn on" id="s-abc">ABC</button>
-    <button class="tbtn" id="s-123">123</button>
-    <button class="tbtn" id="s-grp" aria-label="Grupuri de litere">ghi</button>
-  </div>
 </div>
 
 <div id="stage">
+  <div id="hub"></div>
   <div id="learn">
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
+    <div id="linfo"></div>
     <div id="examples"></div>
   </div>
   <div id="play">
@@ -228,13 +265,10 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="rplay" aria-label="Play">▶</button>
   <button class="nav" id="rnext" aria-label="Next word"></button>
 </div>
+<div id="info"><div id="infohead"><span id="infotitle"></span><button id="infoclose" aria-label="Close">✕</button></div>
+  <div id="infolist"></div><div id="infofoot"><button id="infoplay" aria-label="Play">▶</button></div></div>
 <div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
-<nav id="tabs">
-  <button class="tab" id="m-learn"><span class="ti">📖</span><span class="tl"></span></button>
-  <button class="tab" id="m-play"><span class="ti">🎈</span><span class="tl"></span></button>
-  <button class="tab" id="m-count"><span class="ti">🧮</span><span class="tl"></span></button>
-  <button class="tab" id="m-read"><span class="ti">📚</span><span class="tl"></span></button>
-</nav>
+<nav id="tabs"></nav>
 <canvas id="fx"></canvas>
 
 <div id="install-bar">
@@ -242,968 +276,19 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.4</div>
+<div id="ver">v1.0.0</div>
 
+<!-- All scripts are listed (in load order) by abc/manifest.js, generated by `node tools/check.js --fix`.
+     Adding a language or a module never edits this file. See ARCHITECTURE.md. -->
+<script src="abc/manifest.js"></script>
 <script>
-// ====== DATA ======
-// Letter rows: [letter, word, emoji, like?]  like=true → letter is inside the word, not first ("X like in fox")
-const LANGS = {
-  en: {
-    tts: 'en-US', html: 'en', langName: 'English', col: 1,
-    tabs: ['Learn', 'Play', 'Count', 'Read'],
-    alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-    nums: ['one','two','three','four','five','six','seven','eight','nine','ten'],
-    sayLetter: (c, w, like) => like ? `${c}, like in ${w}!` : `${c} is for ${w}!`,
-    showWord: (w, like) => like ? `like in ${w}` : w,
-    sgpl: ['Singular', 'Plural'],
-    // { sg: [a cow, the cow], pl: [two cows, the cows] }
-    none: ['no singular', 'no plural'],
-    forms: (w, f) => f[0] === 'pl' ? { sg: null, pl: [w, `the ${w}`] } : {
-      sg: [f[0] === '-' ? w : `${f[0]} ${w}`, `the ${w}`],
-      pl: f[1] === '-' ? null : [f[1], `the ${f[1].replace(/^two /, '')}`] },
-    find: 'Find',
-    ask: (kind, name, small) => kind !== 'num' ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
-    thats: n => `That's ${n}.`,
-    cheers: ['Yay!', 'Great job!', 'You did it!', 'Super!', 'Hooray!'],
-    wow: n => `Well done! You have ${n} stars!`
-  },
-  ro: {
-    tts: 'ro-RO', html: 'ro', langName: 'Română', col: 2,
-    tabs: ['Învață', 'Joacă', 'Numără', 'Citește'],
-    alphabet: 'AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ',
-    nums: ['unu','doi','trei','patru','cinci','șase','șapte','opt','nouă','zece'],
-    // Advanced: special letter groups (examples come from WORDS)
-    groups: ['ce','ci','che','chi','ge','gi','ghe','ghi'],
-    // School sound form from DOOM (bî, cî, dî …); vowels as-is; k/q/w/x/y by name
-    spell: c => ({ A:'a', Ă:'ă', Â:'â', E:'e', I:'i', Î:'î', O:'o', U:'u', K:'ca', Q:'chiu', W:'dublu ve', X:'ics', Y:'i grec' })[c]
-               || c.toLocaleLowerCase('ro') + 'î',
-    sayLetter: (c, w, like) => like ? `${c}, ca în ${w}!` : `${c}, de la ${w}!`,
-    showWord: (w, like) => like ? `ca în ${w}` : w,
-    sgpl: ['Singular', 'Plural'],
-    // { sg: [o vacă, vaca], pl: [două vaci, vacile] }. Plural definite (school rule): after "doi" add -i (câini → câinii),
-    // after "două" add -le (vaci → vacile, case → casele, trenuri → trenurile)
-    none: ['nu are singular', 'nu are plural'],
-    forms: (w, f) => {
-      if (f[0] === 'pl') return { sg: null, pl: [`niște ${w}`, f[1]] };          // ochelari, blugi
-      const sg = [f[0] === '-' ? w : `${f[0]} ${w}`, f[1]];
-      if (f[2] === '-') return { sg, pl: null };                                    // lapte, miere, unt
-      const [num, ...rest] = f[2].split(' '), pl = rest.join(' ');
-      return { sg, pl: [f[2], pl + (num === 'doi' ? 'i' : 'le')] };
-    },
-    find: 'Găsește',
-    ask: (kind, name, small) => kind === 'grp' ? `Găsește grupul ${name}!` : kind === 'abc' ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
-    thats: n => `Aceasta e ${n}.`,
-    cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
-    wow: n => `Bravo! Ai ${n} ${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}steluțe!`
-  },
-  de: {
-    tts: 'de-DE', html: 'de', langName: 'Deutsch', col: 3,
-    tabs: ['Lernen', 'Spielen', 'Zählen', 'Lesen'],
-    alphabet: 'AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ',
-    nums: ['eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn'],
-    sayLetter: (c, w) => `${c} wie ${w}!`,
-    showWord: (w, like) => like ? `wie ${w}` : w,
-    sgpl: ['Einzahl', 'Mehrzahl'],
-    // { sg: [ein Hund, der Hund], pl: [zwei Hunde, die Hunde] } (plural article is always die)
-    none: ['kein Singular', 'kein Plural'],
-    forms: (w, f) => f[1] === '-'
-      ? { sg: [w, `${f[0]} ${w}`], pl: null }                                       // Milch, Honig, Butter
-      : { sg: [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`], pl: [f[1], `die ${f[1].replace(/^zwei /, '')}`] },
-    find: 'Finde',
-    ask: (kind, name, small) => kind !== 'num' ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
-    thats: n => `Das ist ${n}.`,
-    cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
-    wow: n => `Super! Du hast ${n} Sterne!`
-  }
-};
-// ====== ONE WORD DICTIONARY (used by Learn examples, letter groups, Read and the index) ======
-// Each row: [emoji, en, ro, de]. Empty string = word not used in that language.
-// Per language:  syllables separated by "/"  then "|" forms (optional):
-//   en: "word|a or an|plural phrase"           → a cow · the cow · two cows
-//   ro: "word|un or o|definite|plural phrase"  → o vacă · vaca · două vaci
-//   de: "word|der/die/das|plural phrase"       → eine Kuh · die Kuh · zwei Kühe
-// Defective nouns:  no plural → plural "-" (and article "-" when it is used without one: milk, lapte, Milch)
-//                   no singular → article "pl" (glasses, ochelari, blugi): en "word|pl", ro "word|pl|definite"
-// A leading "!" = don't use as a first-letter example (first sound differs: sh, ch, Sch, Ei, Au …).
-// Add a word here once → it shows up in Learn (under its letter), Read (if it has forms) and the index.
-const WORDS = [
-  ['🐄','cow|a|two cows','va/că|o|vaca|două vaci','Kuh|die|zwei Kühe'],
-  ['🏠','house|a|two houses','ca/să|o|casa|două case','Haus|das|zwei Häuser'],
-  ['🌙','moon|a|two moons','lu/nă|o|luna|două luni','Mond|der|zwei Monde'],
-  ['🐱','cat|a|two cats','pi/si/că|o|pisica|două pisici','Kat/ze|die|zwei Katzen'],
-  ['🐶','dog|a|two dogs','câi/ne|un|câinele|doi câini','Hund|der|zwei Hunde'],
-  ['🍌','ba/na/na|a|two bananas','ba/na/nă|o|banana|două banane','Ba/na/ne|die|zwei Bananen'],
-  ['⚽','ball|a|two balls','min/ge|o|mingea|două mingi','Ball|der|zwei Bälle'],
-  ['🐟','fish|a|two fish','peș/te|un|peștele|doi pești','Fisch|der|zwei Fische'],
-  ['☀️','sun|a|two suns','soa/re|un|soarele|doi sori','Son/ne|die|zwei Sonnen'],
-  ['🌸','flow/er|a|two flowers','floa/re|o|floarea|două flori','Blu/me|die|zwei Blumen'],
-  ['🍎','ap/ple|an|two apples','măr|un|mărul|două mere','Ap/fel|der|zwei Äpfel'],
-  ['🐻','bear|a|two bears','urs|un|ursul|doi urși','Bär|der|zwei Bären'],
-  ['🐑','!sheep|a|two sheep','oa/ie|o|oaia|două oi','!Schaf|das|zwei Schafe'],
-  ['🦆','duck|a|two ducks','ra/ță|o|rața|două rațe','En/te|die|zwei Enten'],
-  ['🚗','car|a|two cars','ma/și/nă|o|mașina|două mașini','!Au/to|das|zwei Autos'],
-  ['🥚','egg|an|two eggs','ou|un|oul|două ouă','!Ei|das|zwei Eier'],
-  ['🐰','rab/bit|a|two rabbits','ie/pu/re|un|iepurele|doi iepuri','Ha/se|der|zwei Hasen'],
-  ['🐐','goat|a|two goats','ca/pră|o|capra|două capre','Zie/ge|die|zwei Ziegen'],
-  ['🐝','bee|a|two bees','al/bi/nă|o|albina|două albine','Bie/ne|die|zwei Bienen'],
-  ['🐘','el/e/phant|an|two elephants','e/le/fant|un|elefantul|doi elefanți','E/le/fant|der|zwei Elefanten'],
-  ['🐴','horse|a|two horses','cal|un|calul|doi cai','Pferd|das|zwei Pferde'],
-  ['🐬','dol/phin|a|two dolphins','del/fin|un|delfinul|doi delfini','Del/fin|der|zwei Delfine'],
-  ['🦋','but/ter/fly|a|two butterflies','flu/tu/re|un|fluturele|doi fluturi','!Schmet/ter/ling|der|zwei Schmetterlinge'],
-  ['🗑️','bin|a|two bins','gu/noi|un|gunoiul|două gunoaie','Müll/ei/mer|der|zwei Mülleimer'],
-  ['🦛','hip/po|a|two hippos','hi/po/po/tam|un|hipopotamul|doi hipopotami','Nil/pferd|das|zwei Nilpferde'],
-  ['🍦','ice cream|an|two ice creams','în/ghe/ța/tă|o|înghețata|două înghețate','!Eis'],
-  ['🧃','juice|a|two juices','suc|un|sucul|două sucuri','Saft|der|zwei Säfte'],
-  ['🪁','kite|a|two kites','zmeu|un|zmeul|două zmeie','Dra/chen|der|zwei Drachen'],
-  ['🦁','li/on|a|two lions','leu|un|leul|doi lei','Lö/we|der|zwei Löwen'],
-  ['👃','nose|a|two noses','nas|un|nasul|două nasuri','Na/se|die|zwei Nasen'],
-  ['🐙','oc/to/pus|an|two octopuses','ca/ra/ca/ti/ță|o|caracatița|două caracatițe','Ok/to/pus|der|zwei Oktopusse'],
-  ['🐧','pen/guin|a|two penguins','pin/gu/in|un|pinguinul|doi pinguini','Pin/gu/in|der|zwei Pinguine'],
-  ['👸','queen|a|two queens','re/gi/nă|o|regina|două regine','Kö/ni/gin|die|zwei Königinnen'],
-  ['🌈','rain/bow|a|two rainbows','cur/cu/beu|un|curcubeul|două curcubee','Re/gen/bo/gen|der|zwei Regenbogen'],
-  ['🌳','tree|a|two trees','co/pac|un|copacul|doi copaci','Baum|der|zwei Bäume'],
-  ['☂️','um/brel/la|an|two umbrellas','um/bre/lă|o|umbrela|două umbrele','Re/gen/schirm|der|zwei Regenschirme'],
-  ['🎻','vi/o/lin|a|two violins','vi/oa/ră|o|vioara|două viori','Gei/ge|die|zwei Geigen'],
-  ['🐳','whale|a|two whales','ba/le/nă|o|balena|două balene','Wal|der|zwei Wale'],
-  ['🦊','fox|a|two foxes','vul/pe|o|vulpea|două vulpi','Fuchs|der|zwei Füchse'],
-  ['🪀','yo-/yo|a|two yo-yos','yo-/yo','Jo/jo|das|zwei Jojos'],
-  ['🦓','ze/bra|a|two zebras','ze/bră|o|zebra|două zebre','Ze/bra|das|zwei Zebras'],
-  ['🚂','train|a|two trains','tren|un|trenul|două trenuri','Zug|der|zwei Züge'],
-  ['🐢','tur/tle|a|two turtles','țes/toa/să|o|țestoasa|două țestoase','!Schild/krö/te|die|zwei Schildkröten'],
-  ['🐭','mouse|a|two mice','șoa/re/ce|un|șoarecele|doi șoareci','Maus|die|zwei Mäuse'],
-  ['🚢','!ship|a|two ships','va/por|un|vaporul|două vapoare','!Schiff|das|zwei Schiffe'],
-  ['☁️','cloud|a|two clouds','nor|un|norul|doi nori','Wol/ke|die|zwei Wolken'],
-  ['🧸','ted/dy|a|two teddies','ju/că/ri/e|o|jucăria|două jucării','Ted/dy|der|zwei Teddys'],
-  ['🐨','ko/a/la|a|two koalas','ko/a/la','Ko/a/la|der|zwei Koalas'],
-  ['🎶','xy/lo/phone|a|two xylophones','xi/lo/fon|un|xilofonul|două xilofoane','Xy/lo/fon|das|zwei Xylofone'],
-  ['🧘','yo/ga|-|-','yo/ga|-|yoga|-','Yo/ga|das|-'],
-  ['📶','','wi-/fi',''],
-  ['❓','ques/tion|a|two questions','quiz',''],
-  ['🌾','','spic|un|spicul|două spice','Äh/re|die|zwei Ähren'],
-  ['🍞','bread|-|-','pâi/ne|o|pâinea|două pâini','Bröt/chen|das|zwei Brötchen'],
-  ['🦶','foot|a|two feet','pi/cior|un|piciorul|două picioare','Fuß|der|zwei Füße'],
-  ['🎁','gift|a|two gifts','ca/dou|un|cadoul|două cadouri','Ü/ber/ra/schung|die|zwei Überraschungen'],
-  ['⏰','clock|a|two clocks','ceas|un|ceasul|două ceasuri','Uhr|die|zwei Uhren'],
-  ['🐦','bird|a|two birds','pa/să/re|o|pasărea|două păsări','Vo/gel|der|zwei Vögel'],
-  ['🦔','hedge/hog|a|two hedgehogs','a/rici|un|ariciul|doi arici','I/gel|der|zwei Igel'],
-  ['🤡','clown|a|two clowns','clovn|un|clovnul|doi clovni','Clown|der|zwei Clowns'],
-  ['🥒','cu/cum/ber|a|two cucumbers','cas/tra/ve/te|un|castravetele|doi castraveți','Gur/ke|die|zwei Gurken'],
-  ['🐯','ti/ger|a|two tigers','ti/gru|un|tigrul|doi tigri','Ti/ger|der|zwei Tiger'],
-  ['⛵','yacht|a|two yachts','ve/li/er|un|velierul|două veliere','Yacht|die|zwei Yachten'],
-  ['🪼','jel/ly/fish|a|two jellyfish','me/du/ză|o|meduza|două meduze','Qual/le|die|zwei Quallen'],
-  ['🍇','grape|a|two grapes','stru/gu/re|un|strugurele|doi struguri','Trau/be|die|zwei Trauben'],
-  ['🍍','pine/ap/ple|a|two pineapples','a/na/nas|un|ananasul|doi ananași','A/na/nas|die|zwei Ananas'],
-  ['✈️','air/plane|an|two airplanes','a/vi/on|un|avionul|două avioane','Flug/zeug|das|zwei Flugzeuge'],
-  ['🐜','ant|an|two ants','fur/ni/că|o|furnica|două furnici','A/mei/se|die|zwei Ameisen'],
-  ['🎈','bal/loon|a|two balloons','ba/lon|un|balonul|două baloane','Bal/lon|der|zwei Ballons'],
-  ['🐸','frog|a|two frogs','broas/că|o|broasca|două broaște','Frosch|der|zwei Frösche'],
-  ['🐓','roos/ter|a|two roosters','co/coș|un|cocoșul|doi cocoși','Hahn|der|zwei Hähne'],
-  ['🦕','di/no/saur|a|two dinosaurs','di/no/za/ur|un|dinozaurul|doi dinozauri','Di/no|der|zwei Dinos'],
-  ['🎃','pump/kin|a|two pumpkins','dov/leac|un|dovleacul|doi dovleci','Kür/bis|der|zwei Kürbisse'],
-  ['🚁','hel/i/cop/ter|a|two helicopters','e/li/cop/ter|un|elicopterul|două elicoptere','Hub/schrau/ber|der|zwei Hubschrauber'],
-  ['🍴','fork|a|two forks','fur/cu/li/ță|o|furculița|două furculițe','Ga/bel|die|zwei Gabeln'],
-  ['🍩','do/nut|a|two donuts','go/goa/șă|o|gogoașa|două gogoși','Do/nut|der|zwei Donuts'],
-  ['👄','mouth|a|two mouths','gu/ră|o|gura|două guri','Mund|der|zwei Münder'],
-  ['🐹','ham/ster|a|two hamsters','ham/ster|un|hamsterul|doi hamsteri','Hams/ter|der|zwei Hamster'],
-  ['🗺️','map|a|two maps','har/tă|o|harta|două hărți','Kar/te|die|zwei Karten'],
-  ['🏝️','is/land|an|two islands','in/su/lă|o|insula|două insule','In/sel|die|zwei Inseln'],
-  ['👼','an/gel|an|two angels','în/ger|un|îngerul|doi îngeri','En/gel|der|zwei Engel'],
-  ['🐆','jag/uar|a|two jaguars','ja/gu/ar|un|jaguarul|doi jaguari','Ja/gu/ar|der|zwei Jaguare'],
-  ['🧥','jack/et|a|two jackets','ja/che/tă|o|jacheta|două jachete','Ja/cke|die|zwei Jacken'],
-  ['🥝','ki/wi|a|two kiwis','ki/wi','Ki/wi|die|zwei Kiwis'],
-  ['🥋','ka/ra/te|-|-','ka/ra/te','Ka/ra/te|das|-'],
-  ['🍋','lem/on|a|two lemons','lă/mâ/ie|o|lămâia|două lămâi','Zi/tro/ne|die|zwei Zitronen'],
-  ['🐒','mon/key|a|two monkeys','mai/mu/ță|o|maimuța|două maimuțe','Af/fe|der|zwei Affen'],
-  ['👓','glass/es|pl','o/che/lari|pl|ochelarii','Bril/le|die|zwei Brillen'],
-  ['👞','!shoe|a|two shoes','pan/tof|un|pantoful|doi pantofi','!Schuh|der|zwei Schuhe'],
-  ['🚀','rock/et|a|two rockets','ra/che/tă|o|racheta|două rachete','Ra/ke/te|die|zwei Raketen'],
-  ['🤖','ro/bot|a|two robots','ro/bot|un|robotul|doi roboți','Ro/bo/ter|der|zwei Roboter'],
-  ['⭐','star|a|two stars','stea|o|steaua|două stele','!Stern|der|zwei Sterne'],
-  ['🛷','sled|a|two sleds','sa/ni/e|o|sania|două sănii','!Schlit/ten|der|zwei Schlitten'],
-  ['🐍','snake|a|two snakes','șar/pe|un|șarpele|doi șerpi','!Schlan/ge|die|zwei Schlangen'],
-  ['🧦','sock|a|two socks','șo/se/tă|o|șoseta|două șosete','So/cke|die|zwei Socken'],
-  ['📱','!phone|a|two phones','te/le/fon|un|telefonul|două telefoane','Te/le/fon|das|zwei Telefone'],
-  ['🦟','mos/qui/to|a|two mosquitoes','țân/țar|un|țânțarul|doi țânțari','Mü/cke|die|zwei Mücken'],
-  ['🦄','u/ni/corn|a|two unicorns','u/ni/corn|un|unicornul|doi unicorni','!Ein/horn|das|zwei Einhörner'],
-  ['🎲','dice|a|two dice','zar|un|zarul|două zaruri','Wür/fel|der|zwei Würfel'],
-  ['🦒','!gi/raffe|a|two giraffes','gi/ra/fă|o|girafa|două girafe','!Gi/raf/fe|die|zwei Giraffen'],
-  ['🍒','!cher/ry|a|two cherries','ci/rea/șă|o|cireașa|două cireșe','Kir/sche|die|zwei Kirschen'],
-  ['🔑','key|a|two keys','che/ie|o|cheia|două chei','!Schlüs/sel|der|zwei Schlüssel'],
-  ['🎸','gui/tar|a|two guitars','chi/ta/ră|o|chitara|două chitare','Gi/tar/re|die|zwei Gitarren'],
-  ['👜','bag|a|two bags','gean/tă|o|geanta|două genți','Ta/sche|die|zwei Taschen'],
-  ['🧊','ice|-|-','ghea/ță',''],
-  ['🧶','yarn|-|-','ghem|un|ghemul|două gheme','Wol/le|die|-'],
-  ['🎒','back/pack|a|two backpacks','ghioz/dan|un|ghiozdanul|două ghiozdane','Ruck/sack|der|zwei Rucksäcke'],
-  ['🍉','wa/ter/mel/on|a|two watermelons','pe/pe/ne|un|pepenele|doi pepeni','Was/ser/me/lo/ne|die|zwei Wassermelonen'],
-  ['🌋','vol/ca/no|a|two volcanoes','vul/can|un|vulcanul|doi vulcani','Vul/kan|der|zwei Vulkane'],
-  ['🦅','ea/gle|an|two eagles','vul/tur|un|vulturul|doi vulturi','Ad/ler|der|zwei Adler'],
-  ['🥁','drum|a|two drums','to/bă|o|toba|două tobe','Trom/mel|die|zwei Trommeln'],
-  ['🎂','cake|a|two cakes','tort|un|tortul|două torturi','Tor/te|die|zwei Torten'],
-  ['🎩','hat|a|two hats','pă/lă/ri/e|o|pălăria|două pălării','Hut|der|zwei Hüte'],
-  ['🐛','bug|a|two bugs','o/mi/dă|o|omida|două omizi','Rau/pe|die|zwei Raupen'],
-  ['🦘','kan/ga/roo|a|two kangaroos','can/gur|un|cangurul|doi canguri','Kän/gu/ru|das|zwei Kängurus'],
-  ['🍃','leaf|a|two leaves','frun/ză|o|frunza|două frunze','Blatt|das|zwei Blätter'],
-  ['🪺','nest|a|two nests','cuib|un|cuibul|două cuiburi','Nest|das|zwei Nester'],
-  ['🥜','nut|a|two nuts','a/ra/hi/dă|o|arahida|două arahide','Nuss|die|zwei Nüsse'],
-  ['🦉','owl|an|two owls','buf/ni/ță|o|bufnița|două bufnițe','!Eu/le|die|zwei Eulen'],
-  ['🍊','or/ange|an|two oranges','por/to/ca/lă|o|portocala|două portocale','O/ran/ge|die|zwei Orangen'],
-  ['🐷','pig|a|two pigs','porc|un|porcul|doi porci','!Schwein|das|zwei Schweine'],
-  ['🍕','piz/za|a|two pizzas','piz/za|o|pizza|două pizze','Piz/za|die|zwei Pizzas'],
-  ['📦','box|a|two boxes','cu/ti/e|o|cutia|două cutii','Kis/te|die|zwei Kisten'],
-  ['🛋️','so/fa|a|two sofas','ca/na/pea|o|canapeaua|două canapele','So/fa|das|zwei Sofas'],
-  ['🍅','to/ma/to|a|two tomatoes','ro/și/e|o|roșia|două roșii','To/ma/te|die|zwei Tomaten'],
-  ['🛸','','','U/fo|das|zwei Ufos'],
-  ['🚪','door|a|two doors','u/șă|o|ușa|două uși','Tür|die|zwei Türen'],
-  ['🪱','worm|a|two worms','vier/me|un|viermele|doi viermi','Wurm|der|zwei Würmer'],
-  ['💻','com/put/er|a|two computers','cal/cu/la/tor|un|calculatorul|două calculatoare','Com/pu/ter|der|zwei Computer'],
-  ['🐉','drag/on|a|two dragons','dra/gon|un|dragonul|doi dragoni','Dra/che|der|zwei Drachen'],
-  ['🪿','goose|a|two geese','gâs/că|o|gâsca|două gâște','Gans|die|zwei Gänse'],
-  ['🥄','spoon|a|two spoons','lin/gu/ră|o|lingura|două linguri','Löf/fel|der|zwei Löffel'],
-  ['🪜','lad/der|a|two ladders','sca/ră|o|scara|două scări','Lei/ter|die|zwei Leitern'],
-  ['👂','ear|an|two ears','u/re/che|o|urechea|două urechi','Ohr|das|zwei Ohren'],
-  ['💐','bou/quet|a|two bouquets','bu/chet|un|buchetul|două buchete','Strauß|der|zwei Sträuße'],
-  ['⌚','watch|a|two watches','',''],
-  ['🚐','van|a|two vans','',''],
-  ['⬆️','up','',''],
-  ['🌿','grass','iar/bă','Gras'],
-  ['👖','jeans|pl','blugi|pl|blugii','Jeans'],
-  ['🥛','milk|-|-','lap/te|-|laptele|-','Milch|die|-'],
-  ['🍯','hon/ey|-|-','mie/re|-|mierea|-','Ho/nig|der|-'],
-  ['🧈','but/ter|-|-','unt|-|untul|-','But/ter|die|-'],
-  ['🧂','salt|-|-','sa/re|-|sarea|-','Salz|das|-'],
-  ['0️⃣','ze/ro|a|two zeros','','']
-];
-
-// Parse the dictionary for one language → [{ id, pic, w, syl, forms|null, noLetter }]
-function wordsFor(code) {
-  const L = LANGS[code], out = [];
-  WORDS.forEach((row, id) => {
-    let s = row[L.col]; if (!s) return;
-    const noLetter = s[0] === '!'; if (noLetter) s = s.slice(1);
-    const [sylS, ...f] = s.split('|');
-    const syl = sylS.split('/'), w = syl.join('');
-    out.push({ id, pic: row[0], w, syl, forms: f.length ? L.forms(w, f) : null, noLetter });
-  });
-  return out;
-}
-const MAX_EX = 4;
-const NUMPICS = ['🌞','🐥','🐟','🍓','⭐','🎈','🐞','🍪','🚗','🦋'];
-// Night palette for letters/bubbles: soft pastels that read well on dark navy
-const INK = ['#ff8f87','#ffb36b','#f2d06b','#93d98f','#6fd3c4','#7fb4ff','#b49cff','#f38fc4'];
-const ink = h => INK[Math.round(h / 45) % 8];
-const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
-function buildSets(code) {
-  const L = LANGS[code], t = L.tts, WL = wordsFor(code);
-  const low = x => x.toLocaleLowerCase(t);
-  // RO: words starting with ce/ci/che/chi/ge/gi/ghe/ghi belong to the groups, not to C / G
-  const inGroup = w => (L.groups || []).some(g => low(w).startsWith(g));
-  const exFor = (ch, isGroup) => {
-    const c = low(ch);
-    let ex = WL.filter(x => !x.noLetter && low(x.w).startsWith(c) && (isGroup || !inGroup(x.w)))
-               .map(x => [x.w, x.pic, false]);
-    if (!ex.length) ex = WL.filter(x => low(x.w).includes(c)).map(x => [x.w, x.pic, true]); // Ă → vacă, ß → Fuß
-    return ex.slice(0, MAX_EX);
-  };
-  const letters = Array.from(L.alphabet).map((ch, i, a) => {
-    const ex = exFor(ch, false), [w, pic, like] = ex[0] || [ch, '🔤', false];
-    const name = L.spell ? L.spell(ch) : ch;
-    return { ch, key: low(ch), pic, hue: (i * 360 / a.length) | 0, word: L.showWord(w, like),
-             say: L.sayLetter(name, low(w), like), name, ex };
-  });
-  const numbers = L.nums.map((w, i) => ({
-    ch: String(i + 1), key: i === 9 ? '0' : String(i + 1), word: w, pic: NUMPICS[i], n: i + 1,
-    hue: ((i + 1) * 36) % 360, name: w,
-    say: `${w}!`
-  }));
-  const sets = { abc: letters, num: numbers };
-  if (L.groups) sets.grp = L.groups.map((g, i, a) => {
-    const ex = exFor(g, true), [w, pic] = ex[0] || [g, '🔤'];
-    return { ch: g, key: null, pic, hue: (i * 360 / a.length + 20) | 0, word: w,
-             say: L.sayLetter(g, low(w), false), name: g, ex };
-  });
-  // Read: every word in the dictionary (the singular/plural table shows only when it has forms)
-  sets.read = WL;
-  return sets;
-}
-
-// ====== STATE (persisted best-effort) ======
-const store = {
-  get(k, d) { try { const v = localStorage.getItem('abc.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem('abc.' + k, JSON.stringify(v)); } catch (e) {} }
-};
-function defaultLang() {
-  const l = (navigator.language || 'en').slice(0, 2).toLowerCase();
-  return LANGS[l] ? l : 'en';
-}
-let lang = store.get('lang', defaultLang()); if (!LANGS[lang]) lang = 'en';
-let SETS = buildSets(lang);
-let mode = store.get('mode', 'learn');   // 'learn' | 'play' | 'count' | 'read'
-if (!['learn', 'play', 'count', 'read'].includes(mode)) mode = 'learn';
-let setName = store.get('set', 'abc');   // 'abc' | 'num' | 'grp' (letter groups, RO only)
-if (!SETS[setName]) setName = 'abc';
-let stars = store.get('stars', 0);
-const idxKey = () => `idx_${lang}_${setName}`;
-let idx = 0;
-function loadIdx() { idx = Math.min(store.get(idxKey(), 0), SETS[setName].length - 1); }
-loadIdx();
-let streak = 0;
-// per-item miss weight → practice what's hard more often
-let weights = store.get('w', {});
-
-const $ = id => document.getElementById(id);
-const items = () => SETS[setName];
-
-// ====== AUDIO ======
-let AC = null;
-function ensureAudio() {
-  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
-  if (AC.state !== 'running') AC.resume();
-}
-function tone(freq, start, dur, vol = 0.18, type = 'sine') {
-  if (!AC) return;
-  const t = AC.currentTime + start;
-  const o = AC.createOscillator(), g = AC.createGain();
-  o.type = type; o.frequency.setValueAtTime(freq, t);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(vol, t + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-  o.connect(g); g.connect(AC.destination);
-  o.start(t); o.stop(t + dur + 0.05);
-}
-const sfx = {
-  pop()   { tone(660, 0, 0.15, 0.15); tone(990, 0.04, 0.2, 0.08); },
-  right() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.08, 0.35, 0.16, 'triangle')); },
-  wrong() { tone(220, 0, 0.18, 0.12, 'triangle'); tone(196, 0.12, 0.25, 0.1, 'triangle'); },
-  fanfare() { [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, i * 0.11, 0.4, 0.15, 'triangle')); }
-};
-
-// ====== SPEECH (device voice; works offline on most devices) ======
-let voice = null;
-function pickVoice() {
-  if (!('speechSynthesis' in window)) return;
-  const want = LANGS[lang].tts;
-  const all = speechSynthesis.getVoices();
-  const vs = all.filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang));
-  voice = vs.find(v => v.lang.replace('_', '-') === want && /female|samantha|karen|ioana|anna|google/i.test(v.name))
-       || vs.find(v => v.lang.replace('_', '-') === want) || vs[0] || null;
-}
-if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-let speakTimer = null, speakDone = null;
-const liveUtts = new Set(); // keep references: Chrome/Android can cut off (GC) utterances that aren't referenced
-function makeUtt(text, rate, onDone) {
-  // Trailing pause so engines don't clip the last sound ("…litera o" was cut short)
-  const u = new SpeechSynthesisUtterance(text + ' …');
-  if (voice) u.voice = voice;
-  u.lang = voice ? voice.lang : LANGS[lang].tts;
-  u.rate = rate; u.pitch = 1.25;
-  liveUtts.add(u);
-  let fallback;
-  const fin = () => { clearTimeout(fallback); liveUtts.delete(u); onDone && onDone(); };
-  u.onend = u.onerror = fin;
-  fallback = setTimeout(fin, 1500 + text.length * 110); // in case onend never fires
-  return u;
-}
-// Newest request wins (cancels current + pending). Returns a promise that resolves when speech has finished.
-function speak(text, delay = 0) {
-  if (!('speechSynthesis' in window)) return new Promise(r => setTimeout(r, 600));
-  speechSynthesis.cancel();
-  clearTimeout(speakTimer);
-  if (speakDone) speakDone(); // release anyone waiting on the interrupted line
-  return new Promise(res => {
-    let settled = false;
-    const done = () => { if (!settled) { settled = true; if (speakDone === done) speakDone = null; res(); } };
-    speakDone = done;
-    speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, 0.85, done)), delay);
-  });
-}
-const wait = ms => new Promise(r => setTimeout(r, ms));
-let roundTok = 0;
-
-// ====== FX (confetti) ======
-const fx = $('fx'), fctx = fx.getContext('2d');
-let W, H;
-function resize() { W = fx.width = innerWidth; H = fx.height = innerHeight; }
-resize(); addEventListener('resize', () => { resize(); if (mode === 'read') renderRead(false); });
-const parts = [];
-function confetti(x, y, n = 40, spread = 9) {
-  for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * spread;
-    parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4, life: 1,
-      s: 6 + Math.random() * 10, hue: Math.random() * 360, r: Math.random() * 6, vr: (Math.random() - .5) * .4,
-      star: Math.random() < 0.35 });
-  }
-}
-function drawStar(c, r) {
-  c.beginPath();
-  for (let i = 0; i < 10; i++) {
-    const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r;
-    c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
-  }
-  c.closePath(); c.fill();
-}
-function loop() {
-  fctx.clearRect(0, 0, W, H);
-  for (let i = parts.length - 1; i >= 0; i--) {
-    const p = parts[i];
-    p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.vx *= 0.98; p.r += p.vr; p.life -= 0.012;
-    if (p.life <= 0 || p.y > H + 40) { parts.splice(i, 1); continue; }
-    fctx.save(); fctx.globalAlpha = Math.min(1, p.life * 1.5);
-    fctx.translate(p.x, p.y); fctx.rotate(p.r);
-    fctx.fillStyle = INK[(p.hue / 45 | 0) % 8];
-    if (p.star) drawStar(fctx, p.s); else fctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
-    fctx.restore();
-  }
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-// ====== LEARN MODE ======
-function showLearn(sayIt = true) {
-  const it = items()[idx];
-  const g = $('glyph');
-  g.innerHTML = setName === 'abc' && it.key !== it.ch ? `${it.ch}<small>${it.key}</small>` : it.ch;
-  g.classList.toggle('grp', setName === 'grp');
-  g.style.color = ink(it.hue);
-  g.classList.remove('pop'); void g.offsetWidth; g.classList.add('pop');
-  $('word').textContent = it.word;
-  // Arrows show the neighbour they lead to
-  const list = items(), L = list.length;
-  const pv = list[(idx - 1 + L) % L], nx = list[(idx + 1) % L];
-  $('prev').innerHTML = `‹ <b style="color:${ink(pv.hue)}">${pv.ch}</b>`;
-  $('next').innerHTML = `<b style="color:${ink(nx.hue)}">${nx.ch}</b> ›`;
-  // Letters/groups: several tappable example words under the letter, with the letter highlighted
-  const isNum = setName === 'num';
-  $('pics').style.display = $('word').style.display = isNum ? '' : 'none';
-  $('examples').innerHTML = isNum ? '' : it.ex.map(([w, pic], i) => {
-    const shown = lang === 'de' ? w : w.toLocaleLowerCase(LANGS[lang].tts);
-    return `<button class="ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${hl(shown, it.ch, ink(it.hue))}</span></button>`;
-  }).join('');
-  // Numbers: show N items to count; letters: one picture
-  const n = it.n || 1;
-  $('pics').innerHTML = Array.from({ length: n }, (_, i) =>
-    `<span style="animation-delay:${(i * 0.12).toFixed(2)}s">${it.pic}</span>`).join('');
-  store.set(idxKey(), idx);
-  if (sayIt) speak(it.say, 120);
-}
-// Wrap the first occurrence of the letter/group in the word with its colour
-function hl(word, ch, color) {
-  const t = LANGS[lang].tts, i = word.toLocaleLowerCase(t).indexOf(ch.toLocaleLowerCase(t));
-  if (i < 0) return esc(word);
-  return esc(word.slice(0, i)) + `<b style="color:${color}">${esc(word.slice(i, i + ch.length))}</b>` + esc(word.slice(i + ch.length));
-}
-$('examples').addEventListener('pointerdown', e => {
-  const b = e.target.closest('.ex'); if (!b) return;
-  e.stopPropagation(); firstTouch();
-  const it = items()[idx], ex = it.ex[+b.dataset.i];
-  document.querySelectorAll('.ex.lit').forEach(x => x.classList.remove('lit'));
-  b.classList.add('lit'); setTimeout(() => b.classList.remove('lit'), 900);
-  sfx.pop(); speak(ex[0], 80);
-});
-function step(d) {
-  const L = items().length;
-  idx = (idx + d + L) % L;
-  sfx.pop();
-  showLearn();
-}
-
-// ====== PLAY MODE ======
-let target = null, locked = false;
-function nChoices() { return streak >= 8 ? 4 : streak >= 3 ? 3 : 2; }
-function pickTarget() {
-  const list = items();
-  // Weighted random: missed items come up more; avoid immediate repeat
-  const pool = list.filter(it => it !== target);
-  const total = pool.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
-  let r = Math.random() * total;
-  for (const it of pool) { r -= 1 + (weights[wk(it)] || 0); if (r <= 0) return it; }
-  return pool[pool.length - 1];
-}
-const wk = it => lang + ':' + it.ch;
-function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
-// Round variety: letters may be lowercase; prompt may be the symbol, voice only (hidden), or (numbers) the written word
-let round = { lower: false, prompt: 'glyph' };
-const face = it => round.lower ? it.key : it.ch;
-function askLine() { return LANGS[lang].ask(setName, target.name, round.lower); }
-function pickRound() {
-  const abc = setName !== 'num';
-  const lower = setName === 'abc' && target.key !== target.ch && Math.random() < 0.5;
-  const r = Math.random();
-  const prompt = abc ? (r < 0.6 ? 'glyph' : 'voice') : (r < 0.4 ? 'glyph' : r < 0.7 ? 'word' : 'voice');
-  return { lower, prompt };
-}
-
-function newRound() {
-  locked = false;
-  target = pickTarget();
-  const others = shuffle(items().filter(it => it !== target)).slice(0, nChoices() - 1);
-  curOpts = shuffle([target, ...others]);
-  round = pickRound();
-  drawRound();
-}
-let curOpts = [];
-function drawRound() {
-  locked = false;
-  const opts = curOpts;
-  const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : target.ch; // capital in prompt → small-letter rounds match B → b
-  $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${shown}</b>`;
-  const box = $('choices');
-  box.className = 'n' + opts.length + (setName === 'grp' ? ' grp' : '');
-  box.innerHTML = '';
-  opts.forEach((it, i) => {
-    const b = document.createElement('button');
-    b.className = 'bub';
-    b.textContent = face(it);
-    b.dataset.ch = it.ch;
-    b.style.setProperty('--c', ink(it.hue));
-    b.style.animationDelay = (i * 0.4) + 's';
-    b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
-    box.appendChild(b);
-  });
-  speak(askLine(), 250);
-}
-
-function choose(it, el) {
-  ensureAudio();
-  if (locked) return;
-  if (it === target) {
-    locked = true;
-    streak++;
-    stars++; store.set('stars', stars); updateStars();
-    weights[wk(it)] = Math.max(0, (weights[wk(it)] || 0) - 1); store.set('w', weights);
-    if (el) {
-      el.classList.add('right');
-      const r = el.getBoundingClientRect();
-      confetti(r.left + r.width / 2, r.top + r.height / 2);
-    } else confetti(W / 2, H / 2);
-    const big = stars % 10 === 0;
-    let said;
-    if (big) {
-      sfx.fanfare();
-      for (let k = 0; k < 5; k++) setTimeout(() => confetti(Math.random() * W, H * 0.3 + Math.random() * H * 0.3, 60, 12), k * 180);
-      said = speak(LANGS[lang].wow(stars), 700); // after the fanfare
-    } else {
-      sfx.right();
-      const cheers = LANGS[lang].cheers;
-      said = speak(`${cheers[Math.random() * cheers.length | 0]} ${target.name}!`, 400); // after the chime
-    }
-    // Next question only after the praise has been fully spoken (no cutting it off)
-    const tok = ++roundTok;
-    Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => {
-      if (tok === roundTok && mode === 'play' && locked) newRound();
-    });
-  } else {
-    streak = 0;
-    weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights);
-    sfx.wrong();
-    if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-    speak(`${LANGS[lang].thats(it.name)} ${askLine()}`, 350); // after the wrong-sound
-  }
-}
-function updateStars() {
-  const s = $('stars');
-  s.textContent = '⭐ ' + stars;
-  s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 });
-}
-
-// ====== MODE / SET SWITCHING ======
-let keepRound = false;
-function render() {
-  document.body.dataset.mode = mode;
-  ['learn', 'play', 'count', 'read'].forEach((m, i) => {
-    $('m-' + m).classList.toggle('on', mode === m);
-    $('m-' + m).querySelector('.tl').textContent = LANGS[lang].tabs[i];
-  });
-  $('s-abc').classList.toggle('on', setName === 'abc');
-  $('s-123').classList.toggle('on', setName === 'num');
-  $('s-grp').classList.toggle('on', setName === 'grp');
-  $('s-grp').style.display = SETS.grp ? '' : 'none';
-  document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
-  document.documentElement.lang = LANGS[lang].html;
-  $('learn').style.display = mode === 'learn' ? 'flex' : 'none';
-  $('play').style.display = mode === 'play' ? 'flex' : 'none';
-  $('read').style.display = mode === 'read' ? 'flex' : 'none';
-  $('rnav').style.display = mode === 'read' ? 'flex' : 'none';
-  $('count').style.display = mode === 'count' ? 'block' : 'none';
-  $('stage').style.display = mode === 'count' ? 'none' : 'flex';
-  $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
-  stopCount(); readTok++; closeIndex();
-  if (mode === 'learn') showLearn(started);
-  else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
-  else if (mode === 'read') renderRead(started);
-  else renderCount();
-}
-// ====== READ MODE ======
-// One word with its picture, shown 4 ways: CAPITALS letter by letter, small letters (first capital),
-// syllables, and the whole word. Every tile is tappable; ▶ plays it all in order.
-// readIdx = position in SETS.read; the word's dictionary id is remembered so a language switch keeps it
-let readIdx = Math.max(0, SETS.read.findIndex(x => x.id === store.get('rword', 0)));
-function readSeek(id) { // same word in the current language, else the next one that exists
-  const R = SETS.read, i = R.findIndex(x => x.id === id);
-  if (i >= 0) return i;
-  const j = R.findIndex(x => x.id > id); return j >= 0 ? j : 0;
-}
-let readTok = 0;
-const capFirst = (w, t) => w.charAt(0).toLocaleUpperCase(t) + w.slice(1);
-function readData() {
-  const L = LANGS[lang], t = L.tts, e = SETS.read[readIdx], syl = e.syl;
-  const word = syl.join('');
-  return { L, t, syl, word, pic: e.pic, forms: e.forms, shown: capFirst(word, t) };
-}
-function letterSay(ch) { // how one letter is spoken (RO: school sounds bî, cî …; EN/DE: the letter)
-  const L = LANGS[lang], up = ch.toLocaleUpperCase(L.tts);
-  return L.spell ? L.spell(up) : up;
-}
-function letterInk(ch) {
-  const L = LANGS[lang], up = ch.toLocaleUpperCase(L.tts);
-  const it = SETS.abc.find(x => x.ch === up);
-  return it ? ink(it.hue) : 'var(--text)';
-}
-function renderRead(sayIt = true) {
-  const { t, syl, word, pic, shown, forms } = readData();
-  const isL = c => /\p{L}/u.test(c);
-  const chars = Array.from(word).filter(isL);
-  const tile = (txt, say, cls = '', color = '') =>
-    `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
-  // Long words (Wassermelone, caracatiță) shrink the tiles so a whole word always fits on one line
-  const avail = Math.min(innerWidth, 640) - 24, nl = chars.length, gap = nl > 8 ? 3 : 6;
-  const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
-  const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
-  const upper = chars.map(c => tile(c.toLocaleUpperCase(t), letterSay(c), 'u', letterInk(c))).join('');
-  const lower = Array.from(shown).filter(isL).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
-  // Singular/plural table: long phrases put the picture above the text and shrink the font to fit
-  const longest = forms ? Math.max(...[...(forms.sg || []), ...(forms.pl || [])].map(x => x.length), 8) : 0;
-  const chipW = (Math.min(innerWidth, 520) - 24 - 8) / 2, em = longest * 0.66;
-  const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15; // 2 pictures + padding beside the text
-  const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
-  const ns = syl.length, sylFont = Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55));
-  const syls = syl.map((sy, i) => (i ? '<span class="rsep">·</span>' : '') +
-    tile(i === 0 ? capFirst(sy, t) : sy, sy, 's', INK[(i * 3 + 4) % 8])).join('');
-  $('read').innerHTML =
-    `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
-    `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
-    `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
-    // one-syllable words (urs, măr, Kuh, cow): no syllable row — it would only repeat the word
-    (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +
-    `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
-    (forms ? (
-    `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(LANGS[lang].sgpl[0])}</div><div class="rh">${esc(LANGS[lang].sgpl[1])}</div>` +
-      [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
-        ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
-        : `<div class="rc none">${r === 0 ? '— ' + esc(LANGS[lang].none[c]) : ''}</div>`).join('')).join('') +
-    `</div>`) : '');
-  const R = SETS.read, n = R.length;
-  $('rprev').innerHTML = `‹ <b>${R[(readIdx - 1 + n) % n].pic}</b>`;
-  $('rnext').innerHTML = `<b>${R[(readIdx + 1) % n].pic}</b> ›`;
-  store.set('rword', R[readIdx].id);
-  if (sayIt) speak(word, 150);
-}
-function lightTile(el) {
-  document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit'));
-  if (el) el.classList.add('lit');
-}
-$('read').addEventListener('pointerdown', e => {
-  const el = e.target.closest('[data-say]'); if (!el) return;
-  e.stopPropagation(); firstTouch(); readTok++;
-  lightTile(el.classList.contains('rt') || el.classList.contains('rc') ? el : null);
-  sfx.pop(); speak(el.dataset.say, 60);
-});
-// ▶: spell in capitals letter by letter → small letters (whole word) → syllables → whole word
-async function playRead() {
-  const tok = ++readTok;
-  const alive = () => tok === readTok && mode === 'read';
-  const { word } = readData();
-  for (const el of document.querySelectorAll('#rU .rt')) {
-    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(150);
-  }
-  if (!alive()) return; await wait(300);
-  document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit'));
-  document.querySelectorAll('#rL .rt').forEach(x => x.classList.add('lit'));
-  // one-syllable words have no syllable row: say the word only once, at the end
-  if ($('rS')) await speak(word); else await wait(700);
-  if (!alive()) return; await wait(300);
-  for (const el of document.querySelectorAll('#rS .rt')) {
-    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(200);
-  }
-  if (!alive()) return; await wait(300);
-  const w = document.querySelector('#rW .rt'); lightTile(w);
-  sfx.right(); await speak(word, 350);
-  if (!alive()) return; await wait(300);
-  // singular → plural, row by row: "un câine", "doi câini", "câinele", "câinii"
-  for (const el of document.querySelectorAll('#rC .rc[data-say]')) {
-    if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(250);
-  }
-  if (!alive()) return;
-  const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
-  setTimeout(() => { if (alive()) lightTile(null); }, 800);
-}
-// ====== INDEX: all pictures (Read) or all letters/numbers (Learn) on one grid ======
-function openIndex() {
-  let html = '';
-  if (mode === 'read') {
-    const t = LANGS[lang].tts;
-    html = SETS.read.map((e, i) => `<button class="ix${i === readIdx ? ' on' : ''}" data-i="${i}">${e.pic}<small>${esc(capFirst(e.w, t))}</small></button>`).join('');
-  } else {
-    html = items().map((it, i) => `<button class="ix${i === idx ? ' on' : ''}" data-i="${i}"><span style="color:${ink(it.hue)}">${esc(it.ch)}</span>${it.pic ? `<small>${it.pic}</small>` : ''}</button>`).join('');
-  }
-  $('ixgrid').innerHTML = html;
-  $('index').classList.add('open');
-  const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
-  sfx.pop();
-}
-function closeIndex() { $('index').classList.remove('open'); }
-$('ixgrid').addEventListener('click', e => {
-  const b = e.target.closest('.ix'); if (!b) return;
-  firstTouch(); closeIndex();
-  if (mode === 'read') { readIdx = +b.dataset.i; readTok++; sfx.pop(); renderRead(true); }
-  else { idx = +b.dataset.i; sfx.pop(); showLearn(true); }
-});
-function readStep(d) {
-  const n = SETS.read.length;
-  readIdx = (readIdx + d + n) % n; readTok++;
-  sfx.pop(); renderRead(true);
-}
-// Same item in another language: exact letter, else its base letter (Ș→S, Ä→A, ß→S); numbers by value.
-function mapItem(it, list) {
-  if (!it) return null;
-  if (it.n) return list.find(x => x.n === it.n) || null;
-  const base = it.ch === 'ß' ? 'S' : it.ch.normalize('NFD').replace(/\p{M}/gu, '');
-  return list.find(x => x.ch === it.ch) || list.find(x => x.ch === base) || null;
-}
-// ====== COUNT MODE ======
-// One page with 1–10 as objects or fingers. Tap a row → says that number once.
-// ▶ 1→10 → goes row by row saying each number.
-let countStyle = store.get('cstyle', 'obj'); // 'obj' | 'hand'
-let countTimers = [];
-function stopCount() {
-  countTimers.forEach(clearTimeout); countTimers = [];
-  document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
-}
-function sayNow(text) { // queue a short utterance without cancelling the previous one
-  if (!('speechSynthesis' in window)) return;
-  clearTimeout(speakTimer);
-  speechSynthesis.speak(makeUtt(text, 1, null));
-}
-// Cartoon hand, seen from the child's side (back of the hand): LEFT hand has the thumb on the right;
-// the RIGHT hand is its mirror image, so both thumbs point inward.
-// Raise order: index, middle, ring, little, thumb last (1 = index … 5 = thumb).
-const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6';
-const FING = { // left hand: little finger on the left, index next to the thumb
-  little: { x: 13, w: 13, top: 34 },
-  ring:   { x: 28, w: 14, top: 18 },
-  middle: { x: 44, w: 14, top: 10 },
-  index:  { x: 60, w: 14, top: 18 }
-};
-const ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
-function handSVG(raised, right) {
-  const up = new Set(ORDER.slice(0, raised));
-  let g = '';
-  for (const [name, f] of Object.entries(FING)) {
-    if (up.has(name)) {
-      g += `<rect x="${f.x}" y="${f.top}" width="${f.w}" height="${80 - f.top}" rx="${f.w / 2}" fill="${SKIN}"/>` +
-           `<ellipse cx="${f.x + f.w / 2}" cy="${f.top + 7}" rx="${f.w * 0.3}" ry="4.5" fill="${NAIL}"/>`;
-    } else { // folded: rounded knuckle peeking over the palm
-      g += `<rect x="${f.x}" y="48" width="${f.w}" height="24" rx="${f.w / 2}" fill="${SHADE}"/>`;
-    }
-  }
-  g += `<rect x="10" y="54" width="68" height="58" rx="22" fill="${SKIN}"/>`; // palm
-  g += up.has('thumb')
-    ? `<rect x="68" y="50" width="16" height="44" rx="8" fill="${SKIN}" transform="rotate(32 76 92)"/>` +
-      `<ellipse cx="76" cy="57" rx="4.5" ry="4" fill="${NAIL}" transform="rotate(32 76 92)"/>`
-    : `<rect x="34" y="76" width="42" height="15" rx="7.5" fill="${SHADE}"/>`; // thumb tucked across the palm
-  const flip = right ? ' transform="translate(106 0) scale(-1 1)"' : '';
-  return `<svg class="hand" viewBox="0 0 106 120" aria-label="${right ? 'right' : 'left'} hand"><g${flip}>${g}</g></svg>`;
-}
-function renderCount() {
-  $('c-obj').classList.toggle('on', countStyle === 'obj');
-  $('c-hand').classList.toggle('on', countStyle === 'hand');
-  $('crows').innerHTML = SETS.num.map(it => {
-    const items = countStyle === 'obj'
-      ? Array.from({ length: it.n }, () => `<span class="citem">${it.pic}</span>`).join('')
-      : it.n <= 5 ? handSVG(it.n, false) : handSVG(5, false) + handSVG(it.n - 5, true);
-    return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:${ink(it.hue)}">${it.ch}</div><div class="cword">${it.word}</div></div>` +
-           `<div class="citems${countStyle === 'obj' ? ' obj' : ''}">${items}</div></div>`;
-  }).join('');
-  document.querySelectorAll('.crow').forEach(r => r.addEventListener('click', () => { ensureAudio(); countRow(+r.dataset.n); }));
-}
-function lightRow(n) {
-  const row = document.querySelector(`.crow[data-n="${n}"]`);
-  if (!row) return null;
-  document.querySelectorAll('.crow.active').forEach(r => r.classList.remove('active'));
-  void row.offsetWidth; row.classList.add('active');
-  row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  return row;
-}
-// Tap one row: just say that number.
-function countRow(n) {
-  stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel();
-  const row = lightRow(n); if (!row) return;
-  const r = row.querySelector('.cnum').getBoundingClientRect();
-  confetti(r.left + r.width / 2, r.top + r.height / 2, 24, 6);
-  sfx.pop();
-  sayNow(LANGS[lang].nums[n - 1]);
-}
-// ▶ 1→10: one number per row.
-function countAll() {
-  stopCount(); if ('speechSynthesis' in window) speechSynthesis.cancel();
-  LANGS[lang].nums.forEach((w, i) => countTimers.push(setTimeout(() => {
-    lightRow(i + 1); sayNow(w); sfx.pop();
-  }, i * 1000)));
-  countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, 10 * 1000));
-}
-
-function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
-function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
-function setLang(l) {
-  if (l === lang) { sfx.pop(); render(); announceLang(); return; } // tap current flag → repeat
-  const oldLearn = items()[idx], oldTarget = target, oldOpts = curOpts;
-  const scroll = $('count').scrollTop;
-  const readId = SETS.read[readIdx].id;
-  lang = l; store.set('lang', l); SETS = buildSets(l); pickVoice();
-  readIdx = readSeek(readId);
-  if (!SETS[setName]) { setName = 'abc'; store.set('set', 'abc'); } // groups exist only in RO
-  const list = items();
-  // Learn: stay on the same letter/number
-  const li = list.indexOf(mapItem(oldLearn, list));
-  if (li >= 0) { idx = li; store.set(idxKey(), idx); } else loadIdx();
-  // Play: keep the same question + bubbles, just re-ask in the new language
-  keepRound = false;
-  if (mode === 'play' && oldTarget) {
-    const t = mapItem(oldTarget, list), o = oldOpts.map(x => mapItem(x, list));
-    if (t && o.every(Boolean) && new Set(o).size === o.length) {
-      target = t; curOpts = o;
-      if (round.lower && t.key === t.ch) round.lower = false;
-      keepRound = true;
-    }
-  }
-  if (!keepRound) target = null;
-  sfx.pop(); render(); keepRound = false;
-  if (mode === 'count') $('count').scrollTop = scroll;
-  announceLang();
-}
-// Say the language name in that language, then the current item ("Română. a, de la albină!")
-function announceLang() {
-  const name = LANGS[lang].langName;
-  if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
-  else if (mode === 'play' && target) speak(`${name}. ${askLine()}`, 250);
-  else if (mode === 'read') speak(`${name}. ${readData().word}`, 120);
-  else speak(`${name}!`, 120);
-}
-document.querySelectorAll('.flag').forEach(f =>
-  f.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); setLang(f.dataset.lang); }));
-
-// First interaction unlocks audio + speech (browser autoplay rules)
-let started = false;
-function firstTouch() {
-  if (started) return;
-  started = true;
-  ensureAudio();
-}
-addEventListener('pointerdown', firstTouch, true);
-addEventListener('keydown', firstTouch, true);
-
-function tapBtn(id, fn) {
-  $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); fn(); });
-}
-tapBtn('m-learn', () => setMode('learn'));
-tapBtn('m-play', () => setMode('play'));
-tapBtn('m-count', () => setMode('count'));
-tapBtn('m-read', () => setMode('read'));
-tapBtn('rprev', () => readStep(-1));
-tapBtn('rnext', () => readStep(1));
-tapBtn('rplay', () => playRead());
-tapBtn('gridbtn', () => openIndex());
-tapBtn('ixclose', () => closeIndex());
-tapBtn('c-obj', () => { countStyle = 'obj'; store.set('cstyle', 'obj'); stopCount(); sfx.pop(); renderCount(); });
-tapBtn('c-hand', () => { countStyle = 'hand'; store.set('cstyle', 'hand'); stopCount(); sfx.pop(); renderCount(); });
-tapBtn('c-all', () => countAll());
-tapBtn('s-abc', () => setSet('abc'));
-tapBtn('s-123', () => setSet('num'));
-tapBtn('s-grp', () => setSet('grp'));
-tapBtn('prev', () => step(-1));
-tapBtn('next', () => step(1));
-$('glyph').addEventListener('pointerdown', e => { e.stopPropagation(); showLearn(); sfx.pop(); confetti(e.clientX, e.clientY, 18, 6); });
-$('ask').addEventListener('pointerdown', e => { e.stopPropagation(); speak(askLine()); });
-
-// Swipe left/right in learn mode
-let sx = null;
-$('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
-$('stage').addEventListener('pointerup', e => {
-  if (sx == null || (mode !== 'learn' && mode !== 'read')) return;
-  const dx = e.clientX - sx; sx = null;
-  if (Math.abs(dx) > 50) (mode === 'read' ? readStep : step)(dx < 0 ? 1 : -1);
-});
-
-// Keyboard: type a letter/digit → it shows up (learn) or counts as an answer (play)
-addEventListener('keydown', e => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  const k = e.key.toLowerCase();
-  if (mode === 'read') {
-    if (k === 'arrowright') readStep(1); else if (k === 'arrowleft') readStep(-1);
-    else if (k === ' ' || k === 'enter') { e.preventDefault(); ensureAudio(); playRead(); }
-    return;
-  }
-  if (k === 'arrowright') { if (mode === 'learn') step(1); return; }
-  if (k === 'arrowleft')  { if (mode === 'learn') step(-1); return; }
-  if (e.repeat) return;
-  const isLetter = /^\p{L}$/u.test(k), isDigit = /^[0-9]$/.test(k);
-  if (mode === 'count') {
-    if (isDigit) { ensureAudio(); countRow(k === '0' ? 10 : +k); }
-    else if (k === ' ' || k === 'enter') { e.preventDefault(); ensureAudio(); countAll(); }
-    return;
-  }
-  if (!isLetter && !isDigit) {
-    if (k === ' ' || k === 'enter') { e.preventDefault(); if (mode === 'learn') step(1); else speak(askLine()); }
-    return;
-  }
-  const want = isLetter ? 'abc' : 'num';
-  if (!SETS[want].some(it => it.key === k)) return; // letter not in this language's alphabet
-  if (want !== setName) { setSet(want); if (mode === 'play') return; }
-  const list = items();
-  const i = list.findIndex(it => it.key === k);
-  if (i < 0) return;
-  if (mode === 'learn') { idx = i; sfx.pop(); showLearn(); confetti(W / 2, H / 2, 24, 7); }
-  else {
-    const btn = [...document.querySelectorAll('.bub')].find(b => b.dataset.ch === list[i].ch);
-    choose(list[i], btn || null);
-  }
-});
-addEventListener('contextmenu', e => e.preventDefault());
-
-render();
-
-// ====== PWA ======
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
-  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
-}
 (function () {
-  const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');
-  let deferred = null;
-  if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
-  try { if (sessionStorage.getItem('install-dismissed')) return; } catch (e) {}
-  addEventListener('beforeinstallprompt', e => {
-    e.preventDefault(); deferred = e;
-    msg.textContent = 'Install ABC 123! on your device';
-    bar.style.display = 'flex';
+  var M = self.MANIFEST;
+  M.scripts.forEach(function (src) {
+    var e = document.createElement('script');
+    e.src = src + '?v=' + M.version; e.async = false; // async=false keeps execution order, downloads in parallel
+    document.body.appendChild(e);
   });
-  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    setTimeout(() => {
-      if (deferred) return;
-      msg.innerHTML = 'Tap <strong>Share</strong> then <strong>Add to Home Screen</strong>';
-      btn.style.display = 'none'; bar.style.display = 'flex';
-    }, 1500);
-  }
-  bar.addEventListener('pointerdown', e => e.stopPropagation());
-  btn.addEventListener('click', () => {
-    if (!deferred) return;
-    deferred.prompt();
-    deferred.userChoice.then(() => { deferred = null; bar.style.display = 'none'; });
-  });
-  dismiss.addEventListener('click', () => {
-    bar.style.display = 'none';
-    try { sessionStorage.setItem('install-dismissed', '1'); } catch (e) {}
-  });
-  addEventListener('appinstalled', () => { bar.style.display = 'none'; });
 })();
 </script>
 </body>
