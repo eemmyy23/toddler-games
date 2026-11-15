@@ -51,7 +51,8 @@ const SPEECH = {
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 function makeUtt(text, rate, onDone) {
-  const u = new SpeechSynthesisUtterance(text + ' …');
+  const u = new SpeechSynthesisUtterance(/[.!?…:]\s*$/u.test(text) ? text : text + '.');
+  u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = rate; u.pitch = 1.25;
   liveUtts.add(u);

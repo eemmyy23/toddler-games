@@ -12,7 +12,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await p.addInitScript(() => {
     if (!sessionStorage.seeded) { localStorage.clear(); sessionStorage.seeded = 1; }
     window.__said = [];
-    speechSynthesis.speak = u => { __said.push(u.text.replace(' …', '')); setTimeout(() => u.onend && u.onend(), 20); };
+    speechSynthesis.speak = u => { __said.push(u.said); setTimeout(() => u.onend && u.onend(), 20); };
     speechSynthesis.cancel = () => {};
   });
   await p.goto(URL); await p.waitForTimeout(500);
