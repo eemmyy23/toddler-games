@@ -302,10 +302,10 @@ i('egg', { title: 'Das Ei', lines: [
   ['🐣', 'Aus manchen Eiern schlüpfen Küken.'],
   ['🍳', 'Wir essen Eier gekocht oder gebraten.']
 ] });
-i('bread', { title: 'Das Brötchen', lines: [
-  ['🌾', 'Brötchen macht man aus Weizenmehl.'],
+i('bread', { title: 'Das Brot', lines: [
+  ['🌾', 'Brot macht man aus Weizenmehl.'],
   ['🥣', 'Wir mischen das Mehl mit Wasser und Hefe.'],
-  ['🔥', 'Dann backen wir sie im Ofen.']
+  ['🔥', 'Dann backen wir es im Ofen.']
 ] });
 i('carrot', { title: 'Die Karotte', lines: [
   ['🥕', 'Die Karotte wächst in der Erde.'],

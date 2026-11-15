@@ -23,7 +23,7 @@ w('elephant', { w: 'e/le/fant', def: 'elefantul', pl: 'elefanți', g: 'm', plDef
 w('horse', { w: 'cal', def: 'calul', pl: 'cai', g: 'm', plDef: 'caii' });
 w('dolphin', { w: 'del/fin', def: 'delfinul', pl: 'delfini', g: 'm', plDef: 'delfinii' });
 w('butterfly', { w: 'flu/tu/re', def: 'fluturele', pl: 'fluturi', g: 'm', plDef: 'fluturii' });
-w('bin', { w: 'gu/noi', def: 'gunoiul', pl: 'gunoaie', g: 'n', plDef: 'gunoaiele' });
+w('bin', { w: 'coș de gu/noi', def: 'coșul de gunoi', g: 'n' });
 w('hippo', { w: 'hi/po/po/tam', def: 'hipopotamul', pl: 'hipopotami', g: 'm', plDef: 'hipopotamii' });
 w('ice-cream', { w: 'în/ghe/ța/tă', def: 'înghețata', pl: 'înghețate', g: 'f', plDef: 'înghețatele' });
 w('juice', { w: 'suc', def: 'sucul', pl: 'sucuri', g: 'n', plDef: 'sucurile' });
