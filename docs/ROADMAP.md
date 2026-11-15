@@ -10,7 +10,7 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 5. **Nothing unfinished in front of a child** — a tile that is not complete in a language is not shown.
 
 ## Built (status per item)
-- **v1.0** — modular architecture (languages, modules, views, games), stable ids, offline precache from a generated manifest, local voices only, age profiles.
+- **v1.0** — modular architecture (languages, modules, views, games), stable ids, offline precache from a generated manifest, local voices first and never another language's, age profiles.
 - **v1.1** — A–Z index with side letter bar, universal search in all languages, age badges, one layout column (320×480 → 1920×1080), tokens + one class per component, no code comments.
 - **After v1.1** — one question line for every game, gender agreement, Lexend font (full RO/DE), section derived from the screen, links between modules (same concept, lesson ↔ game).
 - **Roadmap 2026-11 — built, reviewed by AI auditors, NOT yet signed off:** the Definition of done below still needs the spoken lines checked with the offline voices on the family's devices and a parent sign-off per language. Until then these are "built", not "done".
@@ -30,7 +30,7 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 | Numbers 11–20 / Tens | 4+ / 5+ | ten + ones, groups of ten | find the number |
 | Solar System | 5+ | the Sun + 8 drawn planets | "Unde e Marte?" |
 | Big numbers | 7+ | 100 … 1 000 000, ∞ | find the number |
-| Immune system | 7+ | germs, white blood cells, fever, vaccines, plasters | questions by function |
+| Immune system | 7+ | germs, blood (white blood cells), fever, vaccines, plasters | questions by function |
 | Chemical elements | 9+ | 1–20 + Fe, Cu, Ag, Au with one fact | "Găsește simbolul pentru oxigen!" |
 
 - Index **A–Z / Groups** switch; 18 "What is it?" cards (sky, weather, seasons, bees, butterflies) plus the rainbow.
@@ -40,7 +40,7 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 ## Next
 - [x] More "What is it?" cards: planets, body, health, animals, food (61 in total).
 - [ ] Parent review tools (`tools/show.js`, `tools/review.js`) — on hold, by request.
-- Not needed now (measured 2026-11-15, v1.2.0): lazy loading — the whole offline set is 103 files, 571 KB (JS 230 KB).
+- Not needed now (measured 2026-11-15, v1.2.0): lazy loading — the whole offline set is 103 files, 572 KB (JS 231 KB).
 - Not needed now: extra views/games (grid, sequence, pairs, order, find-region) — no module needs them yet; add with the module that does.
 
 ## Definition of done (every module)

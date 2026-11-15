@@ -4,7 +4,7 @@
     section: 'disc', ages: [5, 9],
     build(code) { return { planets: CONTENT.set(code, PLANETS, this.strings[code]) }; },
     tiles: [
-      { id: 'planets', icon: '🪐', view: 'card', items: S => S.planets, search: true,
+      { id: 'planets', icon: '🪐', view: 'card', items: S => S.planets, index: true, search: true,
         game: { type: 'find', prompts: ['voice'], ask: () => 'where' } }
     ]
   });

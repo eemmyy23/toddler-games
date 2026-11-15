@@ -60,6 +60,7 @@ for (const a of apps) {
   if (!a.id || !a.start_url || !a.scope || !a.start_url.startsWith(a.scope)) err(`${a.page}: manifest needs id, start_url and a scope that contains start_url`);
   for (const b of apps) if (a !== b && (b.start_url.startsWith(a.scope) || a.id === b.id)) err(`${a.page} and ${b.page}: installed apps overlap (scope ${a.scope} contains ${b.start_url}) — each app needs its own scope`);
 }
+for (const f of fs.readdirSync(root).filter(f => /\.(png|jpe?g|webp|gif)$/i.test(f))) if (!files.includes(f)) err(`${f}: image in the repo root that the app does not use (stray screenshot?)`);
 console.log('config');
 if (!/^\d+\.\d+\.\d+$/.test(CFG.version || '')) err('config.version must be x.y.z');
 if (!langs.includes(base)) err(`config.baseLanguage "${base}" is not in config.languages`);
