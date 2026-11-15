@@ -5,7 +5,7 @@ const CONTENT = {
   words(code) {
     const L = ABC.langs[code];
     return L.words.filter(e => ABC.conceptById[e.id]).map(e => {
-      const syl = e.w.split('/'), w = syl.join(''), c = ABC.conceptById[e.id];
+      const syl = e.w.split(/[/\s]+/), w = e.w.replace(/\//g, ''), c = ABC.conceptById[e.id];
       return { id: e.id, concept: e.id, pic: c.pic, w, syl, forms: L.forms(e, w), noLetter: e.ex === false, entry: e };
     });
   },
