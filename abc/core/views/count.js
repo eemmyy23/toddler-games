@@ -63,7 +63,7 @@
   btn('c-all', all);
   VIEW('count', {
     el: 'count', fullHeight: true,
-    show() { render(); }, leave: stop,
+    show() { render(); }, leave: stop, pause: stop,
     announce(name) { speak(APP.exclaim(name), 120); },
     onKey(k, e) {
       const it = APP.items().find(x => x.key === k); if (it) { APP.firstTouch(); one(it.n); return true; }

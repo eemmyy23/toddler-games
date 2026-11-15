@@ -58,7 +58,7 @@
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().say }), 120); },
-    leave() { partsStop(); },
+    leave() { partsStop(); }, pause() { partsStop(); },
     resize() { APP.fit($('learn')); },
     onKey(k) {
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;

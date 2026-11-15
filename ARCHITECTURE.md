@@ -78,7 +78,7 @@ Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key
 `key`, `word`, `pic`, `pics`, `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game), `plural` (spoken as plural: "Those are …"), `a` (indefinite form) + `g` (gender) for "That's a cow". Two choices in one round never share a `sound` or a look.
 
-**VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
+**VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), pause() (app sent to the background; keep the state), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
 
 **GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):

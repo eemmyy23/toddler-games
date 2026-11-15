@@ -360,7 +360,8 @@ addEventListener('keydown', e => {
   if (e.repeat) return;
   if (v && v.onKey && v.onKey(k, e)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;
-  const play = APP.screen() === GAME_VIEW || (atHub && SECTIONS[section].play);
+  if (APP.screen() === GAME_VIEW) return;
+  const play = atHub && SECTIONS[section].play;
   const t = TILES.find(t => (play || t.section === sectionNow()) && usable(t, play) &&
     ABC.views[play ? GAME_VIEW : t.view].onKey && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
   if (!t || (t.id === tileId && !atHub)) return;
@@ -375,15 +376,14 @@ render();
 if ('serviceWorker' in navigator) {
   const reg = navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => null);
   let stale = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => caches.keys().then(k => { stale = !k.includes('toddler-' + self.MANIFEST.version); }));
+  navigator.serviceWorker.addEventListener('controllerchange', () => fetch('abc/manifest.js', { cache: 'no-store' }).then(r => r.text()).then(t => { stale = !t.includes(`"${self.MANIFEST.version}"`); }).catch(() => {}));
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && stale) location.reload();
     else if (!document.hidden) reg.then(r => r && r.update()).catch(() => {});
   });
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { hush(); if (view() && view().leave) view().leave(); quietAudio(); }
-  else if (!atHub) render();
+  if (document.hidden) { hush(); if (!atHub && view().pause) view().pause(); quietAudio(); }
 });
 (function () {
   const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');

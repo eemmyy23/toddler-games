@@ -137,6 +137,15 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   const tapRes = await ev(async () => { const { target } = ABC.views.play.state(), s0 = APP.stars, b = document.querySelector(`.bub[data-id="${CSS.escape(target.id)}"]`);
     b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); const s1 = APP.stars; b.click(); return [s0, s1, APP.stars]; });
   ok(tapRes[1] === tapRes[0] && tapRes[2] === tapRes[0] + 1, `a choice answers on click (keyboard too), not on a bare touch (stars ${tapRes.join(' → ')})`);
+  const bg = await ev(() => { openTile('letters', true, true); const q0 = ABC.views.play.state().target.id;
+    const flip = h => { Object.defineProperty(document, 'hidden', { value: h, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); };
+    flip(true); flip(false); const q1 = ABC.views.play.state().target.id;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '5' })); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'q' }));
+    openTile('weather', false, true); document.querySelector('#links .infobtn').click(); flip(true); flip(false);
+    const r = { q0, q1, tile: 'letters', infoOpen: !$('info').hidden }; closeInfo(); delete document.hidden; return r; });
+  ok(bg.q0 === bg.q1 && bg.infoOpen, `back from the background: same question (${bg.q0} → ${bg.q1}), the open card stays open`);
+  const keyGame = await ev(() => { openTile('letters', true, true); const s = APP.streak = 4; ['5', 'q', '7'].forEach(k => window.dispatchEvent(new KeyboardEvent('keydown', { key: k }))); return [APP.tile().id, APP.screen()]; });
+  ok(keyGame[0] === 'letters' && keyGame[1] === 'play', `keys that are not a choice never leave the game (${keyGame.join('/')})`);
   const prof = await ev(() => { const has = p => { APP.set({ profile: p, section: 'play', hub: true }); return hubTiles().filter(x => x.t).map(x => x.t.id); };
     const c = has('curious'), s = has('scientist'); APP.set({ profile: 'curious' }); return { c: c.length, s: s.length, gated: s.filter(id => !c.includes(id)).length, extra: c.filter(id => !s.includes(id)).length }; });
   ok(prof.gated > 0 && prof.extra === 0, `the youngest profile hides older games (${prof.c} of ${prof.s}, ${prof.gated} hidden)`);

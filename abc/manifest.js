@@ -1,5 +1,5 @@
 self.MANIFEST = {
-  "version": "bc8ee3dca2",
+  "version": "3cb2783d0c",
   "scripts": [
     "abc/core/registry.js",
     "abc/core/i18n.js",
