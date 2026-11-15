@@ -1,7 +1,7 @@
 MSTRINGS('elements', 'ro', {
   tiles: { elements: ['Elemente chimice', 'Găsește simbolul'] },
   games: { symbol: 'Găsește simbolul pentru {name}!' },
-  intro: '{name}: simbolul {sym}, numărul atomic {z}.',
+  intro: '{name}: simbolul {sym}, numărul atomic {z}. {fact}',
   names: { H: 'hidrogen', He: 'heliu', Li: 'litiu', Be: 'beriliu', B: 'bor', C: 'carbon', N: 'azot', O: 'oxigen', F: 'fluor', Ne: 'neon', Na: 'sodiu', Mg: 'magneziu', Al: 'aluminiu', Si: 'siliciu', P: 'fosfor', S: 'sulf', Cl: 'clor', Ar: 'argon', K: 'potasiu', Ca: 'calciu', Fe: 'fier', Cu: 'cupru', Ag: 'argint', Au: 'aur' },
   facts: { H: 'Cel mai ușor element. Stelele transformă hidrogenul în heliu ca să strălucească.',
            He: 'Face baloanele să plutească.',

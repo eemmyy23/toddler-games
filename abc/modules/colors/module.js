@@ -22,10 +22,9 @@ MODULE('colors', {
       const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => [x.w, x.pic, false]), pics = examples.map(x => x[1]);
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
       if (c.bands && !parts) return null;
-      return { id: c.id, label: name, name, say: parts ? I18N.t(ABC.langs[code].strings.listing, { name, list: I18N.list(s.rainbow, loc) }) : CONTENT.exclaim(code, name),
-        big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`,
-        nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>`,
-        word: name, pics, examples, concept: c.concept || c.id, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
+      return CONTENT.picture(code, { id: c.id, name, concept: c.concept || c.id, bubbleColor: c.hex,
+        big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`, nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>` },
+        { say: parts ? I18N.t(ABC.langs[code].strings.listing, { name, list: I18N.list(s.rainbow, loc) }) : undefined, pics, examples, parts, noPlay: !!c.noPlay });
     }).filter(Boolean);
     return { colors };
   },

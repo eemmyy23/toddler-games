@@ -7,9 +7,6 @@
       const s = this.strings[code];
       return { clean: CONTENT.set(code, CLEAN, { say: s.clean }), immune: CONTENT.set(code, IMMUNE, { say: s.immune }) };
     },
-    check(code, S, s, report) {
-      for (const [k, spec] of [['clean', CLEAN], ['immune', IMMUNE]]) { const miss = spec.filter(e => !(s[k] || {})[e.id]).map(e => e.id); if (miss.length) report(`${k}.${miss.join(', ')} missing`); }
-    },
     tiles: [
       { id: 'clean', icon: '🧼', view: 'card', items: S => S.clean, ages: [3, 6], index: true, search: true, game: { type: 'find', prompts: ['voice'], ask: () => 'where' } },
       { id: 'immune', icon: '🦠', view: 'card', items: S => S.immune, ages: [7, 12], index: true, search: true, game: { type: 'find', prompts: ['voice'], ask: it => 'which.' + it.concept } }

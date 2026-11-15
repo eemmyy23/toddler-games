@@ -38,6 +38,10 @@ tools/smoke.js              browser test: every language, every game, speech, of
   Grammar code only assembles them; school rules are checks (`checkForms`, `checkWord`), not generators.
 - **Base language.** Missing UI strings fall back to `config.baseLanguage` (en); `check.js` reports every missing key.
 - **Modules don't share data.** `build(code)` returns the module's own namespace; its tiles read only that.
+- **One implementation of every shared part.** Every item is built by a `CONTENT` builder — `thing` (a dictionary word), `set` (a list of words + module sentences),
+  `glyph` (text: digits, letters, symbols), `picture` (a drawing or swatch), `group` (several pictures as one card) — with one palette (`CONTENT.palette(i)`),
+  `I18N.capFirst`, the language's `exclaim`/`listing` templates and `CONTENT.sayThe`. A module adds its own fields but cannot override a built one
+  (only `say`, `examples`, `sound` are open); `check.js` rejects an override and any item not built by `CONTENT`, and a tile that misses an item another language has.
   Language data a module reads is declared in `needs` (e.g. `numbers`, `sayLetter`) and checked for every language.
 - **A tile is never shown broken** (`abc/core/tiles.js`): a learn tile needs its label + items; its game needs its label
   and enough playable items at its first and its hardest round. Otherwise it is hidden in that language.
@@ -101,7 +105,7 @@ The flag, tabs and offline cache follow automatically. Tiles without text in tha
 **Add a module** — `abc/modules/<id>/module.js`:
 ```js
 MODULE('shapes', { section: 'disc', ages: [2, 6],
-  build(code) { return { shapes: [/* items: {id, label, name, say, big, …} — see ITEM above */] }; },
+  build(code) { return { shapes: CONTENT.set(code, [{ id: 'circle', ex: 'ball' }, { id: 'square' }], this.strings[code]) }; },
   tiles: [{ id: 'shapes', icon: '🔺', view: 'card', items: S => S.shapes, index: true, game: { type: 'find' } }] });
 ```
 plus `lang/<code>.js` with `MSTRINGS('shapes', code, { tiles: { shapes: ['Forme', 'Găsește forma'] }, games: { shapes: 'Unde e {name}?' } })`,

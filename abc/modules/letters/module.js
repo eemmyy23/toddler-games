@@ -16,18 +16,17 @@
       const letters = A.units.map(u => {
         const ex = examples(L, words, u.lower, false), [w, , inside] = ex[0] || [u.upper, '🔤', false];
         const name = A.name(u), color = A.color(u.id);
-        return { id: u.id, key: u.lower.length === 1 ? u.lower : null, label: u.upper, name, say: L.sayLetter(name, low(w), inside),
-          big: u.cased ? `${esc(u.upper)}<small>${esc(u.lower)}</small>` : esc(u.upper), color, nav: CONTENT.navText(u.upper, color),
-          examples: ex, bubble: u.upper, lower: u.cased ? u.lower : null, bubbleColor: color, prompt: u.upper, unit: u, sound: sound(u) };
+        return CONTENT.glyph(code, { id: u.id, text: u.upper, name, color, small: u.cased ? u.lower : null },
+          { key: u.lower.length === 1 ? u.lower : null, say: L.sayLetter(name, low(w), inside), examples: ex, lower: u.cased ? u.lower : null, unit: u, sound: sound(u) });
       });
       const groups = (L.groups || '').split(/\s+/).filter(Boolean).map((g, i, a) => {
-        const ex = examples(L, words, g, true), [w] = ex[0] || [g], color = ink((i * 360 / a.length + 20) | 0);
-        return { id: 'grp-' + g, label: g, name: g, say: L.sayGroup ? L.sayGroup(g, low(w)) : L.sayLetter(g, low(w), false), big: esc(g), bigClass: 'grp',
-          color, nav: CONTENT.navText(g, color), examples: ex, bubble: g, bubbleColor: color, prompt: g, smallBubble: true };
+        const ex = examples(L, words, g, true), [w] = ex[0] || [g];
+        return CONTENT.glyph(code, { id: 'grp-' + g, text: g, name: g, color: CONTENT.palette(i), cls: 'grp' },
+          { say: L.sayGroup ? L.sayGroup(g, low(w)) : L.sayLetter(g, low(w), false), examples: ex, smallBubble: true });
       });
-      const read = words.map(x => Object.assign({}, x, { label: x.w, name: x.w }));
+      const read = words.map(x => CONTENT.thing(x, { syl: x.syl, w: x.w, forms: x.forms, entry: x.entry }));
       const wordGame = words.filter(x => /^[\p{L}\p{M}][\p{L}\p{M}\s'’-]*$/u.test(x.w))
-        .map((x, i) => CONTENT.thing(x, { bubbleColor: ink((i * 47) % 360) }));
+        .map((x, i) => CONTENT.thing(x, { bubbleColor: CONTENT.palette(i) }));
       return { letters, groups, words: read, wordGame };
     },
     check(code, S, strings, report) {

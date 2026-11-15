@@ -35,5 +35,6 @@ const I18N = {
     }
     return out;
   },
+  capFirst(s, locale) { const g = I18N.graphemes(s, locale); return g.length ? I18N.upper(g[0], null, locale) + s.slice(g[0].length) : s; },
   upper(ch, unit, locale) { if (unit) return unit.cased ? unit.upper : ch; const u = ch.toLocaleUpperCase(locale); return u.length === ch.length ? u : ch; }
 };

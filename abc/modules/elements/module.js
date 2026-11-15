@@ -4,14 +4,11 @@
   MODULE('elements', {
     section: 'disc', ages: [9, 12],
     build(code) {
-      const s = this.strings[code], loc = ABC.langs[code].bcp47, cap = x => x.charAt(0).toLocaleUpperCase(loc) + x.slice(1);
-      return { elements: ELEMENTS.filter(([, sym]) => s.names[sym] && s.facts[sym]).map(([z, sym], i) => {
-        const name = s.names[sym], color = ink((i * 37) % 360);
-        return { id: sym, label: sym, name, say: `${I18N.t(s.intro, { name: cap(name), sym, z })} ${s.facts[sym]}`, big: `${esc(sym)}<small>${z}</small>`, color,
-          nav: CONTENT.navText(sym, color), word: name, bubble: sym, bubbleColor: color, prompt: sym, promptWord: name };
-      }) };
+      const s = this.strings[code], loc = ABC.langs[code].bcp47;
+      return { elements: ELEMENTS.filter(([, sym]) => s.names[sym] && s.facts[sym]).map(([z, sym], i) => CONTENT.glyph(code,
+        { id: sym, text: sym, name: s.names[sym], color: CONTENT.palette(i), small: z, word: s.names[sym] },
+        { say: I18N.t(s.intro, { name: I18N.capFirst(s.names[sym], loc), sym, z, fact: s.facts[sym] }) })) };
     },
-    check(code, S, s, report) { if (S.elements.length < ELEMENTS.length) report(`${ELEMENTS.length - S.elements.length} elements miss a name or a fact`); },
     tiles: [
       { id: 'elements', icon: '⚗️', view: 'card', items: S => S.elements, index: true, search: true,
         game: { type: 'find', prompts: ['word', 'voice'], ask: () => 'symbol' } }

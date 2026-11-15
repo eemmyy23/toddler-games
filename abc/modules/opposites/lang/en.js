@@ -1,5 +1,6 @@
 MSTRINGS('opposites', 'en', {
   tiles: { opposites: ['Opposites', 'Find the opposite'] },
+  pair: '{a} – {b}',
   word: { big: 'big', small: 'small', hot: 'hot', cold: 'cold', fast: 'fast', slow: 'slow', heavy: 'heavy', light: 'light',
           floats: 'floats', sinks: 'sinks', long: 'long', short: 'short' },
   say: { big: 'The elephant is big!', small: 'The mouse is small!', hot: 'The fire is hot!', cold: 'The snow is cold!', fast: 'The jaguar runs fast!',

@@ -9,8 +9,8 @@
   const DAY = [7, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 8];
   const items = (code, s, key, m) => (s[key] || []).length === 12 ? DAY.map(h => {
     const i = h - 1, name = s[key][i], art = face(h, m);
-    return { id: `${h}:${m ? '30' : '00'}`, label: `${h}:${m ? '30' : '00'}`, name, say: (s.say && s.say[i] && !m) ? s.say[i] : CONTENT.exclaim(code, name), word: name,
-      big: art, nav: emoji(h, m), bubble: emoji(h, m), bubbleArt: art, pictureBubble: true, prompt: name, the: name };
+    return CONTENT.picture(code, { id: `${h}:${m ? '30' : '00'}`, label: `${h}:${m ? '30' : '00'}`, name, big: art, nav: emoji(h, m), bubble: emoji(h, m), bubbleArt: art },
+      s.say && s.say[i] && !m ? { say: s.say[i] } : {});
   }) : [];
   MODULE('clock', {
     section: 'num', ages: [3, 9],

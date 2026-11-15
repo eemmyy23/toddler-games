@@ -1,7 +1,7 @@
 MSTRINGS('elements', 'de', {
   tiles: { elements: ['Chemische Elemente', 'Finde das Symbol'] },
   games: { symbol: 'Finde das Symbol für {name}!' },
-  intro: '{name}: Symbol {sym}, Ordnungszahl {z}.',
+  intro: '{name}: Symbol {sym}, Ordnungszahl {z}. {fact}',
   names: { H: 'Wasserstoff', He: 'Helium', Li: 'Lithium', Be: 'Beryllium', B: 'Bor', C: 'Kohlenstoff', N: 'Stickstoff', O: 'Sauerstoff', F: 'Fluor', Ne: 'Neon', Na: 'Natrium', Mg: 'Magnesium', Al: 'Aluminium', Si: 'Silicium', P: 'Phosphor', S: 'Schwefel', Cl: 'Chlor', Ar: 'Argon', K: 'Kalium', Ca: 'Calcium', Fe: 'Eisen', Cu: 'Kupfer', Ag: 'Silber', Au: 'Gold' },
   facts: { H: 'Das leichteste Element. Sterne verwandeln Wasserstoff in Helium und leuchten dabei.',
            He: 'Es lässt Ballons schweben.',

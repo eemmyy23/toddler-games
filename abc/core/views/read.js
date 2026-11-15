@@ -20,8 +20,7 @@
     const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15;
     const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
     const ns = syl.length, sylFont = Math.max(16, Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55)));
-    const capFirst = s => { const g = I18N.graphemes(s, loc); return g.length ? I18N.upper(g[0], null, loc) + s.slice(g[0].length) : s; };
-    const syls = syl.map((sy, i) => (i ? `<span class="rsep">${esc(ABC.config.icons.sep)}</span>` : '') + tile(i === 0 ? capFirst(sy) : sy, sy, 's', ink((i * 3 + 4) * 360 / INK.length))).join('');
+    const syls = syl.map((sy, i) => (i ? `<span class="rsep">${esc(ABC.config.icons.sep)}</span>` : '') + tile(i === 0 ? I18N.capFirst(sy, loc) : sy, sy, 's', CONTENT.palette(i * 3 + 4))).join('');
     $('read').innerHTML =
       `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
       `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +

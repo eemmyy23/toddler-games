@@ -34,7 +34,7 @@ if (FIX) { fs.writeFileSync(path.join(root, 'abc/manifest.js'), manifest); conso
 else if (!exists('abc/manifest.js') || read('abc/manifest.js') !== manifest) err('abc/manifest.js is out of date — run `node tools/check.js --fix`');
 
 for (const f of scripts.slice(3)) { if (/^abc\/core\/(services|shell|views\/)/.test(f)) continue; run(f); }
-const ABC = ctx.ABC, Tiles = vm.runInContext('Tiles', ctx), langs = CFG.languages, base = CFG.baseLanguage;
+const ABC = ctx.ABC, Tiles = vm.runInContext('Tiles', ctx), CONTENT = vm.runInContext('CONTENT', ctx), langs = CFG.languages, base = CFG.baseLanguage;
 for (const f of VIEW_FILES) ABC.views[path.basename(f, '.js')] = {};
 const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && typeof v === 'object' && !Array.isArray(v) && !('other' in v) ? keysOf(v, p + k + '.') : [p + k]);
 
@@ -136,19 +136,20 @@ for (const c of langs) {
     const s = m.strings[c];
     if (!s) { warn(`module ${m.id}: no strings for ${c} → hidden in ${c}`); continue; }
     if (m.check) m.check(c, S[m.id], s, msg => err(`module ${m.id}/${c}: ${msg}`));
-    const base = (m.strings[CFG.baseLanguage] || {}).say || {}, miss = Object.keys(base).filter(k => !(s.say || {})[k]);
-    if (miss.length) err(`module ${m.id}/${c}: say.${miss.join(', say.')} missing`);
+    const mine = new Set(keysOf(s)), miss = keysOf(m.strings[CFG.baseLanguage]).filter(k => !mine.has(k));
+    if (miss.length) err(`module ${m.id}/${c}: ${miss.join(', ')} missing (the base language has them)`);
   }
   for (const t of Tiles.list()) {
     const s = t.module.strings[c]; if (!s) continue;
     const lab = s.tiles && s.tiles[t.id], items = Tiles.items(t, c);
     if (t.view && !items.length) { if (lab) warn(`${c}: tile ${t.id} has a label but no items → hidden`); continue; }
     if (!Array.isArray(lab) || lab.length !== 2) { if (t.view) err(`module ${t.module.id}/${c}: tiles.${t.id} must be [learn label, game label]`); else warn(`module ${t.module.id}/${c}: tiles.${t.id} missing → hidden`); continue; }
-    if (!t.perLanguage && c !== CFG.baseLanguage) {
+    if (!t.perLanguage) {
       const ids = it => [it.id, ...(it.members || []).map(m => it.id + '>' + m.id)], mine = new Set(items.flatMap(ids));
-      const gone = Tiles.items(t, CFG.baseLanguage).flatMap(ids).filter(id => !mine.has(id));
-      if (gone.length) err(`${c}: tile ${t.id} is incomplete — missing ${gone.join(', ')} (base ${CFG.baseLanguage} has them)`);
+      const gone = [...new Set(langs.flatMap(l => Tiles.items(t, l).flatMap(ids)))].filter(id => !mine.has(id));
+      if (gone.length) err(`${c}: tile ${t.id} is incomplete — missing ${gone.join(', ')} (another language has them)`);
     }
+    for (const it of [...items, ...(t.game ? Tiles.gameItems(t, c) : [])]) if (!CONTENT.made(it)) { err(`module ${t.module.id}: tile ${t.id} item "${it.id}" is not built by CONTENT (thing/glyph/picture/group)`); break; }
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }
     const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => t.game.ask ? t.game.ask(it, { lower }) : t.id)));
