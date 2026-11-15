@@ -364,6 +364,7 @@ addEventListener('keydown', e => {
 });
 addEventListener('contextmenu', e => e.preventDefault());
 
+$('ver').textContent = `v${CFG.version} · ${self.MANIFEST.version.slice(0, 6)}`;
 loadIdx();
 render();
 

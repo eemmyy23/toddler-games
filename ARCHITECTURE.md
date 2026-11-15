@@ -85,7 +85,7 @@ flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, in
 `{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
-**config** — `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art? } }` (ascending), `defaultProfile, baseLanguage`.
+**config** — `version` (x.y.z, shown with the build hash in the corner), `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art? } }` (ascending), `defaultProfile, baseLanguage`.
 
 ## Recipes
 **Add a word** — `abc/concepts.js`: `C('wolf', '🐺');` then in each `abc/lang/<code>/words.js`:

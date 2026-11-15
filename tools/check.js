@@ -40,6 +40,7 @@ for (const f of VIEW_FILES) ABC.views[path.basename(f, '.js')] = {};
 const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && typeof v === 'object' && !Array.isArray(v) && !('other' in v) ? keysOf(v, p + k + '.') : [p + k]);
 
 console.log('config');
+if (!/^\d+\.\d+\.\d+$/.test(CFG.version || '')) err('config.version must be x.y.z');
 if (!langs.includes(base)) err(`config.baseLanguage "${base}" is not in config.languages`);
 if (new Set(CFG.sections.map(s => s.id)).size !== CFG.sections.length) err('config.sections: duplicate id');
 if (CFG.sections.filter(s => s.play).length !== 1) err('config.sections: exactly one section must have play: true');

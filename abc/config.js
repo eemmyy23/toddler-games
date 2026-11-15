@@ -1,4 +1,5 @@
 CONFIG({
+  version: '1.2.0',
   languages: ['en', 'ro', 'de'],
   modules: ['numbers', 'letters', 'colors', 'families', 'weather', 'shapes', 'body', 'seasons', 'categories', 'opposites', 'sky', 'clock', 'planets', 'health', 'elements'],
   sections: [
