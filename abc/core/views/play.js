@@ -4,6 +4,7 @@
   const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
   const nChoices = () => APP.streak >= 8 ? 4 : APP.streak >= 3 ? 3 : 2;
+  const look = it => it.bubbleArt || (it.bubble ?? it.label) || it.bubbleColor;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
   function pickTarget() {
     const p = pool().filter(it => it !== target);
@@ -18,7 +19,9 @@
   function newRound() {
     locked = false; target = pickTarget();
     if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; }
-    opts = shuffle([target, ...shuffle(pool().filter(it => it !== target && (!it.sound || it.sound !== target.sound))).slice(0, nChoices() - 1)]);
+    opts = [target];
+    for (const it of shuffle(pool())) if (opts.length < nChoices() && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
+    opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0] };
     draw();
@@ -32,7 +35,7 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label);
+      b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label);
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || ink(i * 90)); b.style.animationDelay = (i * 0.4) + 's';
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });

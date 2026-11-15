@@ -72,8 +72,8 @@ Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key
 **TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages? }`.
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
-`key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
-games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound` (items with the same sound are never choices in one round).
+`key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
+games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound`, `bubbleArt` (HTML picture). Two choices in one round never share a `sound` or a look.
 
 **VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.

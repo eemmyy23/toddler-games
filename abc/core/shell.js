@@ -47,7 +47,7 @@ const APP = {
     if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">📖 ${esc(APP.ui().info)}</button>`);
     if (it.concept) for (const x of TILES) {
       if (x === t || !usable(x, false)) continue;
-      const other = itemsOf(x).find(y => y.concept === it.concept);
+      const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)));
       if (other) out.push(chip(x, other.id, false));
     }
     const home = it.learn ?? it.id;

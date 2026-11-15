@@ -180,4 +180,10 @@ w('sunglasses', { w: 'o/che/lari de soa/re', plOnly: true, plDef: 'ochelarii de 
 w('boots', { w: 'ciz/me', plOnly: true, plDef: 'cizmele' });
 w('gloves', { w: 'mă/nuși', plOnly: true, plDef: 'mănușile' });
 w('scarf', { w: 'fu/lar', def: 'fularul', pl: 'fulare', g: 'n', plDef: 'fularele' });
+w('chicken-chick', { w: 'pui de gă/i/nă', def: 'puiul de găină', g: 'm', ex: false });
+w('circle', { w: 'cerc', def: 'cercul', pl: 'cercuri', g: 'n', plDef: 'cercurile' });
+w('square', { w: 'pă/trat', def: 'pătratul', pl: 'pătrate', g: 'n', plDef: 'pătratele' });
+w('triangle', { w: 'tri/un/ghi', def: 'triunghiul', pl: 'triunghiuri', g: 'n', plDef: 'triunghiurile' });
+w('heart', { w: 'i/ni/mă', def: 'inima', pl: 'inimi', g: 'f', plDef: 'inimile' });
+w('diamond', { w: 'romb', def: 'rombul', pl: 'romburi', g: 'n', plDef: 'romburile' });
 }
