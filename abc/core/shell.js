@@ -66,8 +66,9 @@ function loadIdx() {
   APP.idx = i >= 0 ? i : 0;
 }
 
-// a tile icon is an emoji or a short text ("ce·ci"); text icons get the text style — one rule for hub, search, anywhere
-const tileIcon = (t, cls) => `<span class="${cls} ico${/\p{L}/u.test(t.icon) ? ' txt' : ''}" aria-hidden="true">${esc(t.icon)}</span>`;
+// an icon (tab, tile) is an emoji or a short text ("123", "ABC", "ce·ci"); text icons get the text style — one rule everywhere
+const iconHTML = (icon, cls) => `<span class="${cls} ico${/[\p{L}\p{N}]/u.test(icon) && !/\p{Extended_Pictographic}/u.test(icon) ? ' txt' : ''}" aria-hidden="true">${esc(icon)}</span>`;
+const tileIcon = (t, cls) => iconHTML(t.icon, cls);
 // ---- hubs ----
 function hubTiles() {
   if (!SECTIONS[section].play) return TILES.filter(t => t.section === section && listed(t, false)).map(t => ({ t, ok: learnOk(t), lbl: label(t, 0), play: false }));
@@ -81,7 +82,7 @@ function hubTiles() {
 function renderHub() {
   const U = APP.ui();
   $('hub').innerHTML = `<button class="sbox hsearch" id="hsearch"><span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
-    ? `<div class="hh">${x.header.icon} ${esc(U.sections[x.header.id])}</div>`
+    ? `<div class="hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
@@ -123,7 +124,7 @@ function render() {
   document.body.dataset.sec = section; document.body.dataset.mode = sc;
   document.body.classList.toggle('topic', !atHub);
   document.body.classList.toggle('idx', !atHub && mode !== 'play' && !!tileOf().index);
-  $('barback').innerHTML = `‹ ${SECTIONS[section].icon}`;
+  $('barback').innerHTML = `‹ ${iconHTML(SECTIONS[section].icon, 'bi')}`;
   $('stars').textContent = '⭐ ' + APP.stars;
   $('hub').style.display = sc === 'hub' ? 'grid' : 'none';
   VIEW_ELS.forEach(el => { $(el).style.display = v && v.el === el ? (v.fullHeight ? 'block' : 'flex') : 'none'; });
@@ -288,7 +289,7 @@ function setProfile(p) {
 
 // ---- chrome from config ----
 $('flags').innerHTML = LANGS.map(c => `<button class="flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv">🔇</i></button>`).join('');
-$('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}"><span class="ti">${s.icon}</span><span class="tl"></span></button>`).join('');
+$('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">${iconHTML(s.icon, 'ti')}<span class="tl"></span></button>`).join('');
 // a language whose device has no voice at all gets a 🔇 mark (text still shown; never read by another language's voice)
 function markVoices() {
   if (!('speechSynthesis' in window)) return;
