@@ -6,7 +6,7 @@ STRINGS('ro', {
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
   version: 'v{version} · {build}',
-  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', countRange: '{a}→{b}', noneLine: '— {none}',
+  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: 'Instalează {app} pe dispozitiv',
   index: { az: 'A–Z', other: 'Altele', grp: 'Grupe' },
   search: { placeholder: 'Caută un cuvânt…', hint: 'Scrie în orice limbă — cuvântul apare în limba aleasă sus.', none: 'Nu am găsit nimic.',
@@ -15,5 +15,5 @@ STRINGS('ro', {
   profile: { curious: 'Curios', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
   installBtn: 'Instalează',
   aria: { search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
-    objects: 'Obiecte', fingers: 'Degete', countAll: 'Numără tot', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
+    objects: 'Obiecte', fingers: 'Degete', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
 });

@@ -227,15 +227,16 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
-  await p.locator('#c-all').dispatchEvent('click'); await until(() => document.querySelector('.crow.on')?.dataset.n === '2');
-  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.on')?.dataset.n }));
-  ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
+  await p.locator('#act').dispatchEvent('click'); await until(() => document.querySelector('.crow.on')?.dataset.n === '2');
+  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('act').classList.contains('on'), act: document.querySelector('.crow.on')?.dataset.n }));
+  ok(cp.top < 5 && cp.cls && cp.act === '2', `playing: scrolled to top, ▶ pressed, row ${cp.act}`);
   const rows = [];
-  for (let k = 3; k <= 10; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
+  for (let k = 3; k <= 10; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k);
+    await ev(() => new Promise(res => { let last = -1; const tick = () => { const s = $('count').scrollTop; if (s === last) res(); else { last = s; setTimeout(tick, 80); } }; tick(); })); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
     const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
   ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
-  await p.locator('#c-all').dispatchEvent('click');
-  ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
+  await p.locator('#act').dispatchEvent('click');
+  ok(await ev(() => !$('act').classList.contains('on') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');
   const wow = await ev(() => [1, 2, 20, 21].map(n => APP.t(APP.ui().wow, { n })));

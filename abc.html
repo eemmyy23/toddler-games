@@ -104,6 +104,7 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 
 #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) var(--gut) calc(var(--bot) + var(--nav-gap))}
 body.lownav #stage{padding-left:var(--side);padding-right:var(--side)}
+body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:grid;width:100%;height:100%;grid-template-columns:1fr 1fr;grid-auto-rows:auto;align-content:start;gap:var(--hub-gap);padding:4px 2px 8px}
 .hsearch{grid-column:1/-1}
 .hh{grid-column:1/-1;text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 0;align-self:end}
@@ -183,10 +184,6 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 
 #count{position:absolute;left:0;right:0;top:var(--top);bottom:var(--bot);padding:0 var(--gut) 20px}
 #ctools{position:sticky;top:0;z-index:var(--z-sticky);display:flex;justify-content:center;gap:var(--sp-3);padding:6px 0 12px;background:linear-gradient(var(--bg1) 75%,transparent)}
-#c-all{position:relative;overflow:hidden;--p:0}
-#c-all::before{content:'';position:absolute;inset:0;width:calc(var(--p) * 100%);pointer-events:none;transition:width .5s ease-out;
-  background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--amber) 45%,transparent) 0 7px,color-mix(in srgb,var(--amber) 20%,transparent) 7px 14px)}
-#c-all.playing{box-shadow:var(--ring),inset 0 3px 8px rgba(0,0,0,.45);transform:translateY(2px);color:var(--amber)}
 .crow{display:flex;align-items:center;gap:12px;margin:0 0 var(--sp-3);padding:8px 12px;border-radius:var(--r);background:var(--card);cursor:pointer;transition:background .2s,transform .2s}
 .cnum{flex:0 0 auto;width:var(--cnum-w);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
 .cdig{font-size:var(--cdig);font-weight:700;line-height:1}
@@ -291,7 +288,6 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
   <div id="ctools">
     <button id="c-obj" class="pill on" data-aria="objects" data-icon="objects"></button>
     <button id="c-hand" class="pill" data-aria="fingers" data-icon="fingers"></button>
-    <button id="c-all" class="pill" data-aria="countAll"></button>
   </div>
   <div id="crows"></div>
 </div>

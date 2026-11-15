@@ -43,6 +43,7 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
+  playing(on) { $('act').classList.toggle('on', !!on); $('act').setAttribute('aria-pressed', !!on); },
   shown() {
     APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav ?? esc(x.label));
@@ -161,7 +162,7 @@ function render() {
   $('hub').hidden = sc !== 'hub';
   VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); });
   $('stage').hidden = !!(v && v.fullHeight);
-  $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !(v && v.play);
+  $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !(v && v.play); APP.playing(false);
   closeIndex(); closeInfo(); closeSearch();
   if (sc === 'hub') renderHub(); else v.show(started);
 }

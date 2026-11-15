@@ -4,7 +4,7 @@
   function stop() {
     timers.forEach(clearTimeout); timers = []; playing = false;
     document.querySelectorAll('.crow.on').forEach(r => r.classList.remove('on'));
-    const b = $('c-all'); b.classList.remove('playing'); b.style.setProperty('--p', 0); b.setAttribute('aria-pressed', 'false');
+    APP.playing(false);
   }
   function reveal(row, smooth) {
     const box = $('count'), bar = $('ctools').offsetHeight, room = box.clientHeight - bar;
@@ -29,7 +29,6 @@
   function render() {
     const list = APP.items();
     $('c-obj').classList.toggle('on', style === 'obj'); $('c-hand').classList.toggle('on', style === 'hand');
-    $('c-all').innerHTML = APP.icon('play') + esc(APP.t(APP.ui().countRange, { a: list[0].label, b: list[list.length - 1].label }));
     $('crows').innerHTML = list.map(it => {
       const objs = style === 'obj' ? (it.pics || []).map(p => `<span>${p}</span>`).join('') : it.n <= 5 ? hand(it.n, false) : hand(5, false) + hand(it.n - 5, true);
       return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:${it.color}">${esc(it.label)}</div><div class="cword">${esc(it.name)}</div></div>` +
@@ -50,20 +49,19 @@
   function all() {
     if (playing) { stop(); hush(); sfx.pop(); return; }
     stop(); hush(); playing = true;
-    const b = $('c-all'), list = APP.items(), n = list.length;
-    b.classList.add('playing'); b.setAttribute('aria-pressed', 'true');
+    const list = APP.items(), n = list.length;
+    APP.playing(true);
     $('count').scrollTo({ top: 0, behavior: 'auto' });
-    list.forEach((it, i) => timers.push(setTimeout(() => { light(it.n); b.style.setProperty('--p', (i + 1) / n); sayNow(it.name); sfx.pop(); }, 250 + i * 1000)));
+    list.forEach((it, i) => timers.push(setTimeout(() => { light(it.n); sayNow(it.name); sfx.pop(); }, 250 + i * 1000)));
     timers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); stop(); }, 250 + n * 1000));
   }
   $('crows').addEventListener('click', e => { const r = e.target.closest('.crow'); if (r) { APP.firstTouch(); one(+r.dataset.n); } });
   const btn = (id, fn) => onTap(id, () => { APP.firstTouch(); fn(); });
   btn('c-obj', () => { style = 'obj'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
   btn('c-hand', () => { style = 'hand'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
-  btn('c-all', all);
   VIEW('count', {
     el: 'count', fullHeight: true,
-    show() { render(); }, leave: stop, pause: stop,
+    show() { render(); }, leave: stop, pause: stop, play: all,
     announce(name) { speak(APP.exclaim(name), 120); },
     onKey(k, e) {
       const it = APP.items().find(x => x.key === k); if (it) { APP.firstTouch(); one(it.n); return true; }

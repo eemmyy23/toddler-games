@@ -10,10 +10,10 @@ STRINGS('de', {
     results: { one: '1 Ergebnis', other: '{n} Ergebnisse' } },
   words: { one: '1 Wort', other: '{n} Wörter' },
   version: 'v{version} · {build}',
-  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', countRange: '{a}→{b}', noneLine: '— {none}',
+  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
   aria: { search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
-    objects: 'Dinge', fingers: 'Finger', countAll: 'Alle zählen', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
+    objects: 'Dinge', fingers: 'Finger', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
 });

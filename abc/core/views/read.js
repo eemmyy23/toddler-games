@@ -43,6 +43,7 @@
     sfx.pop(); speak(el.dataset.say, 60);
   });
   async function play() {
+    APP.playing(true);
     const t = ++tok, alive = () => t === tok && APP.screen() === 'read', word = cur().w;
     for (const el of document.querySelectorAll('#rU .rt')) { if (!alive()) return; lit(el); await speak(el.dataset.say); await wait(150); }
     if (!alive()) return; await wait(300);
@@ -57,6 +58,7 @@
     if (!alive()) return;
     const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
     setTimeout(() => { if (alive()) lit(null); }, 800);
+    APP.playing(false);
   }
   const VIEW_READ = {
     el: 'read', arrows: true, swipe: true, navFace: x => `<b>${x.pic}</b>`,
