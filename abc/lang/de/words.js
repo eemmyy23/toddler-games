@@ -138,4 +138,8 @@ w('milk', { w: 'Milch', g: 'f', mass: true });
 w('honey', { w: 'Ho/nig', g: 'm', mass: true });
 w('butter', { w: 'But/ter', g: 'f', mass: true });
 w('salt', { w: 'Salz', g: 'n', mass: true });
+w('chick', { w: 'Kü/ken', g: 'n', pl: 'Küken' });
+w('strawberry', { w: 'Erd/bee/re', g: 'f', pl: 'Erdbeeren' });
+w('ladybird', { w: 'Ma/ri/en/kä/fer', g: 'm', pl: 'Marienkäfer' });
+w('biscuit', { w: 'Keks', g: 'm', pl: 'Kekse' });
 }

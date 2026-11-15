@@ -78,7 +78,8 @@ games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`
 **VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
 
-**GAME** — hosted by the `play` view: `{ needs (min. items, default 2), pool(items, streak) → candidates, prompt(target, round) → HTML }`.
+**GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):
+`{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion) → { text (never reveals the answer), picture: HTML } }`.
 
 **config** — `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art?, soon? } }` (ascending), `defaultProfile, baseLanguage`.
 

@@ -13,7 +13,7 @@
   }
   function askLine() {
     const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id;
-    return APP.mt('games.' + key, { name: target.name, the: target.the || target.name });
+    return APP.mt('games.' + key, Object.assign({}, target, { the: target.the || target.name }));
   }
   function newRound() {
     locked = false; target = pickTarget();
@@ -25,7 +25,8 @@
   }
   function draw() {
     locked = false;
-    $('ask').innerHTML = game().prompt(target, round);
+    const q = game().show(target, round, askLine());
+    $('ask').innerHTML = `<span class="q">🔊 ${esc(q.text)}</span>${q.picture || ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');
     box.innerHTML = '';

@@ -140,4 +140,8 @@ w('milk', { w: 'lap/te', mass: true, def: 'laptele' });
 w('honey', { w: 'mie/re', mass: true, def: 'mierea' });
 w('butter', { w: 'unt', mass: true, def: 'untul' });
 w('salt', { w: 'sa/re', mass: true, def: 'sarea' });
+w('chick', { w: 'pui', def: 'puiul', pl: 'pui', g: 'm', plDef: 'puii' });
+w('strawberry', { w: 'căp/șu/nă', def: 'căpșuna', pl: 'căpșuni', g: 'f', plDef: 'căpșunile' });
+w('ladybird', { w: 'bu/bu/ru/ză', def: 'buburuza', pl: 'buburuze', g: 'f', plDef: 'buburuzele' });
+w('biscuit', { w: 'bis/cu/it', def: 'biscuitul', pl: 'biscuiți', g: 'm', plDef: 'biscuiții' });
 }

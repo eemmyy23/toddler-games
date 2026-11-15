@@ -143,3 +143,7 @@ C('honey', '🍯');
 C('butter', '🧈');
 C('salt', '🧂');
 C('zero', '0️⃣');
+C('chick', '🐥');
+C('strawberry', '🍓');
+C('ladybird', '🐞');
+C('biscuit', '🍪');
