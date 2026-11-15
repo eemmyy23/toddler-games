@@ -138,6 +138,7 @@ function render() {
   document.querySelectorAll('.age').forEach(b => { const on = b.dataset.p === profile; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', profileName(b.dataset.p)); });
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
+  $('ver').textContent = APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
   if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
   const sc = APP.screen(), v = view();
@@ -364,7 +365,6 @@ addEventListener('keydown', e => {
 });
 addEventListener('contextmenu', e => e.preventDefault());
 
-$('ver').textContent = `v${CFG.version} · ${self.MANIFEST.version.slice(0, 6)}`;
 loadIdx();
 render();
 

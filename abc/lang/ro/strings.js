@@ -5,6 +5,7 @@ STRINGS('ro', {
   thats: { m: 'Acesta e {name}.', n: 'Acesta e {name}.', f: 'Aceasta e {name}.', pl: 'Acestea sunt {name}.', other: 'Asta e {name}.' },
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
+  version: 'v{version} · {build}',
   install: 'Instalează ABC 123! pe telefon',
   index: { az: 'A–Z', other: 'Altele', grp: 'Grupe' },
   search: { placeholder: 'Caută un cuvânt…', hint: 'Scrie în orice limbă — cuvântul apare în limba aleasă sus.', none: 'Nu am găsit nimic.',

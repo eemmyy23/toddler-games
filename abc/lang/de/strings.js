@@ -9,6 +9,7 @@ STRINGS('de', {
   search: { placeholder: 'Wort suchen…', hint: 'Schreib in jeder Sprache — das Wort erscheint in der oben gewählten Sprache.', none: 'Nichts gefunden.',
     results: { one: '1 Ergebnis', other: '{n} Ergebnisse' } },
   words: { one: '1 Wort', other: '{n} Wörter' },
+  version: 'v{version} · {build}',
   install: 'ABC 123! auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',

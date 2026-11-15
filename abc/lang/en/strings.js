@@ -9,6 +9,7 @@ STRINGS('en', {
   search: { placeholder: 'Search a word…', hint: 'Type in any language — the word is shown in the language chosen above.', none: 'Nothing found.',
     results: { one: '1 result', other: '{n} results' } },
   words: { one: '1 word', other: '{n} words' },
+  version: 'v{version} · {build}',
   install: 'Install ABC 123! on your device',
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
