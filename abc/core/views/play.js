@@ -38,6 +38,7 @@
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
       box.appendChild(b);
     });
+    APP.fit($('play'));
     speak(askLine(), 250);
   }
   function choose(it, el) {
@@ -69,6 +70,7 @@
     el: 'play',
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },
     leave() { roundTok++; },
+    resize() { if (target) APP.fit($('play')); },
     announce(name) { if (target) speak(`${name}. ${askLine()}`, 250); },
     beforeLang() { return { target: target && target.id, opts: opts.map(o => o.id), lower: round.lower }; },
     afterLang(s) {
