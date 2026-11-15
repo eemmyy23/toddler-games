@@ -15,7 +15,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     speechSynthesis.speak = u => { __said.push(u.said); setTimeout(() => u.onend && u.onend(), 20); };
     speechSynthesis.cancel = () => {};
   });
-  await p.goto(URL); await p.waitForTimeout(500);
+  await p.goto(URL); await p.waitForFunction(() => typeof APP === 'object');
   const ev = (f, a) => p.evaluate(f, a);
   const said = () => ev(() => __said.slice());
   const clear = () => ev(() => { __said.length = 0; });
@@ -223,7 +223,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const k = (await caches.keys()).find(k => k === 'toddler-' + self.MANIFEST.version); if (!k) return 'no cache';
     const c = await caches.open(k), miss = []; for (const f of self.MANIFEST.files) if (!(await c.match(f))) miss.push(f); return miss.join(' '); });
   ok(cached === '', 'all manifest files cached' + (cached ? ': ' + cached : ''));
-  await p.context().setOffline(true); await p.reload(); await p.waitForTimeout(800);
+  await p.context().setOffline(true); await p.reload(); await p.waitForFunction(() => typeof APP === 'object', null, { timeout: 10000 }).catch(() => {});
   ok(await ev(() => typeof APP === 'object' && document.querySelectorAll('.flag').length === 3), 'reload works offline');
   await p.context().setOffline(false);
 
