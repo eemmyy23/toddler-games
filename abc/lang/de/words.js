@@ -234,4 +234,6 @@ w('up', { w: 'oben' });
 w('zero', { w: 'Null', g: 'f', pl: 'Nullen' });
 w('ice', { w: 'Eis/wür/fel', g: 'm', pl: 'Eiswürfel' });
 w('question', { w: 'Fra/ge/zei/chen', g: 'n', pl: 'Fragezeichen' });
+w('wifi', { w: 'WLAN', g: 'n', mass: true, ex: false });
+w('orange-colour', { w: 'o/ran/ge', homonym: 'orange' });
 }

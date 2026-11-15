@@ -28,7 +28,7 @@
       APP.fitText(g);
       APP.fit($('learn'));
       APP.shown();
-      if (sayIt) speak(it.say, 120);
+      if (sayIt) speak(it.say, PAUSE.line);
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     line: () => cur().say,

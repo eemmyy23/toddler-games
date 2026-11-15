@@ -116,7 +116,7 @@ for (const c of langs) {
     try { L.forms(e, w); } catch (x) { err(`${c}/words.js ${e.id}: forms → ${x.message}`); }
     if (L.checkForms) { const m = L.checkForms(e); if (m) warn(`${c}/words.js ${e.id}: ${m}`); }
     const key = w.toLocaleLowerCase(L.bcp47);
-    if (seenW.has(key)) err(`${c}/words.js: "${w}" is used for two concepts (${seenW.get(key)}, ${e.id}) — add a note or pick another word`);
+    if (seenW.has(key) && !(e.homonym && e.homonym === seenW.get(key))) err(`${c}/words.js: "${w}" is used for two concepts (${seenW.get(key)}, ${e.id}) — add a note or pick another word`);
     seenW.set(key, e.id);
     for (const a of (e.also || '').split(',').map(s => s.trim().toLocaleLowerCase(L.bcp47)).filter(Boolean)) { if (seenW.has(a) && seenW.get(a) !== e.id) err(`${c}/words.js ${e.id}: synonym "${a}" is the word of ${seenW.get(a)}`); }
   }

@@ -26,7 +26,7 @@ const Tiles = {
     const g = t.game && ABC.games[t.game.type];
     if (!g || !this.learnOk(t, code) || !this.label(t, code, 1)) return false;
     const items = this.gameItems(t, code), need = g.needs || 2;
-    return g.pool(items, 0).length >= need && g.pool(items, 99).length >= need;
+    return g.pool(items, 0).length >= need && g.pool(items, Infinity).length >= need;
   },
   profiles: () => Object.keys(ABC.config.profiles),
   profileOf(t) {

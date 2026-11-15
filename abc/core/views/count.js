@@ -1,20 +1,7 @@
 (function () {
   let style = store.get('cstyle', 'obj');
   const BEAT = 700;
-  const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6';
-  const FING = { little: { x: 13, w: 13, top: 34 }, ring: { x: 28, w: 14, top: 18 }, middle: { x: 44, w: 14, top: 10 }, index: { x: 60, w: 14, top: 18 } };
-  const ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
-  function hand(raised, right) {
-    const up = new Set(ORDER.slice(0, raised)); let g = '';
-    for (const [name, f] of Object.entries(FING)) g += up.has(name)
-      ? `<rect x="${f.x}" y="${f.top}" width="${f.w}" height="${80 - f.top}" rx="${f.w / 2}" fill="${SKIN}"/><ellipse cx="${f.x + f.w / 2}" cy="${f.top + 7}" rx="${f.w * 0.3}" ry="4.5" fill="${NAIL}"/>`
-      : `<rect x="${f.x}" y="48" width="${f.w}" height="24" rx="${f.w / 2}" fill="${SHADE}"/>`;
-    g += `<rect x="10" y="54" width="68" height="58" rx="22" fill="${SKIN}"/>`;
-    g += up.has('thumb')
-      ? `<rect x="68" y="50" width="16" height="44" rx="8" fill="${SKIN}" transform="rotate(32 76 92)"/><ellipse cx="76" cy="57" rx="4.5" ry="4" fill="${NAIL}" transform="rotate(32 76 92)"/>`
-      : `<rect x="34" y="76" width="42" height="15" rx="7.5" fill="${SHADE}"/>`;
-    return `<svg class="hand" viewBox="0 0 106 120" aria-label="${esc(APP.ui().aria[right ? 'rightHand' : 'leftHand'])}"><g${right ? ' transform="translate(106 0) scale(-1 1)"' : ''}>${g}</g></svg>`;
-  }
+  const hand = (raised, right) => `<svg class="hand" viewBox="0 0 32 32" aria-label="${esc(APP.ui().aria[right ? 'rightHand' : 'leftHand'])}"><g${right ? ' transform="translate(32 0) scale(-1 1)"' : ''}>${ABC.art['hand-' + raised]}</g></svg>`;
   const item = n => APP.items().find(it => it.n === n);
   function render() {
     const list = APP.items();

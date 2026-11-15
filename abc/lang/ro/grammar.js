@@ -17,5 +17,5 @@ LANG('ro', {
     const sg = [e.mass ? w : `${e.g === 'f' ? 'o' : 'un'} ${w}`, e.def];
     return { sg, pl: e.pl ? [`${e.g === 'm' ? 'doi' : 'două'} ${e.pl}`, e.plDef] : null };
   },
-  checkForms(e) { return e.pl && e.plDef !== e.pl + (e.g === 'm' ? 'i' : 'le') ? `plDef "${e.plDef}" ≠ regula (${e.pl + (e.g === 'm' ? 'i' : 'le')})` : null; }
+  checkForms(e) { if (!e.pl || e.pl === e.w.replace(/\//g, '')) return null; const [h, ...rest] = e.pl.split(' '), want = [h + (e.g === 'm' ? 'i' : 'le'), ...rest].join(' '); return e.plDef !== want ? `plDef "${e.plDef}" ≠ regula (${want})` : null; }
 });

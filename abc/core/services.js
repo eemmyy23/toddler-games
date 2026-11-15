@@ -6,6 +6,7 @@ function onTapIn(root, sel, fn) {
   r.addEventListener('click', e => { const b = e.target.closest && e.target.closest(sel); if (!b) return; e.stopPropagation(); fn(b, e); }, true);
 }
 const wait = ms => new Promise(r => setTimeout(r, ms));
+const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700 }, TALK = { base: 2000, perChar: 160, silent: 400 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {
@@ -66,11 +67,11 @@ function makeUtt(text, rate, onDone) {
   let fallback;
   const fin = () => { clearTimeout(fallback); liveUtts.delete(u); onDone && onDone(); };
   u.onend = u.onerror = fin;
-  fallback = setTimeout(fin, 2000 + I18N.graphemes(text, SPEECH.bcp47).length * 160);
+  fallback = setTimeout(fin, TALK.base + I18N.graphemes(text, SPEECH.bcp47).length * TALK.perChar);
   return u;
 }
 function speak(text, delay = 0) {
-  if (!('speechSynthesis' in window) || SPEECH.noVoice) return wait(400 + delay);
+  if (!('speechSynthesis' in window) || SPEECH.noVoice) return wait(TALK.silent + delay);
   speechSynthesis.cancel(); clearTimeout(speakTimer);
   if (speakDone) speakDone();
   return new Promise(res => {

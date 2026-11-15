@@ -37,7 +37,7 @@
   --cnum-w:96px; --cdig:54px; --cword:var(--fs-m); --citems:34px; --citems-min:60px; --hand-w:84px; --hand-h:96px; --row:5;
   --tap:44px; --badge:28px; --tab-w:120px; --icon-m:28px; --learn-gap:1.6vh; --dot:40px; --swatch:min(30vh,52vw); --rainbow:min(44vh,80vw);
   --word-fs:min(6vh,8vw); --pics-fs:min(7vh,9vw); --ask-fs:min(5.5vh,7.5vw); --choice-gap:min(4vw,4vh); --bub-c:var(--card2); --bub-2:min(28vh,40vw); --bub-3:min(25vh,28vw); --bub-4:min(21vh,21vw); --n4-display:flex;
-  --rt-w:54px; --rt-min:34px; --rt-h-tight:36px; --rt-fs-tight:21px; --rpic-tight:7vh; --syl-pad:min(16px,2.4vw); --ix-w:76px; --ix-h:84px; --srp:56px;
+  --rt-w:1.7em; --rt-h-tight:36px; --rt-fs-tight:21px; --rpic-tight:7vh; --syl-pad:.3em; --rt-gap:.2em; --word-gap:.5em; --ix-w:76px; --ix-h:84px; --srp:56px;
   --shadow-text:0 6px 0 var(--shade); --shadow-inset:inset 0 -8px 0 rgba(0,0,0,.12); --shadow-drop:0 3px 0 rgba(0,0,0,.3);
   --inf-fs:var(--fs-m); --inf-pad:12px 16px; --inf-pic:36px; --play-gap:clamp(16px, 7vh, 72px);
 }
@@ -196,23 +196,19 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 #read{display:flex;flex-direction:var(--read-dir);align-items:center;justify-content:center;width:100%;height:100%;gap:var(--read-gap)}
 .rcol{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--read-gap);flex:1 1 0;min-width:0;width:100%}
 #read.tight{--rt-h:var(--rt-h-tight);--rt-fs:var(--rt-fs-tight);--rc-h:var(--rt-h-tight);--rpic:var(--rpic-tight);--read-gap:var(--sp-1)} #rpic{font-size:var(--rpic);line-height:1.1;cursor:pointer}
-.rrow{display:flex;flex-wrap:nowrap;justify-content:center;gap:var(--sp-2);max-width:100%}
-.rt{flex:0 1 var(--rt-w);min-width:var(--rt-min);height:var(--rt-h);border-radius:var(--r-sm);font-size:var(--rt-fs);font-weight:600;
+.rrow{display:flex;flex-wrap:nowrap;justify-content:center;gap:var(--rt-gap);max-width:100%;font-size:calc(var(--rt-fs) * var(--fit,1))}
+.rt{flex:0 0 auto;min-width:var(--rt-w);padding:0 var(--syl-pad);height:calc(var(--rt-h) * var(--fit,1));border-radius:var(--r-sm);font-size:1em;font-weight:600;white-space:nowrap;
   box-shadow:var(--shadow);,box-shadow .15s}
-.rrow.let .rt{flex:0 0 var(--tw,var(--rt-w));width:var(--tw,var(--rt-w));min-width:0;font-size:min(var(--tf,var(--rt-fs)),var(--rt-fs))}
-.rrow.syl{flex-wrap:wrap;row-gap:var(--sp-1)}
-.rrow.syl .rt{flex:0 1 auto;min-width:0;padding:0 var(--syl-pad);font-size:min(var(--sf,var(--rt-fs)),var(--rt-fs))}
-.rt.word{flex:0 0 auto;height:calc(var(--rt-h) + var(--sp-2));padding:0 var(--sp-4);font-size:calc(var(--rt-fs) + var(--sp-1));color:var(--amber)}
+.rt.word{padding:0 var(--sp-4);font-size:1.15em;color:var(--amber)}
+.rgap{flex:0 0 var(--word-gap)}
 .rsep{align-self:center;color:var(--muted);font-size:var(--rce)}
-#rC{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2);width:100%}
+#rC{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-2);width:100%;font-size:calc(var(--rc-fs) * var(--fit,1))}
 .rh{text-align:center}
 .rc{display:flex;align-items:center;justify-content:flex-start;gap:var(--sp-2);min-width:0;overflow:hidden;height:var(--rc-h);padding:0 var(--sp-4) 0 var(--sp-3);
-  border-radius:var(--r-pill);font-size:min(var(--cf,var(--rc-fs)),var(--rc-fs));font-weight:600;white-space:nowrap;
+  border-radius:var(--r-pill);font-size:1em;font-weight:600;white-space:nowrap;
   box-shadow:var(--shadow);,box-shadow .15s}
 .rce{font-size:var(--rce);letter-spacing:-2px}
 #read.tight .rce{display:none}
-#rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:var(--sp-1) var(--sp-2);gap:0;border-radius:var(--r-sm);white-space:normal;text-align:center;line-height:1.1}
-#rC.tall .rce{font-size:var(--fs-m)}
 .rc.none{background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--muted);font-size:var(--fs-xs);justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.1;padding:0 var(--sp-2)}
 #act{position:fixed;left:0;right:0;margin:0 auto;bottom:calc(var(--bot) + var(--nav-gap));z-index:var(--z-float)}
 

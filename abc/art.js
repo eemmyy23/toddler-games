@@ -15,3 +15,18 @@ ART('jupiter', '<circle cx="16" cy="16" r="14.5" fill="#d8a46c" stroke="#1d2150"
 ART('saturn', '<ellipse cx="16" cy="16" rx="15.5" ry="4.6" fill="none" stroke="#1d2150" stroke-width="3.4"/><ellipse cx="16" cy="16" rx="15.5" ry="4.6" fill="none" stroke="#c9b07a" stroke-width="2"/><circle cx="16" cy="16" r="9" fill="#e3c27a" stroke="#1d2150" stroke-width="1.4"/><path d="M7.4 13.5h17.2M7 17.5h18" stroke="#cfa95f" stroke-width="1.4"/><path d="M1 16.4a15.5 4.6 0 0 0 30 0" fill="none" stroke="#c9b07a" stroke-width="2"/>');
 ART('uranus', '<circle cx="16" cy="16" r="11" fill="#8fd3df" stroke="#1d2150" stroke-width="1.4"/><ellipse cx="16" cy="16" rx="3" ry="14" fill="none" stroke="#bfeaf0" stroke-width="1.4"/>');
 ART('neptune', '<circle cx="16" cy="16" r="11" fill="#4f6fd8" stroke="#1d2150" stroke-width="1.4"/><path d="M7 12q9-2 18 0M6 19q10 2 20 0" stroke="#3c58b5" stroke-width="1.6" fill="none"/><ellipse cx="12" cy="15" rx="2.4" ry="1.4" fill="#2c428e"/>');
+{
+  const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6', ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
+  const FING = { little: { x: 13, w: 13, top: 34 }, ring: { x: 28, w: 14, top: 18 }, middle: { x: 44, w: 14, top: 10 }, index: { x: 60, w: 14, top: 18 } };
+  for (let raised = 0; raised <= 5; raised++) {
+    const up = new Set(ORDER.slice(0, raised)); let g = '';
+    for (const [name, f] of Object.entries(FING)) g += up.has(name)
+      ? `<rect x="${f.x}" y="${f.top}" width="${f.w}" height="${80 - f.top}" rx="${f.w / 2}" fill="${SKIN}"/><ellipse cx="${f.x + f.w / 2}" cy="${f.top + 7}" rx="${f.w * 0.3}" ry="4.5" fill="${NAIL}"/>`
+      : `<rect x="${f.x}" y="48" width="${f.w}" height="24" rx="${f.w / 2}" fill="${SHADE}"/>`;
+    g += `<rect x="10" y="54" width="68" height="58" rx="22" fill="${SKIN}"/>`;
+    g += up.has('thumb')
+      ? `<rect x="68" y="50" width="16" height="44" rx="8" fill="${SKIN}" transform="rotate(32 76 92)"/><ellipse cx="76" cy="57" rx="4.5" ry="4" fill="${NAIL}" transform="rotate(32 76 92)"/>`
+      : `<rect x="34" y="76" width="42" height="15" rx="7.5" fill="${SHADE}"/>`;
+    ART('hand-' + raised, `<g transform="scale(0.2667) translate(7 0)">${g}</g>`);
+  }
+}

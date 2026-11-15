@@ -1,14 +1,16 @@
 {
+const HEX = { red: '#e53935', orange: '#fb8c00', yellow: '#fdd835', green: '#43a047', blue: '#1e88e5', indigo: '#3949ab', purple: '#8e24aa',
+  pink: '#f48fb1', brown: '#8d6e63', black: '#111111', white: '#f5f5f5' };
 const COLOR_DATA = [
-  { id: 'red', hex: '#e53935', things: 'apple strawberry tomato cherry' }, { id: 'blue', hex: '#1e88e5', things: 'whale dolphin butterfly jeans' },
-  { id: 'yellow', hex: '#fdd835', things: 'banana lemon chick sun' }, { id: 'green', hex: '#43a047', things: 'cucumber frog leaf grass' },
-  { id: 'orange', concept: 'orange-colour', hex: '#fb8c00', things: 'orange pumpkin fox' }, { id: 'purple', hex: '#8e24aa', things: 'grape umbrella' },
-  { id: 'pink', hex: '#f48fb1', things: 'pig flower donut' }, { id: 'brown', hex: '#8d6e63', things: 'bear horse teddy hedgehog' },
-  { id: 'black', hex: '#111111', things: 'hat penguin' }, { id: 'white', hex: '#f5f5f5', things: 'sheep cloud egg milk' },
+  { id: 'red', things: 'apple strawberry tomato cherry' }, { id: 'blue', things: 'whale dolphin butterfly jeans' },
+  { id: 'yellow', things: 'banana lemon chick sun' }, { id: 'green', things: 'cucumber frog leaf grass' },
+  { id: 'orange', concept: 'orange-colour', things: 'orange pumpkin fox' }, { id: 'purple', things: 'grape umbrella' },
+  { id: 'pink', things: 'pig flower donut' }, { id: 'brown', things: 'bear horse teddy hedgehog' },
+  { id: 'black', things: 'hat penguin' }, { id: 'white', things: 'sheep cloud egg milk' },
   { id: 'rainbow', concept: 'rainbow', things: 'sun cloud umbrella', noPlay: true, bands: true }
-];
-const RAINBOW_HEX = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#3949ab', '#8e24aa'];
-const RAINBOW_DOT = 'conic-gradient(#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#3949ab,#8e24aa,#e53935)';
+].map(c => Object.assign({ hex: HEX[c.id] }, c));
+const RAINBOW_HEX = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'purple'].map(k => HEX[k]);
+const RAINBOW_DOT = `conic-gradient(${[...RAINBOW_HEX, RAINBOW_HEX[0]].join(',')})`;
 function rainbowSVG() {
   return `<svg class="rbsvg" viewBox="0 0 200 104">${RAINBOW_HEX.map((c, i) => { const r = 92 - i * 10;
     return `<path class="part rbb" data-part="${i}" d="M ${100 - r} 100 A ${r} ${r} 0 0 1 ${100 + r} 100" stroke="${c}"/>`; }).join('')}</svg>`;

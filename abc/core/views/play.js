@@ -3,7 +3,8 @@
   const game = () => ABC.games[APP.tile().game.type];
   const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
-  const nChoices = () => APP.streak >= 8 ? 4 : APP.streak >= 3 ? 3 : 2;
+  const RULES = { levels: [[8, 4], [3, 3], [0, 2]], maxWeight: 5, cooldown: 700, bigEvery: 10, next: 1200, nextBig: 2400, settle: 350 };
+  const nChoices = () => RULES.levels.find(([s]) => APP.streak >= s)[1];
   const look = it => it.bubbleArt || it.bubble || it.bubbleColor;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
   const fits = (it, t, os) => (!t.among || it.among === t.among) && !os.some(o => o === it || (o.sound && o.sound === it.sound) || look(o) === look(it));
@@ -45,30 +46,30 @@
     });
     $('plinks').innerHTML = APP.links(target); $('plinks').hidden = !$('plinks').innerHTML;
     APP.fit($('play'));
-    speak(askLine(), 250);
+    speak(askLine(), PAUSE.ask);
   }
   function choose(it, el) {
     if (locked) return;
-    if (it !== target && el) { const now = Date.now(); if (+(el.dataset.cool || 0) > now) return; el.dataset.cool = now + 700; }
+    if (it !== target && el) { const now = Date.now(); if (+(el.dataset.cool || 0) > now) return; el.dataset.cool = now + RULES.cooldown; }
     const U = APP.ui();
     if (it === target) {
       locked = true; APP.streak++; APP.addStar();
       weights[wk(it)] = Math.max(0, (weights[wk(it)] || 0) - 1); store.set('w', weights);
       if (el) el.classList.add('right');
-      const big = APP.stars % 10 === 0;
+      const big = APP.stars % RULES.bigEvery === 0;
       let said;
       if (big) {
         APP.celebrate(el, true); sfx.fanfare();
-        said = speak(APP.t(U.wow, { n: APP.stars }), 700);
-      } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), 400); }
+        said = speak(APP.t(U.wow, { n: APP.stars }), PAUSE.praise);
+      } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), PAUSE.answer); }
       const tok = ++roundTok;
-      Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
+      Promise.all([said, wait(big ? RULES.nextBig : RULES.next)]).then(() => wait(RULES.settle)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {
       APP.streak = 0;
-      if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
+      if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(RULES.maxWeight, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(APP.t(U.wrong, { thats: APP.t(U.thats, it.thats), ask: askLine() }), 350);
+      speak(APP.t(U.wrong, { thats: APP.t(U.thats, it.thats), ask: askLine() }), PAUSE.answer);
     }
   }
   onTap('ask', () => { if (target) speak(askLine()); });

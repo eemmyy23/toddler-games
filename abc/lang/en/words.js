@@ -232,4 +232,8 @@ w('blood', { w: 'blood', mass: true });
 w('fever', { w: 'fe/ver', art: 'a', pl: 'fevers' });
 w('vaccine', { w: 'vac/cine', art: 'a', pl: 'vaccines' });
 w('bandage', { w: 'plas/ter', art: 'a', pl: 'plasters' });
+w('wifi', { w: 'wi/fi', mass: true, ex: false });
+w('wheat-ear', { w: 'ear of wheat', art: 'an', pl: 'ears of wheat' });
+w('ufo', { w: 'U/FO', art: 'a', pl: 'UFOs', ex: false });
+w('orange-colour', { w: 'or/ange', homonym: 'orange' });
 }

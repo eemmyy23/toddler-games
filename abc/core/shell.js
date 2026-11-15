@@ -7,7 +7,7 @@ const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
-const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] };
+const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50;
 let seqTok = 0;
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
@@ -32,7 +32,12 @@ const APP = {
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
   icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
   exclaim: name => APP.t(APP.ui().exclaim, { name }),
-  fitText(el) { let k = 1; el.style.setProperty('--fit', k); for (let i = 0; i < 4 && el.scrollWidth > el.clientWidth + 1; i++) { k *= el.clientWidth / el.scrollWidth; el.style.setProperty('--fit', k.toFixed(3)); } },
+  fitText(el, inner) {
+    const ratio = e => e.scrollWidth > e.clientWidth + 1 ? e.clientWidth / e.scrollWidth : 1;
+    const worst = () => Math.min(ratio(el), ...(inner ? [...el.querySelectorAll(inner)].map(ratio) : []));
+    let k = 1; el.style.setProperty('--fit', k);
+    for (let i = 0; i < 6; i++) { const r = worst(); if (r >= 1) break; k *= r; el.style.setProperty('--fit', k.toFixed(3)); }
+  },
   mt(key, vars) {
     const m = tileOf().module, get = code => key.split('.').reduce((o, k) => o && o[k], m.strings[code]);
     return I18N.t(get(lang) ?? get(CFG.baseLanguage), vars, ABC.langs[lang].bcp47);
@@ -151,12 +156,12 @@ function openTile(id, play, quiet) {
 onTapIn('hub', '.hsearch', openSearch);
 onTapIn('hub', '.ht', b => openTile(b.dataset.id, b.dataset.play === '1'));
 function leaveView() { APP.stop(); if (view() && view().leave) view().leave(); }
-function goHub() { leaveView(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[section]), 80); }
+function goHub() { leaveView(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[section]), PAUSE.tap); }
 function setSection(id) {
   if (id === sectionNow()) { if (!atHub) goHub(); return; }
   leaveView();
   section = id; store.set('sec', id); atHub = true; store.set('athub', true);
-  sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[id]), 80);
+  sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[id]), PAUSE.tap);
 }
 
 const VIEWS = Object.values(ABC.views);
@@ -202,7 +207,7 @@ function setLang(code) {
   if (v0 && v0.keepScroll && view() === v0) $(v0.el).scrollTop = scroll;
   announce();
 }
-function announce() { const name = APP.L().name, line = !atHub && view().line && view().line(); speak(line ? APP.t(APP.ui().then, { a: name, b: line }) : APP.exclaim(name), 120); }
+function announce() { const name = APP.L().name, line = !atHub && view().line && view().line(); speak(line ? APP.t(APP.ui().then, { a: name, b: line }) : APP.exclaim(name), PAUSE.line); }
 
 let infoId = null;
 const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
@@ -210,7 +215,7 @@ function openInfo(c) {
   const I = infoFor(c); if (!I) return;
   infoId = c; $('infotitle').textContent = I.title;
   $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="card inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
-  $('info').hidden = false; sfx.pop(); speak(I.title, 100);
+  $('info').hidden = false; sfx.pop(); speak(I.title, PAUSE.tap);
 }
 function closeInfo() { if (!$('info').hidden) APP.stop(); $('info').hidden = true; }
 onTapIn(document, '.link[data-t]', b => {
@@ -262,7 +267,7 @@ function openIndex() {
 function syncAZ() {
   const g = $('ixgrid'), hs = g.querySelectorAll('.ixh'); if (!hs.length) return;
   let cur = hs[0];
-  for (const h of hs) { if (h.offsetTop - g.scrollTop <= 28) cur = h; else break; }
+  for (const h of hs) { if (h.offsetTop - g.scrollTop <= $('ixaz').offsetWidth) cur = h; else break; }
   if (g.scrollTop + g.clientHeight >= g.scrollHeight - 2) cur = hs[hs.length - 1];
   const u = cur.id.slice(4);
   $('ixaz').querySelectorAll('.az').forEach(a => { const on = a.dataset.u === u; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
@@ -309,7 +314,7 @@ function runSearch() {
     .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1]));
   const groups = new Map();
   for (const h of hits) { const k = h.x.it.concept || fold(h.x.it.name); if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
-  const rows = [...groups.values()].slice(0, 40);
+  const rows = [...groups.values()].slice(0, SEARCH_ROWS);
   $('smeta').textContent = rows.length ? APP.t(U.search.results, { n: rows.length }) : U.search.none;
   const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };
   $('sres').innerHTML = rows.map(([x, ...more]) => {
@@ -321,7 +326,7 @@ function runSearch() {
 }
 function openSearch() {
   const U = APP.ui(); $('sq').placeholder = U.search.placeholder; $('sq').value = '';
-  $('search').hidden = false; runSearch(); sfx.pop(); setTimeout(() => $('sq').focus(), 50);
+  $('search').hidden = false; runSearch(); sfx.pop(); setTimeout(() => $('sq').focus(), FOCUS_DELAY);
 }
 const closeSearch = () => { $('search').hidden = true; $('sq').blur(); };
 $('sq').addEventListener('input', runSearch);
@@ -339,7 +344,7 @@ $('ages').innerHTML = PROFILES.map(p => { const [a, b] = CFG.profiles[p].ages;
 function setProfile(p) {
   if (!CFG.profiles[p]) return;
   profile = p; store.set('profile', p); atHub = true; store.set('athub', true);
-  sfx.pop(); render(); speak(APP.exclaim(profileName(p)), 80);
+  sfx.pop(); render(); speak(APP.exclaim(profileName(p)), PAUSE.tap);
 }
 
 $('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv" hidden>${esc(CFG.icons.mute)}</i></button>`).join('');
@@ -368,7 +373,7 @@ $('stage').addEventListener('pointerup', e => {
   const v = view(), start = sx; sx = null;
   if (start == null || !v || !v.swipe) return;
   const dx = e.clientX - start;
-  if (Math.abs(dx) > 50) v.step((dx < 0) !== (APP.L().dir === 'rtl') ? 1 : -1);
+  if (Math.abs(dx) > SWIPE) v.step((dx < 0) !== (APP.L().dir === 'rtl') ? 1 : -1);
 });
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
