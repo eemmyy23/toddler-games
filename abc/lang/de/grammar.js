@@ -1,6 +1,8 @@
 // ====== DEUTSCH — Meta, Buchstaben und Grammatik ======
 LANG('de', {
   name: 'Deutsch', flag: '🇩🇪', bcp47: 'de-DE', dir: 'ltr',
+  voices: /anna|female/i,
+  fold: s => s.replace(/ß/g, 'ss'),   // Suche: „Strasse“ findet „Straße“
   letters: 'A Ä B C D E F G H I J K L M N O Ö P Q R S ß T U Ü V W X Y Z',
   numbers: ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn'],
   keepCase: true, // Nomen behalten den Großbuchstaben (Kuh, Haus)

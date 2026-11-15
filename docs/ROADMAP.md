@@ -15,15 +15,16 @@ Everything is built on the preview branch and merged only after the parent appro
 
 ### Stage 1 — Foundation ✅ (v1.0.0, 2026-11-15)
 - [x] Stable concept ids (ASCII slugs) for words, colours, info cards and saved progress; migrate stored progress.
-- [x] Game pool ≥ 2 required (`gameUsable` uses the game's own pool).
+- [x] Game pool ≥ 2 required (`Tiles.gameOk` uses the game's own pool and `needs`, at its first and hardest round).
 - [x] Every language merged over a base language → no `undefined`, no crash on a missing string.
 - [x] Service worker: versioned precache of every language (kept network-first so deploys show at once; cache is the offline fallback), `r.ok` check, file list generated (no hand-kept `ASSETS`).
 - [x] `ß` and other letters whose uppercase differs; voices: prefer `localService`, separate `en-GB`, "🔇 no voice" state instead of a foreign voice.
 - [x] `check.js`: duplicate/orphan ids, same written word for two concepts, letter without example = error.
-- [x] `smoke.js` in CI for every language (games, layout at 360×640, offline language switch).
+- [x] `smoke.js` in CI for every language (games, layout at 360×640 and 320×568, offline reload) + `fast.js` layout at 7 sizes 320×480 → 1920×1080.
 
 ### Stage 2 — Modules & age profiles (mostly done in v1.0.0)
-- [x] Shell + shared views (card, count, read, play) + game types (find, howmany). Still to come: (card, count, read → then grid, diagram, sequence) + game types (find, howmany → then sort, order, pairs, find-region).
+- [x] Shell + views card, count, read, play + games find, howmany.
+- [ ] Views grid, diagram, sequence; games sort, order, pairs, find-region.
 - [x] Move current topics into modules: `abc/modules/<id>/{module.js, lang/<code>.js}`.
 - [x] Module list with `ages`; profile picked with the visible bikes in the bar (no parental lock); Little profile hides "coming soon".
 - [ ] Lazy load per module, precache per active profile.
@@ -42,11 +43,14 @@ Everything is built on the preview branch and merged only after the parent appro
 | 1 | Shapes | Little 2+ |
 | 2 | Body parts (tappable diagram) | Little 2+ |
 | 3 | Animal families (male · female · baby) | Little 2+ |
-| 4 | Weather | Little 2.5+ |
+| 4 | Weather | Little 2+ |
 | 5 | Seasons | Little 3+ |
 | 6 | Physics as opposites (big/small, heavy/light, floats/sinks, hot/cold) | Little 3+ |
 | 7 | Sky: sun, moon, stars, day and night | Little/Explorer 3–4 |
 | 8 | Day routine → clock | Little 3+ / Explorer 5+ |
+| 9 | Numbers 11–20, tens (placeholders `teens`, `tens`) | Explorer 4–5+ |
+| 10 | Big numbers (`big`) | Scientist 7+ |
+| 11 | Categories (sorting, `cats`) | Little 3+ |
 | later | Solar system (Explorer 5+), immune system (Scientist 7+; "germs & handwashing" card under Body at 3+), periodic table (Scientist 9+) | |
 
 ## Definition of done (every module)
@@ -55,7 +59,7 @@ Everything is built on the preview branch and merged only after the parent appro
 - [ ] RO / EN / DE complete; `node tools/check.js` passes.
 - [ ] Grammar correct (articles, plurals, counting forms).
 - [ ] "What is it?" card for each key concept: ≤ 3 short sentences, right for the age.
-- [ ] Age band declared; appears only in that profile.
-- [ ] Smoke test passes at 360×640; targets ≥ 60 px; no reading needed in Little.
+- [ ] Age band declared; the tile appears from that profile upwards and wears its badge.
+- [ ] `tools/fast.js` (320×480 → 1920×1080) and `tools/smoke.js` pass; targets ≥ 60 px; no reading needed in Little.
 - [ ] Parent sign-off recorded per language.
 - [ ] ≤ ~20 items per module at first; depth later.

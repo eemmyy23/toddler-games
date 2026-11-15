@@ -1,6 +1,8 @@
 // ====== ROMÂNĂ — meta, litere și gramatică ======
 LANG('ro', {
   name: 'Română', flag: '🇷🇴', bcp47: 'ro-RO', dir: 'ltr',
+  voices: /ioana|female/i,
+  checkWord: e => Object.values(e).some(v => typeof v === 'string' && /[şţŞŢ]/.test(v)) ? 'ş/ţ cu sedilă — folosește ș/ț cu virgulă' : null,
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
   groups: 'ce ci che chi ge gi ghe ghi',           // grupuri de litere (cuvintele lor nu apar la C / G)
   numbers: ['unu', 'doi', 'trei', 'patru', 'cinci', 'șase', 'șapte', 'opt', 'nouă', 'zece'],

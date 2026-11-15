@@ -1,6 +1,6 @@
 // ====== VIEW 'play' — hosts every game type (abc/core/games/*.js) for the current tile ======
-// A game type supplies: pool(items, streak) → candidates, prompt(target, round) → HTML of the question,
-// optionally bubbleText(item, round). The host does rounds, bubbles, praise, stars, miss weights.
+// A game type supplies (see GAME in abc/core/registry.js): needs, pool(items, streak) → candidates, prompt(target, round) → HTML.
+// The host does rounds, bubbles, praise, stars, miss weights.
 (function () {
   let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false;
   const game = () => ABC.games[APP.tile().game.type];
@@ -20,6 +20,7 @@
   }
   function newRound() {
     locked = false; target = pickTarget();
+    if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; } // nothing to ask (never shown: Tiles.gameOk)
     opts = shuffle([target, ...shuffle(pool().filter(it => it !== target)).slice(0, nChoices() - 1)]);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0] };
@@ -33,7 +34,7 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; b.textContent = round.lower && it.lower ? it.lower : it.bubble;
+      b.className = 'bub'; b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label);
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || ink(i * 90)); b.style.animationDelay = (i * 0.4) + 's';
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
@@ -42,7 +43,7 @@
     speak(askLine(), 250);
   }
   function choose(it, el) {
-    ensureAudio(); if (locked) return;
+    APP.firstTouch(); if (locked) return;
     const U = APP.ui();
     if (it === target) {
       locked = true; APP.streak++; APP.addStar();
@@ -75,7 +76,7 @@
     beforeLang() { return { target: target && target.id, opts: opts.map(o => o.id), lower: round.lower }; },
     afterLang(s) {
       if (!s || !s.target) return;
-      const p = pool(), t = p.find(x => x.id === s.target); if (!t) return;
+      const p = pool(), t = p.find(x => x.id === s.target); if (!t) return; // the question doesn't exist in the new language
       // same target; same bubbles where they exist in the new language (e.g. Ș → replaced by another letter in German)
       const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x)));
       target = t; opts = o.map(x => x || spare.pop()).filter(Boolean);

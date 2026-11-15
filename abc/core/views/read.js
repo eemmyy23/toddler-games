@@ -2,24 +2,23 @@
 (function () {
   let tok = 0;
   const cur = () => APP.items()[APP.idx];
-  const lit = el => { document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit')); if (el) el.classList.add('lit'); };
-  function letterSay(u) { const L = APP.L(); return L.spell ? L.spell(u.upper) : u.upper; }
+  const lit = el => { document.querySelectorAll('#read .on').forEach(x => x.classList.remove('on')); if (el) el.classList.add('on'); };
   function render(sayIt) {
-    const L = APP.L(), loc = L.bcp47, S = APP.S(), e = cur(), syl = e.syl, word = e.w, forms = e.forms, pic = e.pic, U = APP.ui();
-    const colorOf = u => { const it = u && S.letters.find(x => x.unit === u); return it ? it.color : 'var(--text)'; };
-    const parts = I18N.splitUnits(word, S.units, loc).filter(p => /[\p{L}\p{M}]/u.test(p.text));
+    const L = APP.L(), loc = L.bcp47, A = APP.alphabet(), e = cur(), syl = e.syl, word = e.w, forms = e.forms, pic = e.pic, U = APP.ui();
+    const colorOf = u => (u && A.color(u.id)) || 'var(--text)';
+    const parts = I18N.splitUnits(word, A.units, loc).filter(p => /[\p{L}\p{M}]/u.test(p.text));
     const tile = (txt, say, cls = '', color = '') => `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
-    // long words shrink the tiles so the whole word always fits on one line
-    const avail = Math.min(innerWidth, 640) - 24, nl = parts.length, gap = nl > 8 ? 3 : 6;
+    // long words shrink the tiles so the whole word always fits on one line (width of the content column)
+    const avail = $('read').clientWidth || innerWidth - 24, nl = parts.length, gap = nl > 8 ? 3 : 6;
     const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
     const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
-    const say = p => p.unit ? letterSay(p.unit) : I18N.upper(p.text, null, loc);
+    const say = p => p.unit ? A.name(p.unit) : I18N.upper(p.text, null, loc);
     const upper = parts.map(p => tile(I18N.upper(p.text, p.unit, loc), say(p), 'u', colorOf(p.unit))).join('');
     const lower = parts.map((p, i) => tile(i === 0 ? I18N.upper(p.text, p.unit, loc) : p.text, say(p), 'l', colorOf(p.unit))).join('');
     const shown = parts.length ? I18N.upper(parts[0].text, parts[0].unit, loc) + word.slice(parts[0].text.length) : word;
     const cells = forms ? [...(forms.sg || []), ...(forms.pl || [])] : [];
     const longest = Math.max(8, ...cells.map(x => x.length));
-    const chipW = (Math.min(innerWidth, 520) - 24 - 8) / 2, em = longest * 0.66;
+    const chipW = (avail - 8) / 2, em = longest * 0.66; // two columns of the table
     const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15;
     const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
     const ns = syl.length, sylFont = Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55));
@@ -31,18 +30,18 @@
       `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
       (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +   // one syllable: no row
       `<div class="rrow" id="rW">${tile(shown, word, 'word')}${APP.infoButton(e.concept)}</div>` +
-      (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(U.sgpl[0])}</div><div class="rh">${esc(U.sgpl[1])}</div>` +
+      (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label rh">${esc(U.sgpl[0])}</div><div class="label rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
           ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
           : `<div class="rc none">${r === 0 ? '— ' + esc(U.none[c]) : ''}</div>`).join('')).join('') + `</div>` : '');
     fit();
-    const R = APP.items(), n = R.length;
-    $('rprev').innerHTML = `‹ <b>${R[(APP.idx - 1 + n) % n].pic}</b>`; $('rnext').innerHTML = `<b>${R[(APP.idx + 1) % n].pic}</b> ›`;
+    const [pv, nx] = APP.neighbors();
+    $('rprev').innerHTML = `‹ <b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b> ›`;
     APP.saveIdx();
     if (sayIt) speak(word, 150);
   }
-  // small screens (e.g. 320×568): if the rows run under the ‹ ▶ › bar, switch to the compact layout
-  const fit = () => APP.fit($('read'), 'tight');   // compact layout first, then scale to fit (shared rule, see APP.fit)
+  // rows that would run under the ‹ ▶ › bar: compact layout, then scale to fit (APP.fit)
+  const fit = () => APP.fit($('read'), 'tight');
   $('read').addEventListener('pointerdown', e => {
     const el = e.target.closest('[data-say]'); if (!el) return;
     e.stopPropagation(); APP.firstTouch(); tok++;
@@ -54,7 +53,7 @@
     const t = ++tok, alive = () => t === tok && APP.screen() === 'read', word = cur().w;
     for (const el of document.querySelectorAll('#rU .rt')) { if (!alive()) return; lit(el); await speak(el.dataset.say); await wait(150); }
     if (!alive()) return; await wait(300);
-    lit(null); document.querySelectorAll('#rL .rt').forEach(x => x.classList.add('lit'));
+    lit(null); document.querySelectorAll('#rL .rt').forEach(x => x.classList.add('on'));
     if ($('rS')) await speak(word); else await wait(700);
     if (!alive()) return; await wait(300);
     for (const el of document.querySelectorAll('#rS .rt')) { if (!alive()) return; lit(el); await speak(el.dataset.say); await wait(200); }
@@ -66,14 +65,18 @@
     const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
     setTimeout(() => { if (alive()) lit(null); }, 800);
   }
-  VIEW('read', {
+  // its own bottom bar (#rnav): ‹ ▶ ›
+  const btn = (id, fn) => $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); APP.firstTouch(); fn(); });
+  btn('rprev', () => VIEW_READ.step(-1)); btn('rnext', () => VIEW_READ.step(1)); btn('rplay', play);
+  const VIEW_READ = {
     el: 'read', nav: 'rnav', swipe: true,
     show(sayIt) { render(sayIt); },
-    step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; tok++; sfx.pop(); render(true); },
+    step(d) { APP.step(d); tok++; sfx.pop(); render(true); },
     play, leave() { tok++; }, resize() { render(false); },
     announce(name) { speak(`${name}. ${cur().w}`, 120); },
-    onKey(k, e) { if (k === ' ' || k === 'enter') { e.preventDefault(); ensureAudio(); play(); return true; } return false; },
+    onKey(k, e) { if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); play(); return true; } return false; },
     indexFace: it => `${it.pic}<small>${esc(it.w)}</small>`,
     indexSort: true
-  });
+  };
+  VIEW('read', VIEW_READ);
 })();

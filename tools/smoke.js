@@ -30,7 +30,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await p.$$eval('.flag', f => f.map(x => x.dataset.lang).join())) === 'en,ro,de', 'flags en,ro,de');
   await ev(() => setLang('ro'));
   ok((await p.$$eval('.tab .tl', t => t.map(x => x.textContent).join('|'))) === 'Numere|Litere|Descoperă|Joacă', 'tabs RO');
-  ok(await ev(() => !!document.querySelector('#manifest-check') || !!self.MANIFEST.version), 'manifest loaded');
+  ok(await ev(() => !!self.MANIFEST.version), 'manifest loaded');
 
   console.log('hubs');
   const hub = async sec => { await ev(s => { section = s; atHub = true; render(); }, sec);
@@ -135,7 +135,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   }
   await ev(() => { openTile('read', false, true); openIndex(); });
   const ix = await ev(() => ({ heads: [...document.querySelectorAll('.ixh b')].map(b => b.textContent), az: document.querySelectorAll('#ixaz .az').length,
-    c: document.querySelector('#ixh-C span').textContent, bar: getComputedStyle($('ixaz')).display }));
+    c: document.querySelector('#ixh-C .label').textContent, bar: getComputedStyle($('ixaz')).display }));
   ok(ix.bar === 'flex' && ix.az >= 26 && ix.heads[0] === 'A' && ix.heads.includes('Ș'), `Read index: A–Z sections (${ix.heads.length}) + side bar (${ix.az} letters)`);
   ok(/^\d+ (de )?cuvinte$/.test(ix.c), `section count: "C · ${ix.c}"`);
   const azb = await p.$eval('#ixaz', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, h: r.height }; });
@@ -143,10 +143,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
   const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
   ok(vis, 'tap V on the side bar jumps to the V section');
-  ok(await ev(() => document.querySelector('#ixaz .az.cur')?.dataset.u === 'V'), 'side bar lights V after the jump');
+  ok(await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u === 'V'), 'side bar lights V after the jump');
   for (const u of ['M', 'C', 'T']) {   // scroll the content → the side bar follows
     await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
-    const cur = await ev(() => document.querySelector('#ixaz .az.cur')?.dataset.u);
+    const cur = await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u);
     ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
   }
   await ev(() => closeIndex());
@@ -159,16 +159,19 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(rot[0] === 'colors:red' && !rot.includes('read:turtle'), `search "rot" → roșu first, no substring noise (${rot.join(' ')})`);
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
   await ev(() => { document.querySelector('.sr').click(); });
-  ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && !$('search').classList.contains('open')), 'tapping a result opens it');
+  ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');
   await ev(() => { openSearch(); }); await p.waitForTimeout(150); await p.keyboard.type('m');
-  ok(await ev(() => $('search').classList.contains('open') && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
+  ok(await ev(() => !$('search').hidden && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
   await p.keyboard.press('Escape');
 
   console.log('hubs: tiles look like buttons (not stretched)');
   for (const sec of ['num', 'abc', 'disc']) {
     await ev(s => { section = s; atHub = true; render(); }, sec);
-    const hs = await p.$$eval('#hub .ht', t => t.map(x => x.getBoundingClientRect().height));
-    ok(hs.length && Math.max(...hs) <= 160, `${sec} hub tiles ≤ 160 px tall (${hs.map(h => h | 0).join(', ')})`);
+    // as tall as the CSS min-height or the content — never stretched (same rule as tools/fast.js)
+    const hs = await p.$$eval('#hub .ht', t => t.map(x => { const R = e => e.getBoundingClientRect(), cs = getComputedStyle(x), kids = [...x.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
+      const content = Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      return [R(x).height | 0, Math.max(parseFloat(cs.minHeight), content) + 2]; }));
+    ok(hs.length && hs.every(([h, max]) => h <= max), `${sec} hub tiles not stretched (${hs.map(h => h[0]).join(', ')})`);
   }
   ok(await p.isVisible('.hsearch'), 'search pill on the hub');
   ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
@@ -195,14 +198,14 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
   await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(1400);
-  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.active')?.dataset.n }));
+  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.on')?.dataset.n }));
   ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
   const rows = [];
-  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.active'); if (!a) return 'none';
+  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
     const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
   ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
   await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(100);
-  ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.active')), 'tap ▶ again stops');
+  ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');
   const wow = await ev(() => [1, 2, 20, 21].map(n => APP.t(APP.ui().wow, { n })));

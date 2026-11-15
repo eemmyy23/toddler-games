@@ -1,6 +1,6 @@
 // ====== ROMÂNĂ — textele aplicației (textele fiecărui subiect sunt în abc/modules/<id>/lang/ro.js) ======
 // Șabloane: "{name}" se înlocuiește; un obiect { one, few, other } se alege cu Intl.PluralRules('ro')
-// (ro: 1 → one, 2–19 și 101–119 → few, 20+ / 100 → other = „de”).
+// (ro: 1 → one; 0, 2–19, 101–119 → few; 20–100, 120+ → other = „de”).
 STRINGS('ro', {
   sections: { num: 'Numere', abc: 'Litere', disc: 'Descoperă', play: 'Joacă' },
   find: 'Găsește', soon: 'în curând', info: 'Ce este?', noVoice: 'nu există voce pentru această limbă',
@@ -12,5 +12,8 @@ STRINGS('ro', {
   search: { placeholder: 'Caută un cuvânt…', hint: 'Scrie în orice limbă — cuvântul apare în limba aleasă sus.', none: 'Nu am găsit nimic.',
     results: { one: 'un rezultat', few: '{n} rezultate', other: '{n} de rezultate' } },
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },
-  profile: { title: 'Vârsta', little: 'Mic, de la 2 la 4 ani', explorer: 'Explorator, de la 4 la 7 ani', scientist: 'Om de știință, de la 7 la 12 ani' }
+  profile: { little: 'Mic', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
+  installBtn: 'Instalează',
+  aria: { back: 'Înapoi', index: 'Toate', prev: 'Înapoi', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
+    objects: 'Obiecte', fingers: 'Degete', countAll: 'Numără tot', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
 });

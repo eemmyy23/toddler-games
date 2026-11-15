@@ -26,12 +26,13 @@ MODULE('colors', {
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
       if (c.bands && !parts) return null; // closed set incomplete → don't show a broken rainbow
       return { id: c.id, label: name, name, say: parts ? `${name}: ${I18N.list(s.rainbow, loc)}!` : `${name}!`,
-        big: parts ? rainbowSVG() : `<span class="sw" style="background:${c.hex}"></span>`,
+        big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`,
         nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>`,
         word: name, pics, concept: c.concept || null, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
     }).filter(Boolean);
     return { colors };
   },
+  check(code, S, s, report) { if (s.rainbow && !S.colors.some(x => x.id === 'rainbow')) report('the rainbow needs all 7 band names (closed set)'); },
   tiles: [
     { id: 'colors', icon: '🎨', view: 'card', items: S => S.colors, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'voice'] } }
   ]

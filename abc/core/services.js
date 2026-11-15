@@ -1,4 +1,4 @@
-// ====== SERVICES — speech, sounds, confetti, storage (used by the shell, views and games through APP) ======
+// ====== SERVICES — speech, sounds, confetti, storage, $ (globals used by the shell, views and games) ======
 const $ = id => document.getElementById(id);
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -32,15 +32,23 @@ const sfx = {
 
 // ---- speech: device voice for the active language, offline voices first; never another language's voice ----
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: 'en-GB',
-  pick(bcp47) {
+  voice: null, noVoice: false, bcp47: null,
+  norm: v => v.lang.replace('_', '-').toLowerCase(),
+  // does this device have any voice for the language? (null: voice list not loaded yet)
+  hasVoice(bcp47) {
+    if (!('speechSynthesis' in window)) return false;
+    const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
+    return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
+  },
+  // prefer: RegExp of preferred voice names (LANG.voices); offline (local) voices first
+  pick(bcp47, prefer) {
     this.bcp47 = bcp47;
     if (!('speechSynthesis' in window)) { this.noVoice = true; return; }
     const all = speechSynthesis.getVoices();
     if (!all.length) { this.voice = null; this.noVoice = false; return; } // list not loaded yet: let the browser choose by lang
-    const norm = v => v.lang.replace('_', '-').toLowerCase(), want = bcp47.toLowerCase(), base = want.split('-')[0];
-    const same = all.filter(v => norm(v) === want), lang = all.filter(v => norm(v).split('-')[0] === base);
-    const nice = v => /female|samantha|karen|ioana|anna|serena|kate|google/i.test(v.name);
+    const want = bcp47.toLowerCase(), base = want.split('-')[0];
+    const same = all.filter(v => this.norm(v) === want), lang = all.filter(v => this.norm(v).split('-')[0] === base);
+    const nice = v => !!prefer && prefer.test(v.name);
     this.voice = same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
               || same.find(nice) || same[0] || lang[0] || null;
     this.noVoice = !this.voice;

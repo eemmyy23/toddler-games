@@ -1,8 +1,10 @@
 // ====== ENGLISH — meta, letters and grammar ======
-// Template for a new language: copy the whole folder abc/lang/en/, translate, add the code to abc/config.js,
-// run `node tools/check.js --fix`. Nothing else in the app needs to change.
+// Template for a new language: copy the folder abc/lang/en/, translate, add the code to abc/config.js,
+// add abc/modules/<id>/lang/<code>.js for each module, run `node tools/check.js --fix`.
+// Nothing in abc/core/, abc.html or sw.js changes. Fields: see LANG in abc/core/registry.js.
 LANG('en', {
   name: 'English', flag: '🇬🇧', bcp47: 'en-GB', dir: 'ltr',
+  voices: /samantha|karen|kate|serena|female/i,       // preferred device voices (names), when several exist
   // letters taught in this language, separated by spaces (multi-character letters allowed: "cs", "ll")
   letters: 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z',
   numbers: ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'],

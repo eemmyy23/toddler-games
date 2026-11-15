@@ -1,8 +1,7 @@
-// ====== PLACEHOLDERS — planned subjects, shown as "coming soon" (never in the Little profile) ======
+// ====== PLACEHOLDERS — planned subjects, shown as "coming soon" (not in profiles with soon: false — Little) ======
 // When a subject is built it becomes its own module folder and its line here is removed.
-// Each tile carries its own target age (from docs/ROADMAP.md); the age badge and the profile filter use it.
+// Each tile carries its own target age — keep it in step with docs/ROADMAP.md Stage 4.
 MODULE('soon', {
-  ages: [4, 12],
   tiles: [
     { id: 'teens', icon: '🔟', section: 'num', ages: [4, 7] }, { id: 'tens', icon: '💯', section: 'num', ages: [5, 8] },
     { id: 'big', icon: '✨', section: 'num', ages: [7, 12] }, { id: 'clock', icon: '⏰', section: 'num', ages: [5, 9] },
