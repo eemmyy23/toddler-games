@@ -50,6 +50,21 @@ body[data-mode=play] #gridbtn,body[data-mode=count] #gridbtn{display:none}
 body[data-mode=play] #stars,body[data-mode=count] #stars{margin-left:auto}
 #stars{background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
 #setgrp{margin:0 auto}
+/* Learn = hub of topics; a topic shows a back chip + title instead of the set switcher */
+body[data-mode=learn] #setgrp{display:none}
+#lhead{display:none;margin:0 auto;align-items:center;gap:10px}
+body[data-mode=learn]:not([data-view=hub]) #lhead{display:flex}
+#hubback{border:none;height:50px;padding:0 16px;border-radius:999px;background:var(--card);color:var(--amber);font-size:22px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#ltitle{font-size:22px;font-weight:600;background:var(--card);border-radius:999px;height:50px;line-height:50px;padding:0 20px;box-shadow:var(--shadow)}
+body[data-view=hub]{--top:70px}
+body[data-mode=learn][data-view=hub] .brk,body[data-mode=learn][data-view=hub] #gridbtn{display:none}
+body[data-mode=learn][data-view=hub] #stars{margin-left:auto}
+#hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(92px,1fr);gap:12px;padding:4px 2px 8px}
+.ht{position:relative;border:none;border-radius:26px;background:var(--card);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);font-size:19px;font-weight:600;padding:8px;text-align:center;line-height:1.15}
+.ht .hp{font-size:48px;line-height:1}
+.ht:active{background:var(--card2)}
+.ht.soon{opacity:.45;cursor:default}
+.ht .badge{position:absolute;top:8px;right:10px;font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:999px;padding:2px 8px}
 body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count] .brk,body[data-mode=read] .brk{display:none}
 .tbtn{border:none;border-radius:999px;min-width:64px;height:46px;padding:0 16px;font-size:21px;font-weight:600;color:var(--text);background:transparent;cursor:pointer;touch-action:manipulation}
 .tbtn.on{background:var(--amber);color:var(--amber-ink)}
@@ -63,7 +78,7 @@ body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count]
 .tab.on .ti{filter:none;transform:scale(1.08)}
 
 #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) 12px calc(var(--bot) + 12px)}
-body[data-mode=learn] #stage{padding-bottom:calc(var(--bot) + 100px)}
+body[data-mode=learn]:not([data-view=hub]) #stage{padding-bottom:calc(var(--bot) + 100px)}
 body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 
 /* Learn */
@@ -171,6 +186,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   .ex{min-width:88px;padding:8px 10px 6px}.ex .ep{font-size:34px}.ex .ew{font-size:17px}
 }
 @media (max-height:700px){
+  .ht{font-size:17px;gap:4px}.ht .hp{font-size:36px}#hub{gap:10px}
   #glyph{font-size:min(24vh,42vw)}
   .rt{height:42px;font-size:24px}.rt.word{height:46px;font-size:28px}#rpic{font-size:9vh}.rc{height:44px;font-size:17px}.rc .rce{font-size:20px}
   #read{gap:1vh}
@@ -193,6 +209,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="gridbtn" aria-label="Index"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg></button>
   <div id="stars">⭐ 0</div>
   <div class="brk"></div>
+  <div id="lhead"><button id="hubback" aria-label="Back">‹ 📖</button><span id="ltitle"></span></div>
   <div class="group" id="setgrp">
     <button class="tbtn on" id="s-abc">ABC</button>
     <button class="tbtn" id="s-123">123</button>
@@ -201,6 +218,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 </div>
 
 <div id="stage">
+  <div id="hub"></div>
   <div id="learn">
     <div id="glyph"></div>
     <div id="pics"></div>
@@ -231,9 +249,9 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 <div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
 <nav id="tabs">
   <button class="tab" id="m-learn"><span class="ti">📖</span><span class="tl"></span></button>
-  <button class="tab" id="m-play"><span class="ti">🎈</span><span class="tl"></span></button>
   <button class="tab" id="m-count"><span class="ti">🧮</span><span class="tl"></span></button>
   <button class="tab" id="m-read"><span class="ti">📚</span><span class="tl"></span></button>
+  <button class="tab" id="m-play"><span class="ti">🎯</span><span class="tl"></span></button>
 </nav>
 <canvas id="fx"></canvas>
 
@@ -242,7 +260,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.4</div>
+<div id="ver">v0.8.0-preview</div>
 
 <script>
 // ====== DATA ======
@@ -250,7 +268,8 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 const LANGS = {
   en: {
     tts: 'en-US', html: 'en', langName: 'English', col: 1,
-    tabs: ['Learn', 'Play', 'Count', 'Read'],
+    tabs: ['Learn', 'Count', 'Read', 'Play'],
+    hub: { abc: 'Letters', num: 'Numbers', grp: 'Letter groups', clock: 'The clock', seasons: 'Seasons', weather: 'Weather', families: 'Animal families', soon: 'soon' },
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     nums: ['one','two','three','four','five','six','seven','eight','nine','ten'],
     sayLetter: (c, w, like) => like ? `${c}, like in ${w}!` : `${c} is for ${w}!`,
@@ -269,7 +288,8 @@ const LANGS = {
   },
   ro: {
     tts: 'ro-RO', html: 'ro', langName: 'Română', col: 2,
-    tabs: ['Învață', 'Joacă', 'Numără', 'Citește'],
+    tabs: ['Învață', 'Numără', 'Citește', 'Joacă'],
+    hub: { abc: 'Litere', num: 'Cifre', grp: 'Grupuri de litere', clock: 'Ceasul', seasons: 'Anotimpurile', weather: 'Vremea', families: 'Familiile animalelor', soon: 'în curând' },
     alphabet: 'AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ',
     nums: ['unu','doi','trei','patru','cinci','șase','șapte','opt','nouă','zece'],
     // Advanced: special letter groups (examples come from WORDS)
@@ -298,7 +318,8 @@ const LANGS = {
   },
   de: {
     tts: 'de-DE', html: 'de', langName: 'Deutsch', col: 3,
-    tabs: ['Lernen', 'Spielen', 'Zählen', 'Lesen'],
+    tabs: ['Lernen', 'Zählen', 'Lesen', 'Spielen'],
+    hub: { abc: 'Buchstaben', num: 'Zahlen', grp: 'Buchstabengruppen', clock: 'Die Uhr', seasons: 'Jahreszeiten', weather: 'Wetter', families: 'Tierfamilien', soon: 'bald' },
     alphabet: 'AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ',
     nums: ['eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn'],
     sayLetter: (c, w) => `${c} wie ${w}!`,
@@ -537,6 +558,7 @@ function defaultLang() {
 }
 let lang = store.get('lang', defaultLang()); if (!LANGS[lang]) lang = 'en';
 let SETS = buildSets(lang);
+let learnView = store.get('lview', 'hub'); // 'hub' or a set: 'abc' | 'num' | 'grp'
 let mode = store.get('mode', 'learn');   // 'learn' | 'play' | 'count' | 'read'
 if (!['learn', 'play', 'count', 'read'].includes(mode)) mode = 'learn';
 let setName = store.get('set', 'abc');   // 'abc' | 'num' | 'grp' (letter groups, RO only)
@@ -809,7 +831,7 @@ function updateStars() {
 let keepRound = false;
 function render() {
   document.body.dataset.mode = mode;
-  ['learn', 'play', 'count', 'read'].forEach((m, i) => {
+  ['learn', 'count', 'read', 'play'].forEach((m, i) => {
     $('m-' + m).classList.toggle('on', mode === m);
     $('m-' + m).querySelector('.tl').textContent = LANGS[lang].tabs[i];
   });
@@ -819,15 +841,24 @@ function render() {
   $('s-grp').style.display = SETS.grp ? '' : 'none';
   document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
   document.documentElement.lang = LANGS[lang].html;
-  $('learn').style.display = mode === 'learn' ? 'flex' : 'none';
+  if (learnView !== 'hub' && !SETS[learnView]) learnView = 'abc';
+  const hub = mode === 'learn' && learnView === 'hub';
+  document.body.dataset.view = hub ? 'hub' : 'topic';
+  if (mode === 'learn' && !hub) {
+    if (setName !== learnView) { setName = learnView; loadIdx(); }
+    $('ltitle').textContent = LANGS[lang].hub[learnView];
+  }
+  $('hub').style.display = hub ? 'grid' : 'none';
+  $('learn').style.display = mode === 'learn' && !hub ? 'flex' : 'none';
   $('play').style.display = mode === 'play' ? 'flex' : 'none';
   $('read').style.display = mode === 'read' ? 'flex' : 'none';
   $('rnav').style.display = mode === 'read' ? 'flex' : 'none';
   $('count').style.display = mode === 'count' ? 'block' : 'none';
   $('stage').style.display = mode === 'count' ? 'none' : 'flex';
-  $('prev').style.display = $('next').style.display = mode === 'learn' ? 'block' : 'none';
+  $('prev').style.display = $('next').style.display = mode === 'learn' && !hub ? 'block' : 'none';
   stopCount(); readTok++; closeIndex();
-  if (mode === 'learn') showLearn(started);
+  if (hub) renderHub();
+  else if (mode === 'learn') showLearn(started);
   else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
   else if (mode === 'read') renderRead(started);
   else renderCount();
@@ -1051,8 +1082,28 @@ function countAll() {
   countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, 10 * 1000));
 }
 
-function setMode(m) { mode = m; store.set('mode', m); streak = 0; sfx.pop(); render(); }
-function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
+// ====== LEARN HUB ======
+// Big topic tiles. Letters / numbers / letter groups work now; the others are shown as "coming soon".
+const HUB = [['abc', '🔤'], ['num', '🔢'], ['grp', 'ce·ci'], ['clock', '⏰', 1], ['seasons', '🌷', 1], ['weather', '🌦️', 1], ['families', '🐐', 1]];
+function renderHub() {
+  const H = LANGS[lang].hub;
+  $('hub').innerHTML = HUB.filter(([id, , soon]) => soon || SETS[id]).map(([id, pic, soon]) =>
+    `<button class="ht${soon ? ' soon' : ''}" data-id="${id}">${soon ? `<span class="badge">${esc(H.soon)}</span>` : ''}` +
+    `<span class="hp"${id === 'grp' ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${pic}</span><span>${esc(H[id])}</span></button>`).join('');
+}
+$('hub').addEventListener('click', e => {
+  const b = e.target.closest('.ht'); if (!b) return;
+  firstTouch(); const id = b.dataset.id, H = LANGS[lang].hub;
+  if (b.classList.contains('soon')) { speak(`${H[id]}. ${H.soon}`); return; }
+  learnView = id; store.set('lview', id); setName = id; store.set('set', id); loadIdx();
+  sfx.pop(); render();
+});
+function goHub() { learnView = 'hub'; store.set('lview', 'hub'); sfx.pop(); render(); }
+function setMode(m) {
+  if (m === 'learn' && mode === 'learn' && learnView !== 'hub') { goHub(); return; } // tap Învață again → hub
+  mode = m; store.set('mode', m); streak = 0; sfx.pop(); render();
+}
+function setSet(s) { if (mode === 'learn') { learnView = s; store.set('lview', s); } setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
 function setLang(l) {
   if (l === lang) { sfx.pop(); render(); announceLang(); return; } // tap current flag → repeat
   const oldLearn = items()[idx], oldTarget = target, oldOpts = curOpts;
@@ -1083,7 +1134,8 @@ function setLang(l) {
 // Say the language name in that language, then the current item ("Română. a, de la albină!")
 function announceLang() {
   const name = LANGS[lang].langName;
-  if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
+  if (mode === 'learn' && learnView === 'hub') speak(`${name}!`, 120);
+  else if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
   else if (mode === 'play' && target) speak(`${name}. ${askLine()}`, 250);
   else if (mode === 'read') speak(`${name}. ${readData().word}`, 120);
   else speak(`${name}!`, 120);
@@ -1108,6 +1160,7 @@ tapBtn('m-learn', () => setMode('learn'));
 tapBtn('m-play', () => setMode('play'));
 tapBtn('m-count', () => setMode('count'));
 tapBtn('m-read', () => setMode('read'));
+tapBtn('hubback', () => goHub());
 tapBtn('rprev', () => readStep(-1));
 tapBtn('rnext', () => readStep(1));
 tapBtn('rplay', () => playRead());
@@ -1128,7 +1181,7 @@ $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); speak(askLi
 let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
 $('stage').addEventListener('pointerup', e => {
-  if (sx == null || (mode !== 'learn' && mode !== 'read')) return;
+  if (sx == null || (mode !== 'learn' && mode !== 'read') || (mode === 'learn' && learnView === 'hub')) return;
   const dx = e.clientX - sx; sx = null;
   if (Math.abs(dx) > 50) (mode === 'read' ? readStep : step)(dx < 0 ? 1 : -1);
 });
