@@ -57,6 +57,11 @@ body.idx #gridbtn{display:flex}
 #hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(92px,1fr);gap:12px;padding:4px 2px 8px}
 .ht{position:relative;border:none;border-radius:26px;background:var(--card);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);font-size:19px;font-weight:600;padding:8px;text-align:center;line-height:1.15}
 .ht .hp{font-size:48px;line-height:1}
+.hh{grid-column:1/-1;font-size:15px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 0;align-self:end}
+body[data-sec=play] #hub{grid-auto-rows:auto}
+body[data-sec=play] .ht{min-height:104px}
+#ask .objs{display:grid;grid-template-columns:repeat(5,auto);gap:4px 10px;font-size:min(6vh,9vw);line-height:1.1;cursor:default}
+#choices.wrd .bub{font-size:calc(var(--s)*.5)}
 .ht:active{background:var(--card2)}
 .ht.soon{opacity:.45;cursor:default}
 .ht .badge{position:absolute;top:8px;right:10px;font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:999px;padding:2px 8px}
@@ -257,7 +262,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.8.2-preview</div>
+<div id="ver">v0.8.3-preview</div>
 
 <script>
 // ====== DATA ======
@@ -269,7 +274,7 @@ const LANGS = {
     hub: { digits: 'Digits', count: 'Count', teens: '11 – 20', tens: 'Tens', big: 'Big numbers', clock: 'The clock',
            letters: 'Alphabet', read: 'Read', groups: 'Letter groups', words: 'All words',
            colors: 'Colours', pcol: 'Find the colour', families: 'Animal families', seasons: 'Seasons', weather: 'Weather', cats: 'Categories',
-           pabc: 'Find the letter', pnum: 'Find the number', pgrp: 'Find the group', pclock: 'What time is it?', soon: 'soon' },
+           pdigits: 'Find the number', pcount: 'How many?', pteens: 'Find 11 – 20', ptens: 'Find the tens', pbig: 'Big numbers', pclock: 'What time is it?', pletters: 'Find the letter', pread: 'Find the word', pgroups: 'Find the group', pcolors: 'Find the colour', pfamilies: 'Where is the baby?', pseasons: 'Which season?', pweather: 'What is the weather?', pcats: 'Sort it', soon: 'soon' },
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     nums: ['one','two','three','four','five','six','seven','eight','nine','ten'],
     sayLetter: (c, w, like) => like ? `${c}, like in ${w}!` : `${c} is for ${w}!`,
@@ -281,6 +286,7 @@ const LANGS = {
       sg: [f[0] === '-' ? w : `${f[0]} ${w}`, `the ${w}`],
       pl: f[1] === '-' ? null : [f[1], `the ${f[1].replace(/^two /, '')}`] },
     find: 'Find',
+    howMany: 'How many?', findWord: w => `Find: ${w}!`, whereIs: w => `Where is ${w}?`,
     ask: (kind, name, small) => kind === 'col' ? `Where is ${name}?` : kind !== 'num' ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
     thats: n => `That's ${n}.`,
     cheers: ['Yay!', 'Great job!', 'You did it!', 'Super!', 'Hooray!'],
@@ -292,7 +298,7 @@ const LANGS = {
     hub: { digits: 'Cifre', count: 'Numără', teens: '11 – 20', tens: 'Zeci', big: 'Numere mari', clock: 'Ceasul',
            letters: 'Alfabetul', read: 'Citește', groups: 'Grupuri de litere', words: 'Toate cuvintele',
            colors: 'Culori', pcol: 'Găsește culoarea', families: 'Familiile animalelor', seasons: 'Anotimpurile', weather: 'Vremea', cats: 'Categorii',
-           pabc: 'Găsește litera', pnum: 'Găsește cifra', pgrp: 'Găsește grupul', pclock: 'Unde e ora?', soon: 'în curând' },
+           pdigits: 'Găsește cifra', pcount: 'Câte sunt?', pteens: 'Găsește 11 – 20', ptens: 'Găsește zecile', pbig: 'Numere mari', pclock: 'Unde e ora?', pletters: 'Găsește litera', pread: 'Găsește cuvântul', pgroups: 'Găsește grupul', pcolors: 'Găsește culoarea', pfamilies: 'Unde e puiul?', pseasons: 'Ce anotimp e?', pweather: 'Ce vreme e?', pcats: 'Pune la locul lui', soon: 'în curând' },
     alphabet: 'AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ',
     nums: ['unu','doi','trei','patru','cinci','șase','șapte','opt','nouă','zece'],
     // Advanced: special letter groups (examples come from WORDS)
@@ -314,6 +320,7 @@ const LANGS = {
       return { sg, pl: [f[2], pl + (num === 'doi' ? 'i' : 'le')] };
     },
     find: 'Găsește',
+    howMany: 'Câte sunt?', findWord: w => `Găsește: ${w}!`, whereIs: w => `Unde e ${w}?`,
     ask: (kind, name, small) => kind === 'col' ? `Unde e ${name}?` : kind === 'grp' ? `Găsește grupul ${name}!` : kind === 'abc' ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
     thats: n => `Aceasta e ${n}.`,
     cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
@@ -325,7 +332,7 @@ const LANGS = {
     hub: { digits: 'Ziffern', count: 'Zählen', teens: '11 – 20', tens: 'Zehner', big: 'Große Zahlen', clock: 'Die Uhr',
            letters: 'Alphabet', read: 'Lesen', groups: 'Buchstabengruppen', words: 'Alle Wörter',
            colors: 'Farben', pcol: 'Finde die Farbe', families: 'Tierfamilien', seasons: 'Jahreszeiten', weather: 'Wetter', cats: 'Kategorien',
-           pabc: 'Finde den Buchstaben', pnum: 'Finde die Zahl', pgrp: 'Finde die Gruppe', pclock: 'Wie spät ist es?', soon: 'bald' },
+           pdigits: 'Finde die Zahl', pcount: 'Wie viele?', pteens: 'Finde 11 – 20', ptens: 'Finde die Zehner', pbig: 'Große Zahlen', pclock: 'Wie spät ist es?', pletters: 'Finde den Buchstaben', pread: 'Finde das Wort', pgroups: 'Finde die Gruppe', pcolors: 'Finde die Farbe', pfamilies: 'Wo ist das Junge?', pseasons: 'Welche Jahreszeit?', pweather: 'Wie ist das Wetter?', pcats: 'Sortieren', soon: 'bald' },
     alphabet: 'AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ',
     nums: ['eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn'],
     sayLetter: (c, w) => `${c} wie ${w}!`,
@@ -337,6 +344,7 @@ const LANGS = {
       ? { sg: [w, `${f[0]} ${w}`], pl: null }                                       // Milch, Honig, Butter
       : { sg: [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`], pl: [f[1], `die ${f[1].replace(/^zwei /, '')}`] },
     find: 'Finde',
+    howMany: 'Wie viele?', findWord: w => `Finde: ${w}!`, whereIs: w => `Wo ist ${w}?`,
     ask: (kind, name, small) => kind === 'col' ? `Wo ist ${name}?` : kind !== 'num' ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
     thats: n => `Das ist ${n}.`,
     cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
@@ -562,6 +570,10 @@ function buildSets(code) {
   });
   // Read: every word in the dictionary (the singular/plural table shows only when it has forms)
   sets.read = WL;
+  // "Find the word" game: one item per dictionary word (bubble = picture, prompt = written word)
+  sets.wrd = WL.filter(x => /^\p{L}+$/u.test(x.w)).map((x, i) => ({
+    ch: x.pic, key: null, wid: x.id, hue: (i * 47) % 360, word: x.w, name: x.w,
+    the: x.forms && x.forms.sg ? x.forms.sg[1] : null, pic: x.pic }));
   return sets;
 }
 
@@ -755,7 +767,8 @@ function step(d) {
 let target = null, locked = false;
 function nChoices() { return streak >= 8 ? 4 : streak >= 3 ? 3 : 2; }
 function pickTarget() {
-  const list = items();
+  let list = items();
+  if (playKind === 'howmany') list = list.filter(it => it.n <= (streak >= 5 ? 10 : 5)); // small amounts first
   // Weighted random: missed items come up more; avoid immediate repeat
   const pool = list.filter(it => it !== target);
   const total = pool.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
@@ -768,19 +781,27 @@ function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.ra
 // Round variety: letters may be lowercase; prompt may be the symbol, voice only (hidden), or (numbers) the written word
 let round = { lower: false, prompt: 'glyph' };
 const face = it => round.lower ? it.key : it.ch;
-function askLine() { return LANGS[lang].ask(setName, target.name, round.lower); }
+let playKind = store.get('pkind', 'find'); // 'find' | 'howmany'
+function askLine() {
+  const L = LANGS[lang];
+  if (playKind === 'howmany') return L.howMany;
+  if (setName === 'wrd') return target.the ? L.whereIs(target.the) : L.findWord(target.name);
+  return L.ask(setName, target.name, round.lower);
+}
 function pickRound() {
   const abc = setName !== 'num';
   const lower = setName === 'abc' && target.key !== target.ch && Math.random() < 0.5;
   const r = Math.random();
-  const prompt = abc ? (r < 0.6 ? 'glyph' : 'voice') : (r < 0.4 ? 'glyph' : r < 0.7 ? 'word' : 'voice');
+  const prompt = setName === 'wrd' ? (r < 0.75 ? 'glyph' : 'voice')
+    : abc ? (r < 0.6 ? 'glyph' : 'voice') : (r < 0.4 ? 'glyph' : r < 0.7 ? 'word' : 'voice');
   return { lower, prompt };
 }
 
 function newRound() {
   locked = false;
   target = pickTarget();
-  const others = shuffle(items().filter(it => it !== target)).slice(0, nChoices() - 1);
+  const base = playKind === 'howmany' ? items().filter(it => it.n <= (streak >= 5 ? 10 : 5)) : items();
+  const others = shuffle(base.filter(it => it !== target)).slice(0, nChoices() - 1);
   curOpts = shuffle([target, ...others]);
   round = pickRound();
   drawRound();
@@ -789,15 +810,20 @@ let curOpts = [];
 function drawRound() {
   locked = false;
   const opts = curOpts;
-  const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word : target.ch; // capital in prompt → small-letter rounds match B → b
-  $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${shown}</b>`;
+  if (playKind === 'howmany') { // show N objects (rows of 5), answer with a digit
+    $('ask').innerHTML = `<span class="objs">${Array.from({ length: target.n }, () => `<span>${target.pic}</span>`).join('')}</span>`;
+  } else {
+    const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? target.word
+      : setName === 'wrd' ? target.word : target.ch; // capital in prompt → small-letter rounds match B → b
+    $('ask').innerHTML = `🔊 ${LANGS[lang].find} <b>${esc(shown)}</b>`;
+  }
   const box = $('choices');
-  box.className = 'n' + opts.length + (setName === 'grp' ? ' grp' : '');
+  box.className = 'n' + opts.length + (setName === 'grp' ? ' grp' : '') + (setName === 'wrd' ? ' wrd' : '');
   box.innerHTML = '';
   opts.forEach((it, i) => {
     const b = document.createElement('button');
     b.className = 'bub';
-    b.textContent = setName === 'col' ? '' : face(it);
+    b.textContent = setName === 'col' ? '' : setName === 'wrd' ? it.pic : face(it);
     if (setName === 'col') b.setAttribute('aria-label', it.name);
     b.dataset.ch = it.ch;
     b.style.setProperty('--c', it.hex || ink(it.hue));
@@ -865,6 +891,7 @@ function render() {
   document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
   document.documentElement.lang = LANGS[lang].html;
   const hub = atHub;
+  document.body.dataset.sec = section;
   document.body.dataset.mode = hub ? 'hub' : mode;
   document.body.classList.toggle('topic', !hub);
   document.body.classList.toggle('idx', !hub && ((mode === 'learn' && setName === 'abc') || mode === 'read'));
@@ -1019,6 +1046,7 @@ function mapItem(it, list) {
   if (!it) return null;
   if (it.n) return list.find(x => x.n === it.n) || null;
   if (it.cid != null) return list.find(x => x.cid === it.cid) || null;
+  if (it.wid != null) return list.find(x => x.wid === it.wid) || null;
   const base = it.ch === 'ß' ? 'S' : it.ch.normalize('NFD').replace(/\p{M}/gu, '');
   return list.find(x => x.ch === it.ch) || list.find(x => x.ch === base) || null;
 }
@@ -1107,21 +1135,31 @@ function countAll() {
 // ====== SECTIONS & HUBS ======
 // Each tab is a subject; its hub shows big tiles. go = which screen a tile opens; soon = shown dimmed ("coming soon").
 const SECTION_IDS = ['num', 'abc', 'disc', 'play'];
-const SECTIONS = {
-  num:  { icon: '🔢', tiles: [['digits', '🔢', { mode: 'learn', set: 'num' }], ['count', '🧮', { mode: 'count' }],
+// Learn tiles: [id, picture, opens, game it pairs with]. The Play tab is GENERATED from these,
+// so every learning screen has exactly one game and every game has exactly one learning screen.
+const LEARN = {
+  num:  { icon: '🔢', tiles: [['digits', '🔢', { mode: 'learn', set: 'num' }, { set: 'num' }],
+                               ['count', '🧮', { mode: 'count' }, { set: 'num', kind: 'howmany' }],
                                ['teens', '🔟'], ['tens', '💯'], ['big', '✨'], ['clock', '⏰']] },
-  abc:  { icon: '🔤', tiles: [['letters', '🔤', { mode: 'learn', set: 'abc' }], ['read', '📚', { mode: 'read' }],
-                               ['groups', 'ce·ci', { mode: 'learn', set: 'grp' }], ['words', '🗂️']] },
-  disc: { icon: '🔎', tiles: [['colors', '🎨', { mode: 'learn', set: 'col' }], ['families', '🐐'], ['seasons', '🌷'], ['weather', '🌦️'], ['cats', '🧩']] },
-  play: { icon: '🎯', tiles: [['pabc', '🔤', { mode: 'play', set: 'abc' }], ['pnum', '🔢', { mode: 'play', set: 'num' }],
-                               ['pgrp', 'ce·ci', { mode: 'play', set: 'grp' }], ['pcol', '🎨', { mode: 'play', set: 'col' }], ['pclock', '⏰']] }
+  abc:  { icon: '🔤', tiles: [['letters', '🔤', { mode: 'learn', set: 'abc' }, { set: 'abc' }],
+                               ['read', '📚', { mode: 'read' }, { set: 'wrd' }],
+                               ['groups', 'ce·ci', { mode: 'learn', set: 'grp' }, { set: 'grp' }]] },
+  disc: { icon: '🔎', tiles: [['colors', '🎨', { mode: 'learn', set: 'col' }, { set: 'col' }],
+                               ['families', '🐐'], ['seasons', '🌷'], ['weather', '🌦️'], ['cats', '🧩']] }
 };
+const SECTIONS = { ...LEARN, play: { icon: '🎯', tiles: [] } };
+for (const sec of ['num', 'abc', 'disc']) {
+  SECTIONS.play.tiles.push(['@' + sec]); // group header
+  for (const [id, pic, go, game] of LEARN[sec].tiles)
+    SECTIONS.play.tiles.push(['p' + id, pic, game ? { mode: 'play', set: game.set, kind: game.kind || 'find' } : undefined]);
+}
 if (!SECTIONS[section]) section = 'num';
-const tileUsable = t => t[2] && (!t[2].set || SETS[t[2].set]); // e.g. letter groups only exist in RO
+const tileUsable = t => t[2] && (!t[2].set || SETS[t[2].set]); // e.g. letter groups only exist in RO // e.g. letter groups only exist in RO
 const tileFind = id => SECTIONS[section].tiles.find(t => t[0] === id);
 function renderHub() {
   const H = LANGS[lang].hub;
-  $('hub').innerHTML = SECTIONS[section].tiles.filter(t => !t[2] || tileUsable(t)).map(([id, pic, go]) =>
+  $('hub').innerHTML = SECTIONS[section].tiles.filter(t => t[0][0] === '@' || !t[2] || tileUsable(t)).map(([id, pic, go]) =>
+    id[0] === '@' ? `<div class="hh">${SECTIONS[id.slice(1)].icon} ${esc(LANGS[lang].tabs[SECTION_IDS.indexOf(id.slice(1))])}</div>` :
     `<button class="ht${go ? '' : ' soon'}" data-id="${id}">${go ? '' : `<span class="badge">${esc(H.soon)}</span>`}` +
     `<span class="hp"${pic.length > 3 ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${pic}</span><span>${esc(H[id])}</span></button>`).join('');
 }
@@ -1129,6 +1167,7 @@ function openTile(id, quiet) {
   const t = tileFind(id); if (!t || !tileUsable(t)) return false;
   const go = t[2];
   mode = go.mode; store.set('mode', mode);
+  if (go.mode === 'play') { playKind = go.kind || 'find'; store.set('pkind', playKind); }
   if (go.set && go.set !== setName) { setName = go.set; store.set('set', setName); loadIdx(); target = null; }
   atHub = false; store.set('athub', false);
   lastTile[section] = id; store.set('ltile', lastTile);
@@ -1254,7 +1293,7 @@ addEventListener('keydown', e => {
   if (atHub) { // on a hub: a typed letter/digit opens the matching screen of this section
     if (section === 'abc' && isLetter) openTile('letters', true);
     else if (section === 'num' && isDigit) openTile('digits', true);
-    else if (section === 'play') openTile(isLetter ? 'pabc' : 'pnum', true);
+    else if (section === 'play') openTile(isLetter ? 'pletters' : 'pdigits', true);
     else return;
   }
   const want = isLetter ? 'abc' : 'num';
