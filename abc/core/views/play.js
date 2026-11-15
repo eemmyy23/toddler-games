@@ -6,6 +6,7 @@
   const nChoices = () => APP.streak >= 8 ? 4 : APP.streak >= 3 ? 3 : 2;
   const look = it => it.bubbleArt || (it.bubble ?? it.label) || it.bubbleColor;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
+  const fits = (it, t, os) => (!t.among || it.among === t.among) && !os.some(o => o === it || (o.sound && o.sound === it.sound) || look(o) === look(it));
   function pickTarget() {
     const p = pool().filter(it => it !== target);
     let r = Math.random() * p.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
@@ -22,7 +23,7 @@
     locked = false; target = pickTarget();
     if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; }
     opts = [target];
-    for (const it of shuffle(pool())) if (opts.length < nChoices() && (!target.among || it.among === target.among) && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
+    for (const it of shuffle(pool())) if (opts.length < nChoices() && fits(it, target, opts)) opts.push(it);
     opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: pickSubject(target) };
@@ -78,12 +79,15 @@
     leave() { roundTok++; },
     resize() { if (target) APP.fit($('play')); },
     announce(name) { if (target) speak(`${name}. ${askLine()}`, 250); },
-    beforeLang() { return { target: target && target.id, opts: opts.map(o => o.id), lower: round.lower }; },
+    beforeLang() { return { target: !locked && target && target.id, opts: opts.map(o => o.id) }; },
     afterLang(s) {
       if (!s || !s.target) return;
       const p = pool(), t = p.find(x => x.id === s.target); if (!t) return;
-      const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x) && (!t.among || x.among === t.among)));
-      target = t; opts = o.map(x => x || spare.pop()).filter(Boolean);
+      const kept = s.opts.map(id => p.find(x => x.id === id)).filter(Boolean), o = [];
+      for (const x of kept) if (x === t || fits(x, t, o.concat(t))) o.push(x);
+      if (!o.includes(t)) o.push(t);
+      for (const x of shuffle(p)) if (o.length < s.opts.length && fits(x, t, o)) o.push(x);
+      target = t; opts = kept.filter(x => o.includes(x)).concat(o.filter(x => !kept.includes(x)));
       if (round.lower && !t.lower) round.lower = false;
       if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = pickSubject(t);
       keep = true;
@@ -91,7 +95,7 @@
     reset() { target = null; },
     onKey(k, e) {
       if (k === ' ' || k === 'enter') { e.preventDefault(); if (target) speak(askLine()); return true; }
-      const it = opts.find(x => x.key === k) || pool().find(x => x.key === k); if (!it) return false;
+      const it = opts.find(x => x.key === k); if (!it) return false;
       choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); return true;
     },
     state: () => ({ target, opts, round }), newRound, choose

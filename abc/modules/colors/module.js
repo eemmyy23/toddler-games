@@ -1,3 +1,4 @@
+{
 const COLOR_DATA = [
   { id: 'red', hex: '#e53935', things: 'apple strawberry tomato cherry' }, { id: 'blue', hex: '#1e88e5', things: 'whale dolphin butterfly jeans' },
   { id: 'yellow', hex: '#fdd835', things: 'banana lemon chick sun' }, { id: 'green', hex: '#43a047', things: 'cucumber frog leaf grass' },
@@ -15,10 +16,9 @@ function rainbowSVG() {
 MODULE('colors', {
   section: 'disc', ages: [2, 6],
   build(code) {
-    const s = this.strings[code], loc = ABC.langs[code].bcp47;
-    if (!s) return { colors: [] };
+    const s = this.strings[code], loc = ABC.langs[code].bcp47, words = new Map(CONTENT.words(code).map(x => [x.id, x]));
     const colors = COLOR_DATA.filter(c => s.colors[c.id]).map(c => {
-      const name = s.colors[c.id], words = new Map(CONTENT.words(code).map(x => [x.id, x]));
+      const name = s.colors[c.id];
       const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => [x.w, x.pic, false]), pics = examples.map(x => x[1]);
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
       if (c.bands && !parts) return null;
@@ -34,3 +34,4 @@ MODULE('colors', {
     { id: 'colors', icon: '🎨', view: 'card', items: S => S.colors, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'voice'] } }
   ]
 });
+}

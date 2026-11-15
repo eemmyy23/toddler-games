@@ -68,7 +68,7 @@
     el: 'read', nav: 'rnav', swipe: true,
     show(sayIt) { render(sayIt); },
     step(d) { APP.step(d); tok++; sfx.pop(); render(true); },
-    play, leave() { tok++; }, resize() { render(false); },
+    play, leave() { tok++; }, resize() { tok++; render(false); },
     announce(name) { speak(`${name}. ${cur().w}`, 120); },
     onKey(k, e) { if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); play(); return true; } return false; },
     indexFace: it => `${it.pic}<small>${esc(it.w)}</small>`,

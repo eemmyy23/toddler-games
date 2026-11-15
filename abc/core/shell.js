@@ -139,7 +139,7 @@ function render() {
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
-  if (!atHub && !usable(tileOf(), mode === 'play')) atHub = true;
+  if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
   const sc = APP.screen(), v = view();
   document.body.dataset.mode = sc;
   document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav)));
@@ -156,8 +156,9 @@ function render() {
 }
 
 function setLang(code) {
-  if (code === lang) { sfx.pop(); render(); announce(); return; }
+  if (code === lang) { sfx.pop(); announce(); return; }
   const v0 = !atHub && view(), cur = v0 && APP.items()[APP.idx];
+  if (v0 && v0.leave) v0.leave();
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
   lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices();
   if (v0) {
@@ -359,7 +360,7 @@ addEventListener('keydown', e => {
     ABC.views[play ? GAME_VIEW : t.view].onKey && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
   if (!t || (t.id === tileId && !atHub)) return;
   openTile(t.id, play, true);
-  if (view().onKey) view().onKey(k, e);
+  if (!play && view().onKey) view().onKey(k, e);
 });
 addEventListener('contextmenu', e => e.preventDefault());
 

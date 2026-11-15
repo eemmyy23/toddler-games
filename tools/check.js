@@ -42,6 +42,7 @@ const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && t
 console.log('config');
 if (!langs.includes(base)) err(`config.baseLanguage "${base}" is not in config.languages`);
 if (new Set(CFG.sections.map(s => s.id)).size !== CFG.sections.length) err('config.sections: duplicate id');
+if (CFG.sections.filter(s => s.play).length !== 1) err('config.sections: exactly one section must have play: true');
 const P = Object.keys(CFG.profiles || {});
 if (!P.length) err('config.profiles is empty');
 if (!CFG.profiles[CFG.defaultProfile]) err(`config.defaultProfile "${CFG.defaultProfile}" is not a profile`);

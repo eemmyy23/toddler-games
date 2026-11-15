@@ -75,9 +75,9 @@ function speak(text, delay = 0) {
 }
 function sayNow(text) {
   if (!('speechSynthesis' in window) || SPEECH.noVoice) return;
-  clearTimeout(speakTimer); speechSynthesis.speak(makeUtt(text, 1, null));
+  clearTimeout(speakTimer); if (speakDone) speakDone(); speechSynthesis.speak(makeUtt(text, 1, null));
 }
-const hush = () => { if ('speechSynthesis' in window) speechSynthesis.cancel(); };
+const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); };
 
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;
