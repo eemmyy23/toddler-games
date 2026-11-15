@@ -11,10 +11,10 @@ Tiny, no-instructions web games for very small children. Rocket! and Paint! are 
   Move the mouse — no clicking needed — to paint the canvas in rainbow colors. **Hold left-click** to spray stars instead of paint. **Middle-click** (or the sponge button) resets the canvas. Touch-drag paints the same way. Pitched musical voice follows the brush, with sparkle bursts and chime pings.
 
 - 🔤 **ABC 123!** — [eemmyy23.github.io/toddler-games/abc.html](https://eemmyy23.github.io/toddler-games/abc.html)
-  Numbers, letters, reading and colours in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, dark night theme, tabs **Numere · Litere · Descoperă · Joacă**:
-  - **123 Numbers:** digits 1–10 and a counting page (objects or hands, index finger first, thumb = 5).
-  - **ABC Letters:** big letter with example words (RO school sounds bî, cî, zî; RO letter groups ce/ci/che/chi/ge/gi/ghe/ghi); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
-  - **🧭 Discover:** colours and a tappable rainbow; "What is it?" cards read aloud.
+  Numbers, letters, reading and the world around us in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, dark night theme, four tabs (Numbers · Letters · Discover · Play):
+  - **123 Numbers:** 1–10, counting (objects or hands), 11–20, tens, big numbers up to a million and ∞, the clock and half past.
+  - **ABC Letters:** big letter with example words (RO school sounds bî, cî, zî), letter groups in every language (RO ce/ci/che/chi…, EN sh/ch/th…, DE sch/ch/ei…); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
+  - **🧭 Discover:** colours and the rainbow, animal families, weather, shapes, my body, seasons, groups, opposites, the sky, the Solar System, germs and washing, the immune system, chemical elements; 61 "What is it?" cards read aloud.
   - **🎯 Play:** one game for every learn screen, paired automatically; stars.
   - **🔍 Search** finds a word, number or colour typed in any language; **⊞** opens every item (A–Z sections with a side letter bar in Read).
   Switching the flag keeps the same item (and the same question in a game). The three bikes next to the flags pick the age: balance bike 2–4 · training wheels 4–7 · mountain bike 7–12. Anyone can switch; a higher age only adds topics.

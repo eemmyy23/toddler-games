@@ -28,7 +28,7 @@ abc/core/shell.js           hubs, tabs, flags, profiles, navigation, language sw
 sw.js                       precaches MANIFEST.files under cache 'toddler-<version>'; versioned scripts (?v=) cache-first, the rest network-first
                             with a 3 s fallback to cache; an open app updates on its next return from the background
 tools/check.js              content + config checks, manifest generator (CI)
-tools/fast.js               layout check, ~2 s, no server: every screen × 7 sizes (CI)
+tools/fast.js               layout check, no server: every language × every hub, every learn tile (first, middle, last, longest item; Read: 6 longest words), every game × 7 portrait/desktop sizes (CI)
 tools/smoke.js              browser test: every language, every game, speech, offline (CI)
 ```
 
@@ -117,7 +117,7 @@ its element is created in the stage — or in the body for `fullHeight` — if `
 ## Checks
 ```
 node tools/check.js --fix        # after every change: content + config checks, rewrites abc/manifest.js
-node tools/fast.js               # ~2 s, no server: every screen × 7 sizes (320×480 → 1920×1080) — after any CSS/markup edit
+node tools/fast.js               # ~10 s, no server: every language × hubs, learn tiles (first/middle/last/longest), games × 7 sizes (320×480 → 1920×1080) — after any CSS/markup edit
 node tools/smoke.js [url] [WxH]  # full suite (minutes), repo's parent folder served on :8765 — before a push
 ```
 CI (`.github/workflows/check.yml`) runs check, fast and smoke (360×640 and 320×568) on every PR and on pushes to main.

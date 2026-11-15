@@ -32,7 +32,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('hubs');
   const hub = async sec => { await ev(s => { APP.set({ section: s }); APP.set({ hub: true }); render(); }, sec);
-    return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : x.querySelector('.hl').textContent)); };
+    return p.$$eval('#hub > :not(.hsearch):not(#ver)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
   ok(['Găsește cifra', 'Câte sunt?', 'Găsește litera', 'Găsește cuvântul', 'Găsește grupul', 'Găsește culoarea'].every(g => play.includes(g)), `Play hub: ${play.filter(x => x[0] !== '#').length} games`);

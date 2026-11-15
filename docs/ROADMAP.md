@@ -9,11 +9,11 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 4. **Every learn screen has exactly one game**, paired automatically.
 5. **Nothing unfinished in front of a child** — a tile that is not complete in a language is not shown.
 
-## Done
+## Built (status per item)
 - **v1.0** — modular architecture (languages, modules, views, games), stable ids, offline precache from a generated manifest, local voices only, age profiles.
 - **v1.1** — A–Z index with side letter bar, universal search in all languages, age badges, one layout column (320×480 → 1920×1080), tokens + one class per component, no code comments.
 - **After v1.1** — one question line for every game, gender agreement, Lexend font (full RO/DE), section derived from the screen, links between modules (same concept, lesson ↔ game).
-- **Roadmap 2026-11 (all content, RO/EN/DE, each with its game, each audited by an independent reviewer):**
+- **Roadmap 2026-11 — built, reviewed by AI auditors, NOT yet signed off:** the Definition of done below still needs the spoken lines checked with the offline voices on the family's devices and a parent sign-off per language. Until then these are "built", not "done".
 
 | Module | Age | Learn | Game |
 |---|---|---|---|
@@ -40,7 +40,7 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 ## Next
 - [x] More "What is it?" cards: planets, body, health, animals, food (61 in total).
 - [ ] Parent review tools (`tools/show.js`, `tools/review.js`) — on hold, by request.
-- Not needed now (measured): lazy loading — the whole offline set is 103 files, 539 KB (JS 199 KB).
+- Not needed now (measured 2026-11-15, v1.2.0): lazy loading — the whole offline set is 103 files, 571 KB (JS 230 KB).
 - Not needed now: extra views/games (grid, sequence, pairs, order, find-region) — no module needs them yet; add with the module that does.
 
 ## Definition of done (every module)

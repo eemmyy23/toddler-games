@@ -14,7 +14,7 @@ function audit() {
   const screens = [];
   for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { APP.set({ section: s.id }); APP.set({ hub: true }); render(); }]);
   for (const t of TILES) {
-    if (learnOk(t)) { const n = itemsOf(t).length, picks = t.view === 'read' ? itemsOf(t).map((x, i) => [x.w.length + (x.forms ? 20 : 0), i]).sort((a, b) => b[0] - a[0]).slice(0, 6).map(x => x[1]) : [0, n - 1];
+    if (learnOk(t)) { const n = itemsOf(t).length, picks = t.view === 'read' ? itemsOf(t).map((x, i) => [x.w.length + (x.forms ? 20 : 0), i]).sort((a, b) => b[0] - a[0]).slice(0, 6).map(x => x[1]) : [...new Set([0, n >> 1, n - 1, itemsOf(t).reduce((b, x, i, a) => String(x.label).length > String(a[b].label).length ? i : b, 0)])];
       for (const i of picks) screens.push([`${t.id}#${i}`, () => { openTile(t.id, false, true); APP.idx = i; view().show(false); }]); }
     if (gameOk(t)) screens.push([`${t.id}:play`, () => openTile(t.id, true, true)]);
   }
@@ -34,6 +34,9 @@ function audit() {
       if (!vis(e) || scroller(e) || e.closest('#ctools')) continue;
       const r = R(e); if (fixed.some(f => hit(r, f))) { bad.push(`${name}: ${e.id || e.className.split(' ')[0]} under the chrome`); break; }
     }
+    for (const e of root.querySelectorAll('#glyph, .nav, .bub, .rt, .rc, .ht .hl')) if (vis(e) && e.scrollWidth > e.clientWidth + 2) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} text wider than its box`);
+    const low = [...document.querySelectorAll('[data-low] button, button[data-low]')].filter(vis);
+    for (let i = 0; i < low.length; i++) for (let j = i + 1; j < low.length; j++) if (!low[i].contains(low[j]) && !low[j].contains(low[i]) && hit(R(low[i]), R(low[j]))) bad.push(`${name}: ${low[i].id || low[i].className.split(' ')[0]} overlaps ${low[j].id || low[j].className.split(' ')[0]}`);
     if (atHub) for (const t of document.querySelectorAll('#hub .ht')) {
       const b = R(t.querySelector('.agebadge'));
       if (t.scrollHeight > t.clientHeight + 1) bad.push(`${name}/${t.dataset.id}: tile overflow`);
@@ -51,11 +54,13 @@ function audit() {
   await p.addInitScript(() => { localStorage.clear(); speechSynthesis.speak = () => {}; });
   await p.goto('file://' + path.join(__dirname, '..', 'abc.html'), { waitUntil: 'load' });
   await p.waitForFunction(() => typeof APP === 'object');
-  await p.evaluate(() => { setLang('ro'); APP.set({ profile: 'scientist' }); });
   const bad = [];
-  for (const [w, h] of SIZES) {
-    await p.setViewportSize({ width: w, height: h });
-    bad.push(...(await p.evaluate(audit)).map(m => `${w}x${h} ${m}`));
+  for (const lang of await p.evaluate(() => ABC.config.languages)) {
+    await p.evaluate(l => { setLang(l); APP.set({ profile: Object.keys(ABC.config.profiles).pop() }); }, lang);
+    for (const [w, h] of SIZES) {
+      await p.setViewportSize({ width: w, height: h });
+      bad.push(...(await p.evaluate(audit)).map(m => `${lang} ${w}x${h} ${m}`));
+    }
   }
   const [w, h] = SIZES[SIZES.length - 1];
   for (const [n, f] of [['hub', () => { APP.set({ section: 'num' }); APP.set({ hub: true }); render(); }], ['read', () => { openTile('read', false, true); APP.idx = 0; view().show(false); }]])

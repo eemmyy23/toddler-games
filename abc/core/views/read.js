@@ -35,7 +35,7 @@
       `<div class="links">${APP.links(e)}</div>`;
     fit();
     const [pv, nx] = APP.neighbors();
-    $('rprev').innerHTML = `${APP.icon('prev')}<b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b>${APP.icon('next')}`;
+    $('rprev').innerHTML = `${APP.icon('prev')}<b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b>${APP.icon('next')}`;  APP.fitText($('rprev')); APP.fitText($('rnext'));
     APP.saveIdx();
     if (sayIt) speak(word, 150);
   }

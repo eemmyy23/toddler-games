@@ -30,6 +30,7 @@ const APP = {
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
   icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
   exclaim: name => APP.t(APP.ui().exclaim, { name }),
+  fitText(el) { el.style.setProperty('--fit', 1); if (el.scrollWidth > el.clientWidth + 1) el.style.setProperty('--fit', (el.clientWidth / el.scrollWidth).toFixed(3)); },
   mt(key, vars) {
     const m = tileOf().module, get = code => key.split('.').reduce((o, k) => o && o[k], m.strings[code]);
     return I18N.t(get(lang) ?? get(CFG.baseLanguage), vars, ABC.langs[lang].bcp47);
@@ -46,8 +47,8 @@ const APP = {
   set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
   links(it) {
     const t = tileOf(), play = mode === 'play', out = [];
-    const chip = (x, id, toPlay) => `<button class="pill small link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
-    if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">${APP.icon('info')}${esc(APP.ui().info)}</button>`);
+    const chip = (x, id, toPlay) => `<button class="pill link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
+    if (!play && infoFor(it.concept)) out.push(`<button class="pill link infobtn" data-c="${esc(it.concept)}">${APP.icon('info')}${esc(APP.ui().info)}</button>`);
     if (it.concept) for (const x of TILES) {
       if (x === t || !usable(x, false)) continue;
       const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)));
@@ -103,10 +104,11 @@ function hubTiles() {
 }
 function renderHub() {
   const U = APP.ui();
-  $('hub').innerHTML = `<button class="pill sbox hsearch" id="hsearch"><span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
+  $('hub').innerHTML = `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="label hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
-      `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
+      `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('') +
+    `<div id="ver" class="label" aria-hidden="true">${esc(APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version }))}</div>`;
 }
 function openTile(id, play, quiet) {
   const t = TILE[id]; if (!usable(t, play)) return false;
@@ -142,7 +144,6 @@ function render() {
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
   document.title = CFG.name;
   document.querySelectorAll('[data-icon]').forEach(e => { e.innerHTML = APP.icon(e.dataset.icon); });
-  $('ver').textContent = APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
   if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
   const sc = APP.screen(), v = view();
@@ -187,7 +188,7 @@ function openInfo(c) {
 }
 function closeInfo() { infoTok++; $('info').hidden = true; }
 const lightInf = i => document.querySelectorAll('.inf').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
-onTapIn(document, '.link', b => {
+onTapIn(document, '.link[data-t]', b => {
   firstTouch();
   const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
   if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }

@@ -42,7 +42,7 @@
       g.className = it.bigClass || ''; g.innerHTML = it.big ?? esc(it.label); g.style.color = it.color || '';
       void g.offsetWidth; g.classList.add('pop');
       const [pv, nx] = APP.neighbors();
-      $('prev').innerHTML = APP.icon('prev') + nav(pv); $('next').innerHTML = nav(nx) + APP.icon('next');
+      $('prev').innerHTML = APP.icon('prev') + nav(pv); $('next').innerHTML = nav(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
       const ex = it.examples || [];
       $('pics').hidden = !!ex.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
@@ -52,6 +52,7 @@
         return `<button class="ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${hl(shown, it.unit ? it.unit.lower : it.label, it.color)}</span></button>`;
       }).join('');
       $('links').innerHTML = APP.links(it);
+      APP.fitText(g);
       APP.fit($('learn'));
       APP.saveIdx();
       if (sayIt) speak(it.say, 120);

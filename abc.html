@@ -27,7 +27,7 @@
   --sp-1:4px; --sp-2:6px; --sp-3:10px; --sp-4:16px;
     --col:640px; --gut:max(12px, calc((100% - var(--col)) / 2));
   --bar-pad:max(10px, env(safe-area-inset-top));
-  --pill-h:54px; --pill-fs:22px; --seg-w:52px; --seg-h:44px; --seg-fs:26px;
+  --pill-h:54px; --pill-fs:22px; --link-h:40px; --link-fs:var(--fs-xs); --link-gap:var(--sp-4); --seg-w:52px; --seg-h:44px; --seg-fs:26px;
   --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --tabbar-h:70px; --tab-h:62px; --tl-fs:var(--fs-xs); --bot:calc(var(--tabbar-h) + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --nav-w:112px; --nav-y:calc(var(--bot) + var(--nav-gap)); --low-h:calc(var(--nav-gap) * 2 + var(--nav-h)); --side:var(--gut); --hero-h:72px;
   --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-toast:11;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
@@ -126,8 +126,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .tab.on .ti{filter:none;transform:scale(1.08)}
 
 #learn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:1.6vh}
-#glyph{font-size:var(--glyph);line-height:1.1;font-weight:700;cursor:pointer;text-shadow:0 6px 0 var(--shade);transition:transform .15s}
-#glyph.grp{font-size:var(--glyph-grp)}
+#glyph{font-size:calc(var(--glyph) * var(--fit,1));max-width:100%;white-space:nowrap;line-height:1.1;font-weight:700;cursor:pointer;text-shadow:0 6px 0 var(--shade);transition:transform .15s}
+#glyph.grp{font-size:calc(var(--glyph-grp) * var(--fit,1))}
 #glyph small{font-size:.5em;opacity:.85;margin-left:.06em}
 #glyph.pop{animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(.6)}100%{transform:scale(1)}}
@@ -151,13 +151,14 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .ep{font-size:var(--ex-pic);line-height:1.1}
 .ew{font-size:var(--ex-fs);font-weight:500;white-space:nowrap}
 .ew b{font-weight:700}
-.nav{--pill-h:var(--nav-h);min-width:var(--nav-w);color:var(--muted);font-size:var(--fs-l)}
-.nav b{font-size:40px;font-weight:700}
+.nav{--pill-h:var(--nav-h);min-width:var(--nav-w);max-width:calc(50% - var(--gut) - var(--sp-2));color:var(--muted);font-size:calc(var(--fs-l) * var(--fit,1));white-space:nowrap}
+.nav b{font-size:calc(40px * var(--fit,1));font-weight:700}
 #prev,#next{position:fixed;bottom:var(--nav-y);z-index:var(--z-float)}
 #prev{left:var(--gut)} #next{right:var(--gut)}
-.links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2)}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2);width:100%;margin-top:var(--link-gap);padding-top:var(--link-gap);border-top:1px solid var(--line)}
 .links:empty{display:none}
-.li{--icon:20px}
+.pill.link{--pill-h:var(--link-h);--pill-fs:var(--link-fs);background:transparent;box-shadow:none;border:1px solid var(--line-strong);color:var(--muted)}
+.li{--icon:16px}
 .infobtn{color:var(--amber)}
 
 #play{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--play-gap)}
@@ -256,7 +257,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 
 #install-bar{position:fixed;top:0;left:0;right:0;z-index:var(--z-toast);display:flex;align-items:center;justify-content:center;gap:12px;padding:var(--bar-pad) var(--gut) 10px;background:var(--card)}
 #install-msg{font-size:14px}
-#ver{position:fixed;bottom:calc(var(--bot) + 2px);right:var(--gut);z-index:var(--z-float);color:color-mix(in srgb,var(--text) 25%,transparent);font:11px var(--font);pointer-events:none}
+#ver{grid-column:1/-1;justify-self:center;font-weight:400;opacity:.5}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -276,8 +277,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
-    <div id="links" class="links"></div>
     <div id="examples"></div>
+    <div id="links" class="links"></div>
   </div>
   <div id="play" hidden>
     <div id="ask"></div>
@@ -323,7 +324,6 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
   <button id="install-btn" class="pill primary small" data-text="installBtn"></button>
   <button id="dismiss-btn" class="rbtn small" data-aria="dismiss" data-icon="close"></button>
 </div>
-<div id="ver" aria-hidden="true"></div>
 
 <script src="abc/manifest.js"></script>
 <script>
