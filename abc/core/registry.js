@@ -7,6 +7,7 @@ var ABC = {
   modules: [],
   views: {},
   games: {},
+  groups: {},
   errors: []
 };
 const abcLang = code => ABC.langs[code] || (ABC.langs[code] = { code, strings: {}, words: [], info: {} });
@@ -32,6 +33,7 @@ function C(id, pic, opts) {
   const c = Object.assign({ id, pic, order: ABC.concepts.length }, opts);
   ABC.concepts.push(c); ABC.conceptById[id] = c;
 }
+function GROUP(id, members) { if (ABC.groups[id]) ABC.errors.push(`groups: "${id}" defined twice`); ABC.groups[id] = members.trim().split(/\s+/); }
 function ART(id, svg) { if (ABC.art[id]) ABC.errors.push(`art: "${id}" defined twice`); ABC.art[id] = svg; }
 function MODULE(id, def) { ABC.modules.push(Object.assign({ id, strings: {} }, def)); }
 function MSTRINGS(id, code, s) {

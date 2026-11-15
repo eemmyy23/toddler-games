@@ -192,4 +192,16 @@ w('spring', { w: 'Früh/ling', g: 'm', pl: 'Frühlinge' });
 w('summer', { w: 'Som/mer', g: 'm', pl: 'Sommer' });
 w('autumn', { w: 'Herbst', g: 'm', pl: 'Herbste' });
 w('winter', { w: 'Win/ter', g: 'm', pl: 'Winter' });
+w('farm-animals', { w: 'Bau/ern/hof/tie/re', plOnly: true });
+w('wild-animals', { w: 'Wild/tie/re', plOnly: true });
+w('birds', { w: 'Vö/gel', plOnly: true });
+w('bugs', { w: 'Krab/bel/tie/re', plOnly: true });
+w('sea-animals', { w: 'Mee/res/tie/re', plOnly: true });
+w('fruit', { w: 'Obst', g: 'n', mass: true });
+w('vegetables', { w: 'Ge/mü/se', g: 'n', mass: true });
+w('food', { w: 'Es/sen', g: 'n', mass: true });
+w('vehicles', { w: 'Fahr/zeu/ge', plOnly: true });
+w('clothes', { w: 'Klei/dung', g: 'f', mass: true });
+w('toys', { w: 'Spiel/zeug', g: 'n', mass: true });
+w('music', { w: 'Mu/sik/in/stru/men/te', plOnly: true });
 }

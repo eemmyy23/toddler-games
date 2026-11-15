@@ -195,4 +195,16 @@ w('spring', { w: 'pri/mă/va/ră', def: 'primăvara', pl: 'primăveri', g: 'f', 
 w('summer', { w: 'va/ră', def: 'vara', pl: 'veri', g: 'f', plDef: 'verile' });
 w('autumn', { w: 'toam/nă', def: 'toamna', pl: 'toamne', g: 'f', plDef: 'toamnele' });
 w('winter', { w: 'iar/nă', def: 'iarna', pl: 'ierni', g: 'f', plDef: 'iernile' });
+w('farm-animals', { w: 'a/ni/ma/le de la fer/mă', plOnly: true, plDef: 'animalele de la fermă' });
+w('wild-animals', { w: 'a/ni/ma/le săl/ba/ti/ce', plOnly: true, plDef: 'animalele sălbatice' });
+w('birds', { w: 'pă/sări', plOnly: true, plDef: 'păsările' });
+w('bugs', { w: 'gâ/ze', plOnly: true, plDef: 'gâzele' });
+w('sea-animals', { w: 'a/ni/ma/le din ma/re', plOnly: true, plDef: 'animalele din mare' });
+w('fruit', { w: 'fruc/te', plOnly: true, plDef: 'fructele' });
+w('vegetables', { w: 'le/gu/me', plOnly: true, plDef: 'legumele' });
+w('food', { w: 'mân/ca/re', def: 'mâncarea', g: 'f', mass: true });
+w('vehicles', { w: 've/hi/cu/le', plOnly: true, plDef: 'vehiculele' });
+w('clothes', { w: 'hai/ne', plOnly: true, plDef: 'hainele' });
+w('toys', { w: 'ju/că/rii', plOnly: true, plDef: 'jucăriile' });
+w('music', { w: 'in/stru/men/te mu/zi/ca/le', plOnly: true, plDef: 'instrumentele muzicale' });
 }

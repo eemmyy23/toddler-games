@@ -12,9 +12,10 @@
     for (const it of p) { r -= 1 + (weights[wk(it)] || 0); if (r <= 0) return it; }
     return p[p.length - 1];
   }
+  const subject = () => round.subject && target.members ? target.members.find(m => m.id === round.subject) || null : null;
   function askLine() {
-    const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id;
-    return APP.mt('games.' + key, Object.assign({}, target, { the: target.the || target.name }));
+    const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id, it = subject() || target;
+    return APP.mt('games.' + key, Object.assign({}, it, { the: it.the || it.name }));
   }
   function newRound() {
     locked = false; target = pickTarget();
@@ -23,12 +24,13 @@
     for (const it of shuffle(pool())) if (opts.length < nChoices() && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
     opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
-    round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0] };
+    const m = target.members || [];
+    round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: m.length ? m[Math.random() * m.length | 0].id : null };
     draw();
   }
   function draw() {
     locked = false;
-    const q = game().show(target, round, askLine());
+    const q = game().show(target, round, askLine(), subject());
     $('ask').innerHTML = `<span class="q">🔊 ${esc(q.text)}</span>${q.picture || ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');

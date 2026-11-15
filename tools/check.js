@@ -72,6 +72,11 @@ for (const x of ABC.concepts) {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(x.id)) err(`concept "${x.id}": id must be an ASCII slug`);
   if (!/\p{Extended_Pictographic}|\p{Regional_Indicator}|⃣/u.test(x.pic)) warn(`concept "${x.id}": picture "${x.pic}" is not an emoji`);
 }
+const inGroup = new Map();
+for (const [g, ms] of Object.entries(ABC.groups)) {
+  if (!ABC.conceptById[g]) err(`group "${g}": not a concept (add it to abc/concepts.js)`);
+  for (const m of ms) { if (!ABC.conceptById[m]) err(`group ${g}: unknown concept "${m}"`); if (inGroup.has(m)) err(`concept "${m}" is in two groups (${inGroup.get(m)}, ${g})`); inGroup.set(m, g); }
+}
 for (const c of langs) {
   const L = ABC.langs[c]; if (!L) continue;
   const seenW = new Map();
