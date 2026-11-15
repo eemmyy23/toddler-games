@@ -1,8 +1,5 @@
-// ====== MODULE: LETTERS, READING, LETTER GROUPS ======
 (function () {
-  const MAX_EX = 4; // example words shown under a letter
-  // example words for a letter / letter group: words starting with it, else words containing it;
-  // a word starting with a letter group (RO "ce", "chi"…) is not an example of its single letter (C)
+  const MAX_EX = 4;
   function examples(L, words, piece, isGroup) {
     const low = x => x.toLocaleLowerCase(L.bcp47), p = low(piece);
     const groups = (L.groups || '').split(/\s+/).filter(Boolean), inGroup = w => groups.some(g => low(w).startsWith(g));
@@ -27,7 +24,6 @@
         return { id: 'grp-' + g, label: g, name: g, say: L.sayLetter(g, low(w), false), big: esc(g), bigClass: 'grp',
           color, nav: CONTENT.navText(g, color), examples: ex, bubble: g, bubbleColor: color, prompt: g, smallBubble: true };
       });
-      // Read: every word; "Find the word": bubble = picture, question uses the definite form ("Unde e vaca?")
       const read = words.map(x => Object.assign({}, x, { label: x.w, name: x.w }));
       const wordGame = words.filter(x => /^[\p{L}\p{M}][\p{L}\p{M}\s'’-]*$/u.test(x.w)).map((x, i) => ({
         id: x.id, label: x.w, name: x.w, word: x.w, concept: x.concept, the: x.forms && x.forms.sg ? x.forms.sg[1] : null,

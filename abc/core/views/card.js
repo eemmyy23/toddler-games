@@ -1,5 +1,3 @@
-// ====== VIEW 'card' — one item big (letter, digit, colour, group…), examples / pictures, ‹ › arrows ======
-// Uses item fields only: big, bigClass, color, nav, word, pics, examples, concept, parts, say, label, name, unit, key.
 (function () {
   let partTimers = [];
   const partsStop = () => { partTimers.forEach(clearTimeout); partTimers = []; };
@@ -7,7 +5,6 @@
     $('glyph').classList.toggle('on', i >= 0);
     document.querySelectorAll('#glyph .part').forEach(p => p.classList.toggle('on', +p.dataset.part === i));
   }
-  // first occurrence of the letter/group in the word, in its colour
   function hl(word, piece, color) {
     const t = APP.L().bcp47, i = word.toLocaleLowerCase(t).indexOf(piece.toLocaleLowerCase(t));
     if (i < 0) return esc(word);
@@ -18,10 +15,10 @@
     if (APP.screen() !== 'card') return;
     e.stopPropagation(); APP.firstTouch(); partsStop();
     const it = cur(), part = e.target.closest && e.target.closest('.part');
-    if (part && it.parts) { // one part: say its name
+    if (part && it.parts) {
       const i = +part.dataset.part; partLight(i); sfx.pop(); speak(it.parts[i].say, 40);
       confetti(e.clientX || W / 2, e.clientY || H / 3, 14, 5); partTimers.push(setTimeout(() => partLight(-1), 1200));
-    } else if (it.parts) { // elsewhere: name, then every part in order
+    } else if (it.parts) {
       hush(); sayNow(it.name);
       it.parts.forEach((p, i) => partTimers.push(setTimeout(() => { partLight(i); sayNow(p.say); sfx.pop(); }, 900 + i * 850)));
       partTimers.push(setTimeout(() => { partLight(-1); confetti(W / 2, H / 3, 60, 10); }, 900 + it.parts.length * 850 + 300));
@@ -62,8 +59,8 @@
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     announce(name) { speak(`${name}. ${cur().say}`, 120); },
     leave() { partsStop(); },
-    onKey(k) { // a typed letter/digit of this list shows it
-      const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false; // key → item
+    onKey(k) {
+      const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;
     },
     indexFace: it => it.examples ? `<span style="color:${it.color}">${esc(it.label)}</span>${it.examples[0] ? `<small>${it.examples[0][1]}</small>` : ''}`

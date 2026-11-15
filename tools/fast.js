@@ -1,22 +1,13 @@
-// Fast layout check for CSS / markup edits — about 2 s (target < 3 s). No server: loads abc.html from disk.
-//   node tools/fast.js [WxH,WxH,…] [outDir]     default: phone low-res → desktop (see SIZES)
-// Generic checks on every screen at every size (no per-screen rules):
-//   · alignment: the top bar, the content and the tab bar share one column (--col / --gut)
-//   · nothing of the active screen sits under the fixed chrome (top bar, tab bar, ‹ › arrows)
-//   · no horizontal scrolling; hub tiles: no overflow, nothing under the age badge, not stretched
-// CI runs it before tools/smoke.js; the full suite also runs locally before a push.
 const { chromium } = require('playwright');
 const path = require('path'), os = require('os'), t0 = Date.now();
 const SIZES = (process.argv[2] || '320x480,360x640,390x844,768x1024,1024x768,1280x800,1920x1080').split(',').map(s => s.split('x').map(Number));
 const out = process.argv[3] || os.tmpdir();
 
-// runs in the page: every screen of the app, measured generically
 function audit() {
   const bad = [], R = e => e.getBoundingClientRect(), vis = e => { const r = R(e); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
   const hit = (a, b) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
   const chrome = () => ['bar', 'tabs', 'prev', 'next', 'rnav'].map(id => document.getElementById(id)).filter(e => e && vis(e))
     .flatMap(e => e.id === 'rnav' || e.id === 'bar' ? [...e.children].filter(vis) : [e]).map(R);
-  // a tile is as tall as its CSS min-height or its content — never more (the same rule as tools/smoke.js)
   const stretched = t => { const cs = getComputedStyle(t), kids = [...t.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
     const content = kids.length ? Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0;
     return R(t).height > Math.max(parseFloat(cs.minHeight) || 0, content) + 2; };
@@ -30,7 +21,6 @@ function audit() {
   for (const [name, go] of screens) {
     go();
     if (document.documentElement.scrollWidth > innerWidth + 1) bad.push(`${name}: horizontal scroll`);
-    // one column: bar edges = content edges = tab edges
     const col = R(document.getElementById('stage')), cs = getComputedStyle(document.getElementById('stage'));
     const L = col.left + parseFloat(cs.paddingLeft), Rr = col.right - parseFloat(cs.paddingRight);
     const items = [...document.getElementById('bar').children].filter(vis).map(R);
@@ -38,11 +28,10 @@ function audit() {
     const tabs = [...document.querySelectorAll('.tab')].map(R);
     if (tabs.length && (tabs[0].left < L - 2 || tabs[tabs.length - 1].right > Rr + 2)) bar('tabs outside the content column');
     function bar(m) { bad.push(`${name}: ${m}`); }
-    // nothing under the fixed chrome
     const fixed = chrome(), root = atHub ? document.getElementById('hub') : document.getElementById(view().el);
     const scroller = el => { for (let e = el.parentElement; e && e !== document.body; e = e.parentElement) { const o = getComputedStyle(e).overflowY; if (o === 'auto' || o === 'scroll') return true; } return false; };
     for (const e of root.querySelectorAll('button,.rrow,.crow,#glyph,#ask,.ex')) {
-      if (!vis(e) || scroller(e) || e.closest('#ctools')) continue; // scrolling lists may pass under the chrome
+      if (!vis(e) || scroller(e) || e.closest('#ctools')) continue;
       const r = R(e); if (fixed.some(f => hit(r, f))) { bad.push(`${name}: ${e.id || e.className.split(' ')[0]} under the chrome`); break; }
     }
     if (atHub) for (const t of document.querySelectorAll('#hub .ht')) {

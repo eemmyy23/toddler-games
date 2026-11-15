@@ -1,5 +1,3 @@
-// ====== ENGLISH — app UI text (the texts of each subject live in abc/modules/<id>/lang/en.js) ======
-// Templates: "{name}" is replaced; an object { one, few, many, other } is chosen with Intl.PluralRules.
 STRINGS('en', {
   sections: { num: 'Numbers', abc: 'Letters', disc: 'Discover', play: 'Play' },
   find: 'Find', soon: 'soon', info: 'What is it?', noVoice: 'no voice for this language',

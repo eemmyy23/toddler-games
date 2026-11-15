@@ -1,4 +1,3 @@
-// ====== VIEW 'count' — all items (numbers, field n) on one page as objects (rows of 5) or mirrored hands ======
 (function () {
   let style = store.get('cstyle', 'obj'), timers = [];
   let playing = false;
@@ -7,13 +6,11 @@
     document.querySelectorAll('.crow.on').forEach(r => r.classList.remove('on'));
     const b = $('c-all'); b.classList.remove('playing'); b.style.setProperty('--p', 0); b.setAttribute('aria-pressed', 'false');
   }
-  // scroll so the row is centred in the space below the sticky toolbar (explicit scrollTo: scrollIntoView is unreliable on phones)
   function reveal(row, smooth) {
     const box = $('count'), bar = $('ctools').offsetHeight, room = box.clientHeight - bar;
     const want = Math.max(0, row.offsetTop - bar - Math.max(6, (room - row.offsetHeight) / 2));
     if (Math.abs(box.scrollTop - want) > 2) box.scrollTo({ top: want, behavior: smooth ? 'smooth' : 'auto' });
   }
-  // hand seen from the back: LEFT thumb on the right, RIGHT hand mirrored; raise order index → … → thumb (5)
   const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6';
   const FING = { little: { x: 13, w: 13, top: 34 }, ring: { x: 28, w: 14, top: 18 }, middle: { x: 44, w: 14, top: 10 }, index: { x: 60, w: 14, top: 18 } };
   const ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
@@ -45,17 +42,17 @@
     void row.offsetWidth; row.classList.add('on'); reveal(row, true);
     return row;
   }
-  function one(n) { // tap a row: just that number
+  function one(n) {
     stop(); hush(); const it = item(n), row = it && light(n); if (!row) return;
     const r = row.querySelector('.cnum').getBoundingClientRect();
     confetti(r.left + r.width / 2, r.top + r.height / 2, 24, 6); sfx.pop(); sayNow(it.name);
   }
-  function all() { // ▶ first→last: one number per row; the button stays pressed and fills with the progress; tap again = stop
+  function all() {
     if (playing) { stop(); hush(); sfx.pop(); return; }
     stop(); hush(); playing = true;
     const b = $('c-all'), list = APP.items(), n = list.length;
     b.classList.add('playing'); b.setAttribute('aria-pressed', 'true');
-    $('count').scrollTo({ top: 0, behavior: 'auto' });            // start at 1, wherever the child had scrolled
+    $('count').scrollTo({ top: 0, behavior: 'auto' });
     list.forEach((it, i) => timers.push(setTimeout(() => { light(it.n); b.style.setProperty('--p', (i + 1) / n); sayNow(it.name); sfx.pop(); }, 250 + i * 1000)));
     timers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); stop(); }, 250 + n * 1000));
   }

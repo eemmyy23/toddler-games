@@ -1,7 +1,4 @@
-// ====== DEUTSCHE WÖRTER ======
-// w(id, { w: Silben "Kat/ze", g: 'm'|'f'|'n', pl: Plural, mass: true (kein Plural), ex: false })
-// ex: false = kein Beispiel für den Anfangsbuchstaben (Sch, Ei, Au …).
-{ // block scope: every language file declares its own helper
+{
 const w = WORDS('de');
 w('cow', { w: 'Kuh', g: 'f', pl: 'Kühe' });
 w('house', { w: 'Haus', g: 'n', pl: 'Häuser' });

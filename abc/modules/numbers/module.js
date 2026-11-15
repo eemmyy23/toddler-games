@@ -1,6 +1,4 @@
-// ====== MODULE: NUMBERS 1–10 ======
-const NUMPICS = ['🌞', '🐥', '🐟', '🍓', '⭐', '🎈', '🐞', '🍪', '🚗', '🦋']; // one picture per number (Count, How many?)
-// tiles: each tile is a learn screen; its `game` is its Play tile (paired automatically).
+const NUMPICS = ['🌞', '🐥', '🐟', '🍓', '⭐', '🎈', '🐞', '🍪', '🚗', '🦋'];
 MODULE('numbers', {
   section: 'num', ages: [2, 6], needs: ['numbers'],
   build(code) {

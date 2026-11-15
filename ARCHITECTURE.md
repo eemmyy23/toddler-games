@@ -59,6 +59,29 @@ tools/smoke.js              browser test: every language, every game, speech, of
   Controls fixed above the tab bar carry `data-low`; a screen too tall for the space calls `APP.fit(el, compactClass)`
   (compact first, then scale to fit) instead of its own sizing code.
 
+## Contracts
+**LANG** (`grammar.js`) — required: `name, flag, bcp47, letters` (space-separated units, multi-character allowed), `forms(entry, word) → { sg: [a, the], pl: [two, the] } | null`.
+Optional: `dir`, `keepCase`, `spell(letter)`, `fold(text)` (search), `voices` (RegExp of preferred voice names), `checkForms(entry)` / `checkWord(entry)` → message.
+Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayLetter(name, word, inside)`, `groups`.
+
+**WORDS** — `w(id, { w: 'va/că', … })`, `/` marks syllables. **INFO** — `i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })`. **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
+
+**MODULE** — `{ section, ages: [from, to], needs?: [LANG fields], build(code) → S, tiles: [TILE], check?(code, S, strings, report) }`.
+Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key>: spoken question with {name} / {the} } }`.
+
+**TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages? }`.
+
+**ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
+`key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
+games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`.
+
+**VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
+flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
+
+**GAME** — hosted by the `play` view: `{ needs (min. items, default 2), pool(items, streak) → candidates, prompt(target, round) → HTML }`.
+
+**config** — `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art?, soon? } }` (ascending), `defaultProfile, baseLanguage`.
+
 ## Recipes
 **Add a word** — `abc/concepts.js`: `C('wolf', '🐺');` then in each `abc/lang/<code>/words.js`:
 ```js

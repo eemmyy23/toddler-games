@@ -1,6 +1,3 @@
-// ====== SHELL — navigation, hubs, age profiles, language switch, info cards, index, search, input ======
-// Knows no subject, language, profile or screen by name: everything comes from ABC.config, modules, views and games.
-// The one fixed name is GAME_VIEW, the core view that hosts every game type.
 'use strict';
 const CFG = ABC.config;
 const GAME_VIEW = 'play';
@@ -10,13 +7,11 @@ const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
 
-// every view gets its element: abc.html may provide one (with its controls); otherwise it is created in the stage
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
   const d = document.createElement('div'); d.id = v.el; d.hidden = true;
   (v.fullHeight ? document.body : $('stage')).appendChild(d);
 }
 
-// ---- state ----
 const defaultLang = () => { const nav = (navigator.language || '').toLowerCase(); return LANGS.find(c => nav === c || nav.startsWith(c + '-')) || LANGS[0]; };
 let lang = store.get('lang', store.legacy('lang') || defaultLang()); if (!LANGS.includes(lang)) lang = LANGS[0];
 let profile = store.get('profile', CFG.defaultProfile); if (!CFG.profiles[profile]) profile = CFG.defaultProfile;
@@ -25,14 +20,13 @@ let atHub = store.get('athub', true), tileId = store.get('tile', TILES[0].id), m
 if (!TILE[tileId]) { tileId = TILES[0].id; atHub = true; }
 let started = false;
 
-// ---- APP: what views and games use ----
 const APP = {
   idx: 0, streak: 0, stars: store.get('stars', store.legacy('stars') || 0),
   L: () => ABC.langs[lang],
   alphabet: () => CONTENT.alphabet(lang),
   ui: () => abcMerge(abcMerge({}, ABC.langs[CFG.baseLanguage].strings), ABC.langs[lang].strings),
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
-  mt(key, vars) { // a string of the current tile's module, e.g. 'games.letters' (falls back to the base language)
+  mt(key, vars) {
     const m = tileOf().module, get = code => key.split('.').reduce((o, k) => o && o[k], m.strings[code]);
     return I18N.t(get(lang) ?? get(CFG.baseLanguage), vars, ABC.langs[lang].bcp47);
   },
@@ -45,8 +39,6 @@ const APP = {
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
   firstTouch, infoButton: c => infoFor(c) ? `<button class="pill infobtn" data-c="${esc(c)}">📖 ${esc(APP.ui().info)}</button>` : '',
-  // fit a screen's content between the top bar and the lowest visible fixed control ([data-low]) above the tab bar:
-  // 1) optional compact class, 2) if still too tall, scale the whole block so it fits exactly (taps scale with it)
   fit(el, compact) {
     if (compact) el.classList.remove(compact);
     el.style.transform = ''; el.style.transformOrigin = '';
@@ -73,8 +65,6 @@ const view = () => ABC.views[APP.screen()];
 const ageOk = t => Tiles.ageOk(t, profile);
 const showsSoon = () => CFG.profiles[profile].soon !== false;
 const usable = (t, play) => !!t && ageOk(t) && (play ? gameOk(t) : learnOk(t));
-// a tile is listed if: right age, has its label in this language, and it works — or it is planned ("coming soon"),
-// which only profiles with soon ≠ false show (a toddler can't tell "soon" from "broken")
 function listed(t, play) {
   if (!ageOk(t) || !label(t, play ? 1 : 0)) return false;
   if (play ? gameOk(t) : learnOk(t)) return true;
@@ -82,17 +72,13 @@ function listed(t, play) {
 }
 function loadIdx() { const i = APP.indexOf(store.get('pos_' + tileId, null)); APP.idx = i >= 0 ? i : 0; }
 
-// ---- age badge + icons ----
 const artSVG = p => `<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none">${ABC.art[CFG.profiles[p].art || p] || ''}</g></svg>`;
 const profileName = p => { const U = APP.ui(), [a, b] = CFG.profiles[p].ages; return APP.t(U.profile.ages, { name: U.profile[p], a, b }); };
-// the profile's bike, placed left → right in profile order (little · explorer · scientist)
 const ageBadge = t => { const p = Tiles.profileOf(t), i = PROFILES.indexOf(p);
   return `<span class="agebadge" data-p="${p}" style="--ax:${PROFILES.length > 1 ? i / (PROFILES.length - 1) : 0}" title="${esc(profileName(p))}">${artSVG(p)}</span>`; };
-// an icon (tab, tile) is an emoji or a short text ("123", "ABC", "ce·ci"); text icons get the text style — one rule everywhere
 const iconHTML = (icon, cls) => `<span class="${cls} ico${/[\p{L}\p{N}]/u.test(icon) && !/\p{Extended_Pictographic}/u.test(icon) ? ' txt' : ''}" aria-hidden="true">${esc(icon)}</span>`;
 const tileIcon = (t, cls) => iconHTML(t.icon, cls);
 
-// ---- hubs ----
 function hubTiles() {
   if (!SECTIONS[section].play) return TILES.filter(t => t.section === section && listed(t, false)).map(t => ({ t, ok: learnOk(t), lbl: label(t, 0), play: false }));
   const out = [];
@@ -114,7 +100,7 @@ function openTile(id, play, quiet) {
   if (view() && view().leave) view().leave();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
-  if (!play) { section = t.section; store.set('sec', section); } // back always leads to the tile's own hub
+  if (!play) { section = t.section; store.set('sec', section); }
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); if (!quiet) sfx.pop(); render();
   return true;
@@ -128,13 +114,12 @@ $('hub').addEventListener('click', e => {
 });
 function goHub() { if (view() && view().leave) view().leave(); atHub = true; store.set('athub', true); sfx.pop(); render(); speak(APP.ui().sections[section] + '!', 80); }
 function setSection(id) {
-  if (id === section) { if (!atHub) goHub(); return; } // tap the active tab → back to its hub
+  if (id === section) { if (!atHub) goHub(); return; }
   if (view() && view().leave) view().leave();
   section = id; store.set('sec', id); atHub = true; store.set('athub', true);
   sfx.pop(); render(); speak(APP.ui().sections[id] + '!', 80);
 }
 
-// ---- render: one visibility mechanism (the hidden attribute) ----
 const VIEWS = Object.values(ABC.views);
 function render() {
   const U = APP.ui(), L = APP.L();
@@ -144,10 +129,10 @@ function render() {
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
-  if (!atHub && !usable(tileOf(), mode === 'play')) atHub = true; // e.g. letter groups exist only in Romanian
+  if (!atHub && !usable(tileOf(), mode === 'play')) atHub = true;
   const sc = APP.screen(), v = view();
   document.body.dataset.sec = section; document.body.dataset.mode = sc;
-  document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav))); // the stage leaves room for bottom controls
+  document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav)));
   $('ages').hidden = !atHub; $('barback').hidden = atHub;
   $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW;
   $('barback').innerHTML = `‹ ${iconHTML(SECTIONS[section].icon, 'bi')}`;
@@ -160,9 +145,8 @@ function render() {
   if (sc === 'hub') renderHub(); else v.show(started);
 }
 
-// ---- language switch: same item / same question / same scroll, then announce ----
 function setLang(code) {
-  if (code === lang) { sfx.pop(); render(); announce(); return; } // tap the current flag → repeat
+  if (code === lang) { sfx.pop(); render(); announce(); return; }
   const v0 = !atHub && view(), cur = v0 && APP.items()[APP.idx];
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
   lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices();
@@ -177,7 +161,6 @@ function setLang(code) {
 }
 function announce() { const name = APP.L().name; if (atHub) speak(`${name}!`, 120); else view().announce(name); }
 
-// ---- "What is it?" cards: appear wherever an item's concept has a card in this language ----
 let infoId = null, infoTok = 0;
 const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
 function openInfo(c) {
@@ -200,8 +183,7 @@ async function playInfo() {
   if (tok === infoTok) { lightInf(-1); sfx.right(); }
 }
 
-// ---- index (⊞): every item of the current tile. Sorted views: A–Z sections + a side letter bar (drag to jump) ----
-const OTHER = '#'; // items that start with a sign outside the alphabet
+const OTHER = '#';
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const face = it => v.indexFace ? v.indexFace(it) : esc(it.label);
@@ -228,12 +210,11 @@ function openIndex() {
   const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
   syncAZ(); sfx.pop();
 }
-// scroll-spy: the side bar always lights the section being read (last header at or above the top of the list)
 function syncAZ() {
   const g = $('ixgrid'), hs = g.querySelectorAll('.ixh'); if (!hs.length) return;
   let cur = hs[0];
   for (const h of hs) { if (h.offsetTop - g.scrollTop <= 28) cur = h; else break; }
-  if (g.scrollTop + g.clientHeight >= g.scrollHeight - 2) cur = hs[hs.length - 1]; // at the very end
+  if (g.scrollTop + g.clientHeight >= g.scrollHeight - 2) cur = hs[hs.length - 1];
   const u = cur.id.slice(4);
   $('ixaz').querySelectorAll('.az').forEach(a => { const on = a.dataset.u === u; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
 }
@@ -241,7 +222,6 @@ let azRaf = 0;
 $('ixgrid').addEventListener('scroll', () => { if (!azRaf) azRaf = requestAnimationFrame(() => { azRaf = 0; syncAZ(); }); }, { passive: true });
 const closeIndex = () => { $('index').hidden = true; };
 $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); if (!b) return; firstTouch(); closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
-// letter bar: tap or drag; empty letters jump to the next letter that has items
 (function () {
   let last = null;
   const jump = y => {
@@ -249,7 +229,7 @@ $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); 
     const r = bar.getBoundingClientRect(), k = Math.max(0, Math.min(all.length - 1, Math.floor((y - r.top) / r.height * all.length)));
     const el = all.slice(k).find(x => !x.classList.contains('off')) || [...all].reverse().find(x => !x.classList.contains('off'));
     if (!el || el.dataset.u === last) return; last = el.dataset.u;
-    const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 }); // #ixgrid is the offsetParent
+    const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 });
     syncAZ(); sfx.pop();
   };
   $('ixaz').addEventListener('pointerdown', e => { e.preventDefault(); last = null; try { $('ixaz').setPointerCapture(e.pointerId); } catch (x) {} jump(e.clientY); });
@@ -257,8 +237,6 @@ $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); 
   $('ixaz').addEventListener('pointerup', () => { last = null; });
 })();
 
-// ---- universal search: every searchable tile, matched in ALL languages, shown in the current one ----
-// folding: no accents, lower case, then each language's own rule (LANG.fold, e.g. ß → ss)
 const FOLDS = LANGS.map(c => ABC.langs[c].fold).filter(Boolean);
 const fold = s => FOLDS.reduce((x, f) => f(x), String(s || '').replace(/\//g, '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase());
 function searchPool() {
@@ -277,7 +255,7 @@ function runSearch() {
   const U = APP.ui(), q = fold($('sq').value.trim()), col = I18N.collator(APP.L().bcp47);
   $('sqclear').classList.toggle('off', !q);
   if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
-  const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; }; // short queries: word starts only
+  const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; };
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
     .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1])).slice(0, 40);
   $('smeta').textContent = hits.length ? APP.t(U.search.results, { n: hits.length }) : U.search.none;
@@ -304,7 +282,6 @@ tapBtn('sqclear', () => { $('sq').value = ''; runSearch(); $('sq').focus(); });
 tapBtn('sclose', closeSearch);
 tapBtn('ixsearch', openSearch);
 
-// ---- age profiles: one bike per profile in the top bar, visible on every hub; anyone may switch ----
 $('ages').innerHTML = PROFILES.map(p => { const [a, b] = CFG.profiles[p].ages;
   return `<button class="seg age" data-p="${p}" role="radio">${artSVG(p)}<small>${a}–${b}</small></button>`; }).join('');
 function setProfile(p) {
@@ -313,10 +290,8 @@ function setProfile(p) {
   sfx.pop(); render(); speak(profileName(p) + '!', 80);
 }
 
-// ---- chrome from config ----
 $('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv">🔇</i></button>`).join('');
 $('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">${iconHTML(s.icon, 'ti')}<span class="tl"></span></button>`).join('');
-// a language whose device has no voice at all gets a 🔇 mark (text still shown; never read by another language's voice)
 function markVoices() {
   document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); });
 }
@@ -324,8 +299,7 @@ SPEECH.pick(APP.L().bcp47, APP.L().voices);
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices(); };
 markVoices();
 
-// ---- input ----
-function firstTouch() { started = true; ensureAudio(); } // every touch: unlock / resume audio (browsers suspend it)
+function firstTouch() { started = true; ensureAudio(); }
 addEventListener('pointerdown', firstTouch, true);
 addEventListener('keydown', firstTouch, true);
 function tapBtn(el, fn) { (typeof el === 'string' ? $(el) : el).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); fn(); }); }
@@ -337,18 +311,17 @@ tapBtn('infoclose', closeInfo); tapBtn('infoplay', playInfo);
 tapBtn('gridbtn', openIndex); tapBtn('ixclose', closeIndex);
 document.querySelectorAll('.age').forEach(b => tapBtn(b, () => setProfile(b.dataset.p)));
 addEventListener('resize', () => { resizeFx(); if (!atHub && view().resize) view().resize(); });
-let sx = null; // swipe on screens that page through items
+let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
 $('stage').addEventListener('pointerup', e => {
   const v = view(); if (sx == null || !v || !v.swipe) return;
   const dx = e.clientX - sx; sx = null;
   if (Math.abs(dx) > 50) v.step((dx < 0) !== (APP.L().dir === 'rtl') ? 1 : -1);
 });
-// keyboard: arrows page; a letter/digit goes to the view, or on a hub opens the tile whose items have that key
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
   if (e.key === 'Escape') { closeSearch(); closeIndex(); closeInfo(); return; }
-  if (!$('search').hidden || (e.target.closest && e.target.closest('input, textarea'))) return; // typing in the search box
+  if (!$('search').hidden || (e.target.closest && e.target.closest('input, textarea'))) return;
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
   if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
   if (e.repeat) return;
@@ -366,9 +339,8 @@ addEventListener('contextmenu', e => e.preventDefault());
 loadIdx();
 render();
 
-// ---- PWA ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {}); // offline cache is a bonus (e.g. file:// has none)
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
   navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
 }
 (function () {

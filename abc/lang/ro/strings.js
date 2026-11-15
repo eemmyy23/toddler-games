@@ -1,6 +1,3 @@
-// ====== ROMÂNĂ — textele aplicației (textele fiecărui subiect sunt în abc/modules/<id>/lang/ro.js) ======
-// Șabloane: "{name}" se înlocuiește; un obiect { one, few, other } se alege cu Intl.PluralRules('ro')
-// (ro: 1 → one; 0, 2–19, 101–119 → few; 20–100, 120+ → other = „de”).
 STRINGS('ro', {
   sections: { num: 'Numere', abc: 'Litere', disc: 'Descoperă', play: 'Joacă' },
   find: 'Găsește', soon: 'în curând', info: 'Ce este?', noVoice: 'nu există voce pentru această limbă',

@@ -1,7 +1,4 @@
-// ====== ENGLISH WORDS ======
-// w(id, { w: syllables "ap/ple", art: 'a'|'an', pl: plural, mass: true (no article/plural), plOnly: true, ex: false })
-// ex: false = not used as a letter example (first sound differs: sh, ch …). Order = order of letter examples.
-{ // block scope: every language file declares its own helper
+{
 const w = WORDS('en');
 w('cow', { w: 'cow', art: 'a', pl: 'cows' });
 w('house', { w: 'house', art: 'a', pl: 'houses' });

@@ -1,4 +1,3 @@
-// ====== VIEW 'read' — a word: CAPITALS · small letters · syllables · whole word · singular/plural table ======
 (function () {
   let tok = 0;
   const cur = () => APP.items()[APP.idx];
@@ -8,7 +7,6 @@
     const colorOf = u => (u && A.color(u.id)) || 'var(--text)';
     const parts = I18N.splitUnits(word, A.units, loc).filter(p => /[\p{L}\p{M}]/u.test(p.text));
     const tile = (txt, say, cls = '', color = '') => `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
-    // long words shrink the tiles so the whole word always fits on one line (width of the content column)
     const avail = $('read').clientWidth || innerWidth - 24, nl = parts.length, gap = nl > 8 ? 3 : 6;
     const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
     const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
@@ -18,7 +16,7 @@
     const shown = parts.length ? I18N.upper(parts[0].text, parts[0].unit, loc) + word.slice(parts[0].text.length) : word;
     const cells = forms ? [...(forms.sg || []), ...(forms.pl || [])] : [];
     const longest = Math.max(8, ...cells.map(x => x.length));
-    const chipW = (avail - 8) / 2, em = longest * 0.66; // two columns of the table
+    const chipW = (avail - 8) / 2, em = longest * 0.66;
     const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15;
     const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
     const ns = syl.length, sylFont = Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55));
@@ -28,7 +26,7 @@
       `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
       `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
       `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
-      (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +   // one syllable: no row
+      (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +
       `<div class="rrow" id="rW">${tile(shown, word, 'word')}${APP.infoButton(e.concept)}</div>` +
       (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label rh">${esc(U.sgpl[0])}</div><div class="label rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
@@ -40,7 +38,6 @@
     APP.saveIdx();
     if (sayIt) speak(word, 150);
   }
-  // rows that would run under the ‹ ▶ › bar: compact layout, then scale to fit (APP.fit)
   const fit = () => APP.fit($('read'), 'tight');
   $('read').addEventListener('pointerdown', e => {
     const el = e.target.closest('[data-say]'); if (!el) return;
@@ -48,7 +45,6 @@
     lit(el.classList.contains('rt') || el.classList.contains('rc') ? el : null);
     sfx.pop(); speak(el.dataset.say, 60);
   });
-  // ▶: CAPITALS letter by letter → small letters as a word → syllables → whole word → singular/plural
   async function play() {
     const t = ++tok, alive = () => t === tok && APP.screen() === 'read', word = cur().w;
     for (const el of document.querySelectorAll('#rU .rt')) { if (!alive()) return; lit(el); await speak(el.dataset.say); await wait(150); }
@@ -65,7 +61,6 @@
     const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
     setTimeout(() => { if (alive()) lit(null); }, 800);
   }
-  // its own bottom bar (#rnav): ‹ ▶ ›
   const btn = (id, fn) => $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); APP.firstTouch(); fn(); });
   btn('rprev', () => VIEW_READ.step(-1)); btn('rnext', () => VIEW_READ.step(1)); btn('rplay', play);
   const VIEW_READ = {

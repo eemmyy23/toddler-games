@@ -1,7 +1,3 @@
-// Browser smoke test for abc.html (Playwright + Chromium).
-// Usage: serve the repo's PARENT folder so the page is at /toddler-games/abc.html, then
-//   node tools/smoke.js [baseUrl] [WxH]  default http://localhost:8765/toddler-games/abc.html 360x640
-// Speech is replaced by a recorder, so the test checks exactly what would be spoken.
 const { chromium } = require('playwright');
 const URL = process.argv[2] || 'http://localhost:8765/toddler-games/abc.html';
 const [VW, VH] = (process.argv[3] || '360x640').split('x').map(Number);
@@ -39,7 +35,6 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   let play = await hub('play');
   ok(!play.some(x => x[0] === '~'), 'Little profile: no "coming soon" tiles');
   ok(play.filter(x => x[0] !== '#').join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', 'Play hub: the 6 games');
-  // 1:1 mapping: every Learn tile listed in a section has exactly one game tile, same id, same order
   for (const prof of ['little', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
       for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
@@ -119,7 +114,6 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => openTile('colors', true, true));
   const seen = await ev(() => { const s = new Set(); for (let k = 0; k < 150; k++) { APP.streak = 9; ABC.views.play.newRound(); ABC.views.play.state().opts.forEach(x => s.add(x.id)); } return [...s]; });
   ok(!seen.includes('rainbow') && seen.length === 10, `Find the colour: 10 plain colours, never the rainbow (${seen.length})`);
-  // language switch keeps the same question
   await ev(() => openTile('letters', true, true));
   for (let k = 0; k < 200 && !(await ev(() => { const st = ABC.views.play.state(); return !/[ȘȚĂÂÎ]/.test(st.target.id) && /[ȘȚĂÂÎ]/.test(st.opts.map(o => o.id).join('')); })); k++) await ev(() => ABC.views.play.newRound());
   const before = await ev(() => ABC.views.play.state().target.id);
@@ -144,7 +138,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
   ok(vis, 'tap V on the side bar jumps to the V section');
   ok(await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u === 'V'), 'side bar lights V after the jump');
-  for (const u of ['M', 'C', 'T']) {   // scroll the content → the side bar follows
+  for (const u of ['M', 'C', 'T']) {
     await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
     const cur = await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u);
     ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
@@ -167,7 +161,6 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('hubs: tiles look like buttons (not stretched)');
   for (const sec of ['num', 'abc', 'disc']) {
     await ev(s => { section = s; atHub = true; render(); }, sec);
-    // as tall as the CSS min-height or the content — never stretched (same rule as tools/fast.js)
     const hs = await p.$$eval('#hub .ht', t => t.map(x => { const R = e => e.getBoundingClientRect(), cs = getComputedStyle(x), kids = [...x.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
       const content = Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       return [R(x).height | 0, Math.max(parseFloat(cs.minHeight), content) + 2]; }));
@@ -175,7 +168,6 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   }
   ok(await p.isVisible('.hsearch'), 'search pill on the hub');
   ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
-  // age badge on every tile: little left · explorer centre · scientist right (from module.ages + config order)
   await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
   const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
     return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));

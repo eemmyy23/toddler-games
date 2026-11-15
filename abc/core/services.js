@@ -1,16 +1,13 @@
-// ====== SERVICES — speech, sounds, confetti, storage, $ (globals used by the shell, views and games) ======
 const $ = id => document.getElementById(id);
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-// ---- storage (best-effort; namespaced; v2 keys use stable concept ids) ----
 const store = {
   get(k, d) { try { const v = localStorage.getItem('abc2.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('abc2.' + k, JSON.stringify(v)); } catch (e) {} },
   legacy(k) { try { const v = localStorage.getItem('abc.' + k); return v == null ? null : JSON.parse(v); } catch (e) { return null; } }
 };
 
-// ---- sound effects ----
 let AC = null;
 function ensureAudio() {
   if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
@@ -30,22 +27,19 @@ const sfx = {
   fanfare() { [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, i * 0.11, 0.4, 0.15, 'triangle')); }
 };
 
-// ---- speech: device voice for the active language, offline voices first; never another language's voice ----
 const SPEECH = {
   voice: null, noVoice: false, bcp47: null,
   norm: v => v.lang.replace('_', '-').toLowerCase(),
-  // does this device have any voice for the language? (null: voice list not loaded yet)
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  // prefer: RegExp of preferred voice names (LANG.voices); offline (local) voices first
   pick(bcp47, prefer) {
     this.bcp47 = bcp47;
     if (!('speechSynthesis' in window)) { this.noVoice = true; return; }
     const all = speechSynthesis.getVoices();
-    if (!all.length) { this.voice = null; this.noVoice = false; return; } // list not loaded yet: let the browser choose by lang
+    if (!all.length) { this.voice = null; this.noVoice = false; return; }
     const want = bcp47.toLowerCase(), base = want.split('-')[0];
     const same = all.filter(v => this.norm(v) === want), lang = all.filter(v => this.norm(v).split('-')[0] === base);
     const nice = v => !!prefer && prefer.test(v.name);
@@ -55,19 +49,18 @@ const SPEECH = {
   }
 };
 let speakTimer = null, speakDone = null;
-const liveUtts = new Set(); // keep references: Chrome/Android can cut off (GC) utterances that aren't referenced
+const liveUtts = new Set();
 function makeUtt(text, rate, onDone) {
-  const u = new SpeechSynthesisUtterance(text + ' …'); // trailing pause so engines don't clip the last sound
+  const u = new SpeechSynthesisUtterance(text + ' …');
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = rate; u.pitch = 1.25;
   liveUtts.add(u);
   let fallback;
   const fin = () => { clearTimeout(fallback); liveUtts.delete(u); onDone && onDone(); };
   u.onend = u.onerror = fin;
-  fallback = setTimeout(fin, 2000 + I18N.graphemes(text, SPEECH.bcp47).length * 160); // if onend never fires
+  fallback = setTimeout(fin, 2000 + I18N.graphemes(text, SPEECH.bcp47).length * 160);
   return u;
 }
-// Newest request wins (cancels current + pending). Resolves when the line has been spoken.
 function speak(text, delay = 0) {
   if (!('speechSynthesis' in window) || SPEECH.noVoice) return wait(400 + delay);
   speechSynthesis.cancel(); clearTimeout(speakTimer);
@@ -79,13 +72,12 @@ function speak(text, delay = 0) {
     speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, 0.85, done)), delay);
   });
 }
-function sayNow(text) { // queue a short line without cancelling the previous one
+function sayNow(text) {
   if (!('speechSynthesis' in window) || SPEECH.noVoice) return;
   clearTimeout(speakTimer); speechSynthesis.speak(makeUtt(text, 1, null));
 }
 const hush = () => { if ('speechSynthesis' in window) speechSynthesis.cancel(); };
 
-// ---- confetti ----
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;
 function resizeFx() { W = fx.width = innerWidth; H = fx.height = innerHeight; }

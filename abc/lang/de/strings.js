@@ -1,4 +1,3 @@
-// ====== DEUTSCH — App-Texte (die Texte der Fächer stehen in abc/modules/<id>/lang/de.js) ======
 STRINGS('de', {
   sections: { num: 'Zahlen', abc: 'Buchstaben', disc: 'Entdecken', play: 'Spielen' },
   find: 'Finde', soon: 'bald', info: 'Was ist das?', noVoice: 'keine Stimme für diese Sprache',
