@@ -1,4 +1,4 @@
-const CACHE = 'toddler-v22';
+const CACHE = 'toddler-v23';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
