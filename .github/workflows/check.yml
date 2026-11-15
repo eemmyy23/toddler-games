@@ -12,3 +12,16 @@ jobs:
         with:
           node-version: 20
       - run: node tools/check.js
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: toddler-games
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: python3 -m http.server 8765 &
+      - run: sleep 1 && node toddler-games/tools/smoke.js http://localhost:8765/toddler-games/abc.html 360x640
+      - run: node toddler-games/tools/smoke.js http://localhost:8765/toddler-games/abc.html 320x568

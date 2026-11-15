@@ -13,26 +13,26 @@ Everything is built on the preview branch and merged only after the parent appro
 
 ## Stages
 
-### Stage 1 — Foundation (fix what is broken today)
-- [ ] Stable concept ids (ASCII slugs) for words, colours, info cards and saved progress; migrate stored progress.
-- [ ] Game pool ≥ 2 required (`gameUsable` uses the game's own pool).
-- [ ] Every language merged over a base language → no `undefined`, no crash on a missing string.
-- [ ] Service worker: versioned precache of every language, cache-first, `r.ok` check, file list generated (no hand-kept `ASSETS`).
-- [ ] `ß` and other letters whose uppercase differs; voices: prefer `localService`, separate `en-GB`, "🔇 no voice" state instead of a foreign voice.
-- [ ] `check.js`: duplicate/orphan ids, same written word for two concepts, letter without example = error.
-- [ ] `smoke.js` in CI for every language (games, layout at 360×640, offline language switch).
+### Stage 1 — Foundation ✅ (v1.0.0, 2026-11-15)
+- [x] Stable concept ids (ASCII slugs) for words, colours, info cards and saved progress; migrate stored progress.
+- [x] Game pool ≥ 2 required (`gameUsable` uses the game's own pool).
+- [x] Every language merged over a base language → no `undefined`, no crash on a missing string.
+- [x] Service worker: versioned precache of every language (kept network-first so deploys show at once; cache is the offline fallback), `r.ok` check, file list generated (no hand-kept `ASSETS`).
+- [x] `ß` and other letters whose uppercase differs; voices: prefer `localService`, separate `en-GB`, "🔇 no voice" state instead of a foreign voice.
+- [x] `check.js`: duplicate/orphan ids, same written word for two concepts, letter without example = error.
+- [x] `smoke.js` in CI for every language (games, layout at 360×640, offline language switch).
 
-### Stage 2 — Modules & age profiles
-- [ ] Shell + shared views (card, count, read → then grid, diagram, sequence) + game types (find, howmany → then sort, order, pairs, find-region).
-- [ ] Move current topics into modules: `abc/modules/<id>/{module.js, data.js, lang/<code>.js}`.
-- [ ] Module list with `ages`; parent picks the profile (hidden setting); Little profile hides "coming soon".
+### Stage 2 — Modules & age profiles (mostly done in v1.0.0)
+- [x] Shell + shared views (card, count, read, play) + game types (find, howmany). Still to come: (card, count, read → then grid, diagram, sequence) + game types (find, howmany → then sort, order, pairs, find-region).
+- [x] Move current topics into modules: `abc/modules/<id>/{module.js, lang/<code>.js}`.
+- [x] Module list with `ages`; parent picks the profile (hidden setting); Little profile hides "coming soon".
 - [ ] Lazy load per module, precache per active profile.
 
-### Stage 3 — Language model
-- [ ] One folder per language: `grammar.js`, `strings.js`, `words.js`, `letters.js`, `info.js`.
-- [ ] Concepts with gloss / translator notes; explicit forms (def, plural, definite plural); bare plurals.
-- [ ] Writing-system units (multi-character letters, no-case scripts, RTL `dir`).
-- [ ] Intl: PluralRules, ListFormat, Collator, Segmenter, NumberFormat; message templates.
+### Stage 3 — Language model (mostly done in v1.0.0)
+- [x] One folder per language: `grammar.js` (incl. letters), `strings.js`, `words.js`, `info.js`.
+- [x] Concepts with gloss / translator notes; explicit forms (def, plural, definite plural); bare plurals.
+- [x] Writing-system units (multi-character letters, no-case scripts, RTL `dir`).
+- [x] Intl: PluralRules, ListFormat, Collator, Segmenter; message templates. (NumberFormat: when numbers > 10 arrive.)
 - [ ] Readiness levels L0–L3 per language; hubs hide topics above a language's level.
 - [ ] `tools/show.js <id>` (one concept in all languages), `tools/review.js <lang>` (parent's review sheet; approves by hash).
 
