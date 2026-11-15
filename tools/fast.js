@@ -21,8 +21,6 @@ function audit() {
   for (const [name, go] of screens) {
     go();
     if (document.documentElement.scrollWidth > innerWidth + 1) bad.push(`${name}: horizontal scroll`);
-    const want = atHub ? section : mode === 'play' ? ABC.config.sections.find(s => s.play).id : tileOf().section, on = document.querySelector('.tab.on');
-    if (!on || on.id !== 't-' + want) bad.push(`${name}: tab ${on && on.id} is lit, the screen belongs to ${want}`);
     const col = R(document.getElementById('stage')), cs = getComputedStyle(document.getElementById('stage'));
     const L = col.left + parseFloat(cs.paddingLeft), Rr = col.right - parseFloat(cs.paddingRight);
     const items = [...document.getElementById('bar').children].filter(vis).map(R);

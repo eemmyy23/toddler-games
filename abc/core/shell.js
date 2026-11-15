@@ -17,6 +17,7 @@ const defaultLang = () => { const nav = (navigator.language || '').toLowerCase()
 let lang = store.get('lang', store.legacy('lang') || defaultLang()); if (!LANGS.includes(lang)) lang = LANGS[0];
 let profile = store.get('profile', CFG.defaultProfile); if (!CFG.profiles[profile]) profile = CFG.defaultProfile;
 let section = store.get('sec', CFG.sections[0].id); if (!SECTIONS[section]) section = CFG.sections[0].id;
+const sectionNow = () => atHub ? section : mode === 'play' ? PLAY_SECTION : tileOf().section;
 let atHub = store.get('athub', true), tileId = store.get('tile', TILES[0].id), mode = store.get('mode', 'view');
 if (!TILE[tileId]) { tileId = TILES[0].id; atHub = true; }
 let started = false;
@@ -101,7 +102,6 @@ function openTile(id, play, quiet) {
   if (view() && view().leave) view().leave();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
-  section = play ? PLAY_SECTION : t.section; store.set('sec', section);
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); if (!quiet) sfx.pop(); render();
   return true;
@@ -113,9 +113,9 @@ $('hub').addEventListener('click', e => {
   if (b.classList.contains('soon')) { const l = b.querySelector('.hl').textContent; speak(l + (/[.!?。？！]$/.test(l) ? ' ' : '. ') + APP.ui().soon); return; }
   openTile(b.dataset.id, b.dataset.play === '1');
 });
-function goHub() { if (view() && view().leave) view().leave(); atHub = true; store.set('athub', true); sfx.pop(); render(); speak(APP.ui().sections[section] + '!', 80); }
+function goHub() { if (view() && view().leave) view().leave(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.ui().sections[section] + '!', 80); }
 function setSection(id) {
-  if (id === section) { if (!atHub) goHub(); return; }
+  if (id === sectionNow()) { if (!atHub) goHub(); return; }
   if (view() && view().leave) view().leave();
   section = id; store.set('sec', id); atHub = true; store.set('athub', true);
   sfx.pop(); render(); speak(APP.ui().sections[id] + '!', 80);
@@ -124,7 +124,8 @@ function setSection(id) {
 const VIEWS = Object.values(ABC.views);
 function render() {
   const U = APP.ui(), L = APP.L();
-  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', section === s.id); b.querySelector('.tl').textContent = U.sections[s.id]; });
+  const sec = sectionNow();
+  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', sec === s.id); b.querySelector('.tl').textContent = U.sections[s.id]; });
   document.querySelectorAll('.flag').forEach(f => { f.classList.toggle('on', f.dataset.lang === lang); f.title = f.classList.contains('novoice') ? U.noVoice : ''; });
   document.querySelectorAll('.age').forEach(b => { const on = b.dataset.p === profile; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', profileName(b.dataset.p)); });
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
@@ -132,11 +133,11 @@ function render() {
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
   if (!atHub && !usable(tileOf(), mode === 'play')) atHub = true;
   const sc = APP.screen(), v = view();
-  document.body.dataset.sec = section; document.body.dataset.mode = sc;
+  document.body.dataset.mode = sc;
   document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav)));
   $('ages').hidden = !atHub; $('barback').hidden = atHub;
   $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW;
-  $('barback').innerHTML = `‹ ${iconHTML(SECTIONS[section].icon, 'bi')}`;
+  $('barback').innerHTML = `‹ ${iconHTML(SECTIONS[sec].icon, 'bi')}`;
   $('stars').textContent = '⭐ ' + APP.stars;
   $('hub').hidden = sc !== 'hub';
   VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); if (x.nav) $(x.nav).hidden = !(v && v === x); });
@@ -329,7 +330,7 @@ addEventListener('keydown', e => {
   if (v && v.onKey && v.onKey(k, e)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;
   const play = APP.screen() === GAME_VIEW || (atHub && SECTIONS[section].play);
-  const t = TILES.find(t => (play || t.section === section) && listed(t, play) && usable(t, play) &&
+  const t = TILES.find(t => (play || t.section === sectionNow()) && listed(t, play) && usable(t, play) &&
     ABC.views[play ? GAME_VIEW : t.view].onKey && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
   if (!t || (t.id === tileId && !atHub)) return;
   openTile(t.id, play, true);
