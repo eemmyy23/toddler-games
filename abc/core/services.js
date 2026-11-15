@@ -10,6 +10,7 @@ const store = {
 };
 
 let AC = null;
+const quietAudio = () => { if (AC && AC.state === 'running') AC.suspend(); };
 function ensureAudio() {
   if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
   if (AC.state !== 'running') AC.resume();
@@ -88,13 +89,15 @@ const fxParts = [];
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 function confetti(x, y, n = 40, spread = 9) {
   if (calm()) return;
+  if (!fxOn) { fxOn = true; requestAnimationFrame(loop); }
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * spread;
     fxParts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4, life: 1, s: 6 + Math.random() * 10,
       hue: Math.random() * 360, r: Math.random() * 6, vr: (Math.random() - .5) * .4, star: Math.random() < 0.35 });
   }
 }
-(function loop() {
+let fxOn = false;
+function loop() {
   fctx.clearRect(0, 0, W, H);
   for (let i = fxParts.length - 1; i >= 0; i--) {
     const p = fxParts[i];
@@ -106,5 +109,5 @@ function confetti(x, y, n = 40, spread = 9) {
     else fctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
     fctx.restore();
   }
-  requestAnimationFrame(loop);
-})();
+  fxOn = fxParts.length > 0; if (fxOn) requestAnimationFrame(loop);
+}

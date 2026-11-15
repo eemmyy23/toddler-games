@@ -221,7 +221,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('offline (service worker precache from manifest)');
   const cached = await ev(async () => { await navigator.serviceWorker.ready; await new Promise(r => setTimeout(r, 1500));
     const k = (await caches.keys()).find(k => k === 'toddler-' + self.MANIFEST.version); if (!k) return 'no cache';
-    const c = await caches.open(k), miss = []; for (const f of self.MANIFEST.files) if (!(await c.match(f))) miss.push(f); return miss.join(' '); });
+    const c = await caches.open(k), miss = []; for (const f of self.MANIFEST.files) if (!(await c.match(self.MANIFEST.scripts.includes(f) ? f + '?v=' + self.MANIFEST.version : f))) miss.push(f); return miss.join(' '); });
   ok(cached === '', 'all manifest files cached' + (cached ? ': ' + cached : ''));
   await p.context().setOffline(true); await p.reload(); await p.waitForFunction(() => typeof APP === 'object', null, { timeout: 10000 }).catch(() => {});
   ok(await ev(() => typeof APP === 'object' && document.querySelectorAll('.flag').length === 3), 'reload works offline');

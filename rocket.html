@@ -567,8 +567,9 @@ requestAnimationFrame(update);
 // Register SW and auto-reload when a new version activates
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+  const updating = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange', function() {
-    window.location.reload();
+    if (updating) window.location.reload();
   });
 }
 

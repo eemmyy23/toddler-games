@@ -25,7 +25,8 @@ abc/core/services.js        $, onTap (acts on click: keyboard + no palm taps), s
 abc/core/views/*.js         VIEW(): card, read, count, play
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, language switch, index, search, info cards, input, APP
-sw.js                       precaches MANIFEST.files under cache 'toddler-<version>'; network-first, cache when offline
+sw.js                       precaches MANIFEST.files under cache 'toddler-<version>'; versioned scripts (?v=) cache-first, the rest network-first
+                            with a 3 s fallback to cache; an open app updates on its next return from the background
 tools/check.js              content + config checks, manifest generator (CI)
 tools/fast.js               layout check, ~2 s, no server: every screen × 7 sizes (CI)
 tools/smoke.js              browser test: every language, every game, speech, offline (CI)

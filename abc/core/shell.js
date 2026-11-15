@@ -368,10 +368,18 @@ loadIdx();
 render();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
-  const updating = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener('controllerchange', () => { if (updating) location.reload(); });
+  const reg = navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => null);
+  let stale = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => caches.keys().then(k => { stale = !k.includes('toddler-' + self.MANIFEST.version); }));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && stale) location.reload();
+    else if (!document.hidden) reg.then(r => r && r.update()).catch(() => {});
+  });
 }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { hush(); if (view() && view().leave) view().leave(); quietAudio(); }
+  else if (!atHub) render();
+});
 (function () {
   const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');
   let deferred = null;
