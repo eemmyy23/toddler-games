@@ -75,7 +75,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('read');
   await ev(() => openTile('read', false, true)); await show(await find("x.w === 'câine'"));
-  await clear(); await p.locator('#rplay').dispatchEvent('click'); await spoken(13);
+  await clear(); await p.locator('#act').dispatchEvent('click'); await spoken(13);
   ok(JSON.stringify(await said()) === JSON.stringify(['cî', 'â', 'i', 'nî', 'e', 'câine', 'câi', 'ne', 'câine', 'un câine', 'doi câini', 'câinele', 'câinii']), 'câine ▶ sequence: ' + (await said()).join(', '));
   await show(await find("x.w === 'urs'"));
   ok(!(await p.$('#rS')), 'one-syllable word has no syllable row');
@@ -250,7 +250,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     for (let i = 0; i < nL; i++) if (await ev(i => { APP.idx = i; ABC.views.card.show(false); const R = e => e.getBoundingClientRect(); return R($('glyph')).top < R($('bar')).bottom - 1 || R($('examples')).bottom > R($('prev')).top + 1; }, i)) bad.push(`${l}:L${i}`);
     await ev(() => openTile('read', false, true));
     const nR = await ev(() => APP.items().length);
-    for (let i = 0; i < nR; i++) if (await ev(i => { APP.idx = i; ABC.views.read.show(false); const R = e => e.getBoundingClientRect(), top = R($('bar')).bottom, bot = R($('rnav')).top;
+    for (let i = 0; i < nR; i++) if (await ev(i => { APP.idx = i; ABC.views.read.show(false); const R = e => e.getBoundingClientRect(), top = R($('bar')).bottom, bot = Math.min(R($('act')).top, R($('prev')).top);
       return [...document.querySelectorAll('#rpic,#read .rrow,#rC')].some(e => { const r = R(e); return r.top < top - 1 || r.bottom > bot + 1; }) ||
              [...document.querySelectorAll('#read .rt,#rC .rc')].some(t => t.scrollWidth > t.clientWidth + 1); }, i)) bad.push(`${l}:R${i}`);
   }

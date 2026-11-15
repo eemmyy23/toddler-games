@@ -6,8 +6,8 @@ const out = process.argv[3] || os.tmpdir();
 function audit() {
   const bad = [], R = e => e.getBoundingClientRect(), vis = e => { const r = R(e); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
   const hit = (a, b) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
-  const chrome = () => ['bar', 'tabs', 'prev', 'next', 'rnav'].map(id => document.getElementById(id)).filter(e => e && vis(e))
-    .flatMap(e => e.id === 'rnav' || e.id === 'bar' ? [...e.children].filter(vis) : [e]).map(R);
+  const chrome = () => ['bar', 'tabs', 'prev', 'next', 'act'].map(id => document.getElementById(id)).filter(e => e && vis(e))
+    .flatMap(e => e.id === 'bar' ? [...e.children].filter(vis) : [e]).map(R);
   const stretched = t => { const cs = getComputedStyle(t), kids = [...t.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
     const content = kids.length ? Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0;
     return R(t).height > Math.max(parseFloat(cs.minHeight) || 0, content) + 2; };

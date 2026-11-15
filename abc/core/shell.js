@@ -43,6 +43,11 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
+  shown() {
+    APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
+    const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav ?? esc(x.label));
+    $('prev').innerHTML = APP.icon('prev') + face(pv); $('next').innerHTML = face(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
+  },
   firstTouch,
   set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
   links(it) {
@@ -148,15 +153,15 @@ function render() {
   if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
   const sc = APP.screen(), v = view();
   document.body.dataset.mode = sc;
-  document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav)));
+  document.body.classList.toggle('lownav', !!(v && (v.arrows || v.play)));
   $('ages').hidden = !atHub; $('barback').hidden = atHub;
   $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW;
   $('barback').innerHTML = APP.icon('back') + iconHTML(SECTIONS[sec].icon, 'bi');
   $('stars').innerHTML = APP.icon('star') + APP.stars;
   $('hub').hidden = sc !== 'hub';
-  VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); if (x.nav) $(x.nav).hidden = !(v && v === x); });
+  VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); });
   $('stage').hidden = !!(v && v.fullHeight);
-  $('prev').hidden = $('next').hidden = !(v && v.arrows);
+  $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !(v && v.play);
   closeIndex(); closeInfo(); closeSearch();
   if (sc === 'hub') renderHub(); else v.show(started);
 }
@@ -339,11 +344,11 @@ function tapBtn(el, fn) { onTap(el, () => { firstTouch(); fn(); }); }
 document.querySelectorAll('.flag').forEach(f => tapBtn(f, () => setLang(f.dataset.lang)));
 CFG.sections.forEach(s => tapBtn('t-' + s.id, () => setSection(s.id)));
 tapBtn('barback', goHub);
-tapBtn('prev', () => view().step(-1)); tapBtn('next', () => view().step(1));
+tapBtn('prev', () => view().step(-1)); tapBtn('next', () => view().step(1)); tapBtn('act', () => view().play());
 tapBtn('infoclose', closeInfo); tapBtn('infoplay', playInfo);
 tapBtn('gridbtn', openIndex); tapBtn('ixclose', closeIndex);
 document.querySelectorAll('.age').forEach(b => tapBtn(b, () => setProfile(b.dataset.p)));
-addEventListener('resize', () => { resizeFx(); if (!atHub && view().resize) view().resize(); });
+addEventListener('resize', () => { resizeFx(); if (atHub) return; if (view().arrows) { APP.fitText($('prev')); APP.fitText($('next')); } if (view().resize) view().resize(); });
 let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; }, true);
 $('stage').addEventListener('pointerup', e => {

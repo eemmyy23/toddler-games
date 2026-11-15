@@ -33,7 +33,7 @@
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
   --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw); --pset:.62em;
   --ex-dir:column; --ex-min:96px; --ex-pad:10px 12px 8px; --ex-pic:40px; --ex-fs:var(--fs-m);
-  --rt-h:58px; --rt-fs:32px; --rc-h:52px; --rc-fs:20px; --rce:26px; --rpic:min(14vh,24vw); --read-gap:1.6vh;
+  --read-dir:column; --read-split:1; --rt-h:58px; --rt-fs:32px; --rc-h:52px; --rc-fs:20px; --rce:26px; --rpic:min(14vh,24vw); --read-gap:1.6vh;
   --cnum-w:96px; --cdig:54px; --cword:var(--fs-m); --citems:34px; --citems-min:60px; --hand-w:84px; --hand-h:96px; --row:5;
   --inf-fs:var(--fs-m); --inf-pad:12px 16px; --inf-pic:36px; --play-gap:clamp(16px, 7vh, 72px);
 }
@@ -43,8 +43,8 @@
   --rt-h:42px;--rt-fs:24px;--rpic:9vh;--rc-h:44px;--rc-fs:17px;--rce:20px;--read-gap:1vh;
   --ex-dir:row;--ex-min:0px;--ex-pad:6px 12px 6px 8px;--ex-pic:26px;--ex-fs:16px;--inf-fs:17px;--inf-pad:9px 12px;--inf-pic:28px;--hero-h:60px}}
 @media (max-width:350px){:root{--seg-w:42px;--seg-h:44px;--seg-fs:22px;--pill-h:46px;--pill-fs:19px;--fs-xs:12px}}
-@media (max-height:450px) and (orientation:landscape){:root{--az-fs:9px;--tabbar-h:50px;--tab-h:44px;--tl-fs:0px;--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-h:44px;--seg-w:44px;--seg-fs:22px;
-  --nav-w:56px;--nav-y:calc(var(--bot) + (100% - var(--bot) - var(--top)) / 2 - var(--nav-h) / 2);--side:calc(var(--gut) + 64px);--glyph:min(30vh,22vw);--rt-h:40px;--rt-fs:22px;--rc-h:40px;--rc-fs:16px;--rpic:14vh;--read-gap:4px;--tile-min:96px;--hub-gap:8px}}
+@media (max-height:450px) and (orientation:landscape){:root{--read-dir:row;--read-split:2;--az-fs:9px;--tabbar-h:50px;--tab-h:44px;--tl-fs:0px;--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-h:44px;--seg-w:44px;--seg-fs:22px;
+  --nav-w:56px;--nav-y:calc(var(--bot) + (100% - var(--bot) - var(--top)) / 2 - var(--nav-h) / 2);--side:calc(var(--gut) + 64px);--glyph:min(30vh,22vw);--rt-h:40px;--rt-fs:22px;--rc-h:40px;--rc-fs:16px;--rpic:20vh;--read-gap:4px;--tile-min:96px;--hub-gap:8px}}
 
 *{margin:0;padding:0;box-sizing:border-box}
 [hidden]{display:none!important} html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -196,7 +196,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .crow.on .objs > *,.crow.on .hand{animation:wig .7s ease}
 @keyframes wig{30%{transform:translateY(-8px) rotate(-5deg)}60%{transform:translateY(-3px) rotate(4deg)}}
 
-#read{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--read-gap)}
+#read{display:flex;flex-direction:var(--read-dir);align-items:center;justify-content:center;width:100%;height:100%;gap:var(--read-gap)}
+.rcol{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--read-gap);flex:1 1 0;min-width:0;width:100%}
 #read.tight{--rt-h:36px;--rt-fs:21px;--rc-h:36px;--rpic:7vh;--read-gap:4px} #rpic{font-size:var(--rpic);line-height:1.1;cursor:pointer}
 .rrow{display:flex;flex-wrap:nowrap;justify-content:center;gap:var(--sp-2);max-width:100%}
 .rt{flex:0 1 54px;min-width:34px;height:var(--rt-h);border-radius:var(--r-sm);background:var(--card);color:var(--text);font-size:var(--rt-fs);font-weight:600;
@@ -216,8 +217,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 #rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:4px 8px;gap:0;border-radius:var(--r-sm);white-space:normal;text-align:center;line-height:1.1}
 #rC.tall .rce{font-size:18px}
 .rc.none{background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--muted);font-size:14px;justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.1;padding:0 8px}
-#rnav{position:fixed;left:0;right:0;bottom:calc(var(--bot) + var(--nav-gap));z-index:var(--z-float);display:flex;justify-content:space-between;align-items:center;padding:0 var(--gut)}
-#rnav .nav b{font-size:36px}
+#act{position:fixed;left:50%;bottom:calc(var(--bot) + var(--nav-gap));transform:translateX(-50%);z-index:var(--z-float)}
 
 #infotitle{flex:1;font-size:var(--fs-l);font-weight:700}
 #infolist{flex:1;display:flex;flex-direction:column;gap:var(--sp-3);width:100%}
@@ -297,11 +297,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 </div>
 <button class="pill nav" id="prev" data-aria="prev" data-low hidden></button>
 <button class="pill nav" id="next" data-aria="next" data-low hidden></button>
-<div id="rnav" data-low hidden>
-  <button class="pill nav" id="rprev" data-aria="prev"></button>
-  <button id="rplay" class="rbtn primary" data-aria="play" data-icon="play"></button>
-  <button class="pill nav" id="rnext" data-aria="next"></button>
-</div>
+<button id="act" class="rbtn primary" data-aria="play" data-icon="play" data-low hidden></button>
 <div id="info" class="sheet" role="dialog" aria-modal="true" aria-labelledby="infotitle" hidden>
   <div class="sheet-head"><span id="infotitle"></span><button id="infoclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="infolist" class="scroll"></div>

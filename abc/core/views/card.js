@@ -38,11 +38,9 @@
     el: 'learn', arrows: true, swipe: true,
     show(sayIt) {
       partsStop();
-      const it = APP.items()[APP.idx], g = $('glyph'), L = APP.L(), nav = x => x.nav ?? esc(x.label);
+      const it = APP.items()[APP.idx], g = $('glyph'), L = APP.L();
       g.className = it.bigClass || ''; g.innerHTML = it.big ?? esc(it.label); g.style.color = it.color || '';
       void g.offsetWidth; g.classList.add('pop');
-      const [pv, nx] = APP.neighbors();
-      $('prev').innerHTML = APP.icon('prev') + nav(pv); $('next').innerHTML = nav(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
       const ex = it.examples || [];
       $('pics').hidden = !!ex.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
@@ -54,13 +52,13 @@
       $('links').innerHTML = APP.links(it);
       APP.fitText(g);
       APP.fit($('learn'));
-      APP.saveIdx();
+      APP.shown();
       if (sayIt) speak(it.say, 120);
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().say }), 120); },
     leave() { partsStop(); }, pause() { partsStop(); },
-    resize() { APP.fitText($('glyph')); APP.fitText($('prev')); APP.fitText($('next')); APP.fit($('learn')); },
+    resize() { APP.fitText($('glyph')); APP.fit($('learn')); },
     onKey(k) {
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;
