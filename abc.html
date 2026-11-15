@@ -242,7 +242,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.3</div>
+<div id="ver">v0.7.4</div>
 
 <script>
 // ====== DATA ======
@@ -882,7 +882,8 @@ function renderRead(sayIt = true) {
     `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
     `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
     `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
-    `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` +
+    // one-syllable words (urs, măr, Kuh, cow): no syllable row — it would only repeat the word
+    (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +
     `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
     (forms ? (
     `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(LANGS[lang].sgpl[0])}</div><div class="rh">${esc(LANGS[lang].sgpl[1])}</div>` +
@@ -917,7 +918,9 @@ async function playRead() {
   if (!alive()) return; await wait(300);
   document.querySelectorAll('#read .lit').forEach(x => x.classList.remove('lit'));
   document.querySelectorAll('#rL .rt').forEach(x => x.classList.add('lit'));
-  await speak(word); if (!alive()) return; await wait(300);
+  // one-syllable words have no syllable row: say the word only once, at the end
+  if ($('rS')) await speak(word); else await wait(700);
+  if (!alive()) return; await wait(300);
   for (const el of document.querySelectorAll('#rS .rt')) {
     if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(200);
   }
