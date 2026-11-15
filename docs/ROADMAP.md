@@ -3,11 +3,11 @@
 The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECTURE.md) · [CLAUDE.md](../CLAUDE.md).
 
 ## Principles
-1. **One engine, age profiles** — Adventurer 2–4 · Explorer 4–7 · Scientist 7–12 (bikes in the top bar, no lock); a higher profile only adds.
+1. **One engine, age profiles** — Curious 2–4 · Explorer 4–7 · Scientist 7–12 (bikes in the top bar, no lock); a higher profile only adds.
 2. **Few languages, done perfectly** — RO / EN / DE; a new language needs a native reviewer and a voice tested on the family's devices.
 3. **Everything is data, config or a module** — new content never edits `abc/core/`, `abc.html` or `sw.js`.
 4. **Every learn screen has exactly one game**, paired automatically.
-5. **Nothing unfinished in front of a toddler** — no "coming soon" for Adventurers (2–4).
+5. **Nothing unfinished in front of a toddler** — no "coming soon" in the Curious profile (2–4).
 
 ## Done
 - **v1.0** — modular architecture (languages, modules, views, games), stable ids, offline precache from a generated manifest, local voices only, age profiles.
@@ -45,7 +45,7 @@ Across all modules:
 - [ ] Shell state (lang, profile, section) behind `APP` instead of script-scope variables the tests set directly.
 
 ## Definition of done (every module)
-- Learn screen + its game; nothing "coming soon" visible for Adventurers (2–4).
+- Learn screen + its game; nothing "coming soon" visible in the Curious profile (2–4).
 - Every spoken line works with the offline voice on the family's devices, in RO / EN / DE; grammar correct (articles, plurals, agreement).
 - `node tools/check.js`, `tools/fast.js` and `tools/smoke.js` pass.
 - Age declared; the tile appears from that profile upwards and wears its badge.

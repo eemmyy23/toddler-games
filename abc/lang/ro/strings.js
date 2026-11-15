@@ -9,7 +9,7 @@ STRINGS('ro', {
   search: { placeholder: 'Caută un cuvânt…', hint: 'Scrie în orice limbă — cuvântul apare în limba aleasă sus.', none: 'Nu am găsit nimic.',
     results: { one: 'un rezultat', few: '{n} rezultate', other: '{n} de rezultate' } },
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },
-  profile: { adventurer: 'Aventurier', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
+  profile: { curious: 'Curios', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
   installBtn: 'Instalează',
   aria: { back: 'Înapoi', index: 'Toate', prev: 'Înapoi', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
     objects: 'Obiecte', fingers: 'Degete', countAll: 'Numără tot', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
