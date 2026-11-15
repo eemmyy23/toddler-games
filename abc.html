@@ -79,6 +79,7 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 .seg{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--seg-w);height:var(--seg-h);
   border-radius:var(--r-pill);font-size:var(--seg-fs);line-height:1;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
 .seg.on{opacity:1;filter:none;background:var(--amber-soft)}
+.seg.txt{width:auto;padding:0 .8em;font-size:var(--fs-s);font-weight:700;white-space:nowrap}
 .dot{display:inline-block;vertical-align:middle;width:var(--dot,40px);height:var(--dot,40px);border-radius:50%;border:2px solid var(--line-strong)}
 .sheet{position:fixed;inset:0;z-index:var(--z-sheet);display:flex;flex-direction:column;background:var(--scrim);padding:var(--bar-pad) var(--gut) var(--sp-3)}
 .sheet-head{display:flex;align-items:center;gap:var(--sp-3);padding-bottom:var(--sp-3)}
@@ -304,7 +305,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
   <div id="infofoot"><button id="infoplay" class="rbtn primary" data-aria="play">▶</button></div>
 </div>
 <div id="index" class="sheet" hidden>
-  <div class="sheet-head"><button id="ixsearch" class="pill sbox"><span></span></button><button id="ixclose" class="rbtn" data-aria="close">✕</button></div>
+  <div class="sheet-head"><button id="ixsearch" class="pill sbox"><span></span></button><div id="ixmode" class="group" hidden><button class="seg txt" data-m="az"></button><button class="seg txt" data-m="grp"></button></div><button id="ixclose" class="rbtn" data-aria="close">✕</button></div>
   <div id="ixbody"><div id="ixgrid" class="scroll"></div><div id="ixaz" hidden></div></div>
 </div>
 <div id="search" class="sheet" hidden>

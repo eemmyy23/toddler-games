@@ -5,7 +5,7 @@
     section: 'disc', ages: [2, 5],
     build(code) {
       const loc = ABC.langs[code].bcp47, cap = s => s.charAt(0).toLocaleUpperCase(loc) + s.slice(1);
-      const fams = FAMILIES.map(f => CONTENT.things(code, f.split(' '))).filter(m => m.length === 3);
+      const fams = FAMILIES.map(f => CONTENT.things(code, f.split(' '))).filter(m => m.length === 3 && m.every(CONTENT.the));
       const families = fams.map(m => ({
         id: m[1].id, label: m[1].w, name: m[1].w, say: cap(I18N.list(m.map(CONTENT.the), loc)) + '!', concept: m[1].id, concepts: m.map(x => x.id), nav: m[1].pic,
         big: `<span class="pset">${m.map((x, i) => `<span class="part" data-part="${i}" style="--s:${SIZES[i]}">${CONTENT.pic(x.id)}</span>`).join('')}</span>`,

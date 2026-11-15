@@ -6,6 +6,7 @@ STRINGS('ro', {
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
   install: 'Instalează ABC 123! pe telefon',
+  index: { az: 'A–Z', grp: 'Grupe' },
   search: { placeholder: 'Caută un cuvânt…', hint: 'Scrie în orice limbă — cuvântul apare în limba aleasă sus.', none: 'Nu am găsit nimic.',
     results: { one: 'un rezultat', few: '{n} rezultate', other: '{n} de rezultate' } },
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },

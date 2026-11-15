@@ -24,7 +24,7 @@ const CONTENT = {
     concept: x.id, the: CONTENT.the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? CONTENT.pic(x.id) : null, pictureBubble: true, prompt: x.w }, more),
   set(code, spec, s) {
     const by = new Map(this.words(code).map(x => [x.id, x])), ex = ids => (ids || '').split(' ').map(i => by.get(i)).filter(Boolean).map(y => [y.w, y.pic, false]);
-    return spec.map(e => by.get(e.id) && this.thing(by.get(e.id), Object.assign({ examples: ex(e.ex) }, s && s.say && s.say[e.id] ? { say: s.say[e.id] } : {}))).filter(Boolean);
+    return spec.map(e => by.get(e.id) && this.thing(by.get(e.id), Object.assign({ examples: ex(e.ex) }, e.sound ? { sound: e.sound } : {}, s && s.say && s.say[e.id] ? { say: s.say[e.id] } : {}))).filter(Boolean);
   },
   navText: (label, color) => `<b style="color:${color}">${esc(label)}</b>`
 };

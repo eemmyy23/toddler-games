@@ -133,7 +133,8 @@ for (const c of langs) {
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }
     const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => t.game.ask ? t.game.ask(it, { lower }) : t.id)));
-    for (const k of asks) if (!k.split('.').reduce((o, x) => o && o[x], s.games || {})) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
+    const spoken = v => typeof v === 'string' || (!!v && typeof v.other === 'string');
+    for (const k of asks) if (!spoken(k.split('.').reduce((o, x) => o && o[x], s.games || {}))) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
   }
 }
 console.log(errors ? `\n${errors} error(s), ${warnings} warning(s)` : `\nOK — ${warnings} warning(s)`);

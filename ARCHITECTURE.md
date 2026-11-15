@@ -33,7 +33,7 @@ tools/smoke.js              browser test: every language, every game, speech, of
 
 ## Key rules
 - **Ids, not words.** Words, info cards and saved progress are keyed by concept id (`cow`), never by text or emoji.
-- **Explicit forms.** Each language writes its forms (RO `def`, `pl`, `plDef`, `g`; DE `g`, `pl`, `mass`; EN `art`, `pl`, `mass`, `plOnly`).
+- **Explicit forms.** Each language writes its forms (RO `def`, `pl`, `plDef`, `g`, `mass`, `plOnly`; DE `g`, `pl`, `mass`, `plOnly`; EN `art`, `pl`, `mass`, `plOnly`).
   Grammar code only assembles them; school rules are checks (`checkForms`, `checkWord`), not generators.
 - **Base language.** Missing UI strings fall back to `config.baseLanguage` (en); `check.js` reports every missing key.
 - **Modules don't share data.** `build(code)` returns the module's own namespace; its tiles read only that.

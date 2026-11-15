@@ -205,22 +205,30 @@ async function playInfo() {
 }
 
 const OTHER = '#';
+const GROUP_OF = new Map(Object.entries(ABC.groups).flatMap(([g, ms]) => ms.map(m => [m, g])));
+const hasGroups = GROUP_OF.size > 0;
+let ixMode = store.get('ixmode', 'az');
+$('ixmode').addEventListener('pointerdown', e => { const b = e.target.closest('.seg'); if (!b) return; e.preventDefault(); firstTouch(); ixMode = b.dataset.m; store.set('ixmode', ixMode); openIndex(); });
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const face = it => v.indexFace ? v.indexFace(it) : esc(it.label);
   const btn = ({ it, i }) => `<button class="ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${face(it)}</button>`;
   let html = '', az = '';
+  const byGroup = !!(v.indexSort && hasGroups && ixMode === 'grp');
+  $('ixmode').hidden = !(v.indexSort && hasGroups);
+  $('ixmode').querySelectorAll('.seg').forEach(b => { b.classList.toggle('on', (b.dataset.m === 'grp') === byGroup); b.textContent = U.index[b.dataset.m]; });
   if (v.indexSort) {
-    const col = I18N.collator(L.bcp47), A = APP.alphabet();
+    const col = I18N.collator(L.bcp47), A = APP.alphabet(), names = new Map(CONTENT.words(lang).map(x => [x.id, x.w]));
     const first = s => { const p = I18N.splitUnits(s, A.units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : OTHER; };
     list.sort((a, b) => col.compare(a.it.label, b.it.label));
-    const groups = new Map(A.units.map(u => [u.id, []])); groups.set(OTHER, []);
-    list.forEach(x => groups.get(first(x.it.label)).push(x));
-    const head = u => { const unit = A.unit(u); return { text: unit ? unit.upper : u, color: A.color(u) || 'var(--muted)' }; };
+    const keys = byGroup ? Object.keys(ABC.groups) : A.units.map(u => u.id), groups = new Map(keys.map(k => [k, []])); groups.set(OTHER, []);
+    list.forEach(x => groups.get(byGroup ? GROUP_OF.get(x.it.concept) || OTHER : first(x.it.label)).push(x));
+    const head = u => { if (byGroup) return { text: u === OTHER ? u : ABC.conceptById[u].pic, color: 'inherit', name: names.get(u) };
+      const unit = A.unit(u); return { text: unit ? unit.upper : u, color: A.color(u) || 'var(--muted)' }; };
     for (const [u, xs] of groups) {
       if (!xs.length) continue;
-      const h = head(u);
-      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${h.color}">${esc(h.text)}</b><span class="label">${esc(APP.t(U.words, { n: xs.length }))}</span></div>` + xs.map(btn).join('');
+      const h = head(u), n = APP.t(U.words, { n: xs.length });
+      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${h.color}">${esc(h.text)}</b><span class="label">${esc(h.name ? `${h.name} · ${n}` : n)}</span></div>` + xs.map(btn).join('');
     }
     az = [...groups.keys()].filter(u => u !== OTHER || groups.get(OTHER).length)
       .map(u => `<span class="az${groups.get(u).length ? '' : ' off'}" data-u="${esc(u)}">${esc(head(u).text)}</span>`).join('');

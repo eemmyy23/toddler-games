@@ -5,6 +5,7 @@ STRINGS('de', {
   thats: 'Das ist {name}.',
   cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
   wow: { one: 'Super! Du hast {n} Stern!', other: 'Super! Du hast {n} Sterne!' },
+  index: { az: 'A–Z', grp: 'Gruppen' },
   search: { placeholder: 'Wort suchen…', hint: 'Schreib in jeder Sprache — das Wort erscheint in der oben gewählten Sprache.', none: 'Nichts gefunden.',
     results: { one: '1 Ergebnis', other: '{n} Ergebnisse' } },
   words: { one: '1 Wort', other: '{n} Wörter' },
