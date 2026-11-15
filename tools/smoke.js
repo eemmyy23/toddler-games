@@ -50,6 +50,21 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   play = await hub('play');
   ok(play.some(x => x[0] === '~'), 'Explorer profile shows "coming soon" tiles');
   await ev(() => { profile = 'little'; });
+  console.log('age profiles (bikes in the bar)');
+  await hub('num');
+  const bar = await ev(() => { const R = e => e.getBoundingClientRect(), f = R($('flags')), a = R($('ages'));
+    return { one: Math.abs(f.top - a.top) < 2, gap: a.left - f.right, right: innerWidth - a.right, n: document.querySelectorAll('.age').length }; });
+  ok(bar.n === 3 && bar.one && bar.gap >= 0 && bar.right >= 0, `3 bikes on the same row as the flags (gap ${bar.gap | 0}px, right ${bar.right | 0}px)`);
+  for (const pr of ['scientist', 'explorer', 'little']) {
+    await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await p.waitForTimeout(150);
+    const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht:not(.soon)')].length }));
+    ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
+  }
+  const counts = await ev(() => ['little', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
+  ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] === 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
+  await ev(() => { profile = 'little'; });
+  await ev(() => openTile('letters', false, true));
+  ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
   await ev(() => setLang('en'));
   ok(!(await hub('abc')).some(x => /group/i.test(x)), 'EN hides RO-only letter groups');
   await ev(() => setLang('ro'));

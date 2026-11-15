@@ -9,5 +9,5 @@ STRINGS('ro', {
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
   install: 'Instalează ABC 123! pe telefon',
-  profile: { title: 'Vârsta', little: 'Mic (2–4)', explorer: 'Explorator (4–7)', scientist: 'Om de știință (7–12)' }
+  profile: { title: 'Vârsta', little: 'Mic, de la 2 la 4 ani', explorer: 'Explorator, de la 4 la 7 ani', scientist: 'Om de știință, de la 7 la 12 ani' }
 });

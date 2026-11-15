@@ -7,5 +7,5 @@ STRINGS('de', {
   cheers: ['Super!', 'Toll gemacht!', 'Bravo!', 'Juhu!', 'Geschafft!'],
   wow: { one: 'Super! Du hast {n} Stern!', other: 'Super! Du hast {n} Sterne!' },
   install: 'ABC 123! auf dem Gerät installieren',
-  profile: { title: 'Alter', little: 'Klein (2–4)', explorer: 'Entdecker (4–7)', scientist: 'Forscher (7–12)' }
+  profile: { title: 'Alter', little: 'Klein, 2 bis 4 Jahre', explorer: 'Entdecker, 4 bis 7 Jahre', scientist: 'Forscher, 7 bis 12 Jahre' }
 });

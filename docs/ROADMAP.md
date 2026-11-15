@@ -4,7 +4,7 @@ Decided after the architecture audit ([AUDIT-2026-11.md](AUDIT-2026-11.md)).
 Everything is built on the preview branch and merged only after the parent approves it on the phone.
 
 ## Principles
-1. **One engine, age profiles.** Little (2–4) · Explorer (4–7) · Scientist (7–12). The child sees only its profile.
+1. **One engine, age profiles.** Little (2–4) · Explorer (4–7) · Scientist (7–12), shown as three bikes in the top bar. No lock; a higher profile only adds topics.
 2. **Few languages, done perfectly.** RO / EN / DE now. A new language needs a native reviewer, a voice tested on the family's devices and a clean `tools/check.js`.
 3. **Everything is data or a module.** Adding a word, a language or a subject never edits the engine, `abc.html` or `sw.js`.
 4. **Every learn screen has exactly one game**, paired automatically.
@@ -25,7 +25,7 @@ Everything is built on the preview branch and merged only after the parent appro
 ### Stage 2 — Modules & age profiles (mostly done in v1.0.0)
 - [x] Shell + shared views (card, count, read, play) + game types (find, howmany). Still to come: (card, count, read → then grid, diagram, sequence) + game types (find, howmany → then sort, order, pairs, find-region).
 - [x] Move current topics into modules: `abc/modules/<id>/{module.js, lang/<code>.js}`.
-- [x] Module list with `ages`; parent picks the profile (hidden setting); Little profile hides "coming soon".
+- [x] Module list with `ages`; profile picked with the visible bikes in the bar (no parental lock); Little profile hides "coming soon".
 - [ ] Lazy load per module, precache per active profile.
 
 ### Stage 3 — Language model (mostly done in v1.0.0)

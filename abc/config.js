@@ -2,7 +2,8 @@
 // languages: active languages, in flag order (a folder abc/lang/<code>/ not listed here is a draft and is not loaded)
 // modules:   subjects, in hub order (folders abc/modules/<id>/)
 // sections:  bottom tabs; play: true → its hub is generated (one game per learn tile of all other sections)
-// profiles:  age profiles chosen by the parent (long-press on the flags); a module shows if its ages overlap
+// profiles:  age profiles, picked with the bike buttons in the top bar (anyone may switch — curiosity is welcome);
+//            a module shows if it starts at or below the profile's upper age (higher profiles add, never take away)
 // After editing: `node tools/check.js --fix` (regenerates abc/manifest.js).
 CONFIG({
   languages: ['en', 'ro', 'de'],

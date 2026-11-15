@@ -36,8 +36,9 @@ tools/smoke.js              browser test: every language, every game, layout, of
 - **Base language.** Missing strings fall back to `config.baseLanguage` (en). `check.js` reports every missing key.
 - **A tile is never shown broken.** A learn tile needs its label + items; its game needs its label + ≥ 2 playable items.
   Otherwise it is hidden in that language (e.g. letter groups exist only in Romanian).
-- **Age profiles.** `module.ages` vs the profile (little 2–4, explorer 4–7, scientist 7–12). Little hides "coming soon".
-  Parent switches profile by long-pressing the flags for 1.5 s.
+- **Age profiles.** little 2–4 · explorer 4–7 · scientist 7–12, picked with the three bikes in the top bar (balance bike,
+  training wheels, mountain bike), visible on every hub. No lock: a curious child may switch. Cumulative: a module shows
+  if `module.ages[0]` ≤ the profile's upper age, so a higher profile adds topics and never removes one. Little hides "coming soon".
 - **Speech** uses only a voice of the current language (local first). No voice → 🔇 on the flag, never a foreign voice.
 
 ## Recipes
