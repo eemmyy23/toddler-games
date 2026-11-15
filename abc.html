@@ -141,6 +141,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #rC .rc{justify-content:flex-start;min-width:0;overflow:hidden;font-size:var(--cf,20px)}
 #rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:4px 8px;gap:0;border-radius:18px}
 #rC.tall .rce{font-size:18px}
+.rc.none{background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--muted);font-size:14px;justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.1;padding:0 8px}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
 #ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
@@ -241,7 +242,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.2</div>
+<div id="ver">v0.7.3</div>
 
 <script>
 // ====== DATA ======
@@ -256,7 +257,10 @@ const LANGS = {
     showWord: (w, like) => like ? `like in ${w}` : w,
     sgpl: ['Singular', 'Plural'],
     // { sg: [a cow, the cow], pl: [two cows, the cows] }
-    forms: (w, f) => ({ sg: [`${f[0]} ${w}`, `the ${w}`], pl: [f[1], `the ${f[1].replace(/^two /, '')}`] }),
+    none: ['no singular', 'no plural'],
+    forms: (w, f) => f[0] === 'pl' ? { sg: null, pl: [w, `the ${w}`] } : {
+      sg: [f[0] === '-' ? w : `${f[0]} ${w}`, `the ${w}`],
+      pl: f[1] === '-' ? null : [f[1], `the ${f[1].replace(/^two /, '')}`] },
     find: 'Find',
     ask: (kind, name, small) => kind !== 'num' ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
     thats: n => `That's ${n}.`,
@@ -278,9 +282,13 @@ const LANGS = {
     sgpl: ['Singular', 'Plural'],
     // { sg: [o vacă, vaca], pl: [două vaci, vacile] }. Plural definite (school rule): after "doi" add -i (câini → câinii),
     // after "două" add -le (vaci → vacile, case → casele, trenuri → trenurile)
+    none: ['nu are singular', 'nu are plural'],
     forms: (w, f) => {
+      if (f[0] === 'pl') return { sg: null, pl: [`niște ${w}`, f[1]] };          // ochelari, blugi
+      const sg = [f[0] === '-' ? w : `${f[0]} ${w}`, f[1]];
+      if (f[2] === '-') return { sg, pl: null };                                    // lapte, miere, unt
       const [num, ...rest] = f[2].split(' '), pl = rest.join(' ');
-      return { sg: [`${f[0]} ${w}`, f[1]], pl: [f[2], pl + (num === 'doi' ? 'i' : 'le')] };
+      return { sg, pl: [f[2], pl + (num === 'doi' ? 'i' : 'le')] };
     },
     find: 'Găsește',
     ask: (kind, name, small) => kind === 'grp' ? `Găsește grupul ${name}!` : kind === 'abc' ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
@@ -297,7 +305,10 @@ const LANGS = {
     showWord: (w, like) => like ? `wie ${w}` : w,
     sgpl: ['Einzahl', 'Mehrzahl'],
     // { sg: [ein Hund, der Hund], pl: [zwei Hunde, die Hunde] } (plural article is always die)
-    forms: (w, f) => ({ sg: [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`], pl: [f[1], `die ${f[1].replace(/^zwei /, '')}`] }),
+    none: ['kein Singular', 'kein Plural'],
+    forms: (w, f) => f[1] === '-'
+      ? { sg: [w, `${f[0]} ${w}`], pl: null }                                       // Milch, Honig, Butter
+      : { sg: [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`], pl: [f[1], `die ${f[1].replace(/^zwei /, '')}`] },
     find: 'Finde',
     ask: (kind, name, small) => kind !== 'num' ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
     thats: n => `Das ist ${n}.`,
@@ -311,6 +322,8 @@ const LANGS = {
 //   en: "word|a or an|plural phrase"           → a cow · the cow · two cows
 //   ro: "word|un or o|definite|plural phrase"  → o vacă · vaca · două vaci
 //   de: "word|der/die/das|plural phrase"       → eine Kuh · die Kuh · zwei Kühe
+// Defective nouns:  no plural → plural "-" (and article "-" when it is used without one: milk, lapte, Milch)
+//                   no singular → article "pl" (glasses, ochelari, blugi): en "word|pl", ro "word|pl|definite"
 // A leading "!" = don't use as a first-letter example (first sound differs: sh, ch, Sch, Ei, Au …).
 // Add a word here once → it shows up in Learn (under its letter), Read (if it has forms) and the index.
 const WORDS = [
@@ -339,9 +352,9 @@ const WORDS = [
   ['🦋','but/ter/fly|a|two butterflies','flu/tu/re|un|fluturele|doi fluturi','!Schmet/ter/ling|der|zwei Schmetterlinge'],
   ['🗑️','bin|a|two bins','gu/noi|un|gunoiul|două gunoaie','Müll/ei/mer|der|zwei Mülleimer'],
   ['🦛','hip/po|a|two hippos','hi/po/po/tam|un|hipopotamul|doi hipopotami','Nil/pferd|das|zwei Nilpferde'],
-  ['🍦','ice cream','în/ghe/ța/tă|o|înghețata|două înghețate','!Eis'],
+  ['🍦','ice cream|an|two ice creams','în/ghe/ța/tă|o|înghețata|două înghețate','!Eis'],
   ['🧃','juice|a|two juices','suc|un|sucul|două sucuri','Saft|der|zwei Säfte'],
-  ['🪁','kite|a|two kites','zmeu','Dra/chen|der|zwei Drachen'],
+  ['🪁','kite|a|two kites','zmeu|un|zmeul|două zmeie','Dra/chen|der|zwei Drachen'],
   ['🦁','li/on|a|two lions','leu|un|leul|doi lei','Lö/we|der|zwei Löwen'],
   ['👃','nose|a|two noses','nas|un|nasul|două nasuri','Na/se|die|zwei Nasen'],
   ['🐙','oc/to/pus|an|two octopuses','ca/ra/ca/ti/ță|o|caracatița|două caracatițe','Ok/to/pus|der|zwei Oktopusse'],
@@ -353,7 +366,7 @@ const WORDS = [
   ['🎻','vi/o/lin|a|two violins','vi/oa/ră|o|vioara|două viori','Gei/ge|die|zwei Geigen'],
   ['🐳','whale|a|two whales','ba/le/nă|o|balena|două balene','Wal|der|zwei Wale'],
   ['🦊','fox|a|two foxes','vul/pe|o|vulpea|două vulpi','Fuchs|der|zwei Füchse'],
-  ['🪀','yo-/yo','yo-/yo','Jo/jo|das|zwei Jojos'],
+  ['🪀','yo-/yo|a|two yo-yos','yo-/yo','Jo/jo|das|zwei Jojos'],
   ['🦓','ze/bra|a|two zebras','ze/bră|o|zebra|două zebre','Ze/bra|das|zwei Zebras'],
   ['🚂','train|a|two trains','tren|un|trenul|două trenuri','Zug|der|zwei Züge'],
   ['🐢','tur/tle|a|two turtles','țes/toa/să|o|țestoasa|două țestoase','!Schild/krö/te|die|zwei Schildkröten'],
@@ -363,11 +376,11 @@ const WORDS = [
   ['🧸','ted/dy|a|two teddies','ju/că/ri/e|o|jucăria|două jucării','Ted/dy|der|zwei Teddys'],
   ['🐨','ko/a/la|a|two koalas','ko/a/la','Ko/a/la|der|zwei Koalas'],
   ['🎶','xy/lo/phone|a|two xylophones','xi/lo/fon|un|xilofonul|două xilofoane','Xy/lo/fon|das|zwei Xylofone'],
-  ['🧘','yo/ga','yo/ga','Yo/ga'],
+  ['🧘','yo/ga|-|-','yo/ga|-|yoga|-','Yo/ga|das|-'],
   ['📶','','wi-/fi',''],
   ['❓','ques/tion|a|two questions','quiz',''],
   ['🌾','','spic|un|spicul|două spice','Äh/re|die|zwei Ähren'],
-  ['🍞','bread','pâi/ne|o|pâinea|două pâini','Bröt/chen|das|zwei Brötchen'],
+  ['🍞','bread|-|-','pâi/ne|o|pâinea|două pâini','Bröt/chen|das|zwei Brötchen'],
   ['🦶','foot|a|two feet','pi/cior|un|piciorul|două picioare','Fuß|der|zwei Füße'],
   ['🎁','gift|a|two gifts','ca/dou|un|cadoul|două cadouri','Ü/ber/ra/schung|die|zwei Überraschungen'],
   ['⏰','clock|a|two clocks','ceas|un|ceasul|două ceasuri','Uhr|die|zwei Uhren'],
@@ -378,7 +391,7 @@ const WORDS = [
   ['🐯','ti/ger|a|two tigers','ti/gru|un|tigrul|doi tigri','Ti/ger|der|zwei Tiger'],
   ['⛵','yacht|a|two yachts','ve/li/er|un|velierul|două veliere','Yacht|die|zwei Yachten'],
   ['🪼','jel/ly/fish|a|two jellyfish','me/du/ză|o|meduza|două meduze','Qual/le|die|zwei Quallen'],
-  ['🍇','grapes','stru/gu/re|un|strugurele|doi struguri','Trau/be|die|zwei Trauben'],
+  ['🍇','grape|a|two grapes','stru/gu/re|un|strugurele|doi struguri','Trau/be|die|zwei Trauben'],
   ['🍍','pine/ap/ple|a|two pineapples','a/na/nas|un|ananasul|doi ananași','A/na/nas|die|zwei Ananas'],
   ['✈️','air/plane|an|two airplanes','a/vi/on|un|avionul|două avioane','Flug/zeug|das|zwei Flugzeuge'],
   ['🐜','ant|an|two ants','fur/ni/că|o|furnica|două furnici','A/mei/se|die|zwei Ameisen'],
@@ -398,10 +411,10 @@ const WORDS = [
   ['🐆','jag/uar|a|two jaguars','ja/gu/ar|un|jaguarul|doi jaguari','Ja/gu/ar|der|zwei Jaguare'],
   ['🧥','jack/et|a|two jackets','ja/che/tă|o|jacheta|două jachete','Ja/cke|die|zwei Jacken'],
   ['🥝','ki/wi|a|two kiwis','ki/wi','Ki/wi|die|zwei Kiwis'],
-  ['🥋','ka/ra/te','ka/ra/te','Ka/ra/te'],
+  ['🥋','ka/ra/te|-|-','ka/ra/te','Ka/ra/te|das|-'],
   ['🍋','lem/on|a|two lemons','lă/mâ/ie|o|lămâia|două lămâi','Zi/tro/ne|die|zwei Zitronen'],
   ['🐒','mon/key|a|two monkeys','mai/mu/ță|o|maimuța|două maimuțe','Af/fe|der|zwei Affen'],
-  ['👓','glass/es','o/che/lari','Bril/le|die|zwei Brillen'],
+  ['👓','glass/es|pl','o/che/lari|pl|ochelarii','Bril/le|die|zwei Brillen'],
   ['👞','!shoe|a|two shoes','pan/tof|un|pantoful|doi pantofi','!Schuh|der|zwei Schuhe'],
   ['🚀','rock/et|a|two rockets','ra/che/tă|o|racheta|două rachete','Ra/ke/te|die|zwei Raketen'],
   ['🤖','ro/bot|a|two robots','ro/bot|un|robotul|doi roboți','Ro/bo/ter|der|zwei Roboter'],
@@ -412,14 +425,14 @@ const WORDS = [
   ['📱','!phone|a|two phones','te/le/fon|un|telefonul|două telefoane','Te/le/fon|das|zwei Telefone'],
   ['🦟','mos/qui/to|a|two mosquitoes','țân/țar|un|țânțarul|doi țânțari','Mü/cke|die|zwei Mücken'],
   ['🦄','u/ni/corn|a|two unicorns','u/ni/corn|un|unicornul|doi unicorni','!Ein/horn|das|zwei Einhörner'],
-  ['🎲','dice','zar|un|zarul|două zaruri','Wür/fel|der|zwei Würfel'],
+  ['🎲','dice|a|two dice','zar|un|zarul|două zaruri','Wür/fel|der|zwei Würfel'],
   ['🦒','!gi/raffe|a|two giraffes','gi/ra/fă|o|girafa|două girafe','!Gi/raf/fe|die|zwei Giraffen'],
   ['🍒','!cher/ry|a|two cherries','ci/rea/șă|o|cireașa|două cireșe','Kir/sche|die|zwei Kirschen'],
   ['🔑','key|a|two keys','che/ie|o|cheia|două chei','!Schlüs/sel|der|zwei Schlüssel'],
   ['🎸','gui/tar|a|two guitars','chi/ta/ră|o|chitara|două chitare','Gi/tar/re|die|zwei Gitarren'],
   ['👜','bag|a|two bags','gean/tă|o|geanta|două genți','Ta/sche|die|zwei Taschen'],
-  ['🧊','ice','ghea/ță',''],
-  ['🧶','yarn','ghem|un|ghemul|două gheme','Wol/le'],
+  ['🧊','ice|-|-','ghea/ță',''],
+  ['🧶','yarn|-|-','ghem|un|ghemul|două gheme','Wol/le|die|-'],
   ['🎒','back/pack|a|two backpacks','ghioz/dan|un|ghiozdanul|două ghiozdane','Ruck/sack|der|zwei Rucksäcke'],
   ['🍉','wa/ter/mel/on|a|two watermelons','pe/pe/ne|un|pepenele|doi pepeni','Was/ser/me/lo/ne|die|zwei Wassermelonen'],
   ['🌋','vol/ca/no|a|two volcanoes','vul/can|un|vulcanul|doi vulcani','Vul/kan|der|zwei Vulkane'],
@@ -453,9 +466,12 @@ const WORDS = [
   ['🚐','van|a|two vans','',''],
   ['⬆️','up','',''],
   ['🌿','grass','iar/bă','Gras'],
-  ['👖','jeans','blugi','Jeans'],
-  ['🥛','milk','lap/te','Milch'],
-  ['0️⃣','ze/ro','','']
+  ['👖','jeans|pl','blugi|pl|blugii','Jeans'],
+  ['🥛','milk|-|-','lap/te|-|laptele|-','Milch|die|-'],
+  ['🍯','hon/ey|-|-','mie/re|-|mierea|-','Ho/nig|der|-'],
+  ['🧈','but/ter|-|-','unt|-|untul|-','But/ter|die|-'],
+  ['🧂','salt|-|-','sa/re|-|sarea|-','Salz|das|-'],
+  ['0️⃣','ze/ro|a|two zeros','','']
 ];
 
 // Parse the dictionary for one language → [{ id, pic, w, syl, forms|null, noLetter }]
@@ -855,7 +871,7 @@ function renderRead(sayIt = true) {
   const upper = chars.map(c => tile(c.toLocaleUpperCase(t), letterSay(c), 'u', letterInk(c))).join('');
   const lower = Array.from(shown).filter(isL).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
   // Singular/plural table: long phrases put the picture above the text and shrink the font to fit
-  const longest = forms ? Math.max(...[...forms.sg, ...forms.pl].map(x => x.length)) : 0;
+  const longest = forms ? Math.max(...[...(forms.sg || []), ...(forms.pl || [])].map(x => x.length), 8) : 0;
   const chipW = (Math.min(innerWidth, 520) - 24 - 8) / 2, em = longest * 0.66;
   const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15; // 2 pictures + padding beside the text
   const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
@@ -870,8 +886,9 @@ function renderRead(sayIt = true) {
     `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
     (forms ? (
     `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(LANGS[lang].sgpl[0])}</div><div class="rh">${esc(LANGS[lang].sgpl[1])}</div>` +
-      [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n]) =>
-        `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`).join('')).join('') +
+      [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
+        ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
+        : `<div class="rc none">${r === 0 ? '— ' + esc(LANGS[lang].none[c]) : ''}</div>`).join('')).join('') +
     `</div>`) : '');
   const R = SETS.read, n = R.length;
   $('rprev').innerHTML = `‹ <b>${R[(readIdx - 1 + n) % n].pic}</b>`;
@@ -909,7 +926,7 @@ async function playRead() {
   sfx.right(); await speak(word, 350);
   if (!alive()) return; await wait(300);
   // singular → plural, row by row: "un câine", "doi câini", "câinele", "câinii"
-  for (const el of document.querySelectorAll('#rC .rc')) {
+  for (const el of document.querySelectorAll('#rC .rc[data-say]')) {
     if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(250);
   }
   if (!alive()) return;
