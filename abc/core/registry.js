@@ -10,7 +10,8 @@ var ABC = {
   errors: []
 };
 const abcLang = code => ABC.langs[code] || (ABC.langs[code] = { code, strings: {}, words: [], info: {} });
-const abcMerge = (a, b) => { for (const k in b) a[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && typeof a[k] === 'object') ? abcMerge(a[k], b[k]) : b[k]; return a; };
+const isPlain = x => !!x && typeof x === 'object' && !Array.isArray(x);
+const abcMerge = (a, b) => { for (const k in b) a[k] = isPlain(b[k]) ? abcMerge(isPlain(a[k]) ? a[k] : {}, b[k]) : b[k]; return a; };
 
 function CONFIG(c) { ABC.config = c; }
 function LANG(code, def) { Object.assign(abcLang(code), def); }
