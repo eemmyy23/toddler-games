@@ -183,4 +183,9 @@ w('square', { w: 'Qua/drat', g: 'n', pl: 'Quadrate' });
 w('triangle', { w: 'Drei/eck', g: 'n', pl: 'Dreiecke' });
 w('heart', { w: 'Herz', g: 'n', pl: 'Herzen' });
 w('diamond', { w: 'Rau/te', g: 'f', pl: 'Rauten' });
+w('eye', { w: 'Au/ge', g: 'n', pl: 'Augen' });
+w('tooth', { w: 'Zahn', g: 'm', pl: 'Zähne' });
+w('tongue', { w: 'Zun/ge', g: 'f', pl: 'Zungen' });
+w('hand', { w: 'Hand', g: 'f', pl: 'Hände' });
+w('arm', { w: 'Arm', g: 'm', pl: 'Arme' });
 }

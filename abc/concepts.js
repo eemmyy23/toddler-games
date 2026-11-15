@@ -189,3 +189,8 @@ C('square', '🟥');
 C('triangle', '🔺');
 C('heart', '❤️');
 C('diamond', '🔷');
+C('eye', '👁️');
+C('tooth', '🦷');
+C('tongue', '👅');
+C('hand', '✋');
+C('arm', '💪');

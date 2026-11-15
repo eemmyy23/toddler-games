@@ -186,4 +186,9 @@ w('square', { w: 'pă/trat', def: 'pătratul', pl: 'pătrate', g: 'n', plDef: 'p
 w('triangle', { w: 'tri/un/ghi', def: 'triunghiul', pl: 'triunghiuri', g: 'n', plDef: 'triunghiurile' });
 w('heart', { w: 'i/ni/mă', def: 'inima', pl: 'inimi', g: 'f', plDef: 'inimile' });
 w('diamond', { w: 'romb', def: 'rombul', pl: 'romburi', g: 'n', plDef: 'romburile' });
+w('eye', { w: 'ochi', def: 'ochiul', pl: 'ochi', g: 'm', plDef: 'ochii' });
+w('tooth', { w: 'din/te', def: 'dintele', pl: 'dinți', g: 'm', plDef: 'dinții' });
+w('tongue', { w: 'lim/bă', def: 'limba', pl: 'limbi', g: 'f', plDef: 'limbile' });
+w('hand', { w: 'mâ/nă', def: 'mâna', pl: 'mâini', g: 'f', plDef: 'mâinile' });
+w('arm', { w: 'braț', def: 'brațul', pl: 'brațe', g: 'n', plDef: 'brațele' });
 }

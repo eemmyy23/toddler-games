@@ -187,4 +187,9 @@ w('square', { w: 'square', art: 'a', pl: 'squares' });
 w('triangle', { w: 'tri/an/gle', art: 'a', pl: 'triangles' });
 w('heart', { w: 'heart', art: 'a', pl: 'hearts' });
 w('diamond', { w: 'dia/mond', art: 'a', pl: 'diamonds' });
+w('eye', { w: 'eye', art: 'an', pl: 'eyes' });
+w('tooth', { w: 'tooth', art: 'a', pl: 'teeth' });
+w('tongue', { w: 'tongue', art: 'a', pl: 'tongues' });
+w('hand', { w: 'hand', art: 'a', pl: 'hands' });
+w('arm', { w: 'arm', art: 'an', pl: 'arms' });
 }
