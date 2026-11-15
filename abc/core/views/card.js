@@ -52,7 +52,8 @@
         const shown = L.keepCase ? w : w.toLocaleLowerCase(L.bcp47);
         return `<button class="ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${hl(shown, it.unit ? it.unit.lower : it.label, it.color)}</span></button>`;
       }).join('');
-      $('linfo').innerHTML = APP.infoButton(it.concept);
+      $('links').innerHTML = APP.links(it);
+      APP.fit($('learn'));
       APP.saveIdx();
       if (sayIt) speak(it.say, 120);
     },

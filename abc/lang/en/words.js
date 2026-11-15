@@ -146,4 +146,13 @@ w('chick', { w: 'chick', art: 'a', pl: 'chicks' });
 w('strawberry', { w: 'straw/ber/ry', art: 'a', pl: 'strawberries' });
 w('ladybird', { w: 'la/dy/bird', art: 'a', pl: 'ladybirds' });
 w('biscuit', { w: 'bis/cuit', art: 'a', pl: 'biscuits' });
+w('red', { w: 'red' });
+w('blue', { w: 'blue' });
+w('yellow', { w: 'yel/low' });
+w('green', { w: 'green' });
+w('purple', { w: 'pur/ple' });
+w('pink', { w: 'pink' });
+w('brown', { w: 'brown' });
+w('black', { w: 'black' });
+w('white', { w: 'white' });
 }

@@ -1,7 +1,7 @@
 const COLOR_DATA = [
   { id: 'red', hex: '#e53935', pics: '🍎🍓🚒' }, { id: 'blue', hex: '#1e88e5', pics: '🫐💧🦋' },
   { id: 'yellow', hex: '#fdd835', pics: '🍌🐤🌻' }, { id: 'green', hex: '#43a047', pics: '🥒🐸🍃' },
-  { id: 'orange', hex: '#fb8c00', pics: '🍊🥕🎃' }, { id: 'purple', hex: '#8e24aa', pics: '🍇🍆🔮' },
+  { id: 'orange', concept: 'orange-colour', hex: '#fb8c00', pics: '🍊🥕🎃' }, { id: 'purple', hex: '#8e24aa', pics: '🍇🍆🔮' },
   { id: 'pink', hex: '#f48fb1', pics: '🐷🌸🦩' }, { id: 'brown', hex: '#8d6e63', pics: '🐻🌰🍫' },
   { id: 'black', hex: '#111111', pics: '🐈‍⬛🎩🎱' }, { id: 'white', hex: '#f5f5f5', pics: '☁️⛄🐑' },
   { id: 'rainbow', concept: 'rainbow', pics: '🌈🌦️☔', noPlay: true, bands: true }
@@ -24,7 +24,7 @@ MODULE('colors', {
       return { id: c.id, label: name, name, say: parts ? `${name}: ${I18N.list(s.rainbow, loc)}!` : `${name}!`,
         big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`,
         nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>`,
-        word: name, pics, concept: c.concept || null, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
+        word: name, pics, concept: c.concept || c.id, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
     }).filter(Boolean);
     return { colors };
   },

@@ -40,7 +40,20 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
-  firstTouch, infoButton: c => infoFor(c) ? `<button class="pill infobtn" data-c="${esc(c)}">📖 ${esc(APP.ui().info)}</button>` : '',
+  firstTouch,
+  links(it) {
+    const t = tileOf(), play = mode === 'play', out = [];
+    const chip = (x, id, toPlay) => `<button class="pill small link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
+    if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">📖 ${esc(APP.ui().info)}</button>`);
+    if (it.concept) for (const x of TILES) {
+      if (x === t || !usable(x, false)) continue;
+      const other = itemsOf(x).find(y => y.concept === it.concept);
+      if (other) out.push(chip(x, other.id, false));
+    }
+    if (play && usable(t, false) && itemsOf(t).some(y => y.id === it.id)) out.push(chip(t, it.id, false));
+    if (!play && usable(t, true)) out.push(chip(t, it.id, true));
+    return out.join('');
+  },
   fit(el, compact) {
     if (compact) el.classList.remove(compact);
     el.style.transform = ''; el.style.transformOrigin = '';
@@ -173,6 +186,11 @@ function openInfo(c) {
 }
 function closeInfo() { infoTok++; $('info').hidden = true; }
 const lightInf = i => document.querySelectorAll('.inf').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.link'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch();
+  const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
+  if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
+}, true);
 document.addEventListener('pointerdown', e => { const b = e.target.closest('.infobtn'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch(); openInfo(b.dataset.c); }, true);
 $('infolist').addEventListener('click', e => { const b = e.target.closest('.inf'); if (!b) return; firstTouch(); infoTok++; lightInf(+b.dataset.i); speak(infoFor(infoId).lines[+b.dataset.i][1], 40); });
 async function playInfo() {
@@ -259,14 +277,17 @@ function runSearch() {
   if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
   const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; };
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
-    .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1])).slice(0, 40);
-  $('smeta').textContent = hits.length ? APP.t(U.search.results, { n: hits.length }) : U.search.none;
+    .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1]));
+  const groups = new Map();
+  for (const h of hits) { const k = h.x.it.concept || `${h.x.t.id}:${h.x.it.id}`; if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
+  const rows = [...groups.values()].slice(0, 40);
+  $('smeta').textContent = rows.length ? APP.t(U.search.results, { n: rows.length }) : U.search.none;
   const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };
-  $('sres').innerHTML = hits.map(({ x }) => {
+  $('sres').innerHTML = rows.map(([x, ...more]) => {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
-    return `<button class="sr" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
-      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>` +
-      `${tileIcon(x.t, 'srk')}</button>`;
+    const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
+    return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
+      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>${icons}</div>`;
   }).join('');
 }
 function openSearch() {
@@ -276,7 +297,7 @@ function openSearch() {
 const closeSearch = () => { $('search').hidden = true; $('sq').blur(); };
 $('sq').addEventListener('input', runSearch);
 $('sres').addEventListener('click', e => {
-  const b = e.target.closest('.sr'); if (!b) return; firstTouch(); closeSearch(); closeIndex();
+  const b = e.target.closest('.sr'); if (!b || e.target.closest('.link')) return; firstTouch(); closeSearch(); closeIndex();
   openTile(b.dataset.t, false, true); const i = APP.indexOf(b.dataset.id);
   if (i >= 0) { APP.idx = i; APP.saveIdx(); } view().show(true);
 });

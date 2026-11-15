@@ -144,4 +144,14 @@ w('chick', { w: 'pui', def: 'puiul', pl: 'pui', g: 'm', plDef: 'puii' });
 w('strawberry', { w: 'căp/șu/nă', def: 'căpșuna', pl: 'căpșuni', g: 'f', plDef: 'căpșunile' });
 w('ladybird', { w: 'bu/bu/ru/ză', def: 'buburuza', pl: 'buburuze', g: 'f', plDef: 'buburuzele' });
 w('biscuit', { w: 'bis/cu/it', def: 'biscuitul', pl: 'biscuiți', g: 'm', plDef: 'biscuiții' });
+w('red', { w: 'ro/șu' });
+w('blue', { w: 'al/bas/tru' });
+w('yellow', { w: 'gal/ben' });
+w('green', { w: 'ver/de' });
+w('orange-colour', { w: 'por/to/ca/liu' });
+w('purple', { w: 'mov' });
+w('pink', { w: 'roz' });
+w('brown', { w: 'ma/ro' });
+w('black', { w: 'ne/gru' });
+w('white', { w: 'alb' });
 }

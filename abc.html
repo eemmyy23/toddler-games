@@ -111,7 +111,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .ht:active{background:var(--card2)}
 .ht.soon{opacity:.45;cursor:default}
 .hp{order:1;--icon:var(--tile-icon)} .hl{order:2}
-.hp.txt,.srk.txt{color:var(--amber)}
+.hp.txt,.ico-s.txt{color:var(--amber)}
 .ht .badge{order:3;white-space:nowrap;font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:var(--r-pill);padding:2px 8px}
 .agebadge{position:absolute;top:7px;left:calc(10px + (100% - 20px - 28px) * var(--ax));width:28px;height:28px;opacity:.9;pointer-events:none}
 .agebadge svg{width:100%;height:100%;display:block}
@@ -150,7 +150,10 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .nav b{font-size:40px;font-weight:700}
 #prev,#next{position:fixed;bottom:calc(var(--bot) + var(--nav-gap));z-index:var(--z-float)}
 #prev{left:var(--gut)} #next{right:var(--gut)}
-.infobtn{--pill-h:48px;font-size:var(--fs-m);color:var(--amber);margin-top:var(--sp-1)}
+.links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2)}
+.links:empty{display:none}
+.li{--icon:20px}
+.infobtn{color:var(--amber)}
 
 #play{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--play-gap)}
 #ask{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.4em;padding:.25em .4em .25em .6em;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--shadow);
@@ -241,7 +244,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .srt b{font-size:var(--fs-l);line-height:1.1}
 .srt small{font-size:var(--fs-s);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sr mark{background:none;color:var(--amber);font-weight:700}
-.srk{flex:0 0 auto;opacity:.8;--icon:22px}
+.srk{flex:0 0 auto;opacity:.85;padding:var(--sp-1)}
+.ico-s{--icon:22px}
 .shint{color:var(--muted);text-align:center;font-size:16px;line-height:1.4;padding:24px 20px}
 
 #install-bar{position:fixed;top:0;left:0;right:0;z-index:var(--z-toast);display:flex;align-items:center;justify-content:center;gap:12px;padding:var(--bar-pad) var(--gut) 10px;background:var(--card)}
@@ -266,12 +270,13 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
-    <div id="linfo"></div>
+    <div id="links" class="links"></div>
     <div id="examples"></div>
   </div>
   <div id="play" hidden>
     <div id="ask"></div>
     <div id="choices"></div>
+    <div id="plinks" class="links"></div>
   </div>
   <div id="read" hidden></div>
 </div>

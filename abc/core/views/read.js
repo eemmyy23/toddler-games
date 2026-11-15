@@ -27,11 +27,12 @@
       `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
       `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
       (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +
-      `<div class="rrow" id="rW">${tile(shown, word, 'word')}${APP.infoButton(e.concept)}</div>` +
+      `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
       (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label rh">${esc(U.sgpl[0])}</div><div class="label rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
           ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
-          : `<div class="rc none">${r === 0 ? '— ' + esc(U.none[c]) : ''}</div>`).join('')).join('') + `</div>` : '');
+          : `<div class="rc none">${r === 0 ? '— ' + esc(U.none[c]) : ''}</div>`).join('')).join('') + `</div>` : '') +
+      `<div class="links">${APP.links(e)}</div>`;
     fit();
     const [pv, nx] = APP.neighbors();
     $('rprev').innerHTML = `‹ <b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b> ›`;

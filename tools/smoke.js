@@ -84,7 +84,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await show(await find("x.w === 'urs'"));
   ok(!(await p.$('#rS')), 'one-syllable word has no syllable row');
   await show(await find("x.w === 'curcubeu'"));
-  ok(await p.isVisible('#rW .infobtn'), 'info button in Read for 🌈 (same concept as the colour)');
+  ok(await p.isVisible('#read .links .infobtn'), 'info button in Read for 🌈 (same concept as the colour)');
 
   console.log('colours + rainbow parts + info');
   await ev(() => openTile('colors', false, true)); await show(await find("x.id === 'rainbow'"));
@@ -94,7 +94,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,oranj,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
-  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
+  await p.locator('#links .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('pointerdown');
 
@@ -152,7 +152,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await search('ziege')).includes('read:goat'), 'search "Ziege" (DE, any case) → capră');
   ok((await search('zwei'))[0] === 'digits:n2', 'search "zwei" → 2');
   const rot = await search('rot');
-  ok(rot[0] === 'colors:red' && !rot.includes('read:turtle'), `search "rot" → roșu first, no substring noise (${rot.join(' ')})`);
+  ok(rot[0].endsWith(':red') && rot.length === 1, `search "rot" → one result for roșu, no substring noise (${rot.join(' ')})`);
+  ok(await ev(() => [...document.querySelectorAll('.sr .link')].map(l => l.dataset.t).join()) === 'read,colors', 'roșu links to Citește and Culori');
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
   await ev(() => { document.querySelector('.sr').click(); });
   ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');

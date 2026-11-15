@@ -142,4 +142,13 @@ w('chick', { w: 'Kü/ken', g: 'n', pl: 'Küken' });
 w('strawberry', { w: 'Erd/bee/re', g: 'f', pl: 'Erdbeeren' });
 w('ladybird', { w: 'Ma/ri/en/kä/fer', g: 'm', pl: 'Marienkäfer' });
 w('biscuit', { w: 'Keks', g: 'm', pl: 'Kekse' });
+w('red', { w: 'Rot' });
+w('blue', { w: 'Blau' });
+w('yellow', { w: 'Gelb' });
+w('green', { w: 'Grün' });
+w('purple', { w: 'Li/la' });
+w('pink', { w: 'Ro/sa' });
+w('brown', { w: 'Braun' });
+w('black', { w: 'Schwarz' });
+w('white', { w: 'Weiß' });
 }
