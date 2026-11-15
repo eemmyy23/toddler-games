@@ -1,7 +1,7 @@
 LANG('de', {
   name: 'Deutsch', flag: '🇩🇪', bcp47: 'de-DE', dir: 'ltr',
   voices: /anna|female/i,
-  fold: s => s.replace(/ß/g, 'ss'),
+  fold: s => s.replace(/ß/g, 'ss').replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u'),
   letters: 'A Ä B C D E F G H I J K L M N O Ö P Q R S ß T U Ü V W X Y Z',
   groups: 'sch ei au eu st pf',
   sayGroup: (g, w) => `${w}!`,

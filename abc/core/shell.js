@@ -137,7 +137,7 @@ const VIEWS = Object.values(ABC.views);
 function render() {
   const U = APP.ui(), L = APP.L();
   const sec = sectionNow();
-  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', sec === s.id); b.setAttribute('aria-current', sec === s.id ? 'page' : 'false'); b.querySelector('.tl').textContent = U.sections[s.id]; });
+  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', sec === s.id); b.setAttribute('aria-current', sec === s.id ? 'page' : 'false'); b.querySelector('.tl').textContent = U.sections[s.id]; APP.fitText(b.querySelector('.tl')); });
   document.querySelectorAll('.flag').forEach(f => { f.classList.toggle('on', f.dataset.lang === lang); f.setAttribute('aria-pressed', f.dataset.lang === lang); f.title = f.classList.contains('novoice') ? U.noVoice : ''; });
   document.querySelectorAll('.age').forEach(b => { const on = b.dataset.p === profile; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', profileName(b.dataset.p)); });
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
@@ -268,7 +268,7 @@ $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); 
 })();
 
 const FOLDS = LANGS.map(c => ABC.langs[c].fold).filter(Boolean);
-const fold = s => FOLDS.reduce((x, f) => f(x), String(s || '').replace(/\//g, '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase());
+const fold = s => FOLDS.reduce((x, f) => f(x), String(s || '').replace(/\//g, '').replace(/[-‐]/g, ' ').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase());
 function searchPool() {
   const out = [];
   for (const t of TILES) {
@@ -289,7 +289,7 @@ function runSearch() {
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
     .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1]));
   const groups = new Map();
-  for (const h of hits) { const k = h.x.it.concept || `${h.x.t.id}:${h.x.it.id}`; if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
+  for (const h of hits) { const k = h.x.it.concept || fold(h.x.it.name); if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
   const rows = [...groups.values()].slice(0, 40);
   $('smeta').textContent = rows.length ? APP.t(U.search.results, { n: rows.length }) : U.search.none;
   const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };

@@ -146,6 +146,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(bg.q0 === bg.q1 && bg.infoOpen, `back from the background: same question (${bg.q0} → ${bg.q1}), the open card stays open`);
   const keyGame = await ev(() => { openTile('letters', true, true); const s = APP.streak = 4; ['5', 'q', '7'].forEach(k => window.dispatchEvent(new KeyboardEvent('keydown', { key: k }))); return [APP.tile().id, APP.screen()]; });
   ok(keyGame[0] === 'letters' && keyGame[1] === 'play', `keys that are not a choice never leave the game (${keyGame.join('/')})`);
+  const sfold = await ev(() => { const q = (c, v) => { setLang(c); openSearch(); $('sq').value = v; runSearch(); const r = [...document.querySelectorAll('#sres .sr')].map(x => x.dataset.t + ':' + x.dataset.id); closeSearch(); return r; };
+    const r = { gruen: q('de', 'gruen').length, ice: q('en', 'ice-cream').length, ten: q('en', 'ten').filter(x => /^(digits|tens)/.test(x)).length }; setLang('ro'); return r; });
+  ok(sfold.gruen >= 1 && sfold.ice >= 1 && sfold.ten === 1, `search: DE ue = ü, hyphen = space, one row per number (${JSON.stringify(sfold)})`);
   const prof = await ev(() => { const has = p => { APP.set({ profile: p, section: 'play', hub: true }); return hubTiles().filter(x => x.t).map(x => x.t.id); };
     const c = has('curious'), s = has('scientist'); APP.set({ profile: 'curious' }); return { c: c.length, s: s.length, gated: s.filter(id => !c.includes(id)).length, extra: c.filter(id => !s.includes(id)).length }; });
   ok(prof.gated > 0 && prof.extra === 0, `the youngest profile hides older games (${prof.c} of ${prof.s}, ${prof.gated} hidden)`);

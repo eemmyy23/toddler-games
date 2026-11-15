@@ -11,8 +11,8 @@
       for (const [k, spec] of [['clean', CLEAN], ['immune', IMMUNE]]) { const miss = spec.filter(e => !(s[k] || {})[e.id]).map(e => e.id); if (miss.length) report(`${k}.${miss.join(', ')} missing`); }
     },
     tiles: [
-      { id: 'clean', icon: '🧼', view: 'card', items: S => S.clean, ages: [3, 6], search: true, game: { type: 'find', prompts: ['voice'], ask: () => 'where' } },
-      { id: 'immune', icon: '🦠', view: 'card', items: S => S.immune, ages: [7, 12], search: true, game: { type: 'find', prompts: ['voice'], ask: it => 'which.' + it.concept } }
+      { id: 'clean', icon: '🧼', view: 'card', items: S => S.clean, ages: [3, 6], index: true, search: true, game: { type: 'find', prompts: ['voice'], ask: () => 'where' } },
+      { id: 'immune', icon: '🦠', view: 'card', items: S => S.immune, ages: [7, 12], index: true, search: true, game: { type: 'find', prompts: ['voice'], ask: it => 'which.' + it.concept } }
     ]
   });
 }
