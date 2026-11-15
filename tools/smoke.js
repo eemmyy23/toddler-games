@@ -36,7 +36,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
   ok(!play.some(x => x[0] === '~'), 'Curious profile: no "coming soon" tiles');
-  ok(play.filter(x => x[0] !== '#').join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', 'Play hub: the 6 games');
+  ok(play.filter(x => x[0] !== '#').slice(0, 6).join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', `Play hub: ${play.filter(x => x[0] !== '#').length} games`);
   for (const prof of ['curious', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
       for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
@@ -58,7 +58,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
   const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
-  ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] === 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
+  ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] >= 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
   await ev(() => { profile = 'curious'; });
   await ev(() => openTile('letters', false, true));
   ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
@@ -100,9 +100,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('games (every language)');
   const ASK = {
-    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /]],
-    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /]],
-    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /]]
+    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e \S+\?$/]],
+    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the \S+\?$/]],
+    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) \S+\?$/]]
   };
   for (const l of ['ro', 'en', 'de']) {
     await ev(x => setLang(x), l);

@@ -31,7 +31,7 @@
   --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --bot:calc(70px + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --hero-h:72px;
   --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-toast:11;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
-  --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw);
+  --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw); --pset:.62em;
   --ex-dir:column; --ex-min:96px; --ex-pad:10px 12px 8px; --ex-pic:40px; --ex-fs:var(--fs-m);
   --rt-h:58px; --rt-fs:32px; --rc-h:52px; --rc-fs:20px; --rce:26px; --rpic:min(14vh,24vw); --read-gap:1.6vh;
   --cnum-w:96px; --cdig:54px; --cword:var(--fs-m); --citems:34px; --citems-min:60px; --hand-w:84px; --hand-h:96px; --row:5;
@@ -133,6 +133,9 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .sw{--dot:min(30vh,52vw);border-width:3px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.15),var(--shadow-lg)}
 .rbsvg{display:block;width:min(44vh,80vw);height:auto;overflow:visible}
 .rbb{fill:none;stroke-width:10.6}
+.pset{display:inline-flex;align-items:flex-end;gap:.08em;font-size:var(--pset);text-shadow:none}
+.pset .part{font-size:calc(var(--s,1) * 1em)}
+.art{width:1em;height:1em;vertical-align:middle;overflow:visible}
 .part{cursor:pointer;transition:opacity .2s,filter .2s}
 #glyph.on .part{opacity:.28}
 #glyph.on .part.on{opacity:1;filter:drop-shadow(0 0 5px rgba(255,255,255,.8))}

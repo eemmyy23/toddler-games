@@ -17,5 +17,10 @@ const CONTENT = {
     const name = u => L.spell ? L.spell(u.upper) : u.upper;
     return (this._abc[code] = { units, color, name, unit: id => units.find(u => u.id === id) || null });
   },
+  things(code, ids) { const by = new Map(this.words(code).map(x => [x.id, x])); return ids.map(id => by.get(id)).filter(Boolean); },
+  pic: id => ABC.art[id] ? `<svg class="art" viewBox="0 0 32 32" aria-hidden="true">${ABC.art[id]}</svg>` : ABC.conceptById[id].pic,
+  the: x => x.forms && x.forms.sg ? x.forms.sg[1] : x.w,
+  thing: (x, more) => Object.assign({ id: x.id, label: x.w, name: x.w, say: `${x.w}!`, big: CONTENT.pic(x.id), word: x.w, nav: x.pic, pic: x.pic,
+    concept: x.id, the: CONTENT.the(x), bubble: x.pic, pictureBubble: true, prompt: x.w }, more),
   navText: (label, color) => `<b style="color:${color}">${esc(label)}</b>`
 };

@@ -50,7 +50,8 @@ const APP = {
       const other = itemsOf(x).find(y => y.concept === it.concept);
       if (other) out.push(chip(x, other.id, false));
     }
-    if (play && usable(t, false) && itemsOf(t).some(y => y.id === it.id)) out.push(chip(t, it.id, false));
+    const home = it.learn ?? it.id;
+    if (play && usable(t, false) && itemsOf(t).some(y => y.id === home)) out.push(chip(t, home, false));
     if (!play && usable(t, true)) out.push(chip(t, it.id, true));
     return out.join('');
   },

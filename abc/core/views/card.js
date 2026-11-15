@@ -7,7 +7,7 @@
   }
   function hl(word, piece, color) {
     const t = APP.L().bcp47, i = word.toLocaleLowerCase(t).indexOf(piece.toLocaleLowerCase(t));
-    if (i < 0) return esc(word);
+    if (i < 0 || !color) return esc(word);
     return esc(word.slice(0, i)) + `<b style="color:${color}">${esc(word.slice(i, i + piece.length))}</b>` + esc(word.slice(i + piece.length));
   }
   const cur = () => APP.items()[APP.idx];

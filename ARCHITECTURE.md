@@ -73,7 +73,7 @@ Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
 `key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
-games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `sound` (items with the same sound are never choices in one round).
+games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound` (items with the same sound are never choices in one round).
 
 **VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.

@@ -1,6 +1,6 @@
 CONFIG({
   languages: ['en', 'ro', 'de'],
-  modules: ['numbers', 'letters', 'colors', 'soon'],
+  modules: ['numbers', 'letters', 'colors', 'families', 'soon'],
   sections: [
     { id: 'num', icon: '123' }, { id: 'abc', icon: 'ABC' }, { id: 'disc', icon: '🧭' }, { id: 'play', icon: '🎯', play: true }
   ],
