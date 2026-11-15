@@ -66,6 +66,8 @@ function loadIdx() {
   APP.idx = i >= 0 ? i : 0;
 }
 
+// a tile icon is an emoji or a short text ("ce·ci"); text icons get the text style — one rule for hub, search, anywhere
+const tileIcon = (t, cls) => `<span class="${cls} ico${/\p{L}/u.test(t.icon) ? ' txt' : ''}" aria-hidden="true">${esc(t.icon)}</span>`;
 // ---- hubs ----
 function hubTiles() {
   if (!SECTIONS[section].play) return TILES.filter(t => t.section === section && listed(t, false)).map(t => ({ t, ok: learnOk(t), lbl: label(t, 0), play: false }));
@@ -78,10 +80,10 @@ function hubTiles() {
 }
 function renderHub() {
   const U = APP.ui();
-  $('hub').innerHTML = `<button class="hsearch" id="hsearch">🔍 <span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
+  $('hub').innerHTML = `<button class="sbox hsearch" id="hsearch"><span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="hh">${x.header.icon} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
-      `<span class="hp"${x.t.icon.length > 3 ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${x.t.icon}</span><span class="hl">${esc(x.lbl)}</span></button>`).join('');
+      `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
 function openTile(id, play, quiet) {
   const t = TILE[id]; if (!t || !(play ? gameOk(t) : learnOk(t))) return false;
@@ -174,7 +176,8 @@ async function playInfo() {
 }
 
 // ---- index (⊞): every item of the current tile. Word lists: A–Z sections + a side letter bar (drag to jump) ----
-const firstUnit = (w, L, units) => { const p = I18N.splitUnits(w, units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : '#'; };
+const OTHER = '#'; // words that start with a sign outside the alphabet
+const firstUnit = (w, L, units) => { const p = I18N.splitUnits(w, units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : OTHER; };
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const btn = ({ it, i }) => `<button class="ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${v.indexFace(it)}</button>`;
@@ -182,22 +185,33 @@ function openIndex() {
   if (v.indexSort) {
     const col = I18N.collator(L.bcp47), units = APP.S().units, letters = APP.S().letters;
     list.sort((a, b) => col.compare(a.it.w || a.it.label, b.it.w || b.it.label));
-    const groups = new Map(units.map(u => [u.id, []])); groups.set('#', []);
+    const groups = new Map(units.map(u => [u.id, []])); groups.set(OTHER, []);
     list.forEach(x => groups.get(firstUnit(x.it.w || x.it.label, L, units)).push(x));
     for (const [u, xs] of groups) {
       if (!xs.length) continue;
       const lt = letters.find(l => l.id === u), color = lt ? lt.color : 'var(--muted)';
       html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${color}">${esc(lt ? lt.label : u)}</b><span>${esc(APP.t(U.words, { n: xs.length }))}</span></div>` + xs.map(btn).join('');
     }
-    az = [...groups.keys()].filter(u => u !== '#' || groups.get('#').length)
+    az = [...groups.keys()].filter(u => u !== OTHER || groups.get(OTHER).length)
       .map(u => `<span class="az${groups.get(u).length ? '' : ' off'}" data-u="${esc(u)}">${esc((letters.find(l => l.id === u) || { label: u }).label)}</span>`).join('');
   } else html = list.map(btn).join('');
   $('ixgrid').innerHTML = html; $('ixaz').innerHTML = az; $('ixaz').style.display = az ? 'flex' : 'none';
   $('ixsearch').querySelector('span').textContent = U.search.placeholder;
   $('index').classList.add('open');
   const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
-  sfx.pop();
+  syncAZ(); sfx.pop();
 }
+// scroll-spy: the side bar always lights the section being read (last header at or above the top of the list)
+function syncAZ() {
+  const g = $('ixgrid'), hs = g.querySelectorAll('.ixh'); if (!hs.length) return;
+  let cur = hs[0];
+  for (const h of hs) { if (h.offsetTop - g.scrollTop <= 28) cur = h; else break; }
+  if (g.scrollTop + g.clientHeight >= g.scrollHeight - 2) cur = hs[hs.length - 1]; // at the very end
+  const u = cur.id.slice(4);
+  $('ixaz').querySelectorAll('.az').forEach(a => { const on = a.dataset.u === u; a.classList.toggle('cur', on); if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+}
+let azRaf = 0;
+$('ixgrid').addEventListener('scroll', () => { if (!azRaf) azRaf = requestAnimationFrame(() => { azRaf = 0; syncAZ(); }); }, { passive: true });
 const closeIndex = () => $('index').classList.remove('open');
 $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); if (!b) return; firstTouch(); closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
 // letter bar: tap or drag; empty letters jump to the next letter that has words
@@ -208,8 +222,8 @@ $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); 
     const r = bar.getBoundingClientRect(), k = Math.max(0, Math.min(all.length - 1, Math.floor((y - r.top) / r.height * all.length)));
     const el = all.slice(k).find(x => !x.classList.contains('off')) || [...all].reverse().find(x => !x.classList.contains('off'));
     if (!el || el.dataset.u === last) return; last = el.dataset.u;
-    all.forEach(x => x.classList.toggle('cur', x === el));
     const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 }); // #ixgrid is the offsetParent
+    syncAZ();
     sfx.pop();
   };
   $('ixaz').addEventListener('pointerdown', e => { e.preventDefault(); last = null; try { $('ixaz').setPointerCapture(e.pointerId); } catch (x) {} jump(e.clientY); });
@@ -244,7 +258,7 @@ function runSearch() {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
     return `<button class="sr" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || ''}</span>` +
       `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>` +
-      `<span class="srk">${x.t.icon.length > 3 ? '🔤' : x.t.icon}</span></button>`;
+      `${tileIcon(x.t, 'srk')}</button>`;
   }).join('');
 }
 function openSearch() {

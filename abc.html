@@ -196,12 +196,14 @@ body.topic #ages{display:none}
 .ixh b{font-size:34px;line-height:1}.ixh span{font-size:15px;font-weight:600;color:var(--muted)}
 #ixaz{flex:0 0 28px;display:none;flex-direction:column;justify-content:space-between;align-items:center;background:var(--card);border-radius:999px;padding:8px 0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
 .az{font-size:13px;font-weight:700;color:var(--muted);line-height:1;width:24px;text-align:center;padding:1px 0;border-radius:999px}
-.az.off{opacity:.3}.az.cur{background:var(--amber);color:var(--amber-ink)}
+.az.off{opacity:.3}.az{transition:background .15s,color .15s,transform .15s}.az.cur{background:var(--amber);color:var(--amber-ink);transform:scale(1.25)}
 /* search: a pill on every hub + in the index; full-screen results, matched in every language */
 .sbox{flex:1;display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;border:none;border-radius:999px;background:var(--card);color:var(--muted);font-size:18px;font-weight:600;text-align:left;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);min-width:0}
+.sbox::before{content:'🔍';flex:0 0 auto} /* the only place the search symbol is defined */
 .sbox span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sbox.on{box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);cursor:text}
-.hsearch{grid-column:1/-1;display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;border:none;border-radius:999px;background:var(--card);color:var(--muted);font-size:17px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+.hsearch{grid-column:1/-1;height:52px;font-size:17px}
+.ico.txt,.ht .ico.txt{font-size:34px;font-weight:700;color:var(--amber);letter-spacing:-.5px}.srk.ico.txt{font-size:15px}
 #search{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;background:rgba(9,12,31,.98);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #search.open{display:flex}
 #shead{display:flex;gap:10px;align-items:center}
@@ -300,8 +302,8 @@ body.topic #ages{display:none}
 </div>
 <div id="info"><div id="infohead"><span id="infotitle"></span><button id="infoclose" aria-label="Close">✕</button></div>
   <div id="infolist"></div><div id="infofoot"><button id="infoplay" aria-label="Play">▶</button></div></div>
-<div id="index"><div id="ixhead"><button id="ixsearch" class="sbox">🔍 <span></span></button><button id="ixclose" aria-label="Close">✕</button></div><div id="ixbody"><div id="ixgrid"></div><div id="ixaz"></div></div></div>
-<div id="search"><div id="shead"><div class="sbox on"><span aria-hidden="true">🔍</span><input id="sq" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" aria-label="Clear">✕</button></div><button id="sclose" aria-label="Close">✕</button></div><div id="smeta"></div><div id="sres"></div></div>
+<div id="index"><div id="ixhead"><button id="ixsearch" class="sbox"><span></span></button><button id="ixclose" aria-label="Close">✕</button></div><div id="ixbody"><div id="ixgrid"></div><div id="ixaz"></div></div></div>
+<div id="search"><div id="shead"><div class="sbox on"><input id="sq" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" aria-label="Clear">✕</button></div><button id="sclose" aria-label="Close">✕</button></div><div id="smeta"></div><div id="sres"></div></div>
 <nav id="tabs"></nav>
 <canvas id="fx"></canvas>
 

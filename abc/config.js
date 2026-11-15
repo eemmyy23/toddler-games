@@ -9,7 +9,7 @@ CONFIG({
   languages: ['en', 'ro', 'de'],
   modules: ['numbers', 'letters', 'colors', 'soon'],
   sections: [
-    { id: 'num', icon: '🔢' }, { id: 'abc', icon: '🔤' }, { id: 'disc', icon: '🔎' }, { id: 'play', icon: '🎯', play: true }
+    { id: 'num', icon: '🔢' }, { id: 'abc', icon: '🔤' }, { id: 'disc', icon: '🧭' }, { id: 'play', icon: '🎯', play: true }
   ],
   profiles: { little: [2, 4], explorer: [4, 7], scientist: [7, 12] },
   defaultProfile: 'little',

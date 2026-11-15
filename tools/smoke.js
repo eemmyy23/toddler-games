@@ -143,6 +143,12 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
   const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
   ok(vis, 'tap V on the side bar jumps to the V section');
+  ok(await ev(() => document.querySelector('#ixaz .az.cur')?.dataset.u === 'V'), 'side bar lights V after the jump');
+  for (const u of ['M', 'C', 'T']) {   // scroll the content → the side bar follows
+    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
+    const cur = await ev(() => document.querySelector('#ixaz .az.cur')?.dataset.u);
+    ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
+  }
   await ev(() => closeIndex());
   const search = async q => { await ev(q => { openSearch(); $('sq').value = q; runSearch(); }, q);
     return ev(() => [...document.querySelectorAll('.sr')].map(r => r.dataset.t + ':' + r.dataset.id)); };
@@ -165,6 +171,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     ok(hs.length && Math.max(...hs) <= 160, `${sec} hub tiles ≤ 160 px tall (${hs.map(h => h | 0).join(', ')})`);
   }
   ok(await p.isVisible('.hsearch'), 'search pill on the hub');
+  ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
