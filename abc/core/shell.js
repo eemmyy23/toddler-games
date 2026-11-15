@@ -40,7 +40,20 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
-  firstTouch, infoButton: c => infoFor(c) ? `<button class="pill infobtn" data-c="${esc(c)}">📖 ${esc(APP.ui().info)}</button>` : '',
+  firstTouch,
+  links(it) {
+    const t = tileOf(), play = mode === 'play', out = [];
+    const chip = (x, id, toPlay) => `<button class="pill small link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
+    if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">📖 ${esc(APP.ui().info)}</button>`);
+    if (it.concept) for (const x of TILES) {
+      if (x === t || !usable(x, false)) continue;
+      const other = itemsOf(x).find(y => y.concept === it.concept);
+      if (other) out.push(chip(x, other.id, false));
+    }
+    if (play && usable(t, false) && itemsOf(t).some(y => y.id === it.id)) out.push(chip(t, it.id, false));
+    if (!play && usable(t, true)) out.push(chip(t, it.id, true));
+    return out.join('');
+  },
   fit(el, compact) {
     if (compact) el.classList.remove(compact);
     el.style.transform = ''; el.style.transformOrigin = '';
@@ -173,6 +186,11 @@ function openInfo(c) {
 }
 function closeInfo() { infoTok++; $('info').hidden = true; }
 const lightInf = i => document.querySelectorAll('.inf').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.link'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch();
+  const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
+  if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
+}, true);
 document.addEventListener('pointerdown', e => { const b = e.target.closest('.infobtn'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch(); openInfo(b.dataset.c); }, true);
 $('infolist').addEventListener('click', e => { const b = e.target.closest('.inf'); if (!b) return; firstTouch(); infoTok++; lightInf(+b.dataset.i); speak(infoFor(infoId).lines[+b.dataset.i][1], 40); });
 async function playInfo() {

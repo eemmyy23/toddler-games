@@ -84,7 +84,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await show(await find("x.w === 'urs'"));
   ok(!(await p.$('#rS')), 'one-syllable word has no syllable row');
   await show(await find("x.w === 'curcubeu'"));
-  ok(await p.isVisible('#rW .infobtn'), 'info button in Read for 🌈 (same concept as the colour)');
+  ok(await p.isVisible('#read .links .infobtn'), 'info button in Read for 🌈 (same concept as the colour)');
 
   console.log('colours + rainbow parts + info');
   await ev(() => openTile('colors', false, true)); await show(await find("x.id === 'rainbow'"));
@@ -94,7 +94,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,oranj,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
-  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
+  await p.locator('#links .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('pointerdown');
 

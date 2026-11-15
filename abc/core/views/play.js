@@ -38,6 +38,7 @@
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
       box.appendChild(b);
     });
+    $('plinks').innerHTML = APP.links(target);
     APP.fit($('play'));
     speak(askLine(), 250);
   }
