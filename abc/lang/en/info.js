@@ -17,7 +17,7 @@ i('sun', { title: 'The Sun', lines: [
 i('moon', { title: 'The Moon', lines: [
   ['🌙', 'The Moon goes around the Earth.'],
   ['🔦', 'It makes no light: it shines because the Sun lights it up.'],
-  ['🌗', 'Sometimes we see it round, sometimes like a slice.'],
+  ['🌗', 'Sometimes we see it round, sometimes like a crescent.'],
   ['👨‍🚀', 'People went to the Moon in a rocket.']
 ] });
 i('star', { title: 'Stars', lines: [
@@ -88,7 +88,7 @@ i('winter', { title: 'Winter', lines: [
 i('rocket', { title: 'Rockets', lines: [
   ['🚀', 'A rocket flies very fast, up into space.'],
   ['🔥', 'It burns fuel and pushes flames down.'],
-  ['👨‍🚀', 'Astronauts ride in it all the way to the Moon.']
+  ['👨‍🚀', 'Some rockets took astronauts to the Moon.']
 ] });
 i('bee', { title: 'Bees', lines: [
   ['🐝', 'Bees fly from flower to flower.'],
@@ -97,7 +97,7 @@ i('bee', { title: 'Bees', lines: [
 ] });
 i('butterfly', { title: 'Butterflies', lines: [
   ['🐛', 'A butterfly starts as a caterpillar.'],
-  ['🛌', 'The caterpillar wraps itself in a cocoon and sleeps.'],
-  ['🦋', 'Out of the cocoon comes a butterfly!']
+  ['🐛', 'The caterpillar turns into a chrysalis and changes inside.'],
+  ['🦋', 'Out of the chrysalis comes a butterfly!']
 ] });
 }

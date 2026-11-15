@@ -289,7 +289,7 @@ function runSearch() {
   $('sres').innerHTML = rows.map(([x, ...more]) => {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
     const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
-    return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
+    return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
       `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>${icons}</div>`;
   }).join('');
 }

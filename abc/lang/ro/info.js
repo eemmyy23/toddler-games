@@ -17,7 +17,7 @@ i('sun', { title: 'Soarele', lines: [
 i('moon', { title: 'Luna', lines: [
   ['🌙', 'Luna se învârte în jurul Pământului.'],
   ['🔦', 'Ea nu face lumină: strălucește pentru că o luminează Soarele.'],
-  ['🌗', 'Uneori o vedem rotundă, alteori ca o felie.'],
+  ['🌗', 'Uneori o vedem rotundă, alteori ca o seceră.'],
   ['👨‍🚀', 'Oamenii au mers pe Lună cu o rachetă.']
 ] });
 i('star', { title: 'Stelele', lines: [
@@ -88,7 +88,7 @@ i('winter', { title: 'Iarna', lines: [
 i('rocket', { title: 'Racheta', lines: [
   ['🚀', 'Racheta zboară foarte repede, sus, în spațiu.'],
   ['🔥', 'Arde combustibil și împinge flăcări în jos.'],
-  ['👨‍🚀', 'Astronauții merg cu ea până la Lună.']
+  ['👨‍🚀', 'Unele rachete i-au dus pe astronauți pe Lună.']
 ] });
 i('bee', { title: 'Albina', lines: [
   ['🐝', 'Albinele zboară din floare în floare.'],
@@ -97,7 +97,7 @@ i('bee', { title: 'Albina', lines: [
 ] });
 i('butterfly', { title: 'Fluturele', lines: [
   ['🐛', 'Fluturele începe ca o omidă.'],
-  ['🛌', 'Omida se învelește într-un cocon și doarme.'],
-  ['🦋', 'Din cocon iese un fluture!']
+  ['🐛', 'Omida se face crisalidă și se schimbă pe dinăuntru.'],
+  ['🦋', 'Din crisalidă iese un fluture!']
 ] });
 }

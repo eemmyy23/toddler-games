@@ -5,7 +5,7 @@
     section: 'disc', ages: [3, 12],
     build(code) {
       const s = this.strings[code];
-      return { clean: CONTENT.set(code, CLEAN, { say: s.clean }), immune: CONTENT.set(code, IMMUNE, { say: s.immune }).map(x => Object.assign({}, x, { id: 'imm-' + x.id })) };
+      return { clean: CONTENT.set(code, CLEAN, { say: s.clean }), immune: CONTENT.set(code, IMMUNE, { say: s.immune }) };
     },
     check(code, S, s, report) {
       for (const [k, spec] of [['clean', CLEAN], ['immune', IMMUNE]]) { const miss = spec.filter(e => !(s[k] || {})[e.id]).map(e => e.id); if (miss.length) report(`${k}.${miss.join(', ')} missing`); }

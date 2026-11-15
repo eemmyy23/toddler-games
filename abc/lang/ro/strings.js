@@ -2,7 +2,7 @@ STRINGS('ro', {
   sections: { num: 'Numere', abc: 'Litere', disc: 'Descoperă', play: 'Joacă' },
   find: 'Găsește', info: 'Ce este?', noVoice: 'nu există voce pentru această limbă',
   sgpl: ['Singular', 'Plural'], none: ['nu are singular', 'nu are plural'],
-  thats: { m: 'Acesta e {name}.', n: 'Acesta e {name}.', pl: 'Acestea sunt {name}.', other: 'Aceasta e {name}.' },
+  thats: { m: 'Acesta e {name}.', n: 'Acesta e {name}.', f: 'Aceasta e {name}.', pl: 'Acestea sunt {name}.', other: 'Asta e {name}.' },
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
   install: 'Instalează ABC 123! pe telefon',

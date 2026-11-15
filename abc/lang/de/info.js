@@ -17,7 +17,7 @@ i('sun', { title: 'Die Sonne', lines: [
 i('moon', { title: 'Der Mond', lines: [
   ['🌙', 'Der Mond kreist um die Erde.'],
   ['🔦', 'Er macht kein eigenes Licht: Die Sonne beleuchtet ihn.'],
-  ['🌗', 'Manchmal sehen wir ihn rund, manchmal wie eine Scheibe.'],
+  ['🌗', 'Manchmal sehen wir ihn rund, manchmal wie eine Sichel.'],
   ['👨‍🚀', 'Menschen sind mit einer Rakete zum Mond geflogen.']
 ] });
 i('star', { title: 'Die Sterne', lines: [
@@ -88,7 +88,7 @@ i('winter', { title: 'Der Winter', lines: [
 i('rocket', { title: 'Die Rakete', lines: [
   ['🚀', 'Eine Rakete fliegt sehr schnell, hoch hinauf ins All.'],
   ['🔥', 'Sie verbrennt Treibstoff und stößt Flammen nach unten.'],
-  ['👨‍🚀', 'Astronauten fliegen mit ihr bis zum Mond.']
+  ['👨‍🚀', 'Manche Raketen haben Astronauten zum Mond gebracht.']
 ] });
 i('bee', { title: 'Die Biene', lines: [
   ['🐝', 'Bienen fliegen von Blume zu Blume.'],
@@ -97,7 +97,7 @@ i('bee', { title: 'Die Biene', lines: [
 ] });
 i('butterfly', { title: 'Der Schmetterling', lines: [
   ['🐛', 'Ein Schmetterling ist zuerst eine Raupe.'],
-  ['🛌', 'Die Raupe hüllt sich in einen Kokon und schläft.'],
-  ['🦋', 'Aus dem Kokon schlüpft ein Schmetterling!']
+  ['🐛', 'Die Raupe wird zur Puppe und verwandelt sich darin.'],
+  ['🦋', 'Aus der Puppe schlüpft ein Schmetterling!']
 ] });
 }
