@@ -1,6 +1,6 @@
 {
-  const SKY = [{ id: 'sun', ex: 'day' }, { id: 'moon', ex: 'night' }, { id: 'star', ex: 'night' }, { id: 'earth', ex: 'house tree' },
-    { id: 'day', ex: 'sun ball' }, { id: 'night', ex: 'moon star' }, { id: 'rocket', ex: 'star moon' }];
+  const SKY = [{ id: 'sun', ex: 'day', sound: 'sun' }, { id: 'moon', ex: 'night', sound: 'night' }, { id: 'star', ex: 'night', sound: 'night' }, { id: 'earth', ex: 'house tree' },
+    { id: 'day', ex: 'sun ball', sound: 'sun' }, { id: 'night', ex: 'moon star', sound: 'night' }, { id: 'rocket', ex: 'star moon' }];
   MODULE('sky', {
     section: 'disc', ages: [3, 6],
     build(code) { return { sky: CONTENT.set(code, SKY, this.strings[code]) }; },

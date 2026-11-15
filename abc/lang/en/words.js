@@ -111,7 +111,7 @@ w('eagle', { w: 'ea/gle', art: 'an', pl: 'eagles' });
 w('drum', { w: 'drum', art: 'a', pl: 'drums' });
 w('cake', { w: 'cake', art: 'a', pl: 'cakes' });
 w('hat', { w: 'hat', art: 'a', pl: 'hats' });
-w('bug', { w: 'bug', art: 'a', pl: 'bugs' });
+w('bug', { w: 'cat/er/pil/lar', art: 'a', pl: 'caterpillars' });
 w('kangaroo', { w: 'kan/ga/roo', art: 'a', pl: 'kangaroos' });
 w('leaf', { w: 'leaf', art: 'a', pl: 'leaves' });
 w('nest', { w: 'nest', art: 'a', pl: 'nests' });

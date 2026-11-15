@@ -12,6 +12,7 @@
     for (const it of p) { r -= 1 + (weights[wk(it)] || 0); if (r <= 0) return it; }
     return p[p.length - 1];
   }
+  const pickSubject = t => { const m = t.members || []; return m.length ? m[Math.random() * m.length | 0].id : null; };
   const subject = () => round.subject && target.members ? target.members.find(m => m.id === round.subject) || null : null;
   function askLine() {
     const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id, it = subject() || target;
@@ -24,8 +25,7 @@
     for (const it of shuffle(pool())) if (opts.length < nChoices() && (!target.among || it.among === target.among) && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
     opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
-    const m = target.members || [];
-    round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: m.length ? m[Math.random() * m.length | 0].id : null };
+    round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: pickSubject(target) };
     draw();
   }
   function draw() {
@@ -68,7 +68,7 @@
       weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights);
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(`${APP.t(U.thats, { name: it.name, g: it.plural ? 'pl' : null })} ${askLine()}`, 350);
+      speak(`${APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.g })} ${askLine()}`, 350);
     }
   }
   $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); if (target) speak(askLine()); });
@@ -82,10 +82,10 @@
     afterLang(s) {
       if (!s || !s.target) return;
       const p = pool(), t = p.find(x => x.id === s.target); if (!t) return;
-      const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x)));
+      const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x) && (!t.among || x.among === t.among)));
       target = t; opts = o.map(x => x || spare.pop()).filter(Boolean);
       if (round.lower && !t.lower) round.lower = false;
-      if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = t.members && t.members.length ? t.members[Math.random() * t.members.length | 0].id : null;
+      if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = pickSubject(t);
       keep = true;
     },
     reset() { target = null; },

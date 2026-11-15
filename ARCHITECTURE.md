@@ -68,13 +68,13 @@ Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayL
 
 **MODULE** — `{ section, ages: [from, to], needs?: [LANG fields], build(code) → S, tiles: [TILE], check?(code, S, strings, report) }`.
 Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key or group.key>: spoken question with {name} / {the} }, say?: { <concept>: Learn line } }`
-(`say` is read by `CONTENT.set`; every language must have the base language's `say` keys).
+(`say` is read by `CONTENT.set`; every language must have the base language's `say` keys). Other keys are the module's own text (e.g. `word`, `hours`).
 
 **TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages? }`.
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
 `key`, `word`, `pic`, `pics`, `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
-games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game), `plural` (spoken as plural: "Those are …"). Two choices in one round never share a `sound` or a look.
+games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game), `plural` (spoken as plural: "Those are …"), `a` (indefinite form) + `g` (gender) for "That's a cow". Two choices in one round never share a `sound` or a look.
 
 **VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
 flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
