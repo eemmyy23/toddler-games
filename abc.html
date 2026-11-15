@@ -12,8 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="ABC 123!">
 <link rel="apple-touch-icon" href="abc-icon-192.png">
 <style>
-@font-face{font-family:'Fredoka';font-weight:400 700;font-display:swap;src:url(fonts/fredoka-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Fredoka';font-weight:400 700;font-display:swap;src:url(fonts/fredoka-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Lexend';font-weight:100 900;font-display:swap;src:url(fonts/lexend-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Lexend';font-weight:100 900;font-display:swap;src:url(fonts/lexend-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 :root{
     --bg0:#090c1f; --bg1:#11163a; --bg-glow:#1b2156; --card:#1a2050; --card2:#232a63;
   --line:rgba(255,255,255,.07); --line-strong:rgba(255,255,255,.25);
@@ -21,7 +21,7 @@
   --scrim:color-mix(in srgb,var(--bg0) 97%,transparent); --tabbar:color-mix(in srgb,var(--bg0) 94%,transparent);
   --shade:rgba(0,0,0,.35); --shadow:0 6px 18px var(--shade); --shadow-lg:0 8px 22px rgba(0,0,0,.45);
   --ring:inset 0 0 0 2px var(--amber);
-  --font:'Fredoka',ui-rounded,'Nunito','Segoe UI',system-ui,sans-serif;
+  --font:'Lexend',ui-rounded,'Segoe UI',system-ui,sans-serif;
     --r-sm:16px; --r:22px; --r-lg:26px; --r-pill:999px;
   --fs-xs:13px; --fs-s:15px; --fs-m:19px; --fs-l:24px; --fs-xl:34px; --fs-hero:48px;
   --sp-1:4px; --sp-2:6px; --sp-3:10px; --sp-4:16px;
@@ -34,8 +34,8 @@
   --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw);
   --ex-dir:column; --ex-min:96px; --ex-pad:10px 12px 8px; --ex-pic:40px; --ex-fs:var(--fs-m);
   --rt-h:58px; --rt-fs:32px; --rc-h:52px; --rc-fs:20px; --rce:26px; --rpic:min(14vh,24vw); --read-gap:1.6vh;
-  --cnum-w:96px; --cdig:54px; --cword:var(--fs-m); --citems:34px; --citems-min:60px; --hand-w:84px; --hand-h:96px;
-  --inf-fs:var(--fs-m); --inf-pad:12px 16px; --inf-pic:36px;
+  --cnum-w:96px; --cdig:54px; --cword:var(--fs-m); --citems:34px; --citems-min:60px; --hand-w:84px; --hand-h:96px; --row:5;
+  --inf-fs:var(--fs-m); --inf-pad:12px 16px; --inf-pic:36px; --play-gap:clamp(16px, 7vh, 72px);
 }
 @media (max-width:440px){:root{--seg-w:46px;--cnum-w:76px;--cdig:44px;--cword:16px;--citems:26px;--citems-min:48px;--hand-w:68px;--hand-h:78px;
   --rt-h:52px;--rt-fs:28px;--ex-min:88px;--ex-pad:8px 10px 6px;--ex-pic:34px;--ex-fs:17px}}
@@ -71,6 +71,10 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 .accent{color:var(--amber)}
 :is(.pill,.rbtn):not(.primary):not(.on):active{background:var(--card2)}
 .off{visibility:hidden}
+.objs{--obj:1.25em;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:var(--sp-1) var(--sp-3);line-height:1.1;
+  max-width:calc(var(--row) * var(--obj) + (var(--row) - 1) * var(--sp-3))}
+.objs > *{width:var(--obj);text-align:center}
+.objs.start{justify-content:flex-start}
 .group{display:flex;gap:var(--sp-2);background:var(--card);border-radius:var(--r-pill);padding:5px;box-shadow:var(--shadow)}
 .seg{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:var(--seg-w);height:var(--seg-h);
   border-radius:var(--r-pill);font-size:var(--seg-fs);line-height:1;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
@@ -148,11 +152,12 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 #prev{left:var(--gut)} #next{right:var(--gut)}
 .infobtn{--pill-h:48px;font-size:var(--fs-m);color:var(--amber);margin-top:var(--sp-1)}
 
-#play{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:4vh}
-#ask{display:flex;align-items:center;gap:.4em;padding:.25em .4em .25em .6em;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--shadow);
+#play{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--play-gap)}
+#ask{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.4em;padding:.25em .4em .25em .6em;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--shadow);
   font-size:min(5.5vh,7.5vw);font-weight:600;cursor:pointer}
+#ask .q{white-space:nowrap}
 #ask b{display:inline-block;background:var(--amber);color:var(--amber-ink);border-radius:.4em;padding:0 .35em;font-weight:700}
-#ask .objs{display:grid;grid-template-columns:repeat(5,auto);gap:4px 10px;font-size:min(6vh,9vw);line-height:1.1;cursor:default}
+#ask .objs{flex-basis:100%;margin:0 auto}
 #choices{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:min(4vw,4vh);max-width:100%}
 #choices.grp{--bf:.34} #choices.wrd{--bf:.5}
 .bub{--s:min(28vh,40vw);--c:#7fb4ff;width:var(--s);height:var(--s);border-radius:50%;font-weight:700;font-size:calc(var(--s) * var(--bf, .56));color:var(--ink);
@@ -178,10 +183,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .cdig{font-size:var(--cdig);font-weight:700;line-height:1}
 .cword{font-size:var(--cword);font-weight:600;opacity:.9;white-space:nowrap}
 .citems{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;font-size:var(--citems);line-height:1.1;min-height:var(--citems-min)}
-.citems.obj{display:grid;grid-template-columns:repeat(5,1fr);gap:6px 10px;align-items:center}
-.citem{display:inline-block;text-align:center}
 .hand{width:var(--hand-w);height:var(--hand-h);filter:drop-shadow(0 3px 0 rgba(0,0,0,.3))}
-.crow.on .citem,.crow.on .hand{animation:wig .7s ease}
+.crow.on .objs > *,.crow.on .hand{animation:wig .7s ease}
 @keyframes wig{30%{transform:translateY(-8px) rotate(-5deg)}60%{transform:translateY(-3px) rotate(4deg)}}
 
 #read{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--read-gap)}

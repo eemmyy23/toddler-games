@@ -13,7 +13,7 @@
   }
   function askLine() {
     const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id;
-    return APP.mt('games.' + key, { name: target.name, the: target.the || target.name });
+    return APP.mt('games.' + key, Object.assign({}, target, { the: target.the || target.name }));
   }
   function newRound() {
     locked = false; target = pickTarget();
@@ -25,7 +25,8 @@
   }
   function draw() {
     locked = false;
-    $('ask').innerHTML = game().prompt(target, round);
+    const q = game().show(target, round, askLine());
+    $('ask').innerHTML = `<span class="q">🔊 ${esc(q.text)}</span>${q.picture || ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');
     box.innerHTML = '';
@@ -37,6 +38,7 @@
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
       box.appendChild(b);
     });
+    APP.fit($('play'));
     speak(askLine(), 250);
   }
   function choose(it, el) {
@@ -68,6 +70,7 @@
     el: 'play',
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },
     leave() { roundTok++; },
+    resize() { if (target) APP.fit($('play')); },
     announce(name) { if (target) speak(`${name}. ${askLine()}`, 250); },
     beforeLang() { return { target: target && target.id, opts: opts.map(o => o.id), lower: round.lower }; },
     afterLang(s) {

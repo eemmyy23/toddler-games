@@ -4,7 +4,7 @@ const I18N = {
     if (tpl == null) return '';
     if (typeof tpl === 'function') return tpl(vars || {});
     if (typeof tpl === 'object' && !Array.isArray(tpl)) {
-      const cat = new Intl.PluralRules(locale).select((vars && vars.n) || 0);
+      const v = vars || {}, cat = v.g != null && tpl[v.g] != null ? v.g : new Intl.PluralRules(locale).select(v.n || 0);
       tpl = tpl[cat] != null ? tpl[cat] : tpl.other;
     }
     return String(tpl).replace(/\{(\w+)\}/g, (m, k) => vars && vars[k] != null ? vars[k] : m);

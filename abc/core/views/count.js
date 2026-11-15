@@ -31,9 +31,9 @@
     $('c-obj').classList.toggle('on', style === 'obj'); $('c-hand').classList.toggle('on', style === 'hand');
     $('c-all').textContent = `▶ ${list[0].label}→${list[list.length - 1].label}`;
     $('crows').innerHTML = list.map(it => {
-      const objs = style === 'obj' ? (it.pics || []).map(p => `<span class="citem">${p}</span>`).join('') : it.n <= 5 ? hand(it.n, false) : hand(5, false) + hand(it.n - 5, true);
+      const objs = style === 'obj' ? (it.pics || []).map(p => `<span>${p}</span>`).join('') : it.n <= 5 ? hand(it.n, false) : hand(5, false) + hand(it.n - 5, true);
       return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:${it.color}">${esc(it.label)}</div><div class="cword">${esc(it.name)}</div></div>` +
-             `<div class="citems${style === 'obj' ? ' obj' : ''}">${objs}</div></div>`;
+             `<div class="citems${style === 'obj' ? ' objs start' : ''}">${objs}</div></div>`;
     }).join('');
   }
   function light(n) {

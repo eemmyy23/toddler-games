@@ -1,8 +1,8 @@
 GAME('find', {
   needs: 2,
   pool: items => items,
-  prompt(t, round) {
+  show(t, round) {
     const shown = round.prompt === 'voice' ? '👂' : round.prompt === 'word' ? (t.promptWord || t.prompt) : t.prompt;
-    return `🔊 ${esc(APP.ui().find)} <b>${esc(shown)}</b>`;
+    return { text: APP.ui().find, picture: `<b>${esc(shown)}</b>` };
   }
 });
