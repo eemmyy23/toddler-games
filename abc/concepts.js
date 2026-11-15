@@ -1,7 +1,3 @@
-// ====== CONCEPTS — language-neutral, one per thing a child learns ======
-// C(id, picture, { gloss })   id: permanent ASCII slug (never rename: saved progress and every language use it)
-//                             gloss: translator note when the picture could mean several things
-// Each language decides which concepts it has, in abc/lang/<code>/words.js.
 C('cow', '🐄');
 C('house', '🏠');
 C('moon', '🌙');

@@ -1,7 +1,3 @@
-// Browser smoke test for abc.html (Playwright + Chromium).
-// Usage: serve the repo's PARENT folder so the page is at /toddler-games/abc.html, then
-//   node tools/smoke.js [baseUrl] [WxH]  default http://localhost:8765/toddler-games/abc.html 360x640
-// Speech is replaced by a recorder, so the test checks exactly what would be spoken.
 const { chromium } = require('playwright');
 const URL = process.argv[2] || 'http://localhost:8765/toddler-games/abc.html';
 const [VW, VH] = (process.argv[3] || '360x640').split('x').map(Number);
@@ -30,16 +26,15 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await p.$$eval('.flag', f => f.map(x => x.dataset.lang).join())) === 'en,ro,de', 'flags en,ro,de');
   await ev(() => setLang('ro'));
   ok((await p.$$eval('.tab .tl', t => t.map(x => x.textContent).join('|'))) === 'Numere|Litere|Descoperă|Joacă', 'tabs RO');
-  ok(await ev(() => !!document.querySelector('#manifest-check') || !!self.MANIFEST.version), 'manifest loaded');
+  ok(await ev(() => !!self.MANIFEST.version), 'manifest loaded');
 
   console.log('hubs');
   const hub = async sec => { await ev(s => { section = s; atHub = true; render(); }, sec);
-    return p.$$eval('#hub > *', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
+    return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
   ok(!play.some(x => x[0] === '~'), 'Little profile: no "coming soon" tiles');
   ok(play.filter(x => x[0] !== '#').join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', 'Play hub: the 6 games');
-  // 1:1 mapping: every Learn tile listed in a section has exactly one game tile, same id, same order
   for (const prof of ['little', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
       for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
@@ -119,13 +114,90 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => openTile('colors', true, true));
   const seen = await ev(() => { const s = new Set(); for (let k = 0; k < 150; k++) { APP.streak = 9; ABC.views.play.newRound(); ABC.views.play.state().opts.forEach(x => s.add(x.id)); } return [...s]; });
   ok(!seen.includes('rainbow') && seen.length === 10, `Find the colour: 10 plain colours, never the rainbow (${seen.length})`);
-  // language switch keeps the same question
   await ev(() => openTile('letters', true, true));
   for (let k = 0; k < 200 && !(await ev(() => { const st = ABC.views.play.state(); return !/[ȘȚĂÂÎ]/.test(st.target.id) && /[ȘȚĂÂÎ]/.test(st.opts.map(o => o.id).join('')); })); k++) await ev(() => ABC.views.play.newRound());
   const before = await ev(() => ABC.views.play.state().target.id);
   await ev(() => setLang('de')); const after = await ev(() => ABC.views.play.state().target.id);
   ok(before === after, `language switch keeps the question (${before} → ${after})`);
   await ev(() => setLang('ro'));
+
+  console.log('index, A–Z bar, universal search');
+  await ev(() => setLang('ro'));
+  for (const id of ['digits', 'letters', 'read', 'colors']) {
+    await ev(i => openTile(i, false, true), id);
+    ok(await p.isVisible('#gridbtn'), `${id}: index (⊞) button visible`);
+  }
+  await ev(() => { openTile('read', false, true); openIndex(); });
+  const ix = await ev(() => ({ heads: [...document.querySelectorAll('.ixh b')].map(b => b.textContent), az: document.querySelectorAll('#ixaz .az').length,
+    c: document.querySelector('#ixh-C .label').textContent, bar: getComputedStyle($('ixaz')).display }));
+  ok(ix.bar === 'flex' && ix.az >= 26 && ix.heads[0] === 'A' && ix.heads.includes('Ș'), `Read index: A–Z sections (${ix.heads.length}) + side bar (${ix.az} letters)`);
+  ok(/^\d+ (de )?cuvinte$/.test(ix.c), `section count: "C · ${ix.c}"`);
+  const azb = await p.$eval('#ixaz', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, h: r.height }; });
+  const n = await ev(() => document.querySelectorAll('#ixaz .az').length), k = await ev(() => [...document.querySelectorAll('#ixaz .az')].findIndex(a => a.dataset.u === 'V'));
+  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
+  const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
+  ok(vis, 'tap V on the side bar jumps to the V section');
+  ok(await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u === 'V'), 'side bar lights V after the jump');
+  for (const u of ['M', 'C', 'T']) {
+    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
+    const cur = await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u);
+    ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
+  }
+  await ev(() => closeIndex());
+  const search = async q => { await ev(q => { openSearch(); $('sq').value = q; runSearch(); }, q);
+    return ev(() => [...document.querySelectorAll('.sr')].map(r => r.dataset.t + ':' + r.dataset.id)); };
+  ok((await search('goat')).includes('read:goat'), 'search "goat" (EN) → capră');
+  ok((await search('ziege')).includes('read:goat'), 'search "Ziege" (DE, any case) → capră');
+  ok((await search('zwei'))[0] === 'digits:n2', 'search "zwei" → 2');
+  const rot = await search('rot');
+  ok(rot[0] === 'colors:red' && !rot.includes('read:turtle'), `search "rot" → roșu first, no substring noise (${rot.join(' ')})`);
+  ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
+  await ev(() => { document.querySelector('.sr').click(); });
+  ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');
+  await ev(() => { openSearch(); }); await p.waitForTimeout(150); await p.keyboard.type('m');
+  ok(await ev(() => !$('search').hidden && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
+  await p.keyboard.press('Escape');
+
+  console.log('hubs: tiles look like buttons (not stretched)');
+  for (const sec of ['num', 'abc', 'disc']) {
+    await ev(s => { section = s; atHub = true; render(); }, sec);
+    const hs = await p.$$eval('#hub .ht', t => t.map(x => { const R = e => e.getBoundingClientRect(), cs = getComputedStyle(x), kids = [...x.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
+      const content = Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      return [R(x).height | 0, Math.max(parseFloat(cs.minHeight), content) + 2]; }));
+    ok(hs.length && hs.every(([h, max]) => h <= max), `${sec} hub tiles not stretched (${hs.map(h => h[0]).join(', ')})`);
+  }
+  ok(await p.isVisible('.hsearch'), 'search pill on the hub');
+  ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
+  await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
+  const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
+    return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));
+  const where = { little: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
+  await ev(() => { profile = 'scientist'; section = 'disc'; render(); });
+  ok(badges.length && badges.every(b => where[b.p](b.x)), 'age badges placed by age: ' + badges.map(b => `${b.id}=${b.p}@${b.x.toFixed(2)}`).join(' '));
+  ok(badges.find(b => b.id === 'colors').p === 'little' && badges.find(b => b.id === 'families').p === 'little', 'colours, families = little');
+  await ev(() => { section = 'num'; render(); });
+  const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
+  ok(nb.digits === 'little' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
+  const over = [];
+  for (const pr of ['little', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
+    await ev(([pr, sec]) => { profile = pr; section = sec; atHub = true; render(); }, [pr, sec]);
+    over.push(...await ev(() => [...document.querySelectorAll('#hub .ht')].filter(t => { const r = t.getBoundingClientRect(), b = t.querySelector('.agebadge').getBoundingClientRect();
+      return t.scrollHeight > t.clientHeight + 1 || [...t.querySelectorAll('.hp,.hl,.badge')].some(e => { const q = e.getBoundingClientRect(); return q.top < b.bottom - 1 && q.right > b.left && q.left < b.right; }); }).map(t => t.dataset.id)));
+  }
+  ok(!over.length, 'hub tiles: nothing overflows or sits under the age badge' + (over.length ? ': ' + [...new Set(over)].join(' ') : ''));
+  await ev(() => { profile = 'little'; render(); });
+
+  console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
+  await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(1400);
+  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.on')?.dataset.n }));
+  ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
+  const rows = [];
+  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
+    const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
+  ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(100);
+  ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');
   const wow = await ev(() => [1, 2, 20, 21].map(n => APP.t(APP.ui().wow, { n })));

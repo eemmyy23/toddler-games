@@ -1,5 +1,4 @@
-// ====== „WAS IST DAS?“-KARTEN — Deutsch ======
-{ // block scope: every language file declares its own helper
+{
 const i = INFO('de');
 i('rainbow', { title: 'Der Regenbogen', lines: [
   ['🌈', 'Ein Regenbogen ist ein bunter Bogen am Himmel.'],

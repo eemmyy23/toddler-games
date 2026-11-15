@@ -1,6 +1,4 @@
-// ====== "WHAT IS IT?" CARDS — English ======
-// i(conceptId, { title, lines: [[emoji, sentence], …] }). Short, true, for small children.
-{ // block scope: every language file declares its own helper
+{
 const i = INFO('en');
 i('rainbow', { title: 'The rainbow', lines: [
   ['🌈', 'A rainbow is a colourful arc in the sky.'],

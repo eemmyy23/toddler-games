@@ -1,7 +1,6 @@
-// ====== MODULE: NUMBERS 1–10 ======
-// tiles: each tile is a learn screen; its `game` is its Play tile (paired automatically).
+const NUMPICS = ['🌞', '🐥', '🐟', '🍓', '⭐', '🎈', '🐞', '🍪', '🚗', '🦋'];
 MODULE('numbers', {
-  section: 'num', ages: [2, 6],
+  section: 'num', ages: [2, 6], needs: ['numbers'],
   build(code) {
     const L = ABC.langs[code];
     return { numbers: L.numbers.map((w, i) => {
@@ -12,7 +11,7 @@ MODULE('numbers', {
     }) };
   },
   tiles: [
-    { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
+    { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
     { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany' } }
   ]
 });

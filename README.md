@@ -1,6 +1,6 @@
 # Toddler Games
 
-Tiny, no-instructions web games for very small children. Each one is a single self-contained HTML file with PWA install support.
+Tiny, no-instructions web games for very small children. Rocket! and Paint! are single self-contained HTML files; ABC 123! is `abc.html` plus the `abc/` folder. All install as PWAs and share `sw.js` for offline use.
 
 ## Play online
 
@@ -12,10 +12,11 @@ Tiny, no-instructions web games for very small children. Each one is a single se
 
 - 🔤 **ABC 123!** — [eemmyy23.github.io/toddler-games/abc.html](https://eemmyy23.github.io/toddler-games/abc.html)
   Numbers, letters, reading and colours in 🇬🇧 English, 🇷🇴 Romanian and 🇩🇪 German, dark night theme, tabs **Numere · Litere · Descoperă · Joacă**:
-  - **🔢 Numbers:** digits 1–10 and a counting page (objects or hands, index finger first, thumb = 5).
-  - **🔤 Letters:** big letter with example words (RO school sounds bî, cî, zî; RO letter groups ce/ci/che/chi/ge/gi/ghe/ghi); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
-  - **🔎 Discover:** colours and a tappable rainbow; "What is it?" cards read aloud.
+  - **123 Numbers:** digits 1–10 and a counting page (objects or hands, index finger first, thumb = 5).
+  - **ABC Letters:** big letter with example words (RO school sounds bî, cî, zî; RO letter groups ce/ci/che/chi/ge/gi/ghe/ghi); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
+  - **🧭 Discover:** colours and a tappable rainbow; "What is it?" cards read aloud.
   - **🎯 Play:** one game for every learn screen, paired automatically; stars.
+  - **🔍 Search** finds a word, number or colour typed in any language; **⊞** opens every item (A–Z sections with a side letter bar in Read).
   Switching the flag keeps the same item (and the same question in a game). The three bikes next to the flags pick the age: balance bike 2–4 · training wheels 4–7 · mountain bike 7–12. Anyone can switch; a higher age only adds topics.
 
 ## Installing
@@ -24,4 +25,4 @@ Each game is a Progressive Web App. Open the link, then use your browser's "Inst
 
 ## Extending ABC 123!
 
-Words, colours, info cards, languages and subjects are data. See [ARCHITECTURE.md](ARCHITECTURE.md) for the layout and step-by-step recipes, and run `node tools/check.js --fix` after any change (it checks the content and regenerates `abc/manifest.js`).
+Words, colours, info cards, languages, subjects and age profiles are data or modules. See [ARCHITECTURE.md](ARCHITECTURE.md) for the layout and step-by-step recipes, and run `node tools/check.js --fix` after any change (it checks the content and regenerates `abc/manifest.js`).

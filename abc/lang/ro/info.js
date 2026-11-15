@@ -1,6 +1,4 @@
-// ====== FIȘE „CE ESTE?” — română ======
-// i(idConcept, { title, lines: [[emoji, propoziție], …] }). Scurte, corecte, pentru copii mici.
-{ // block scope: every language file declares its own helper
+{
 const i = INFO('ro');
 i('rainbow', { title: 'Curcubeul', lines: [
   ['🌈', 'Curcubeul este un arc colorat pe cer.'],

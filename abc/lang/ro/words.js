@@ -1,7 +1,4 @@
-// ====== CUVINTE ÎN ROMÂNĂ ======
-// w(id, { w: silabe "va/că", g: 'm'|'f'|'n', def: articulat, pl: plural, plDef: plural articulat, mass, plOnly, ex: false })
-// ex: false = nu e exemplu de literă. Ordinea = ordinea exemplelor la fiecare literă.
-{ // block scope: every language file declares its own helper
+{
 const w = WORDS('ro');
 w('cow', { w: 'va/că', def: 'vaca', pl: 'vaci', g: 'f', plDef: 'vacile' });
 w('house', { w: 'ca/să', def: 'casa', pl: 'case', g: 'f', plDef: 'casele' });

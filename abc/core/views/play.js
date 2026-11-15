@@ -1,14 +1,11 @@
-// ====== VIEW 'play' — hosts every game type (abc/core/games/*.js) for the current tile ======
-// A game type supplies: pool(items, streak) → candidates, prompt(target, round) → HTML of the question,
-// optionally bubbleText(item, round). The host does rounds, bubbles, praise, stars, miss weights.
 (function () {
   let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false;
   const game = () => ABC.games[APP.tile().game.type];
-  const wk = it => `${APP.tile().id}:${it.id}`;                    // stable ids → progress survives language switch
+  const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
   const nChoices = () => APP.streak >= 8 ? 4 : APP.streak >= 3 ? 3 : 2;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
-  function pickTarget() {                                            // missed items come up more; no immediate repeat
+  function pickTarget() {
     const p = pool().filter(it => it !== target);
     let r = Math.random() * p.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
     for (const it of p) { r -= 1 + (weights[wk(it)] || 0); if (r <= 0) return it; }
@@ -20,6 +17,7 @@
   }
   function newRound() {
     locked = false; target = pickTarget();
+    if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; }
     opts = shuffle([target, ...shuffle(pool().filter(it => it !== target)).slice(0, nChoices() - 1)]);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0] };
@@ -33,7 +31,7 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; b.textContent = round.lower && it.lower ? it.lower : it.bubble;
+      b.className = 'bub'; b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label);
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || ink(i * 90)); b.style.animationDelay = (i * 0.4) + 's';
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
@@ -42,7 +40,7 @@
     speak(askLine(), 250);
   }
   function choose(it, el) {
-    ensureAudio(); if (locked) return;
+    APP.firstTouch(); if (locked) return;
     const U = APP.ui();
     if (it === target) {
       locked = true; APP.streak++; APP.addStar();
@@ -55,7 +53,7 @@
         for (let k = 0; k < 5; k++) setTimeout(() => confetti(Math.random() * W, H * 0.3 + Math.random() * H * 0.3, 60, 12), k * 180);
         said = speak(APP.t(U.wow, { n: APP.stars }), 700);
       } else { sfx.right(); said = speak(`${U.cheers[Math.random() * U.cheers.length | 0]} ${target.name}!`, 400); }
-      const tok = ++roundTok; // next question only after the praise has been fully spoken
+      const tok = ++roundTok;
       Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {
       APP.streak = 0;
@@ -71,12 +69,10 @@
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },
     leave() { roundTok++; },
     announce(name) { if (target) speak(`${name}. ${askLine()}`, 250); },
-    // language switch: keep the same question and bubbles (same ids) when possible
     beforeLang() { return { target: target && target.id, opts: opts.map(o => o.id), lower: round.lower }; },
     afterLang(s) {
       if (!s || !s.target) return;
       const p = pool(), t = p.find(x => x.id === s.target); if (!t) return;
-      // same target; same bubbles where they exist in the new language (e.g. Ș → replaced by another letter in German)
       const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x)));
       target = t; opts = o.map(x => x || spare.pop()).filter(Boolean);
       if (round.lower && !t.lower) round.lower = false; keep = true;
