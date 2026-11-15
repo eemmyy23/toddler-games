@@ -86,6 +86,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #glyph{font-size:min(28vh,46vw);line-height:1.1;font-weight:700;cursor:pointer;text-shadow:0 6px 0 rgba(0,0,0,.35);transition:transform .15s}
 #glyph.grp{font-size:min(22vh,26vw)}
 .sw{display:inline-block;width:min(30vh,52vw);height:min(30vh,52vw);border-radius:50%;box-shadow:inset 0 -10px 0 rgba(0,0,0,.15),0 10px 30px rgba(0,0,0,.45);border:3px solid rgba(255,255,255,.22);vertical-align:middle}
+.sw.rb{box-shadow:none;border:0;border-radius:0;background-color:transparent;width:min(40vh,72vw);height:min(20vh,36vw)}
 .nav .dot{display:inline-block;width:40px;height:40px;border-radius:50%;vertical-align:middle;border:2px solid rgba(255,255,255,.25)}
 #glyph small{font-size:.5em;opacity:.85;margin-left:.06em}
 #glyph.pop{animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
@@ -262,7 +263,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.8.3-preview</div>
+<div id="ver">v0.8.4-preview</div>
 
 <script>
 // ====== DATA ======
@@ -528,8 +529,14 @@ const COLORS = [
   ['#fdd835', 'yellow', 'galben', 'Gelb', '🍌🐤🌻'], ['#43a047', 'green', 'verde', 'Grün', '🥒🐸🍃'],
   ['#fb8c00', 'orange', 'portocaliu', 'Orange', '🍊🥕🎃'], ['#8e24aa', 'purple', 'mov', 'Lila', '🍇🍆🔮'],
   ['#f48fb1', 'pink', 'roz', 'Rosa', '🐷🌸🦩'], ['#8d6e63', 'brown', 'maro', 'Braun', '🐻🌰🍫'],
-  ['#111111', 'black', 'negru', 'Schwarz', '🐈‍⬛🎩🎱'], ['#f5f5f5', 'white', 'alb', 'Weiß', '☁️⛄🐑']
+  ['#111111', 'black', 'negru', 'Schwarz', '🐈‍⬛🎩🎱'], ['#f5f5f5', 'white', 'alb', 'Weiß', '☁️⛄🐑'],
+  // the rainbow: Learn only (not a single colour, so not in "Find the colour"); spoken with its 7 colours (ROGVAIV)
+  ['rainbow', 'rainbow', 'curcubeu', 'Regenbogen', '🌈🌦️☔']
 ];
+const RAINBOW = { en: 'red, orange, yellow, green, blue, indigo, violet',
+                  ro: 'roșu, oranj, galben, verde, albastru, indigo, violet',
+                  de: 'Rot, Orange, Gelb, Grün, Blau, Indigo, Violett' };
+const RAINBOW_BG = 'radial-gradient(ellipse 50% 100% at 50% 100%, transparent 0 44%, #8e24aa 44% 52%, #3949ab 52% 60%, #1e88e5 60% 68%, #43a047 68% 76%, #fdd835 76% 84%, #fb8c00 84% 92%, #e53935 92% 100%, transparent 100%)';
 const NUMPICS = ['🌞','🐥','🐟','🍓','⭐','🎈','🐞','🍪','🚗','🦋'];
 // Night palette for letters/bubbles: soft pastels that read well on dark navy
 const INK = ['#ff8f87','#ffb36b','#f2d06b','#93d98f','#6fd3c4','#7fb4ff','#b49cff','#f38fc4'];
@@ -561,7 +568,9 @@ function buildSets(code) {
   const sets = { abc: letters, num: numbers };
   sets.col = COLORS.map((c, i) => {
     const name = c[L.col], pics = Array.from(c[4].matchAll(/\p{Extended_Pictographic}(\u200d\p{Extended_Pictographic}|\ufe0f)*/gu), m => m[0]);
-    return { ch: name, key: null, cid: i, hex: c[0], hue: 0, pic: pics[0], pics, word: name, name, say: `${name}!`, ex: [] };
+    const rb = c[0] === 'rainbow';
+    return { ch: name, key: null, cid: i, hex: rb ? null : c[0], bg: rb ? RAINBOW_BG : c[0], noPlay: rb, hue: 0, pic: pics[0], pics,
+             word: name, name, say: rb ? `${name}: ${RAINBOW[code]}!` : `${name}!`, ex: [] };
   });
   if (L.groups) sets.grp = L.groups.map((g, i, a) => {
     const ex = exFor(g, true), [w, pic] = ex[0] || [g, '🔤'];
@@ -716,7 +725,7 @@ function showLearn(sayIt = true) {
   const it = items()[idx];
   const g = $('glyph');
   const isCol = setName === 'col';
-  g.innerHTML = isCol ? `<span class="sw" style="background:${it.hex}"></span>`
+  g.innerHTML = isCol ? `<span class="sw${it.noPlay ? ' rb' : ''}" style="background:${it.bg}"></span>`
     : setName === 'abc' && it.key !== it.ch ? `${it.ch}<small>${it.key}</small>` : it.ch;
   g.classList.toggle('grp', setName === 'grp');
   g.style.color = ink(it.hue);
@@ -725,7 +734,7 @@ function showLearn(sayIt = true) {
   // Arrows show the neighbour they lead to
   const list = items(), L = list.length;
   const pv = list[(idx - 1 + L) % L], nx = list[(idx + 1) % L];
-  const navFace = x => isCol ? `<span class="dot" style="background:${x.hex}"></span>` : `<b style="color:${ink(x.hue)}">${x.ch}</b>`;
+  const navFace = x => isCol ? `<span class="dot" style="background:${x.hex || 'conic-gradient(#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#3949ab,#8e24aa,#e53935)'}"></span>` : `<b style="color:${ink(x.hue)}">${x.ch}</b>`;
   $('prev').innerHTML = `‹ ${navFace(pv)}`;
   $('next').innerHTML = `${navFace(nx)} ›`;
   // Letters/groups: several tappable example words under the letter, with the letter highlighted
@@ -767,7 +776,7 @@ function step(d) {
 let target = null, locked = false;
 function nChoices() { return streak >= 8 ? 4 : streak >= 3 ? 3 : 2; }
 function pickTarget() {
-  let list = items();
+  let list = items().filter(it => !it.noPlay);
   if (playKind === 'howmany') list = list.filter(it => it.n <= (streak >= 5 ? 10 : 5)); // small amounts first
   // Weighted random: missed items come up more; avoid immediate repeat
   const pool = list.filter(it => it !== target);
@@ -800,7 +809,7 @@ function pickRound() {
 function newRound() {
   locked = false;
   target = pickTarget();
-  const base = playKind === 'howmany' ? items().filter(it => it.n <= (streak >= 5 ? 10 : 5)) : items();
+  const base = (playKind === 'howmany' ? items().filter(it => it.n <= (streak >= 5 ? 10 : 5)) : items()).filter(it => !it.noPlay);
   const others = shuffle(base.filter(it => it !== target)).slice(0, nChoices() - 1);
   curOpts = shuffle([target, ...others]);
   round = pickRound();
