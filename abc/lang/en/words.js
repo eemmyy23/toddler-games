@@ -225,4 +225,12 @@ w('jupiter', { w: 'Ju/pi/ter', ex: false });
 w('saturn', { w: 'Sat/urn', ex: false });
 w('uranus', { w: 'U/ra/nus', ex: false });
 w('neptune', { w: 'Nep/tune', ex: false });
+w('germ', { w: 'germ', art: 'a', pl: 'germs' });
+w('soap', { w: 'soap', mass: true });
+w('toothbrush', { w: 'tooth/brush', art: 'a', pl: 'toothbrushes' });
+w('water', { w: 'wa/ter', mass: true });
+w('blood', { w: 'blood', mass: true });
+w('fever', { w: 'fe/ver', mass: true });
+w('vaccine', { w: 'vac/cine', art: 'a', pl: 'vaccines' });
+w('bandage', { w: 'plas/ter', art: 'a', pl: 'plasters' });
 }

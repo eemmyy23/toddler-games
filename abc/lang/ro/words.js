@@ -224,4 +224,12 @@ w('jupiter', { w: 'Ju/pi/ter', ex: false });
 w('saturn', { w: 'Sa/turn', ex: false });
 w('uranus', { w: 'U/ra/nus', ex: false });
 w('neptune', { w: 'Nep/tun', ex: false });
+w('germ', { w: 'mi/crob', def: 'microbul', pl: 'microbi', g: 'm', plDef: 'microbii' });
+w('soap', { w: 'să/pun', def: 'săpunul', pl: 'săpunuri', g: 'n', plDef: 'săpunurile' });
+w('toothbrush', { w: 'pe/ri/u/ță de dinți', def: 'periuța de dinți', g: 'f' });
+w('water', { w: 'a/pă', def: 'apa', g: 'f', mass: true });
+w('blood', { w: 'sân/ge', def: 'sângele', g: 'n', mass: true });
+w('fever', { w: 'fe/bră', def: 'febra', g: 'f', mass: true });
+w('vaccine', { w: 'vac/cin', def: 'vaccinul', pl: 'vaccinuri', g: 'n', plDef: 'vaccinurile' });
+w('bandage', { w: 'plas/tu/re', def: 'plasturele', pl: 'plasturi', g: 'm', plDef: 'plasturii' });
 }
