@@ -167,7 +167,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 #ask .objs{flex-basis:100%;margin:0 auto}
 #choices{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:min(4vw,4vh);max-width:100%}
 #choices.grp{--bf:.34} #choices.wrd{--bf:.5}
-.bub{--s:min(28vh,40vw);--c:#7fb4ff;width:var(--s);height:var(--s);border-radius:50%;font-weight:700;font-size:calc(var(--s) * var(--bf, .56));color:var(--ink);
+.bub{--s:min(28vh,40vw);--c:#7fb4ff;width:var(--s);height:var(--s);border-radius:50%;font-weight:700;font-size:calc(var(--s) * min(var(--bf, .56), var(--fit, 1)));color:var(--ink);
   background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--c) 70%,#fff) 0%,var(--c) 45%,color-mix(in srgb,var(--c) 72%,#000) 100%);
   box-shadow:var(--shadow-lg),inset 0 -8px 0 rgba(0,0,0,.12);animation:float 4s ease-in-out infinite}
 .n3 .bub{--s:min(25vh,28vw)}

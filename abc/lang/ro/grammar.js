@@ -5,6 +5,8 @@ LANG('ro', {
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
   groups: 'ce ci che chi ge gi ghe ghi',
   alike: 'â=î',
+  teens: ['unsprezece', 'doisprezece', 'treisprezece', 'paisprezece', 'cincisprezece', 'șaisprezece', 'șaptesprezece', 'optsprezece', 'nouăsprezece', 'douăzeci'],
+  tens: ['zece', 'douăzeci', 'treizeci', 'patruzeci', 'cincizeci', 'șaizeci', 'șaptezeci', 'optzeci', 'nouăzeci', 'o sută'],
   numbers: ['unu', 'doi', 'trei', 'patru', 'cinci', 'șase', 'șapte', 'opt', 'nouă', 'zece'],
   spell: c => ({ A: 'a', Ă: 'ă', Â: 'â', E: 'e', I: 'i', Î: 'î', O: 'o', U: 'u', K: 'ca', Q: 'chiu', W: 'dublu ve', X: 'ics', Y: 'i grec' })[c]
              || c.toLocaleLowerCase('ro') + 'î',

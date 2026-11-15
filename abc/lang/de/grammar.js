@@ -5,6 +5,8 @@ LANG('de', {
   letters: 'A Ä B C D E F G H I J K L M N O Ö P Q R S ß T U Ü V W X Y Z',
   groups: 'sch ei au eu st pf',
   sayGroup: (g, w) => `${w}!`,
+  teens: ['elf', 'zwölf', 'dreizehn', 'vierzehn', 'fünfzehn', 'sechzehn', 'siebzehn', 'achtzehn', 'neunzehn', 'zwanzig'],
+  tens: ['zehn', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig', 'hundert'],
   numbers: ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn'],
   keepCase: true,
   sayLetter: (c, w, inside) => `${c} wie ${w}!`,

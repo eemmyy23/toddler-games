@@ -37,7 +37,7 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label);
+      b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else { b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label); b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || ink(i * 90)); b.style.animationDelay = (i * 0.4) + 's';
       b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });

@@ -58,7 +58,7 @@ const needs = new Set(Tiles.modules().flatMap(m => m.needs || []));
 for (const c of langs) {
   const L = ABC.langs[c]; if (!L) { err(`${c}: not loaded`); continue; }
   for (const k of ['name', 'flag', 'bcp47', 'letters', 'forms', ...needs]) if (L[k] == null) err(`${c}: grammar.js missing "${k}"`);
-  if (L.numbers && L.numbers.length !== 10) err(`${c}: numbers must have 10 entries`);
+  for (const k of ['numbers', 'teens', 'tens']) if (L[k] && L[k].length !== 10) err(`${c}: ${k} must have 10 entries`);
   try { new Intl.Locale(L.bcp47); } catch (e) { err(`${c}: bcp47 "${L.bcp47}" is not a valid locale`); }
   const ck = new Set(keysOf(L.strings));
   for (const k of keysOf(ABC.langs[base].strings)) if (!ck.has(k)) err(`${c}/strings.js: missing "${k}" (would show ${base} text)`);

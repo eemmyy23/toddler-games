@@ -62,7 +62,7 @@ tools/smoke.js              browser test: every language, every game, speech, of
 ## Contracts
 **LANG** (`grammar.js`) — required: `name, flag, bcp47, letters` (space-separated units, multi-character allowed), `forms(entry, word) → { sg: [a, the], pl: [two, the] } | null`.
 Optional: `dir`, `keepCase`, `spell(letter)`, `fold(text)` (search), `voices` (RegExp of preferred voice names), `checkForms(entry)` / `checkWord(entry)` → message.
-Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayLetter(name, word, inside)`, `groups`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
+Module data, only when a module lists it in `needs`: `numbers` (1–10), `teens` (11–20), `tens` (10, 20 … 100) — 10 words each, `sayLetter(name, word, inside)`, `groups`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
 
 **WORDS** — `w(id, { w: 'va/că', … })`, `/` marks syllables. **INFO** — `i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })`. **GROUP** — `GROUP(id, 'member ids')`: the group is a concept too (its word names it); a concept is in at most one group (index Groups mode, Groups module). **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
 
