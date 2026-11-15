@@ -39,7 +39,7 @@ w('umbrella', { w: 'um/bre/lă', def: 'umbrela', pl: 'umbrele', g: 'f', plDef: '
 w('violin', { w: 'vi/oa/ră', def: 'vioara', pl: 'viori', g: 'f', plDef: 'viorile' });
 w('whale', { w: 'ba/le/nă', def: 'balena', pl: 'balene', g: 'f', plDef: 'balenele' });
 w('fox', { w: 'vul/pe', def: 'vulpea', pl: 'vulpi', g: 'f', plDef: 'vulpile' });
-w('yo-yo', { w: 'yo-/yo' });
+w('yo-yo', { w: 'yo-/yo', def: 'yo-youl', pl: 'yo-youri', g: 'n', plDef: 'yo-yourile' });
 w('zebra', { w: 'ze/bră', def: 'zebra', pl: 'zebre', g: 'f', plDef: 'zebrele' });
 w('train', { w: 'tren', def: 'trenul', pl: 'trenuri', g: 'n', plDef: 'trenurile' });
 w('turtle', { w: 'țes/toa/să', def: 'țestoasa', pl: 'țestoase', g: 'f', plDef: 'țestoasele' });
@@ -47,7 +47,7 @@ w('mouse', { w: 'șoa/re/ce', def: 'șoarecele', pl: 'șoareci', g: 'm', plDef: 
 w('ship', { w: 'va/por', def: 'vaporul', pl: 'vapoare', g: 'n', plDef: 'vapoarele' });
 w('cloud', { w: 'nor', def: 'norul', pl: 'nori', g: 'm', plDef: 'norii' });
 w('teddy', { w: 'ur/su/leț', def: 'ursulețul', pl: 'ursuleți', g: 'm', plDef: 'ursuleții' });
-w('koala', { w: 'ko/a/la' });
+w('koala', { w: 'ko/a/la', def: 'koala', pl: 'koala', g: 'm', plDef: 'koala' });
 w('xylophone', { w: 'xi/lo/fon', def: 'xilofonul', pl: 'xilofoane', g: 'n', plDef: 'xilofoanele' });
 w('yoga', { w: 'yo/ga', mass: true, def: 'yoga' });
 w('wifi', { w: 'wi-/fi' });
@@ -232,4 +232,8 @@ w('blood', { w: 'sân/ge', def: 'sângele', g: 'n', mass: true });
 w('fever', { w: 'fe/bră', def: 'febra', g: 'f', mass: true });
 w('vaccine', { w: 'vac/cin', def: 'vaccinul', pl: 'vaccinuri', g: 'n', plDef: 'vaccinurile' });
 w('bandage', { w: 'plas/tu/re', def: 'plasturele', pl: 'plasturi', g: 'm', plDef: 'plasturii' });
+w('van', { w: 'du/bă', def: 'duba', pl: 'dube', g: 'f', plDef: 'dubele' });
+w('watch', { w: 'ceas de mâ/nă', def: 'ceasul de mână', g: 'n' });
+w('up', { w: 'sus' });
+w('zero', { w: 'ze/ro', def: 'zeroul', pl: 'zerouri', g: 'n', plDef: 'zerourile' });
 }

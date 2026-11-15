@@ -229,4 +229,10 @@ w('blood', { w: 'Blut', g: 'n', mass: true });
 w('fever', { w: 'Fie/ber', g: 'n', mass: true });
 w('vaccine', { w: 'Imp/fung', g: 'f', pl: 'Impfungen' });
 w('bandage', { w: 'Pflas/ter', g: 'n', pl: 'Pflaster' });
+w('van', { w: 'Klein/bus', g: 'm', pl: 'Kleinbusse' });
+w('watch', { w: 'Arm/band/uhr', g: 'f', pl: 'Armbanduhren' });
+w('up', { w: 'oben' });
+w('zero', { w: 'Null', g: 'f', pl: 'Nullen' });
+w('ice', { w: 'Eis/wür/fel', g: 'm', pl: 'Eiswürfel' });
+w('question', { w: 'Fra/ge/zei/chen', g: 'n', pl: 'Fragezeichen' });
 }

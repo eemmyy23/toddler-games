@@ -5,7 +5,7 @@
     build(code) {
       const cats = CONTENT.things(code, Object.keys(ABC.groups)).map(g => {
         const members = CONTENT.things(code, ABC.groups[g.id]).filter(x => x.forms && x.forms.sg).map(x => CONTENT.thing(x));
-        return members.length >= 2 && CONTENT.thing(g, { members, sound: ALIKE.find(a => a.split(' ').includes(g.id)), concepts: members.map(x => x.id), say: `${g.w}!`,
+        return members.length >= 2 && CONTENT.thing(g, { members, sound: ALIKE.find(a => a.split(' ').includes(g.id)), concepts: members.map(x => x.id), say: g.say,
           examples: members.slice(0, SHOWN).map(x => [x.word, x.pic, false]) });
       });
       return { categories: cats.filter(Boolean) };

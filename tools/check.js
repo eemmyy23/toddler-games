@@ -144,6 +144,11 @@ for (const c of langs) {
     const lab = s.tiles && s.tiles[t.id], items = Tiles.items(t, c);
     if (t.view && !items.length) { if (lab) warn(`${c}: tile ${t.id} has a label but no items → hidden`); continue; }
     if (!Array.isArray(lab) || lab.length !== 2) { if (t.view) err(`module ${t.module.id}/${c}: tiles.${t.id} must be [learn label, game label]`); else warn(`module ${t.module.id}/${c}: tiles.${t.id} missing → hidden`); continue; }
+    if (!t.perLanguage && c !== CFG.baseLanguage) {
+      const ids = it => [it.id, ...(it.members || []).map(m => it.id + '>' + m.id)], mine = new Set(items.flatMap(ids));
+      const gone = Tiles.items(t, CFG.baseLanguage).flatMap(ids).filter(id => !mine.has(id));
+      if (gone.length) err(`${c}: tile ${t.id} is incomplete — missing ${gone.join(', ')} (base ${CFG.baseLanguage} has them)`);
+    }
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }
     const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => t.game.ask ? t.game.ask(it, { lower }) : t.id)));
@@ -151,5 +156,19 @@ for (const c of langs) {
     for (const k of asks) if (!spoken(k.split('.').reduce((o, x) => o && o[x], s.games || {}))) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
   }
 }
+console.log('engine');
+const lit = new Set([...CFG.languages, ...Object.keys(CFG.profiles), ...CFG.modules, ...CFG.sections.map(s => s.id), ...tileIds.keys(), ...ABC.concepts.map(x => x.id)]);
+const engine = new Set([...Object.keys(ABC.views), ...Object.keys(ABC.games), ...Object.keys(CFG.icons), 'view', 'hub', 'sine', 'square', 'triangle', 'sawtooth', 'hand', 'obj']);
+for (const f of ['sw.js', ...ls('abc/core', /\.js$/), ...VIEW_FILES, ...GAME_FILES]) {
+  const src = read(f);
+  for (const m of src.matchAll(/(['"`])([a-z][a-z0-9-]*)\1/g)) if (lit.has(m[2]) && !engine.has(m[2])) err(`${f}: names "${m[2]}" (a language, profile, module, section, tile or concept) — the engine must not`);
+}
+for (const f of [...scripts, 'sw.js', ...ls('tools', /\.js$/)].filter(f => f !== 'abc/manifest.js')) {
+  const src = read(f).replace(/(['"`])(?:\\.|(?!\1)[^\\])*\1/g, '""').replace(/\/(?![*/])(?:\\.|\[(?:\\.|[^\]])*\]|[^/\\\n])+\/[gimsuy]*/g, '/r/');
+  for (const m of src.matchAll(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g)) err(`${f}: comment "${m[0].slice(0, 40)}" — no comments in code`);
+}
+for (const m of css.matchAll(/\/\*([\s\S]*?)\*\//g)) err(`abc.html CSS: comment "${m[1].trim().slice(0, 40)}"`);
+for (const m of html.matchAll(/<!--([\s\S]*?)-->/g)) err(`abc.html: comment "${m[1].trim().slice(0, 40)}"`);
+for (const m of markup.matchAll(/\s(aria-label|title|alt|placeholder|value)="([^"]+)"/g)) err(`abc.html: ${m[1]}="${m[2]}" is hard-coded text — set it from strings`);
 console.log(errors ? `\n${errors} error(s), ${warnings} warning(s)` : `\nOK — ${warnings} warning(s)`);
 process.exit(errors ? 1 : 0);

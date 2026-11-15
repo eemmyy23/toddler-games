@@ -72,7 +72,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key or group.key>: spoken question with {name} / {the} }, say?: { <concept>: Learn line } }`
 (`say` is read by `CONTENT.set`, or is the module's own list; every language must have the base language's `say` keys). Other keys are the module's own text (e.g. `word`, `hours`).
 
-**TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages? }`.
+**TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages?, perLanguage? }` — `perLanguage`: its items differ by language (letters, the dictionary); every other tile has every base-language item in every language (checked).
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass` (default: label), `color`, `nav` (default: label),
 `key`, `word`, `pic`, `pics`, `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),

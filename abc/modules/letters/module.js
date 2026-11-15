@@ -35,11 +35,11 @@
       if (bare.length) report(`letters with no example word: ${bare.join(' ')}`);
     },
     tiles: [
-      { id: 'letters', icon: '🔤', view: 'card', items: S => S.letters, index: true,
+      { id: 'letters', icon: '🔤', view: 'card', items: S => S.letters, index: true, perLanguage: true,
         game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'], lower: true, ask: (it, r) => r.lower ? 'lettersSmall' : 'letters' } },
-      { id: 'read', icon: '📚', view: 'read', items: S => S.words, index: true, search: true,
+      { id: 'read', icon: '📚', view: 'read', items: S => S.words, index: true, search: true, perLanguage: true,
         game: { type: 'find', items: S => S.wordGame, prompts: ['glyph', 'glyph', 'glyph', 'voice'], ask: it => it.the ? 'read' : 'readBare' } },
-      { id: 'groups', icon: 'ch', view: 'card', items: S => S.groups, index: true,
+      { id: 'groups', icon: 'ch', view: 'card', items: S => S.groups, index: true, perLanguage: true,
         game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'] } }
     ]
   });
