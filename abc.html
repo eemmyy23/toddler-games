@@ -163,6 +163,19 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:4px 8px;gap:0;border-radius:18px}
 #rC.tall .rce{font-size:18px}
 .rc.none{background:transparent;box-shadow:inset 0 0 0 2px var(--line);color:var(--muted);font-size:14px;justify-content:center;cursor:default;white-space:normal;text-align:center;line-height:1.1;padding:0 8px}
+#infobtn{display:none;border:none;margin-top:4px;height:48px;padding:0 20px;border-radius:999px;background:var(--card);color:var(--amber);font-size:19px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#info{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 14px 14px}
+#info.open{display:flex}
+#infohead{display:flex;align-items:center;gap:10px;padding-bottom:10px}
+#infotitle{flex:1;font-size:24px;font-weight:700}
+#infoclose{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--text);font-size:24px;cursor:pointer}
+#infolist{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:flex;flex-direction:column;gap:10px;max-width:640px;width:100%;margin:0 auto}
+.inf{border:none;display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);color:var(--text);border-radius:20px;padding:12px 16px;font-size:19px;font-weight:500;line-height:1.3;cursor:pointer;touch-action:manipulation;transition:background .2s,box-shadow .2s}
+.inf .ie{font-size:36px;flex:0 0 auto}
+.inf.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber)}
+#infofoot{display:flex;justify-content:center;padding-top:12px}
+#infoplay{width:72px;height:72px;border-radius:50%;border:none;background:var(--amber);color:var(--amber-ink);font-size:32px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+@media (max-height:700px){.inf{font-size:17px;padding:9px 12px}.inf .ie{font-size:28px}#infoplay{width:60px;height:60px}}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
 #ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
@@ -229,6 +242,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
+    <button id="infobtn"></button>
     <div id="examples"></div>
   </div>
   <div id="play">
@@ -252,6 +266,8 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="rplay" aria-label="Play">▶</button>
   <button class="nav" id="rnext" aria-label="Next word"></button>
 </div>
+<div id="info"><div id="infohead"><span id="infotitle"></span><button id="infoclose" aria-label="Close">✕</button></div>
+  <div id="infolist"></div><div id="infofoot"><button id="infoplay" aria-label="Play">▶</button></div></div>
 <div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
 <nav id="tabs">
   <button class="tab" id="t-num"><span class="ti">🔢</span><span class="tl"></span></button>
@@ -266,7 +282,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.8.5-preview</div>
+<div id="ver">v0.8.6-preview</div>
 
 <script>
 // ====== DATA ======
@@ -582,7 +598,7 @@ function buildSets(code) {
   sets.col = COLORS.map((c, i) => {
     const name = c[L.col], pics = Array.from(c[4].matchAll(/\p{Extended_Pictographic}(\u200d\p{Extended_Pictographic}|\ufe0f)*/gu), m => m[0]);
     const rb = c[0] === 'rainbow';
-    return { ch: name, key: null, cid: i, hex: rb ? null : c[0], bg: rb ? null : c[0], noPlay: rb, hue: 0, pic: pics[0], pics,
+    return { ch: name, key: null, cid: i, info: rb ? 'rainbow' : null, hex: rb ? null : c[0], bg: rb ? null : c[0], noPlay: rb, hue: 0, pic: pics[0], pics,
              word: name, name, say: rb ? `${name}: ${RAINBOW[code].join(', ')}!` : `${name}!`, ex: [] };
   });
   if (L.groups) sets.grp = L.groups.map((g, i, a) => {
@@ -761,6 +777,7 @@ function showLearn(sayIt = true) {
   const n = it.n || 1, pics = it.pics || Array.from({ length: n }, () => it.pic);
   $('pics').innerHTML = pics.map((pc, i) =>
     `<span style="animation-delay:${(i * 0.12).toFixed(2)}s">${pc}</span>`).join('');
+  updateInfoBtn(it);
   store.set(idxKey(), idx);
   if (sayIt) speak(it.say, 120);
 }
@@ -927,7 +944,7 @@ function render() {
   $('count').style.display = !hub && mode === 'count' ? 'block' : 'none';
   $('stage').style.display = !hub && mode === 'count' ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = mode === 'learn' && !hub ? 'block' : 'none';
-  stopCount(); readTok++; closeIndex();
+  stopCount(); readTok++; closeIndex(); closeInfo();
   if (hub) renderHub();
   else if (mode === 'learn') showLearn(started);
   else if (mode === 'play') { if (keepRound && target) drawRound(); else { target = null; newRound(); } }
@@ -1051,6 +1068,62 @@ function openIndex() {
   $('index').classList.add('open');
   const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
   sfx.pop();
+}
+// ====== INFO CARDS ("Ce este?") — tiny encyclopedia for kids, every sentence spoken ======
+// Key = an item id (e.g. colour id 'rainbow'). Add more entries here; the button appears automatically.
+const INFO = {
+  rainbow: {
+    en: { btn: 'What is it?', title: 'The rainbow', lines: [
+      ['🌈', 'A rainbow is a colourful arc in the sky.'],
+      ['🌦️', 'It appears when it rains and the sun shines at the same time.'],
+      ['💧', 'Sunlight goes into the raindrops.'],
+      ['✨', 'The drops split the light into colours: red, orange, yellow, green, blue, indigo and violet.'],
+      ['☀️', 'To see a rainbow, the sun must be behind you and the rain in front of you.'],
+      ['⭕', 'A rainbow is really a circle, but from the ground we only see half of it.']] },
+    ro: { btn: 'Ce este?', title: 'Curcubeul', lines: [
+      ['🌈', 'Curcubeul este un arc colorat pe cer.'],
+      ['🌦️', 'Apare când plouă și soarele strălucește în același timp.'],
+      ['💧', 'Lumina soarelui intră în picăturile de ploaie.'],
+      ['✨', 'Picăturile desfac lumina în culori: roșu, oranj, galben, verde, albastru, indigo și violet.'],
+      ['☀️', 'Ca să vezi curcubeul, soarele trebuie să fie în spatele tău, iar ploaia în fața ta.'],
+      ['⭕', 'Curcubeul este de fapt un cerc, dar de pe pământ vedem doar jumătate din el.']] },
+    de: { btn: 'Was ist das?', title: 'Der Regenbogen', lines: [
+      ['🌈', 'Ein Regenbogen ist ein bunter Bogen am Himmel.'],
+      ['🌦️', 'Er erscheint, wenn es regnet und gleichzeitig die Sonne scheint.'],
+      ['💧', 'Das Sonnenlicht geht in die Regentropfen hinein.'],
+      ['✨', 'Die Tropfen teilen das Licht in Farben: Rot, Orange, Gelb, Grün, Blau, Indigo und Violett.'],
+      ['☀️', 'Um einen Regenbogen zu sehen, muss die Sonne hinter dir sein und der Regen vor dir.'],
+      ['⭕', 'Ein Regenbogen ist eigentlich ein Kreis, aber vom Boden aus sehen wir nur die Hälfte.']] }
+  }
+};
+let infoKey = null, infoTok = 0;
+function infoFor(it) { return it && it.info && INFO[it.info] ? INFO[it.info][lang] : null; }
+function updateInfoBtn(it) {
+  const I = infoFor(it); infoKey = I ? it.info : null;
+  $('infobtn').style.display = I ? 'inline-block' : 'none';
+  if (I) $('infobtn').textContent = '📖 ' + I.btn;
+}
+function openInfo() {
+  const I = INFO[infoKey] && INFO[infoKey][lang]; if (!I) return;
+  $('infotitle').textContent = I.title;
+  $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
+  $('info').classList.add('open'); sfx.pop(); speak(I.title, 100);
+}
+function closeInfo() { infoTok++; $('info').classList.remove('open'); }
+function lightInf(i) { document.querySelectorAll('.inf').forEach(b => b.classList.toggle('lit', +b.dataset.i === i)); }
+$('infolist').addEventListener('click', e => {
+  const b = e.target.closest('.inf'); if (!b) return;
+  firstTouch(); infoTok++; const i = +b.dataset.i;
+  lightInf(i); speak(INFO[infoKey][lang].lines[i][1], 40);
+});
+async function playInfo() {
+  const tok = ++infoTok, I = INFO[infoKey][lang];
+  for (let i = 0; i < I.lines.length; i++) {
+    if (tok !== infoTok) return;
+    lightInf(i); document.querySelector(`.inf[data-i="${i}"]`).scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    await speak(I.lines[i][1], i ? 250 : 80);
+  }
+  if (tok === infoTok) { lightInf(-1); sfx.right(); }
 }
 function closeIndex() { $('index').classList.remove('open'); }
 $('ixgrid').addEventListener('click', e => {
@@ -1269,6 +1342,9 @@ tapBtn('barback', () => goHub());
 tapBtn('rprev', () => readStep(-1));
 tapBtn('rnext', () => readStep(1));
 tapBtn('rplay', () => playRead());
+tapBtn('infobtn', () => openInfo());
+tapBtn('infoclose', () => closeInfo());
+tapBtn('infoplay', () => playInfo());
 tapBtn('gridbtn', () => openIndex());
 tapBtn('ixclose', () => closeIndex());
 tapBtn('c-obj', () => { countStyle = 'obj'; store.set('cstyle', 'obj'); stopCount(); sfx.pop(); renderCount(); });
