@@ -1,16 +1,6 @@
 (function () {
-  let style = store.get('cstyle', 'obj'), timers = [];
-  let playing = false;
-  function stop() {
-    timers.forEach(clearTimeout); timers = []; playing = false;
-    document.querySelectorAll('.crow.on').forEach(r => r.classList.remove('on'));
-    APP.playing(false);
-  }
-  function reveal(row, smooth) {
-    const box = $('count'), bar = $('ctools').offsetHeight, room = box.clientHeight - bar;
-    const want = Math.max(0, row.offsetTop - bar - Math.max(6, (room - row.offsetHeight) / 2));
-    if (Math.abs(box.scrollTop - want) > 2) box.scrollTo({ top: want, behavior: smooth ? 'smooth' : 'auto' });
-  }
+  let style = store.get('cstyle', 'obj');
+  const BEAT = 700;
   const SKIN = '#f8d2ae', SHADE = '#e7b088', NAIL = '#fde7d6';
   const FING = { little: { x: 13, w: 13, top: 34 }, ring: { x: 28, w: 14, top: 18 }, middle: { x: 44, w: 14, top: 10 }, index: { x: 60, w: 14, top: 18 } };
   const ORDER = ['index', 'middle', 'ring', 'little', 'thumb'];
@@ -35,39 +25,16 @@
              `<div class="citems${style === 'obj' ? ' objs start' : ''}">${objs}</div></div>`;
     }).join('');
   }
-  function light(n) {
-    const row = document.querySelector(`.crow[data-n="${n}"]`); if (!row) return null;
-    document.querySelectorAll('.crow.on').forEach(r => r.classList.remove('on'));
-    void row.offsetWidth; row.classList.add('on'); reveal(row, true);
-    return row;
-  }
-  function one(n) {
-    stop(); hush(); const it = item(n), row = it && light(n); if (!row) return;
-    const r = row.querySelector('.cnum').getBoundingClientRect();
-    confetti(r.left + r.width / 2, r.top + r.height / 2, 24, 6); sfx.pop(); sayNow(it.name);
-  }
-  function all() {
-    if (playing) { stop(); hush(); sfx.pop(); return; }
-    stop(); hush(); playing = true;
-    const list = APP.items(), n = list.length;
-    APP.playing(true);
-    $('count').scrollTo({ top: 0, behavior: 'auto' });
-    list.forEach((it, i) => timers.push(setTimeout(() => { light(it.n); sayNow(it.name); sfx.pop(); }, 250 + i * 1000)));
-    timers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); stop(); }, 250 + n * 1000));
-  }
-  $('crows').addEventListener('click', e => { const r = e.target.closest('.crow'); if (r) { APP.firstTouch(); one(+r.dataset.n); } });
-  const btn = (id, fn) => onTap(id, () => { APP.firstTouch(); fn(); });
-  btn('c-obj', () => { style = 'obj'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
-  btn('c-hand', () => { style = 'hand'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
+  const row = n => document.querySelector(`.crow[data-n="${n}"]`);
+  function one(n) { const it = item(n), r = it && row(n); if (!r) return; APP.celebrate(r.querySelector('.cnum')); APP.sequence('crows', [{ light: r, say: it.name }]); }
+  function all() { $('count').scrollTo({ top: 0 }); APP.sequence('crows', APP.items().map(it => ({ light: row(it.n), say: it.name, pop: true, pause: BEAT })), { button: true, finale: true }); }
+  onTapIn('crows', '.crow', r => one(+r.dataset.n));
+  onTap('c-obj', () => { style = 'obj'; store.set('cstyle', style); APP.stop(); sfx.pop(); render(); });
+  onTap('c-hand', () => { style = 'hand'; store.set('cstyle', style); APP.stop(); sfx.pop(); render(); });
   VIEW('count', {
     el: 'count', fullHeight: true,
-    show() { render(); }, leave: stop, pause: stop, play: all,
-    announce(name) { speak(APP.exclaim(name), 120); },
-    onKey(k, e) {
-      const it = APP.items().find(x => x.key === k); if (it) { APP.firstTouch(); one(it.n); return true; }
-      if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); all(); return true; }
-      return false;
-    },
+    show() { render(); }, play: all,
+    select(it) { one(it.n); },
     keepScroll: true
   });
 })();

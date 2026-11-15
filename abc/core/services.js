@@ -9,8 +9,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {
-  get(k, d) { try { const v = localStorage.getItem('abc2.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
-  set(k, v) { try { localStorage.setItem('abc2.' + k, JSON.stringify(v)); } catch (e) {} },
+  get(k, d, session) { try { const v = (session ? sessionStorage : localStorage).getItem('abc2.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v, session) { try { (session ? sessionStorage : localStorage).setItem('abc2.' + k, JSON.stringify(v)); } catch (e) {} },
   legacy(k) { try { const v = localStorage.getItem('abc.' + k); return v == null ? null : JSON.parse(v); } catch (e) { return null; } }
 };
 

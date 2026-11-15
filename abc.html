@@ -140,8 +140,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .ic{font-style:normal;margin-inline:.15em}
 .art{width:1em;height:1em;vertical-align:middle;overflow:visible;text-shadow:none}
 .part{cursor:pointer;transition:opacity .2s,filter .2s}
-#glyph.on .part{opacity:.28}
-#glyph.on .part.on{opacity:1;filter:drop-shadow(0 0 5px rgba(255,255,255,.8))}
+#glyph:has(.part.on) .part{opacity:.28}
+#glyph .part.on{opacity:1;opacity:1;filter:drop-shadow(0 0 5px rgba(255,255,255,.8))}
 #word{font-size:min(6vh,8vw);font-weight:600;text-align:center;min-height:1.2em}
 #pics{font-size:min(7vh,9vw);text-align:center;max-width:100%;line-height:1.2;min-height:1.2em;letter-spacing:.05em}
 #pics span{display:inline-block;animation:bob 2.4s ease-in-out infinite}
@@ -182,7 +182,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .bub.right{animation:burst .5s forwards}
 @keyframes burst{50%{transform:scale(1.2)}100%{transform:scale(0);opacity:0}}
 
-#count{position:absolute;left:0;right:0;top:var(--top);bottom:var(--bot);padding:0 var(--gut) 20px}
+#count{position:absolute;left:0;right:0;top:var(--top);bottom:var(--bot);padding:0 var(--gut) 20px;scroll-padding-top:calc(var(--pill-h) + var(--sp-4) + var(--sp-2))}
 #ctools{position:sticky;top:0;z-index:var(--z-sticky);display:flex;justify-content:center;gap:var(--sp-3);padding:6px 0 12px;background:linear-gradient(var(--bg1) 75%,transparent)}
 .crow{display:flex;align-items:center;gap:12px;margin:0 0 var(--sp-3);padding:8px 12px;border-radius:var(--r);background:var(--card);cursor:pointer;transition:background .2s,transform .2s}
 .cnum{flex:0 0 auto;width:var(--cnum-w);display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}

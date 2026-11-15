@@ -7,6 +7,8 @@ const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
+const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] };
+let seqTok = 0;
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
   const d = document.createElement('div'); d.id = v.el; d.hidden = true;
@@ -43,6 +45,27 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
+  light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
+  reveal(el) { if (el) el.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); },
+  celebrate(el, big) { const r = el && el.getBoundingClientRect(); sfx[big ? 'right' : 'pop'](); confetti(r ? r.left + r.width / 2 : W / 2, r ? r.top + r.height / 2 : H / 3, ...CELEBRATE[big ? 'burst' : 'spark']); },
+  stop() { seqTok++; hush(); APP.playing(false); document.querySelectorAll('#stage .on, #count .on, #infolist .on').forEach(x => x.classList.remove('on')); },
+  async sequence(scope, steps, opts = {}) {
+    const t = ++seqTok, alive = () => t === seqTok; hush();
+    if (opts.button) APP.playing(true);
+    try {
+      for (const s of steps) {
+        if (!alive()) return false;
+        if ('light' in s) { APP.light(scope, s.light); APP.reveal([].concat(s.light)[0]); }
+        if (s.pop) sfx.pop();
+        if (s.say) await speak(s.say, s.delay || 0);
+        if (!alive()) return false;
+        await wait(s.pause ?? GAP);
+      }
+      if (!alive()) return false;
+      APP.light(scope, null); if (opts.finale) APP.celebrate(opts.at, true);
+      return true;
+    } finally { if (opts.button && t === seqTok) APP.playing(false); }
+  },
   playing(on) { $('act').classList.toggle('on', !!on); $('act').setAttribute('aria-pressed', !!on); },
   shown() {
     APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
@@ -118,23 +141,20 @@ function renderHub() {
 }
 function openTile(id, play, quiet) {
   const t = TILE[id]; if (!usable(t, play)) return false;
-  if (view() && view().leave) view().leave();
+  leaveView();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); if (!quiet) sfx.pop(); render();
   return true;
 }
-$('hub').addEventListener('click', e => {
-  if (e.target.closest('.hsearch')) { firstTouch(); openSearch(); return; }
-  const b = e.target.closest('.ht'); if (!b) return;
-  firstTouch();
-  openTile(b.dataset.id, b.dataset.play === '1');
-});
-function goHub() { if (view() && view().leave) view().leave(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[section]), 80); }
+onTapIn('hub', '.hsearch', openSearch);
+onTapIn('hub', '.ht', b => openTile(b.dataset.id, b.dataset.play === '1'));
+function leaveView() { APP.stop(); if (view() && view().leave) view().leave(); }
+function goHub() { leaveView(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[section]), 80); }
 function setSection(id) {
   if (id === sectionNow()) { if (!atHub) goHub(); return; }
-  if (view() && view().leave) view().leave();
+  leaveView();
   section = id; store.set('sec', id); atHub = true; store.set('athub', true);
   sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[id]), 80);
 }
@@ -151,7 +171,7 @@ function render() {
   document.title = CFG.name;
   document.querySelectorAll('[data-icon]').forEach(e => { e.innerHTML = APP.icon(e.dataset.icon); });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
-  if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
+  if (!atHub && !usable(tileOf(), mode === 'play')) { leaveView(); atHub = true; }
   const sc = APP.screen(), v = view();
   document.body.dataset.mode = sc;
   document.body.classList.toggle('lownav', !!(v && (v.arrows || v.play)));
@@ -170,7 +190,7 @@ function render() {
 function setLang(code) {
   if (code === lang) { sfx.pop(); announce(); return; }
   const v0 = !atHub && view(), cur = v0 && APP.items()[APP.idx];
-  if (v0 && v0.leave) v0.leave();
+  if (v0) leaveView();
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
   lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices();
   if (v0) {
@@ -182,9 +202,9 @@ function setLang(code) {
   if (v0 && v0.keepScroll && view() === v0) $(v0.el).scrollTop = scroll;
   announce();
 }
-function announce() { const name = APP.L().name; if (atHub) speak(APP.exclaim(name), 120); else view().announce(name); }
+function announce() { const name = APP.L().name, line = !atHub && view().line && view().line(); speak(line ? APP.t(APP.ui().then, { a: name, b: line }) : APP.exclaim(name), 120); }
 
-let infoId = null, infoTok = 0;
+let infoId = null;
 const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
 function openInfo(c) {
   const I = infoFor(c); if (!I) return;
@@ -192,30 +212,23 @@ function openInfo(c) {
   $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
   $('info').hidden = false; sfx.pop(); speak(I.title, 100);
 }
-function closeInfo() { infoTok++; $('info').hidden = true; }
-const lightInf = i => document.querySelectorAll('.inf').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+function closeInfo() { if (!$('info').hidden) APP.stop(); $('info').hidden = true; }
 onTapIn(document, '.link[data-t]', b => {
-  firstTouch();
   const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
   if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
 });
-onTapIn(document, '.infobtn', b => { firstTouch(); openInfo(b.dataset.c); });
-$('infolist').addEventListener('click', e => { const b = e.target.closest('.inf'); if (!b) return; firstTouch(); infoTok++; lightInf(+b.dataset.i); speak(infoFor(infoId).lines[+b.dataset.i][1], 40); });
-async function playInfo() {
-  const tok = ++infoTok, I = infoFor(infoId);
-  for (let i = 0; i < I.lines.length; i++) {
-    if (tok !== infoTok) return;
-    lightInf(i); document.querySelector(`.inf[data-i="${i}"]`).scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' });
-    await speak(I.lines[i][1], i ? 250 : 80);
-  }
-  if (tok === infoTok) { lightInf(-1); sfx.right(); }
+onTapIn(document, '.infobtn', b => openInfo(b.dataset.c));
+onTapIn('infolist', '.inf', b => APP.sequence('infolist', [{ light: b, say: infoFor(infoId).lines[+b.dataset.i][1] }]));
+function playInfo() {
+  const I = infoFor(infoId);
+  APP.sequence('infolist', I.lines.map((l, i) => ({ light: document.querySelector(`.inf[data-i="${i}"]`), say: l[1] })), { finale: true });
 }
 
 const OTHER = CFG.icons.other;
 const GROUP_OF = new Map(Object.entries(ABC.groups).flatMap(([g, ms]) => ms.map(m => [m, g])));
 const hasGroups = GROUP_OF.size > 0;
 let ixMode = store.get('ixmode', 'az');
-onTapIn('ixmode', '.seg', b => { firstTouch(); ixMode = b.dataset.m; store.set('ixmode', ixMode); openIndex(); });
+onTapIn('ixmode', '.seg', b => { ixMode = b.dataset.m; store.set('ixmode', ixMode); openIndex(); });
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const face = it => v.indexFace ? v.indexFace(it) : esc(it.label);
@@ -257,7 +270,7 @@ function syncAZ() {
 let azRaf = 0;
 $('ixgrid').addEventListener('scroll', () => { if (!azRaf) azRaf = requestAnimationFrame(() => { azRaf = 0; syncAZ(); }); }, { passive: true });
 const closeIndex = () => { $('index').hidden = true; };
-$('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); if (!b) return; firstTouch(); closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
+onTapIn('ixgrid', '.ix', b => { closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
 (function () {
   let last = null;
   const jump = y => {
@@ -312,14 +325,14 @@ function openSearch() {
 }
 const closeSearch = () => { $('search').hidden = true; $('sq').blur(); };
 $('sq').addEventListener('input', runSearch);
-$('sres').addEventListener('click', e => {
-  const b = e.target.closest('.sr'); if (!b || e.target.closest('.link')) return; firstTouch(); closeSearch(); closeIndex();
+onTapIn('sres', '.sr', b => {
+  closeSearch(); closeIndex();
   openTile(b.dataset.t, false, true); const i = APP.indexOf(b.dataset.id);
   if (i >= 0) { APP.idx = i; APP.saveIdx(); } view().show(true);
 });
-tapBtn('sqclear', () => { $('sq').value = ''; runSearch(); $('sq').focus(); });
-tapBtn('sclose', closeSearch);
-tapBtn('ixsearch', openSearch);
+onTap('sqclear', () => { $('sq').value = ''; runSearch(); $('sq').focus(); });
+onTap('sclose', closeSearch);
+onTap('ixsearch', openSearch);
 
 $('ages').innerHTML = PROFILES.map(p => { const [a, b] = CFG.profiles[p].ages;
   return `<button class="seg age" data-p="${p}" role="radio">${artSVG(p)}<small>${esc(APP.t(APP.ui().range, { a, b }))}</small></button>`; }).join('');
@@ -341,14 +354,13 @@ markVoices();
 function firstTouch() { started = true; ensureAudio(); }
 addEventListener('pointerdown', firstTouch, true);
 addEventListener('keydown', firstTouch, true);
-function tapBtn(el, fn) { onTap(el, () => { firstTouch(); fn(); }); }
-document.querySelectorAll('.flag').forEach(f => tapBtn(f, () => setLang(f.dataset.lang)));
-CFG.sections.forEach(s => tapBtn('t-' + s.id, () => setSection(s.id)));
-tapBtn('barback', goHub);
-tapBtn('prev', () => view().step(-1)); tapBtn('next', () => view().step(1)); tapBtn('act', () => view().play());
-tapBtn('infoclose', closeInfo); tapBtn('infoplay', playInfo);
-tapBtn('gridbtn', openIndex); tapBtn('ixclose', closeIndex);
-document.querySelectorAll('.age').forEach(b => tapBtn(b, () => setProfile(b.dataset.p)));
+document.querySelectorAll('.flag').forEach(f => onTap(f, () => setLang(f.dataset.lang)));
+CFG.sections.forEach(s => onTap('t-' + s.id, () => setSection(s.id)));
+onTap('barback', goHub);
+onTap('prev', () => view().step(-1)); onTap('next', () => view().step(1)); onTap('act', () => $('act').classList.contains('on') ? APP.stop() : view().play());
+onTap('infoclose', closeInfo); onTap('infoplay', playInfo);
+onTap('gridbtn', openIndex); onTap('ixclose', closeIndex);
+document.querySelectorAll('.age').forEach(b => onTap(b, () => setProfile(b.dataset.p)));
 addEventListener('resize', () => { resizeFx(); if (atHub) return; if (view().arrows) { APP.fitText($('prev')); APP.fitText($('next')); } if (view().resize) view().resize(); });
 let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; }, true);
@@ -365,15 +377,17 @@ addEventListener('keydown', e => {
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
   if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
   if (e.repeat) return;
-  if (v && v.onKey && v.onKey(k, e)) return;
+  if ((k === ' ' || k === 'enter') && v) { e.preventDefault(); if (v.play) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
+  const pick = (vw, k) => { const it = (vw.choices ? vw.choices() : APP.items()).find(x => x.key === k); if (it && vw.select) vw.select(it); return !!it; };
+  if (v && pick(v, k)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;
   if (APP.screen() === GAME_VIEW) return;
   const play = atHub && SECTIONS[section].play;
   const t = TILES.find(t => (play || t.section === sectionNow()) && usable(t, play) &&
-    ABC.views[play ? GAME_VIEW : t.view].onKey && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
+    ABC.views[play ? GAME_VIEW : t.view].select && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
   if (!t || (t.id === tileId && !atHub)) return;
   openTile(t.id, play, true);
-  if (!play && view().onKey) view().onKey(k, e);
+  if (!play) pick(view(), k);
 });
 addEventListener('contextmenu', e => e.preventDefault());
 
@@ -391,16 +405,16 @@ if ('serviceWorker' in navigator) {
   });
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { hush(); if (!atHub && view().pause) view().pause(); quietAudio(); }
+  if (document.hidden) { APP.stop(); if (!atHub && view().pause) view().pause(); quietAudio(); }
 });
 (function () {
   const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');
   let deferred = null;
   if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
-  try { if (sessionStorage.getItem('install-dismissed')) return; } catch (e) {}
+  if (store.get('install-dismissed', false, true)) return;
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; msg.textContent = APP.t(APP.ui().install, { app: CFG.name }); bar.hidden = false; });
   bar.addEventListener('pointerdown', e => e.stopPropagation());
-  btn.addEventListener('click', () => { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(() => { deferred = null; bar.hidden = true; }); });
-  dismiss.addEventListener('click', () => { bar.hidden = true; try { sessionStorage.setItem('install-dismissed', '1'); } catch (e) {} });
+  onTap(btn, () => { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(() => { deferred = null; bar.hidden = true; }); });
+  onTap(dismiss, () => { bar.hidden = true; store.set('install-dismissed', true, true); });
   addEventListener('appinstalled', () => { bar.hidden = true; });
 })();

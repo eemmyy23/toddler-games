@@ -41,7 +41,6 @@
       b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.animationDelay = (i * 0.4) + 's';
-      onTap(b, () => choose(it, b));
       box.appendChild(b);
     });
     $('plinks').innerHTML = APP.links(target);
@@ -49,20 +48,19 @@
     speak(askLine(), 250);
   }
   function choose(it, el) {
-    APP.firstTouch(); if (locked) return;
+    if (locked) return;
     if (it !== target && el) { const now = Date.now(); if (+(el.dataset.cool || 0) > now) return; el.dataset.cool = now + 700; }
     const U = APP.ui();
     if (it === target) {
       locked = true; APP.streak++; APP.addStar();
       weights[wk(it)] = Math.max(0, (weights[wk(it)] || 0) - 1); store.set('w', weights);
-      if (el) { el.classList.add('right'); const r = el.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top + r.height / 2); } else confetti(W / 2, H / 2);
+      if (el) el.classList.add('right');
       const big = APP.stars % 10 === 0;
       let said;
       if (big) {
-        sfx.fanfare();
-        for (let k = 0; k < 5; k++) setTimeout(() => confetti(Math.random() * W, H * 0.3 + Math.random() * H * 0.3, 60, 12), k * 180);
+        APP.celebrate(el, true); sfx.fanfare();
         said = speak(APP.t(U.wow, { n: APP.stars }), 700);
-      } else { sfx.right(); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), 400); }
+      } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), 400); }
       const tok = ++roundTok;
       Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {
@@ -74,12 +72,13 @@
     }
   }
   onTap('ask', () => { if (target) speak(askLine()); });
+  onTapIn('choices', '.bub', b => { const it = opts.find(o => o.id === b.dataset.id); if (it) choose(it, b); });
   VIEW('play', {
     el: 'play',
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },
     leave() { roundTok++; },
     resize() { if (target) APP.fit($('play')); },
-    announce(name) { if (target) speak(APP.t(APP.ui().then, { a: name, b: askLine() }), 250); },
+    line: () => target ? askLine() : null,
     beforeLang() { return { target: !locked && target && target.id, opts: opts.map(o => o.id) }; },
     afterLang(s) {
       if (!s || !s.target) return;
@@ -94,11 +93,8 @@
       keep = true;
     },
     reset() { target = null; },
-    onKey(k, e) {
-      if (k === ' ' || k === 'enter') { e.preventDefault(); if (target) speak(askLine()); return true; }
-      const it = opts.find(x => x.key === k); if (!it) return false;
-      choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); return true;
-    },
+    choices: () => opts,
+    select(it) { choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); },
     state: () => ({ target, opts, round }), newRound, choose
   });
 })();

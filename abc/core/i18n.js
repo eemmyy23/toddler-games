@@ -35,6 +35,7 @@ const I18N = {
     }
     return out;
   },
+  highlight(text, piece, fold, wrap) { const f = fold(text), i = f.indexOf(fold(piece)), n = fold(piece).length; return i < 0 || !n || f.length !== text.length ? esc(text) : esc(text.slice(0, i)) + wrap(esc(text.slice(i, i + n))) + esc(text.slice(i + n)); },
   capFirst(s, locale) { const g = I18N.graphemes(s, locale); return g.length ? I18N.upper(g[0], null, locale) + s.slice(g[0].length) : s; },
   upper(ch, unit, locale) { if (unit) return unit.cased ? unit.upper : ch; const u = ch.toLocaleUpperCase(locale); return u.length === ch.length ? u : ch; }
 };

@@ -82,8 +82,11 @@ Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key
 `key`, `word`, `pic`, `pics`, `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 games: `bubble` (default: label), `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs), `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game), `plural` (spoken as plural: "Those are …"), `a` (indefinite form) + `g` (gender) for "That's a cow". Two choices in one round never share a `sound` or a look.
 
-**VIEW** — required `el, show(sayIt), announce(languageName)`; optional `step(d), leave(), pause() (app sent to the background; keep the state), onKey(key, e) → handled, resize(), play(), reset(), beforeLang() → state, afterLang(state)`,
-flags `arrows` (the shell draws ‹ › with `navFace(item)`, default `item.nav`), `play()` (the shell shows ▶ for it), `swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
+**VIEW** — required `el, show(sayIt)`; optional `line()` (what the language announcement and Space say), `select(item)` (a key picked this item; `choices()` limits which),
+`step(d), leave(), pause(), resize(), reset(), beforeLang() → state, afterLang(state)`, flags `arrows` (the shell draws ‹ › with `navFace(item)`, default `item.nav`),
+`play()` (the shell shows ▶ and toggles it), `swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
+Views never schedule speech or highlights themselves: `APP.sequence(scope, steps, { button, finale, at })` speaks, lights (`.on`), reveals and celebrates step by step,
+and the shell cancels it (`APP.stop()`) on leave, step, language switch and background. One-off feedback is `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
 
 **GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):
 `{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
@@ -114,7 +117,7 @@ add `'shapes'` to `config.modules`, run `node tools/check.js --fix`. The Play ti
 **Add an age profile** — `config.profiles.<id> = { ages: [from, to] }` (ascending order), `ART('<id>', svg)` in `abc/art.js`,
 `profile.<id>` in each `strings.js`.
 
-**Add a view or a game type** — `abc/core/views/<id>.js` with `VIEW(id, {el, show, announce, …})` (contract above;
+**Add a view or a game type** — `abc/core/views/<id>.js` with `VIEW(id, {el, show, …})` (contract above;
 its element is created in the stage — or in the body for `fullHeight` — if `abc.html` has none; add markup and CSS there only for fixed controls) or
 `abc/core/games/<id>.js` with `GAME(id, {needs, pool, show})`; run `node tools/check.js --fix`.
 
