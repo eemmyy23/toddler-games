@@ -128,14 +128,19 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #rpic{font-size:min(14vh,24vw);line-height:1.1;cursor:pointer}
 .rrow{display:flex;flex-wrap:nowrap;justify-content:center;gap:6px;max-width:100%}
 .rt{border:none;flex:0 1 54px;min-width:34px;height:58px;border-radius:16px;background:var(--card);color:var(--text);font-size:32px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);transition:transform .15s,background .15s,box-shadow .15s}
-.rrow.syl .rt{flex:0 1 auto;min-width:72px;padding:0 16px}
+.rrow.syl .rt{flex:0 1 auto;min-width:0;padding:0 min(16px,2.4vw);font-size:var(--sf,32px)}
+.rrow.let .rt{flex:0 0 var(--tw,54px);width:var(--tw,54px);min-width:0;font-size:var(--tf,32px)}
 .rt.word{flex:0 1 auto;padding:0 26px;font-size:36px;height:64px;color:var(--amber)}
 .rt.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-4px) scale(1.06)}
 .rsep{align-self:center;color:var(--muted);font-size:26px}
 .rc{border:none;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--text);border-radius:999px;height:52px;padding:0 16px 0 10px;font-size:20px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);white-space:nowrap;transition:transform .15s,background .15s,box-shadow .15s}
 .rc .rce{font-size:26px;letter-spacing:-2px}
 .rc.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-3px)}
-#rC{gap:8px 8px;flex-wrap:wrap;max-width:560px}
+#rC{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;width:100%;max-width:520px}
+.rh{text-align:center;font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+#rC .rc{justify-content:flex-start;min-width:0;overflow:hidden;font-size:var(--cf,20px)}
+#rC.tall .rc{flex-direction:column;justify-content:center;height:auto;padding:4px 8px;gap:0;border-radius:18px}
+#rC.tall .rce{font-size:18px}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
 #ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
@@ -174,6 +179,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+@media (max-width:350px){.flag{width:40px;height:40px;font-size:22px}#gridbtn{width:46px;height:46px}#stars{height:46px;padding:0 10px;font-size:19px}#bar{gap:6px}}
 </style>
 </head>
 <body>
@@ -235,7 +241,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.0</div>
+<div id="ver">v0.7.1</div>
 
 <script>
 // ====== DATA ======
@@ -248,7 +254,9 @@ const LANGS = {
     nums: ['one','two','three','four','five','six','seven','eight','nine','ten'],
     sayLetter: (c, w, like) => like ? `${c}, like in ${w}!` : `${c} is for ${w}!`,
     showWord: (w, like) => like ? `like in ${w}` : w,
-    forms: (w, f) => [`${f[0]} ${w}`, `the ${w}`, f[1]],
+    sgpl: ['Singular', 'Plural'],
+    // { sg: [a cow, the cow], pl: [two cows, the cows] }
+    forms: (w, f) => ({ sg: [`${f[0]} ${w}`, `the ${w}`], pl: [f[1], `the ${f[1].replace(/^two /, '')}`] }),
     find: 'Find',
     ask: (kind, name, small) => kind !== 'num' ? `Find the ${small ? 'small ' : ''}letter ${name}!` : `Find the number ${name}!`,
     thats: n => `That's ${n}.`,
@@ -267,7 +275,13 @@ const LANGS = {
                || c.toLocaleLowerCase('ro') + 'î',
     sayLetter: (c, w, like) => like ? `${c}, ca în ${w}!` : `${c}, de la ${w}!`,
     showWord: (w, like) => like ? `ca în ${w}` : w,
-    forms: (w, f) => [`${f[0]} ${w}`, f[1], f[2]],
+    sgpl: ['Singular', 'Plural'],
+    // { sg: [o vacă, vaca], pl: [două vaci, vacile] }. Plural definite (school rule): after "doi" add -i (câini → câinii),
+    // after "două" add -le (vaci → vacile, case → casele, trenuri → trenurile)
+    forms: (w, f) => {
+      const [num, ...rest] = f[2].split(' '), pl = rest.join(' ');
+      return { sg: [`${f[0]} ${w}`, f[1]], pl: [f[2], pl + (num === 'doi' ? 'i' : 'le')] };
+    },
     find: 'Găsește',
     ask: (kind, name, small) => kind === 'grp' ? `Găsește grupul ${name}!` : kind === 'abc' ? `Găsește litera ${small ? 'mică ' : ''}${name}!` : `Găsește numărul ${name}!`,
     thats: n => `Aceasta e ${n}.`,
@@ -281,7 +295,9 @@ const LANGS = {
     nums: ['eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn'],
     sayLetter: (c, w) => `${c} wie ${w}!`,
     showWord: (w, like) => like ? `wie ${w}` : w,
-    forms: (w, f) => [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`, f[1]],
+    sgpl: ['Einzahl', 'Mehrzahl'],
+    // { sg: [ein Hund, der Hund], pl: [zwei Hunde, die Hunde] } (plural article is always die)
+    forms: (w, f) => ({ sg: [`${f[0] === 'die' ? 'eine' : 'ein'} ${w}`, `${f[0]} ${w}`], pl: [f[1], `die ${f[1].replace(/^zwei /, '')}`] }),
     find: 'Finde',
     ask: (kind, name, small) => kind !== 'num' ? `Finde den ${small ? 'kleinen ' : ''}Buchstaben ${name}!` : `Finde die Zahl ${name}!`,
     thats: n => `Das ist ${n}.`,
@@ -591,7 +607,7 @@ let roundTok = 0;
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;
 function resize() { W = fx.width = innerWidth; H = fx.height = innerHeight; }
-resize(); addEventListener('resize', resize);
+resize(); addEventListener('resize', () => { resize(); if (mode === 'read') renderRead(false); });
 const parts = [];
 function confetti(x, y, n = 40, spread = 9) {
   for (let i = 0; i < n; i++) {
@@ -831,18 +847,30 @@ function renderRead(sayIt = true) {
   const chars = Array.from(word);
   const tile = (txt, say, cls = '', color = '') =>
     `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
+  // Long words (Wassermelone, caracatiță) shrink the tiles so a whole word always fits on one line
+  const avail = Math.min(innerWidth, 640) - 24, nl = chars.length, gap = nl > 8 ? 3 : 6;
+  const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
+  const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
   const upper = chars.map(c => tile(c.toLocaleUpperCase(t), letterSay(c), 'u', letterInk(c))).join('');
   const lower = Array.from(shown).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
+  // Singular/plural table: long phrases put the picture above the text and shrink the font to fit
+  const longest = Math.max(...[...forms.sg, ...forms.pl].map(x => x.length));
+  const chipW = (Math.min(innerWidth, 520) - 24 - 8) / 2, em = longest * 0.66;
+  const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15; // 2 pictures + padding beside the text
+  const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
+  const ns = syl.length, sylFont = Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55));
   const syls = syl.map((sy, i) => (i ? '<span class="rsep">·</span>' : '') +
     tile(i === 0 ? capFirst(sy, t) : sy, sy, 's', INK[(i * 3 + 4) % 8])).join('');
   $('read').innerHTML =
     `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
-    `<div class="rrow" id="rU">${upper}</div>` +
-    `<div class="rrow" id="rL">${lower}</div>` +
-    `<div class="rrow syl" id="rS">${syls}</div>` +
+    `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
+    `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
+    `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` +
     `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
-    `<div class="rrow" id="rC">` + forms.map((ph, i) =>
-      `<button class="rc" data-say="${esc(ph)}"><span class="rce">${pic.repeat(i === 2 ? 2 : 1)}</span><span>${esc(ph)}</span></button>`).join('') + `</div>`;
+    `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(LANGS[lang].sgpl[0])}</div><div class="rh">${esc(LANGS[lang].sgpl[1])}</div>` +
+      [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n]) =>
+        `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`).join('')).join('') +
+    `</div>`;
   const R = SETS.read, n = R.length;
   $('rprev').innerHTML = `‹ <b>${R[(readIdx - 1 + n) % n].pic}</b>`;
   $('rnext').innerHTML = `<b>${R[(readIdx + 1) % n].pic}</b> ›`;
@@ -878,7 +906,7 @@ async function playRead() {
   const w = document.querySelector('#rW .rt'); lightTile(w);
   sfx.right(); await speak(word, 350);
   if (!alive()) return; await wait(300);
-  // articles + counting: "un câine", "câinele", "doi câini"
+  // singular → plural, row by row: "un câine", "doi câini", "câinele", "câinii"
   for (const el of document.querySelectorAll('#rC .rc')) {
     if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(250);
   }
