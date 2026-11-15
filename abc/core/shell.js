@@ -295,7 +295,7 @@ function searchPool() {
     const per = LANGS.map(c => [c, new Map(Tiles.items(t, c).map(it => [it.id, it]))]);
     for (const it of itemsOf(t)) {
       const names = per.map(([c, m]) => { const x = m.get(it.id); return [c, x ? x.name : null]; }).filter(x => x[1]);
-      out.push({ t, it, names, extra: [it.label] });
+      out.push({ t, it, names, extra: [it.label, ...per.flatMap(([, m]) => (m.get(it.id) || {}).also || [])] });
     }
   }
   return out;

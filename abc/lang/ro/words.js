@@ -176,7 +176,7 @@ w('wind', { w: 'vânt', def: 'vântul', pl: 'vânturi', g: 'n', plDef: 'vânturi
 w('storm', { w: 'fur/tu/nă', def: 'furtuna', pl: 'furtuni', g: 'f', plDef: 'furtunile' });
 w('cap', { w: 'șap/că', def: 'șapca', pl: 'șepci', g: 'f', plDef: 'șepcile' });
 w('sunglasses', { w: 'o/che/lari de soa/re', plOnly: true, plDef: 'ochelarii de soare' });
-w('boots', { w: 'ciz/me', plOnly: true, plDef: 'cizmele' });
+w('boots', { w: 'ciz/mă', def: 'cizma', pl: 'cizme', g: 'f', plDef: 'cizmele', also: 'ghete, bocanci' });
 w('gloves', { w: 'mă/nuși', plOnly: true, plDef: 'mănușile' });
 w('scarf', { w: 'fu/lar', def: 'fularul', pl: 'fulare', g: 'n', plDef: 'fularele' });
 w('chicken-chick', { w: 'pui de gă/i/nă', def: 'puiul de găină', g: 'm', ex: false });
