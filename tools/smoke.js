@@ -34,7 +34,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('hubs');
   const hub = async sec => { await ev(s => { section = s; atHub = true; render(); }, sec);
-    return p.$$eval('#hub > *', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
+    return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
   ok(!play.some(x => x[0] === '~'), 'Little profile: no "coming soon" tiles');
@@ -126,6 +126,57 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => setLang('de')); const after = await ev(() => ABC.views.play.state().target.id);
   ok(before === after, `language switch keeps the question (${before} → ${after})`);
   await ev(() => setLang('ro'));
+
+  console.log('index, A–Z bar, universal search');
+  await ev(() => setLang('ro'));
+  for (const id of ['digits', 'letters', 'read', 'colors']) {
+    await ev(i => openTile(i, false, true), id);
+    ok(await p.isVisible('#gridbtn'), `${id}: index (⊞) button visible`);
+  }
+  await ev(() => { openTile('read', false, true); openIndex(); });
+  const ix = await ev(() => ({ heads: [...document.querySelectorAll('.ixh b')].map(b => b.textContent), az: document.querySelectorAll('#ixaz .az').length,
+    c: document.querySelector('#ixh-C span').textContent, bar: getComputedStyle($('ixaz')).display }));
+  ok(ix.bar === 'flex' && ix.az >= 26 && ix.heads[0] === 'A' && ix.heads.includes('Ș'), `Read index: A–Z sections (${ix.heads.length}) + side bar (${ix.az} letters)`);
+  ok(/^\d+ (de )?cuvinte$/.test(ix.c), `section count: "C · ${ix.c}"`);
+  const azb = await p.$eval('#ixaz', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, h: r.height }; });
+  const n = await ev(() => document.querySelectorAll('#ixaz .az').length), k = await ev(() => [...document.querySelectorAll('#ixaz .az')].findIndex(a => a.dataset.u === 'V'));
+  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
+  const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
+  ok(vis, 'tap V on the side bar jumps to the V section');
+  await ev(() => closeIndex());
+  const search = async q => { await ev(q => { openSearch(); $('sq').value = q; runSearch(); }, q);
+    return ev(() => [...document.querySelectorAll('.sr')].map(r => r.dataset.t + ':' + r.dataset.id)); };
+  ok((await search('goat')).includes('read:goat'), 'search "goat" (EN) → capră');
+  ok((await search('ziege')).includes('read:goat'), 'search "Ziege" (DE, any case) → capră');
+  ok((await search('zwei'))[0] === 'digits:n2', 'search "zwei" → 2');
+  const rot = await search('rot');
+  ok(rot[0] === 'colors:red' && !rot.includes('read:turtle'), `search "rot" → roșu first, no substring noise (${rot.join(' ')})`);
+  ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
+  await ev(() => { document.querySelector('.sr').click(); });
+  ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && !$('search').classList.contains('open')), 'tapping a result opens it');
+  await ev(() => { openSearch(); }); await p.waitForTimeout(150); await p.keyboard.type('m');
+  ok(await ev(() => $('search').classList.contains('open') && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
+  await p.keyboard.press('Escape');
+
+  console.log('hubs: tiles look like buttons (not stretched)');
+  for (const sec of ['num', 'abc', 'disc']) {
+    await ev(s => { section = s; atHub = true; render(); }, sec);
+    const hs = await p.$$eval('#hub .ht', t => t.map(x => x.getBoundingClientRect().height));
+    ok(hs.length && Math.max(...hs) <= 160, `${sec} hub tiles ≤ 160 px tall (${hs.map(h => h | 0).join(', ')})`);
+  }
+  ok(await p.isVisible('.hsearch'), 'search pill on the hub');
+
+  console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
+  await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(1400);
+  const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.active')?.dataset.n }));
+  ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
+  const rows = [];
+  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.active'); if (!a) return 'none';
+    const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
+  ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(100);
+  ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.active')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');
   const wow = await ev(() => [1, 2, 20, 21].map(n => APP.t(APP.ui().wow, { n })));

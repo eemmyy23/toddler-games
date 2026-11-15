@@ -78,7 +78,7 @@ function hubTiles() {
 }
 function renderHub() {
   const U = APP.ui();
-  $('hub').innerHTML = hubTiles().map(x => x.header
+  $('hub').innerHTML = `<button class="hsearch" id="hsearch">🔍 <span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="hh">${x.header.icon} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
       `<span class="hp"${x.t.icon.length > 3 ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${x.t.icon}</span><span class="hl">${esc(x.lbl)}</span></button>`).join('');
@@ -88,11 +88,13 @@ function openTile(id, play, quiet) {
   if (view() && view().leave) view().leave();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) ABC.views.play.reset();
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
+  if (!play) { section = t.section; store.set('sec', section); } // back always leads to the tile's own hub
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); if (!quiet) sfx.pop(); render();
   return true;
 }
 $('hub').addEventListener('click', e => {
+  if (e.target.closest('.hsearch')) { firstTouch(); openSearch(); return; }
   const b = e.target.closest('.ht'); if (!b) return;
   firstTouch();
   if (b.classList.contains('soon')) { const l = b.querySelector('.hl').textContent; speak(l + (/[.!?。？！]$/.test(l) ? ' ' : '. ') + APP.ui().soon); return; }
@@ -126,7 +128,7 @@ function render() {
   $('stage').style.display = v && v.fullHeight ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = v && v.arrows ? 'block' : 'none';
   $('rnav').style.display = v && v.nav === 'rnav' ? 'flex' : 'none';
-  closeIndex(); closeInfo();
+  closeIndex(); closeInfo(); closeSearch();
   if (sc === 'hub') renderHub(); else v.show(started);
 }
 
@@ -171,17 +173,95 @@ async function playInfo() {
   if (tok === infoTok) { lightInf(-1); sfx.right(); }
 }
 
-// ---- index (⊞): every item of the current tile; sorted with the language's collation when the view asks ----
+// ---- index (⊞): every item of the current tile. Word lists: A–Z sections + a side letter bar (drag to jump) ----
+const firstUnit = (w, L, units) => { const p = I18N.splitUnits(w, units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : '#'; };
 function openIndex() {
-  const v = view(), list = APP.items().map((it, i) => ({ it, i }));
-  if (v.indexSort) { const col = I18N.collator(APP.L().bcp47); list.sort((a, b) => col.compare(a.it.w || a.it.label, b.it.w || b.it.label)); }
-  $('ixgrid').innerHTML = list.map(({ it, i }) => `<button class="ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${v.indexFace(it)}</button>`).join('');
+  const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
+  const btn = ({ it, i }) => `<button class="ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${v.indexFace(it)}</button>`;
+  let html = '', az = '';
+  if (v.indexSort) {
+    const col = I18N.collator(L.bcp47), units = APP.S().units, letters = APP.S().letters;
+    list.sort((a, b) => col.compare(a.it.w || a.it.label, b.it.w || b.it.label));
+    const groups = new Map(units.map(u => [u.id, []])); groups.set('#', []);
+    list.forEach(x => groups.get(firstUnit(x.it.w || x.it.label, L, units)).push(x));
+    for (const [u, xs] of groups) {
+      if (!xs.length) continue;
+      const lt = letters.find(l => l.id === u), color = lt ? lt.color : 'var(--muted)';
+      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${color}">${esc(lt ? lt.label : u)}</b><span>${esc(APP.t(U.words, { n: xs.length }))}</span></div>` + xs.map(btn).join('');
+    }
+    az = [...groups.keys()].filter(u => u !== '#' || groups.get('#').length)
+      .map(u => `<span class="az${groups.get(u).length ? '' : ' off'}" data-u="${esc(u)}">${esc((letters.find(l => l.id === u) || { label: u }).label)}</span>`).join('');
+  } else html = list.map(btn).join('');
+  $('ixgrid').innerHTML = html; $('ixaz').innerHTML = az; $('ixaz').style.display = az ? 'flex' : 'none';
+  $('ixsearch').querySelector('span').textContent = U.search.placeholder;
   $('index').classList.add('open');
   const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });
   sfx.pop();
 }
 const closeIndex = () => $('index').classList.remove('open');
 $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); if (!b) return; firstTouch(); closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
+// letter bar: tap or drag; empty letters jump to the next letter that has words
+(function () {
+  let last = null;
+  const jump = y => {
+    const bar = $('ixaz'), all = [...bar.children]; if (!all.length) return;
+    const r = bar.getBoundingClientRect(), k = Math.max(0, Math.min(all.length - 1, Math.floor((y - r.top) / r.height * all.length)));
+    const el = all.slice(k).find(x => !x.classList.contains('off')) || [...all].reverse().find(x => !x.classList.contains('off'));
+    if (!el || el.dataset.u === last) return; last = el.dataset.u;
+    all.forEach(x => x.classList.toggle('cur', x === el));
+    const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 }); // #ixgrid is the offsetParent
+    sfx.pop();
+  };
+  $('ixaz').addEventListener('pointerdown', e => { e.preventDefault(); last = null; try { $('ixaz').setPointerCapture(e.pointerId); } catch (x) {} jump(e.clientY); });
+  $('ixaz').addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') jump(e.clientY); });
+  $('ixaz').addEventListener('pointerup', () => { last = null; });
+})();
+
+// ---- universal search: every searchable tile, matched in ALL languages, shown in the current one ----
+const fold = s => String(s || '').replace(/\//g, '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/ß/g, 'ss');
+function searchPool() {
+  const out = [];
+  for (const t of TILES) {
+    if (!t.search || !listed(t, false) || !learnOk(t)) continue;
+    const per = LANGS.map(c => [c, new Map(((t.items(content(c)) || [])).map(it => [it.id, it]))]);
+    for (const it of itemsOf(t)) {
+      const names = per.map(([c, m]) => { const x = m.get(it.id); return [c, x ? (x.w || x.name) : null]; }).filter(x => x[1]);
+      out.push({ t, it, names, extra: [it.label] });
+    }
+  }
+  return out;
+}
+function runSearch() {
+  const U = APP.ui(), q = fold($('sq').value.trim()), col = I18N.collator(APP.L().bcp47);
+  $('sqclear').style.visibility = q ? 'visible' : 'hidden';
+  if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
+  const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; }; // short queries: word starts only
+  const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
+    .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1])).slice(0, 40);
+  $('smeta').textContent = hits.length ? APP.t(U.search.results, { n: hits.length }) : U.search.none;
+  const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };
+  $('sres').innerHTML = hits.map(({ x }) => {
+    const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
+    return `<button class="sr" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.pic || x.it.nav || ''}</span>` +
+      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>` +
+      `<span class="srk">${x.t.icon.length > 3 ? '🔤' : x.t.icon}</span></button>`;
+  }).join('');
+}
+function openSearch() {
+  const U = APP.ui(); $('sq').placeholder = U.search.placeholder; $('sq').value = '';
+  $('search').classList.add('open'); runSearch(); sfx.pop(); setTimeout(() => $('sq').focus(), 50);
+}
+const closeSearch = () => { $('search').classList.remove('open'); $('sq').blur(); };
+$('sq').addEventListener('input', runSearch);
+$('sres').addEventListener('click', e => {
+  const b = e.target.closest('.sr'); if (!b) return; firstTouch(); closeSearch(); closeIndex();
+  const t = TILE[b.dataset.t];
+  openTile(t.id, false, true); const i = APP.items().findIndex(it => it.id === b.dataset.id);
+  if (i >= 0) { APP.idx = i; APP.saveIdx(); } view().show(true);
+});
+tapBtn('sqclear', () => { $('sq').value = ''; runSearch(); $('sq').focus(); });
+tapBtn('sclose', closeSearch);
+tapBtn('ixsearch', openSearch);
 
 // ---- age profiles: three bikes in the top bar, visible on every hub; anyone may switch ----
 $('ages').innerHTML = Object.keys(CFG.profiles).map(p => { const [a, b] = CFG.profiles[p];
@@ -232,6 +312,8 @@ $('stage').addEventListener('pointerup', e => {
 // keyboard: arrows page; a letter/digit goes to the view, or on a hub opens the tile that has it
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey || e.isComposing) return;
+  if (e.key === 'Escape') { closeSearch(); closeIndex(); closeInfo(); return; }
+  if ($('search').classList.contains('open') || (e.target.closest && e.target.closest('input, textarea'))) return; // typing in the search box
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
   if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
   if (e.repeat) return;

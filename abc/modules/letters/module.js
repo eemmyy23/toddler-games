@@ -26,9 +26,9 @@ MODULE('letters', {
   tiles: [
     { id: 'letters', icon: '🔤', view: 'card', items: S => S.letters, index: true,
       game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'], lower: true, ask: (it, r) => r.lower ? 'lettersSmall' : 'letters' } },
-    { id: 'read', icon: '📚', view: 'read', items: S => S.words, index: true,
+    { id: 'read', icon: '📚', view: 'read', items: S => S.words, index: true, search: true,
       game: { type: 'find', items: S => S.wordGame, prompts: ['glyph', 'glyph', 'glyph', 'voice'], ask: it => it.the ? 'read' : 'readBare' } },
-    { id: 'groups', icon: 'ce·ci', view: 'card', items: S => S.groups,
+    { id: 'groups', icon: 'ce·ci', view: 'card', items: S => S.groups, index: true,
       game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'] } }
   ]
 });

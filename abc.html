@@ -51,7 +51,7 @@ body.topic #barback{display:flex;margin-left:auto}
 body.idx #gridbtn{display:flex}
 #barback{height:54px;padding:0 14px;border:none;border-radius:999px;background:var(--card);color:var(--amber);font-size:22px;font-weight:600;align-items:center;gap:4px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
 #stars{background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
-#hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(92px,1fr);gap:12px;padding:4px 2px 8px}
+#hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-template-rows:52px;grid-auto-rows:clamp(112px,21vh,156px);align-content:start;gap:12px;padding:4px 2px 8px}
 .ht{position:relative;border:none;border-radius:26px;background:var(--card);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);font-size:19px;font-weight:600;padding:8px;text-align:center;line-height:1.15}
 .ht .hp{font-size:48px;line-height:1}
 .hh{grid-column:1/-1;font-size:15px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 0;align-self:end}
@@ -127,6 +127,10 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 #ctools{position:sticky;top:0;z-index:2;display:flex;justify-content:center;gap:10px;padding:6px 0 12px;background:linear-gradient(var(--bg1) 75%,transparent)}
 #ctools button{border:none;border-radius:999px;height:52px;padding:0 20px;font-size:24px;font-weight:600;color:var(--text);background:var(--card);cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
 #ctools button.on{background:var(--amber);color:var(--amber-ink)}
+/* ▶ while counting: pressed look + hatched fill that grows with the progress (--p 0…1) */
+#c-all{position:relative;overflow:hidden;--p:0}
+#c-all::before{content:'';position:absolute;inset:0;width:calc(var(--p) * 100%);background:repeating-linear-gradient(-45deg,rgba(255,201,77,.45) 0 7px,rgba(255,201,77,.2) 7px 14px);transition:width .5s ease-out;pointer-events:none}
+#c-all.playing{box-shadow:inset 0 0 0 3px var(--amber),inset 0 3px 8px rgba(0,0,0,.45);transform:translateY(2px);color:var(--amber)}
 .crow{display:flex;align-items:center;gap:12px;margin:0 auto 10px;max-width:900px;padding:8px 12px;border-radius:var(--r);background:var(--card);cursor:pointer;transition:background .2s,transform .2s}
 .crow.active{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber);transform:scale(1.02)}
 .cnum{flex:0 0 auto;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
@@ -185,7 +189,36 @@ body.topic #ages{display:none}
 @media (max-width:350px){.age{width:40px;height:40px}.age svg{width:30px;height:30px}}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
-#ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
+#ixhead{display:flex;gap:10px;align-items:center;padding-bottom:10px}
+#ixbody{flex:1;min-height:0;display:flex;gap:6px}
+#ixgrid{position:relative}
+.ixh{grid-column:1/-1;display:flex;align-items:baseline;gap:10px;padding:10px 4px 0}
+.ixh b{font-size:34px;line-height:1}.ixh span{font-size:15px;font-weight:600;color:var(--muted)}
+#ixaz{flex:0 0 28px;display:none;flex-direction:column;justify-content:space-between;align-items:center;background:var(--card);border-radius:999px;padding:8px 0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.az{font-size:13px;font-weight:700;color:var(--muted);line-height:1;width:24px;text-align:center;padding:1px 0;border-radius:999px}
+.az.off{opacity:.3}.az.cur{background:var(--amber);color:var(--amber-ink)}
+/* search: a pill on every hub + in the index; full-screen results, matched in every language */
+.sbox{flex:1;display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;border:none;border-radius:999px;background:var(--card);color:var(--muted);font-size:18px;font-weight:600;text-align:left;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);min-width:0}
+.sbox span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbox.on{box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);cursor:text}
+.hsearch{grid-column:1/-1;display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;border:none;border-radius:999px;background:var(--card);color:var(--muted);font-size:17px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#search{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;background:rgba(9,12,31,.98);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
+#search.open{display:flex}
+#shead{display:flex;gap:10px;align-items:center}
+#sq{flex:1;min-width:0;border:none;outline:none;background:transparent;color:var(--text);font:inherit;font-size:20px;-webkit-appearance:none;appearance:none}
+#sq::-webkit-search-cancel-button{display:none}
+#sqclear{border:none;background:var(--card2);color:var(--text);width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;visibility:hidden}
+#sclose{width:54px;height:54px;flex:0 0 54px;border:none;border-radius:50%;background:var(--card);color:var(--text);font-size:24px;cursor:pointer}
+#smeta{padding:12px 6px 8px;font-size:15px;font-weight:600;color:var(--muted);min-height:20px}
+#sres{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;padding-bottom:20px}
+.sr{display:flex;align-items:center;gap:14px;min-height:76px;padding:10px 14px;border:none;border-radius:22px;background:var(--card);color:var(--text);text-align:left;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+.srp{flex:0 0 56px;height:56px;border-radius:16px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:34px}
+.srp b{font-size:34px}.srp .dot,.ix .dot{display:inline-block;border-radius:50%;border:2px solid rgba(255,255,255,.25)}.srp .dot{width:34px;height:34px}.ix .dot{width:40px;height:40px}
+.srt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.srt b{font-size:24px;line-height:1.1}.srt small{font-size:15px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr mark{background:none;color:var(--amber);font-weight:700}
+.srk{flex:0 0 auto;font-size:22px;opacity:.8}
+.shint{color:var(--muted);text-align:center;font-size:16px;line-height:1.4;padding:24px 20px}
 #ixclose{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--text);font-size:24px;cursor:pointer;touch-action:manipulation}
 #ixgrid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;align-content:start;padding-bottom:20px}
 .ix{height:84px;border:none;border-radius:18px;background:var(--card);color:var(--text);font-size:38px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;line-height:1.15;padding-top:2px}
@@ -267,7 +300,8 @@ body.topic #ages{display:none}
 </div>
 <div id="info"><div id="infohead"><span id="infotitle"></span><button id="infoclose" aria-label="Close">✕</button></div>
   <div id="infolist"></div><div id="infofoot"><button id="infoplay" aria-label="Play">▶</button></div></div>
-<div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
+<div id="index"><div id="ixhead"><button id="ixsearch" class="sbox">🔍 <span></span></button><button id="ixclose" aria-label="Close">✕</button></div><div id="ixbody"><div id="ixgrid"></div><div id="ixaz"></div></div></div>
+<div id="search"><div id="shead"><div class="sbox on"><span aria-hidden="true">🔍</span><input id="sq" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" aria-label="Clear">✕</button></div><button id="sclose" aria-label="Close">✕</button></div><div id="smeta"></div><div id="sres"></div></div>
 <nav id="tabs"></nav>
 <canvas id="fx"></canvas>
 
@@ -276,7 +310,7 @@ body.topic #ages{display:none}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v1.0.0</div>
+<div id="ver">v1.1.0</div>
 
 <!-- All scripts are listed (in load order) by abc/manifest.js, generated by `node tools/check.js --fix`.
      Adding a language or a module never edits this file. See ARCHITECTURE.md. -->

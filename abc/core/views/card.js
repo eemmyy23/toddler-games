@@ -66,7 +66,8 @@
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;
     },
-    indexFace: it => `<span style="color:${it.color}">${esc(it.label)}</span>${it.examples && it.examples[0] ? `<small>${it.examples[0][1]}</small>` : ''}`
+    indexFace: it => it.examples ? `<span style="color:${it.color}">${esc(it.label)}</span>${it.examples[0] ? `<small>${it.examples[0][1]}</small>` : ''}`
+      : `${it.nav || esc(it.label)}<small>${esc(it.name)}</small>`
   };
   VIEW('card', VIEW_CARD);
 })();

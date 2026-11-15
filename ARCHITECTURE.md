@@ -60,6 +60,8 @@ MODULE('shapes', { section: 'disc', ages: [2, 6],
 ```
 plus `lang/<code>.js` with `MSTRINGS('shapes', code, { tiles: { shapes: ['Forme', 'Găsește forma'] }, games: { shapes: 'Unde e {name}?' } })`,
 add `'shapes'` to `config.modules`, run `node tools/check.js --fix`. The Play tile is created from `game` (1 learn ↔ 1 game).
+Tile flags: `index: true` → ⊞ grid of all items (A–Z sections + side letter bar when the view sets `indexSort`);
+`search: true` → items are found by the universal search (🔍 on every hub and in the index), matched in every language.
 
 **Add a view or a game type** — `abc/core/views/<id>.js` with `VIEW(id, {el, show, step, …})` or
 `abc/core/games/<id>.js` with `GAME(id, {needs, pool, prompt})`; the manifest picks it up.

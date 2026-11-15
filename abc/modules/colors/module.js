@@ -33,6 +33,6 @@ MODULE('colors', {
     return { colors };
   },
   tiles: [
-    { id: 'colors', icon: '🎨', view: 'card', items: S => S.colors, game: { type: 'find', prompts: ['glyph', 'voice'] } }
+    { id: 'colors', icon: '🎨', view: 'card', items: S => S.colors, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'voice'] } }
   ]
 });

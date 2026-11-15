@@ -12,7 +12,7 @@ MODULE('numbers', {
     }) };
   },
   tiles: [
-    { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
+    { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
     { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany' } }
   ]
 });
