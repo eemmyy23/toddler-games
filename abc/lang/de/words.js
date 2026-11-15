@@ -161,7 +161,6 @@ w('calf', { w: 'Kalb', g: 'n', pl: 'Kälber' });
 w('stallion', { w: 'Hengst', g: 'm', pl: 'Hengste' });
 w('mare', { w: 'Stu/te', g: 'f', pl: 'Stuten' });
 w('foal', { w: 'Foh/len', g: 'n', pl: 'Fohlen' });
-w('boar', { w: 'E/ber', g: 'm', pl: 'Eber' });
 w('sow', { w: 'Sau', g: 'f', pl: 'Säue' });
 w('piglet', { w: 'Fer/kel', g: 'n', pl: 'Ferkel' });
 w('drake', { w: 'Er/pel', g: 'm', pl: 'Erpel' });

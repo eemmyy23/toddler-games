@@ -165,7 +165,6 @@ w('calf', { w: 'calf', art: 'a', pl: 'calves' });
 w('stallion', { w: 'stal/lion', art: 'a', pl: 'stallions' });
 w('mare', { w: 'mare', art: 'a', pl: 'mares' });
 w('foal', { w: 'foal', art: 'a', pl: 'foals' });
-w('boar', { w: 'boar', art: 'a', pl: 'boars' });
 w('sow', { w: 'sow', art: 'a', pl: 'sows' });
 w('piglet', { w: 'pig/let', art: 'a', pl: 'piglets' });
 w('drake', { w: 'drake', art: 'a', pl: 'drakes' });

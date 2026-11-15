@@ -1,5 +1,5 @@
 {
-  const FAMILIES = ['rooster hen chicken-chick', 'billy-goat goat kid', 'ram sheep lamb', 'bull cow calf', 'stallion mare foal', 'boar sow piglet', 'drake duck duckling', 'tomcat cat kitten'];
+  const FAMILIES = ['rooster hen chicken-chick', 'billy-goat goat kid', 'ram sheep lamb', 'bull cow calf', 'stallion mare foal', 'pig sow piglet', 'drake duck duckling', 'tomcat cat kitten'];
   const SIZES = [1, 0.85, 0.6];
   MODULE('families', {
     section: 'disc', ages: [2, 5],

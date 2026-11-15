@@ -164,7 +164,6 @@ w('calf', { w: 'vi/țel', def: 'vițelul', pl: 'viței', g: 'm', plDef: 'vițeii
 w('stallion', { w: 'ar/mă/sar', def: 'armăsarul', pl: 'armăsari', g: 'm', plDef: 'armăsarii' });
 w('mare', { w: 'ia/pă', def: 'iapa', pl: 'iepe', g: 'f', plDef: 'iepele' });
 w('foal', { w: 'mânz', def: 'mânzul', pl: 'mânji', g: 'm', plDef: 'mânjii' });
-w('boar', { w: 'vier', def: 'vierul', pl: 'vieri', g: 'm', plDef: 'vierii' });
 w('sow', { w: 'scroa/fă', def: 'scroafa', pl: 'scroafe', g: 'f', plDef: 'scroafele' });
 w('piglet', { w: 'pur/cel', def: 'purcelul', pl: 'purcei', g: 'm', plDef: 'purceii' });
 w('drake', { w: 'ră/țoi', def: 'rățoiul', pl: 'rățoi', g: 'm', plDef: 'rățoii' });
