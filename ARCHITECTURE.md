@@ -1,5 +1,8 @@
 # ABC 123! — architecture
 
+> Current state (v0.9). The target architecture and the plan to get there are in
+> [docs/ROADMAP.md](docs/ROADMAP.md); the findings behind them in [docs/AUDIT-2026-11.md](docs/AUDIT-2026-11.md).
+
 A single static PWA: no framework, no build step. Works offline via `sw.js`.
 Everything the child sees is **data**. The engine (`abc/app.js`) has no per-subject, per-language or per-word code.
 
