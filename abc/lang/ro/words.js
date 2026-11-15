@@ -171,4 +171,13 @@ w('drake', { w: 'ră/țoi', def: 'rățoiul', pl: 'rățoi', g: 'm', plDef: 'ră
 w('duckling', { w: 'ră/țuș/că', def: 'rățușca', pl: 'rățuște', g: 'f', plDef: 'rățuștele' });
 w('tomcat', { w: 'mo/tan', def: 'motanul', pl: 'motani', g: 'm', plDef: 'motanii' });
 w('kitten', { w: 'pi/soi', def: 'pisoiul', pl: 'pisoi', g: 'm', plDef: 'pisoii' });
+w('rain', { w: 'ploa/ie', def: 'ploaia', pl: 'ploi', g: 'f', plDef: 'ploile' });
+w('snow', { w: 'ză/pa/dă', def: 'zăpada', pl: 'zăpezi', g: 'f', plDef: 'zăpezile' });
+w('wind', { w: 'vânt', def: 'vântul', pl: 'vânturi', g: 'n', plDef: 'vânturile' });
+w('storm', { w: 'fur/tu/nă', def: 'furtuna', pl: 'furtuni', g: 'f', plDef: 'furtunile' });
+w('cap', { w: 'șap/că', def: 'șapca', pl: 'șepci', g: 'f', plDef: 'șepcile' });
+w('sunglasses', { w: 'o/che/lari de soa/re', plOnly: true, plDef: 'ochelarii de soare' });
+w('boots', { w: 'ciz/me', plOnly: true, plDef: 'cizmele' });
+w('gloves', { w: 'mă/nuși', plOnly: true, plDef: 'mănușile' });
+w('scarf', { w: 'fu/lar', def: 'fularul', pl: 'fulare', g: 'n', plDef: 'fularele' });
 }

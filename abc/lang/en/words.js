@@ -172,4 +172,13 @@ w('drake', { w: 'drake', art: 'a', pl: 'drakes' });
 w('duckling', { w: 'duck/ling', art: 'a', pl: 'ducklings' });
 w('tomcat', { w: 'tom/cat', art: 'a', pl: 'tomcats' });
 w('kitten', { w: 'kit/ten', art: 'a', pl: 'kittens' });
+w('rain', { w: 'rain', mass: true });
+w('snow', { w: 'snow', mass: true });
+w('wind', { w: 'wind', mass: true });
+w('storm', { w: 'storm', art: 'a', pl: 'storms' });
+w('cap', { w: 'cap', art: 'a', pl: 'caps' });
+w('sunglasses', { w: 'sun/glass/es', plOnly: true });
+w('boots', { w: 'boots', plOnly: true });
+w('gloves', { w: 'gloves', plOnly: true });
+w('scarf', { w: 'scarf', art: 'a', pl: 'scarves' });
 }

@@ -168,4 +168,13 @@ w('drake', { w: 'Er/pel', g: 'm', pl: 'Erpel' });
 w('duckling', { w: 'En/ten/kü/ken', g: 'n', pl: 'Entenküken' });
 w('tomcat', { w: 'Ka/ter', g: 'm', pl: 'Kater' });
 w('kitten', { w: 'Kätz/chen', g: 'n', pl: 'Kätzchen' });
+w('rain', { w: 'Re/gen', g: 'm', mass: true });
+w('snow', { w: 'Schnee', g: 'm', mass: true });
+w('wind', { w: 'Wind', g: 'm', pl: 'Winde' });
+w('storm', { w: 'Ge/wit/ter', g: 'n', pl: 'Gewitter' });
+w('cap', { w: 'Kap/pe', g: 'f', pl: 'Kappen' });
+w('sunglasses', { w: 'Son/nen/bril/le', g: 'f', pl: 'Sonnenbrillen' });
+w('boots', { w: 'Stie/fel', g: 'm', pl: 'Stiefel' });
+w('gloves', { w: 'Hand/schuh', g: 'm', pl: 'Handschuhe' });
+w('scarf', { w: 'Schal', g: 'm', pl: 'Schals' });
 }
