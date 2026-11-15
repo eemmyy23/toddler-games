@@ -93,7 +93,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
-(orange the colour / the fruit); `also: 'ghete, bocanci'` lists synonyms — same picture and concept, found by search, never shown as a second word.
+(orange the colour / the fruit); `also: 'gheată|ghete, bocanc|bocanci'` lists synonyms (singular|plural) — same picture and concept, shown as "also called" under the word and found by search (with their plurals).
 **INFO** — `const i = INFO(code); i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })` (`gloss`: a note for translators, not read by the app).
 **GROUP** — `GROUP(id, 'member ids')`: the group is a concept too (its word names it); a concept is in at most one group (index Groups mode, Groups module).
 **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).

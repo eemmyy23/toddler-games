@@ -13,10 +13,10 @@ const CONTENT = (() => {
     const L = ABC.langs[code];
     return (wordCache[code] = L.words.filter(e => ABC.conceptById[e.id]).map(e => {
       const syl = e.w.split(/[/\s]+/), w = e.w.replace(/\//g, ''), c = ABC.conceptById[e.id];
-      return Object.freeze({ id: e.id, concept: e.id, pic: c.pic, w, syl, also: e.also ? e.also.split(',').map(s => s.trim()) : [], say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e });
+      return Object.freeze({ id: e.id, concept: e.id, pic: c.pic, w, syl, also: e.also ? e.also.split(',').map(s => s.trim().split('|')[0]) : [], alsoForms: e.also ? e.also.split(/[,|]/).map(s => s.trim()) : [], say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e });
     }));
   }
-  const byId = code => new Map(words(code).map(x => [x.id, x]));
+  const idCache = {}, byId = code => idCache[code] || (idCache[code] = new Map(words(code).map(x => [x.id, x])));
   function seal(base, extra) {
     for (const [k, v] of Object.entries(extra || {})) {
       if (v === undefined) continue;
@@ -44,7 +44,7 @@ const CONTENT = (() => {
       return (abcCache[code] = { units, color, name, unit: id => units.find(u => u.id === id) || null });
     },
     thing: (x, extra) => seal({ id: x.id, label: x.w, name: x.w, say: x.say, big: pic(x.id), word: x.w, nav: pic(x.id), pic: x.pic,
-      concept: x.id, the: the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? pic(x.id) : null, pictureBubble: true, prompt: x.w, also: x.also, plural: !!x.entry.plOnly,
+      concept: x.id, the: the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? pic(x.id) : null, pictureBubble: true, prompt: x.w, also: x.also, alsoForms: x.alsoForms, plural: !!x.entry.plOnly,
       a: x.forms && x.forms.sg ? x.forms.sg[x.entry.unique ? 1 : 0] : null, g: x.entry.g }, extra),
     word: (x, extra) => C.thing(x, Object.assign({ syl: x.syl, w: x.w, forms: x.forms }, extra)),
     glyph: (code, { id, text, name, color, small, word, cls }, extra) => seal({ id, label: text, name, say: C.exclaim(code, name),

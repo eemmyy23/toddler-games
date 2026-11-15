@@ -5,6 +5,7 @@ STRINGS('ro', {
   thats: { m: 'Acesta e {name}.', n: 'Acesta e {name}.', f: 'Aceasta e {name}.', pl: 'Acestea sunt {name}.', other: 'Asta e {name}.' },
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
+  also: 'Se mai spune:',
   version: 'v{version} · {build}',
   exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: 'Instalează {app} pe dispozitiv',

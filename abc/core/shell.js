@@ -7,7 +7,7 @@ const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
-const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50;
+const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50, STEM = 4;
 let seqTok = 0;
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
@@ -72,6 +72,7 @@ const APP = {
     } finally { if (opts.button && t === seqTok) APP.playing(false); }
   },
   playing(on) { $('act').classList.toggle('on', !!on); $('act').setAttribute('aria-pressed', !!on); },
+  synonyms: it => it.also && it.also.length ? `<span class="label">${esc(APP.ui().also)}</span>${it.also.map(a => `<button class="pill small syn" data-say="${esc(a)}">${esc(a)}</button>`).join('')}` : '',
   shown() {
     APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
@@ -138,11 +139,10 @@ function hubTiles() {
 }
 function renderHub() {
   const U = APP.ui();
-  $('hub').innerHTML = `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
+  $('hub').innerHTML = `<div id="ver" class="label" aria-hidden="true">${esc(APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version }))}</div>` + `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="label caps hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="card ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
-      `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('') +
-    `<div id="ver" class="label" aria-hidden="true">${esc(APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version }))}</div>`;
+      `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
 function openTile(id, play, quiet) {
   const t = TILE[id]; if (!usable(t, play)) return false;
@@ -223,6 +223,7 @@ onTapIn(document, '.link[data-t]', b => {
   if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
 });
 onTapIn(document, '.infobtn', b => openInfo(b.dataset.c));
+onTapIn(document, '.syn', b => APP.sequence(b.parentNode, [{ light: b, say: b.dataset.say, pop: true }]));
 onTapIn('infolist', '.inf', b => APP.sequence('infolist', [{ light: b, say: infoFor(infoId).lines[+b.dataset.i][1] }]));
 function playInfo() {
   const I = infoFor(infoId);
@@ -300,7 +301,8 @@ function searchPool() {
     const per = LANGS.map(c => [c, new Map(Tiles.items(t, c).map(it => [it.id, it]))]);
     for (const it of itemsOf(t)) {
       const names = per.map(([c, m]) => { const x = m.get(it.id); return [c, x ? x.name : null]; }).filter(x => x[1]);
-      out.push({ t, it, names, extra: [it.label, ...per.flatMap(([, m]) => (m.get(it.id) || {}).also || [])] });
+      const forms = c => { const x = it.concept && CONTENT.byId(c).get(it.concept); return x && x.forms ? [...(x.forms.sg || []), ...(x.forms.pl || [])] : []; };
+      out.push({ t, it, names, extra: [it.label, ...per.flatMap(([c, m]) => [...((m.get(it.id) || {}).alsoForms || []), ...forms(c)])] });
     }
   }
   return out;
@@ -309,7 +311,8 @@ function runSearch() {
   const U = APP.ui(), q = fold($('sq').value.trim()), col = I18N.collator(APP.L().bcp47);
   $('sqclear').hidden = !q;
   if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
-  const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; };
+  const stem = q.length >= STEM ? q.slice(0, -1) : null;
+  const score = s => { const f = fold(s), ws = f.split(/[\s-]+/); return f === q ? 3 : ws.some(w => w.startsWith(q)) ? 2 : q.length >= STEM && (f.includes(q) || ws.some(w => w.startsWith(stem))) ? 1 : 0; };
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
     .sort((a, b) => b.s - a.s || col.compare(a.x.names[0][1], b.x.names[0][1]));
   const groups = new Map();

@@ -155,6 +155,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .nav b{font-size:calc(var(--fs-xxl) * var(--fit,1));font-weight:700}
 #prev,#next{position:fixed;bottom:var(--nav-y);z-index:var(--z-float)}
 #prev{left:var(--gut)} #next{right:var(--gut)}
+.also{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:var(--sp-2);max-width:100%}
 .links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2);width:100%;margin-top:var(--link-gap);padding-top:var(--link-gap);border-top:1px solid var(--line)}
 .pill.link{--pill-h:var(--link-h);--pill-fs:var(--link-fs);background:transparent;box-shadow:none;border:1px solid var(--line-strong);color:var(--muted)}
 .li{--icon:var(--fs-s)}
@@ -248,7 +249,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 
 #install-bar{position:fixed;top:0;left:0;right:0;z-index:var(--z-toast);display:flex;align-items:center;justify-content:center;gap:var(--sp-3);padding:var(--bar-pad) var(--gut) var(--sp-3);background:var(--card)}
 #install-msg{font-size:var(--fs-xs)}
-#ver{grid-column:1/-1;justify-self:center;font-weight:400;opacity:.5}
+#ver{grid-column:1/-1;justify-self:end;font-size:var(--fs-xxs);font-weight:400;margin-bottom:calc(-1 * var(--sp-2))}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -268,6 +269,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
     <div id="glyph"></div>
     <div id="pics"></div>
     <div id="word"></div>
+    <div id="also" class="also" hidden></div>
     <div id="examples"></div>
     <div id="links" class="links"></div>
   </div>

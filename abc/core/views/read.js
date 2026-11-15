@@ -16,7 +16,7 @@
       `<div class="rrow let" id="rU">${upper}</div>` +
       `<div class="rrow let" id="rL">${lower}</div>` +
       (syl.length > 1 ? `<div class="rrow syl" id="rS">${syls}</div>` : '') +
-      `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div></div><div class="rcol">` +
+      `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` + (e.also && e.also.length ? `<div class="also" id="rA">${APP.synonyms(e)}</div>` : '') + `</div><div class="rcol">` +
       (forms ? `<div id="rC"><div class="label caps rh">${esc(U.sgpl[0])}</div><div class="label caps rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
           ? `<button class="card rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
@@ -36,6 +36,7 @@
       { light: all('#rL .rt'), say: $('rS') ? word : null },
       ...all('#rS .rt').map(el => ({ light: el, say: el.dataset.say })),
       { light: w, say: word, pop: true },
+      ...all('#rA .syn').map(el => ({ light: el, say: el.dataset.say })),
       ...all('#rC .rc[data-say]').map(el => ({ light: el, say: el.dataset.say }))
     ], { button: true, finale: true, at: w });
   }

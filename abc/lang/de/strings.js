@@ -9,6 +9,7 @@ STRINGS('de', {
   search: { placeholder: 'Wort suchen…', hint: 'Schreib in jeder Sprache — das Wort erscheint in der oben gewählten Sprache.', none: 'Nichts gefunden.',
     results: { one: '1 Ergebnis', other: '{n} Ergebnisse' } },
   words: { one: '1 Wort', other: '{n} Wörter' },
+  also: 'Auch:',
   version: 'v{version} · {build}',
   exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: '{app} auf dem Gerät installieren',
