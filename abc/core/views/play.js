@@ -21,7 +21,7 @@
     locked = false; target = pickTarget();
     if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; }
     opts = [target];
-    for (const it of shuffle(pool())) if (opts.length < nChoices() && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
+    for (const it of shuffle(pool())) if (opts.length < nChoices() && (!target.among || it.among === target.among) && !opts.some(o => (o.sound && o.sound === it.sound) || look(o) === look(it))) opts.push(it);
     opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     const m = target.members || [];

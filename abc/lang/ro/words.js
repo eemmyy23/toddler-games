@@ -207,4 +207,9 @@ w('vehicles', { w: 've/hi/cu/le', plOnly: true, plDef: 'vehiculele' });
 w('clothes', { w: 'hai/ne', plOnly: true, plDef: 'hainele' });
 w('toys', { w: 'ju/că/rii', plOnly: true, plDef: 'jucăriile' });
 w('music', { w: 'in/stru/men/te mu/zi/ca/le', plOnly: true, plDef: 'instrumentele muzicale' });
+w('fire', { w: 'foc', def: 'focul', pl: 'focuri', g: 'n', plDef: 'focurile' });
+w('snail', { w: 'melc', def: 'melcul', pl: 'melci', g: 'm', plDef: 'melcii' });
+w('stone', { w: 'pia/tră', def: 'piatra', pl: 'pietre', g: 'f', plDef: 'pietrele' });
+w('feather', { w: 'pa/nă', def: 'pana', pl: 'pene', g: 'f', plDef: 'penele' });
+w('anchor', { w: 'an/co/ră', def: 'ancora', pl: 'ancore', g: 'f', plDef: 'ancorele' });
 }

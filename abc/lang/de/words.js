@@ -204,4 +204,9 @@ w('vehicles', { w: 'Fahr/zeu/ge', plOnly: true });
 w('clothes', { w: 'Klei/dung', g: 'f', mass: true });
 w('toys', { w: 'Spiel/zeug', g: 'n', mass: true });
 w('music', { w: 'Mu/sik/in/stru/men/te', plOnly: true });
+w('fire', { w: 'Feu/er', g: 'n', pl: 'Feuer' });
+w('snail', { w: 'Schne/cke', g: 'f', pl: 'Schnecken' });
+w('stone', { w: 'Stein', g: 'm', pl: 'Steine' });
+w('feather', { w: 'Fe/der', g: 'f', pl: 'Federn' });
+w('anchor', { w: 'An/ker', g: 'm', pl: 'Anker' });
 }

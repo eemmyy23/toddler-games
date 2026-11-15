@@ -208,4 +208,9 @@ w('vehicles', { w: 've/hi/cles', plOnly: true });
 w('clothes', { w: 'clothes', plOnly: true });
 w('toys', { w: 'toys', plOnly: true });
 w('music', { w: 'mu/si/cal in/stru/ments', plOnly: true });
+w('fire', { w: 'fire', art: 'a', pl: 'fires' });
+w('snail', { w: 'snail', art: 'a', pl: 'snails' });
+w('stone', { w: 'stone', art: 'a', pl: 'stones' });
+w('feather', { w: 'feath/er', art: 'a', pl: 'feathers' });
+w('anchor', { w: 'an/chor', art: 'an', pl: 'anchors' });
 }
