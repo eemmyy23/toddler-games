@@ -18,7 +18,7 @@
   function newRound() {
     locked = false; target = pickTarget();
     if (!target) { opts = []; $('ask').innerHTML = ''; $('choices').innerHTML = ''; return; }
-    opts = shuffle([target, ...shuffle(pool().filter(it => it !== target)).slice(0, nChoices() - 1)]);
+    opts = shuffle([target, ...shuffle(pool().filter(it => it !== target && (!it.sound || it.sound !== target.sound))).slice(0, nChoices() - 1)]);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0] };
     draw();

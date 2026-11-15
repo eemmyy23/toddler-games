@@ -12,12 +12,13 @@
     build(code) {
       const L = ABC.langs[code], words = CONTENT.words(code), A = CONTENT.alphabet(code);
       const low = x => x.toLocaleLowerCase(L.bcp47);
+      const alike = (L.alike || '').split(/\s+/).filter(Boolean), sound = u => alike.find(s => s.split('=').includes(u.lower)) || u.id;
       const letters = A.units.map(u => {
         const ex = examples(L, words, u.lower, false), [w, , inside] = ex[0] || [u.upper, '🔤', false];
         const name = A.name(u), color = A.color(u.id);
         return { id: u.id, key: u.lower.length === 1 ? u.lower : null, label: u.upper, name, say: L.sayLetter(name, low(w), inside),
           big: u.cased ? `${esc(u.upper)}<small>${esc(u.lower)}</small>` : esc(u.upper), color, nav: CONTENT.navText(u.upper, color),
-          examples: ex, bubble: u.upper, lower: u.cased ? u.lower : null, bubbleColor: color, prompt: u.upper, unit: u };
+          examples: ex, bubble: u.upper, lower: u.cased ? u.lower : null, bubbleColor: color, prompt: u.upper, unit: u, sound: sound(u) };
       });
       const groups = (L.groups || '').split(/\s+/).filter(Boolean).map((g, i, a) => {
         const ex = examples(L, words, g, true), [w] = ex[0] || [g], color = ink((i * 360 / a.length + 20) | 0);
