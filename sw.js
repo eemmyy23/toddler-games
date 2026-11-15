@@ -1,8 +1,18 @@
-const CACHE = 'toddler-v28';
+const CACHE = 'toddler-v29';
 const ASSETS = [
   '/toddler-games/rocket.html',
   '/toddler-games/paint.html',
   '/toddler-games/abc.html',
+  '/toddler-games/abc/registry.js',
+  '/toddler-games/abc/lang/en.js',
+  '/toddler-games/abc/lang/ro.js',
+  '/toddler-games/abc/lang/de.js',
+  '/toddler-games/abc/data/words.js',
+  '/toddler-games/abc/data/colors.js',
+  '/toddler-games/abc/data/info.js',
+  '/toddler-games/abc/content.js',
+  '/toddler-games/abc/topics.js',
+  '/toddler-games/abc/app.js',
   '/toddler-games/manifest-abc.json',
   '/toddler-games/abc-icon-192.png',
   '/toddler-games/abc-icon-512.png',
