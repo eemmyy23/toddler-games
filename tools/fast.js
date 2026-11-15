@@ -37,7 +37,7 @@ function audit() {
     if (atHub) for (const t of document.querySelectorAll('#hub .ht')) {
       const b = R(t.querySelector('.agebadge'));
       if (t.scrollHeight > t.clientHeight + 1) bad.push(`${name}/${t.dataset.id}: tile overflow`);
-      if ([...t.querySelectorAll('.hp,.hl,.badge')].some(e => hit(R(e), b))) bad.push(`${name}/${t.dataset.id}: under the age badge`);
+      if ([...t.querySelectorAll('.hp,.hl')].some(e => hit(R(e), b))) bad.push(`${name}/${t.dataset.id}: under the age badge`);
       if (stretched(t)) bad.push(`${name}/${t.dataset.id}: stretched`);
     }
   }

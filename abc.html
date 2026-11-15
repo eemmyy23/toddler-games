@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>ABC 123! 🔤</title>
+<title>ABC 123!</title>
 <link rel="icon" href="abc-icon-192.png" type="image/png">
 <link rel="manifest" href="manifest-abc.json">
 <meta name="theme-color" content="#090c1f">
@@ -72,7 +72,6 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 :is(.pill,.rbtn).primary,.pill.on{background:var(--amber);color:var(--amber-ink)}
 .accent{color:var(--amber)}
 :is(.pill,.rbtn):not(.primary):not(.on):active{background:var(--card2)}
-.off{visibility:hidden}
 .objs{--obj:1.25em;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:var(--sp-1) var(--sp-3);line-height:1.1;
   max-width:calc(var(--row) * var(--obj) + (var(--row) - 1) * var(--sp-3))}
 .objs > *{width:var(--obj);text-align:center}
@@ -115,7 +114,6 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .ht:active{background:var(--card2)}
 .hp{order:1;--icon:var(--tile-icon)} .hl{order:2}
 .hp.txt,.ico-s.txt{color:var(--amber)}
-.ht .badge{order:3;white-space:nowrap;font-size:12px;font-weight:600;color:var(--amber);background:var(--amber-soft);border-radius:var(--r-pill);padding:2px 8px}
 .agebadge{position:absolute;top:7px;left:calc(10px + (100% - 20px - 28px) * var(--ax));width:28px;height:28px;opacity:.9;pointer-events:none}
 .agebadge svg{width:100%;height:100%;display:block}
 
@@ -138,6 +136,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .rbb{fill:none;stroke-width:10.6}
 .pset{display:inline-flex;align-items:flex-end;gap:.08em;font-size:var(--pset);text-shadow:none}
 .pset .part{font-size:calc(var(--s,1) * 1em)}
+.ic{font-style:normal;margin-inline:.15em}
 .art{width:1em;height:1em;vertical-align:middle;overflow:visible;text-shadow:none}
 .part{cursor:pointer;transition:opacity .2s,filter .2s}
 #glyph.on .part{opacity:.28}
@@ -235,10 +234,10 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 #ixaz{flex:0 0 28px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:8px 0;border-radius:var(--r-pill);background:var(--card);
   touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
 .az{width:24px;padding:1px 0;border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:700;line-height:1;text-align:center;color:var(--muted);transition:background .15s,color .15s,transform .15s}
-.az.off{opacity:.3}
+.az.dim{opacity:.3}
 .az.on{background:var(--amber);color:var(--amber-ink);transform:scale(1.25)}
 .sbox{flex:1;justify-content:flex-start;gap:var(--sp-3);min-width:0;color:var(--muted);font-size:18px;text-align:left}
-.sbox::before{content:'🔍';flex:0 0 auto} .sbox span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbox i{flex:0 0 auto;font-style:normal} .sbox span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sbox:focus-within{box-shadow:var(--ring),var(--shadow);cursor:text}
 #sq{flex:1;min-width:0;border:none;outline:none;background:transparent;color:var(--text);font:inherit;font-size:20px;-webkit-appearance:none;appearance:none}
 #sq::-webkit-search-cancel-button{display:none}
@@ -267,7 +266,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
   <div id="flags" class="group"></div>
   <div id="ages" class="group" role="radiogroup"></div>
   <button id="barback" class="pill accent" data-aria="back" hidden></button>
-  <button id="gridbtn" class="rbtn accent" data-aria="index" hidden><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg></button>
+  <button id="gridbtn" class="rbtn accent" data-aria="index" data-icon="grid" hidden></button>
   <div id="stars" class="pill" hidden></div>
 </div>
 
@@ -289,30 +288,30 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 </div>
 <div id="count" class="scroll" hidden>
   <div id="ctools">
-    <button id="c-obj" class="pill on" data-aria="objects">🍓</button>
-    <button id="c-hand" class="pill" data-aria="fingers">✋</button>
+    <button id="c-obj" class="pill on" data-aria="objects" data-icon="objects"></button>
+    <button id="c-hand" class="pill" data-aria="fingers" data-icon="fingers"></button>
     <button id="c-all" class="pill" data-aria="countAll"></button>
   </div>
   <div id="crows"></div>
 </div>
-<button class="pill nav" id="prev" data-aria="prev" data-low hidden>◀</button>
-<button class="pill nav" id="next" data-aria="next" data-low hidden>▶</button>
+<button class="pill nav" id="prev" data-aria="prev" data-low hidden></button>
+<button class="pill nav" id="next" data-aria="next" data-low hidden></button>
 <div id="rnav" data-low hidden>
   <button class="pill nav" id="rprev" data-aria="prev"></button>
-  <button id="rplay" class="rbtn primary" data-aria="play">▶</button>
+  <button id="rplay" class="rbtn primary" data-aria="play" data-icon="play"></button>
   <button class="pill nav" id="rnext" data-aria="next"></button>
 </div>
 <div id="info" class="sheet" role="dialog" aria-modal="true" aria-labelledby="infotitle" hidden>
-  <div class="sheet-head"><span id="infotitle"></span><button id="infoclose" class="rbtn" data-aria="close">✕</button></div>
+  <div class="sheet-head"><span id="infotitle"></span><button id="infoclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="infolist" class="scroll"></div>
-  <div id="infofoot"><button id="infoplay" class="rbtn primary" data-aria="play">▶</button></div>
+  <div id="infofoot"><button id="infoplay" class="rbtn primary" data-aria="play" data-icon="play"></button></div>
 </div>
 <div id="index" class="sheet" role="dialog" aria-modal="true" hidden>
-  <div class="sheet-head"><button id="ixsearch" class="pill sbox"><span></span></button><div id="ixmode" class="group" hidden><button class="seg txt" data-m="az"></button><button class="seg txt" data-m="grp"></button></div><button id="ixclose" class="rbtn" data-aria="close">✕</button></div>
+  <div class="sheet-head"><button id="ixsearch" class="pill sbox"><i data-icon="search"></i><span></span></button><div id="ixmode" class="group" hidden><button class="seg txt" data-m="az"></button><button class="seg txt" data-m="grp"></button></div><button id="ixclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="ixbody"><div id="ixgrid" class="scroll"></div><div id="ixaz" hidden></div></div>
 </div>
 <div id="search" class="sheet" role="dialog" aria-modal="true" hidden>
-  <div class="sheet-head"><div class="pill sbox"><input id="sq" type="search" data-aria="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" class="rbtn small off" data-aria="clear">✕</button></div><button id="sclose" class="rbtn" data-aria="close">✕</button></div>
+  <div class="sheet-head"><div class="pill sbox"><i data-icon="search"></i><input id="sq" type="search" data-aria="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" class="rbtn small" data-aria="clear" data-icon="close" hidden></button></div><button id="sclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="smeta" class="label"></div>
   <div id="sres" class="scroll"></div>
 </div>
@@ -322,7 +321,7 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 <div id="install-bar" hidden>
   <span id="install-msg"></span>
   <button id="install-btn" class="pill primary small" data-text="installBtn"></button>
-  <button id="dismiss-btn" class="rbtn small" data-aria="dismiss">✕</button>
+  <button id="dismiss-btn" class="rbtn small" data-aria="dismiss" data-icon="close"></button>
 </div>
 <div id="ver" aria-hidden="true"></div>
 

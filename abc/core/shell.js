@@ -28,6 +28,8 @@ const APP = {
   alphabet: () => CONTENT.alphabet(lang),
   ui: () => abcMerge(abcMerge({}, ABC.langs[CFG.baseLanguage].strings), ABC.langs[lang].strings),
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
+  icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
+  exclaim: name => APP.t(APP.ui().exclaim, { name }),
   mt(key, vars) {
     const m = tileOf().module, get = code => key.split('.').reduce((o, k) => o && o[k], m.strings[code]);
     return I18N.t(get(lang) ?? get(CFG.baseLanguage), vars, ABC.langs[lang].bcp47);
@@ -45,7 +47,7 @@ const APP = {
   links(it) {
     const t = tileOf(), play = mode === 'play', out = [];
     const chip = (x, id, toPlay) => `<button class="pill small link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
-    if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">📖 ${esc(APP.ui().info)}</button>`);
+    if (!play && infoFor(it.concept)) out.push(`<button class="pill small infobtn" data-c="${esc(it.concept)}">${APP.icon('info')}${esc(APP.ui().info)}</button>`);
     if (it.concept) for (const x of TILES) {
       if (x === t || !usable(x, false)) continue;
       const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)));
@@ -70,7 +72,7 @@ const APP = {
     const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
-  addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.textContent = '⭐ ' + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
+  addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.innerHTML = APP.icon('star') + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
 const tileOf = () => TILE[tileId];
 const itemsOf = t => Tiles.items(t, lang);
@@ -121,12 +123,12 @@ $('hub').addEventListener('click', e => {
   firstTouch();
   openTile(b.dataset.id, b.dataset.play === '1');
 });
-function goHub() { if (view() && view().leave) view().leave(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.ui().sections[section] + '!', 80); }
+function goHub() { if (view() && view().leave) view().leave(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[section]), 80); }
 function setSection(id) {
   if (id === sectionNow()) { if (!atHub) goHub(); return; }
   if (view() && view().leave) view().leave();
   section = id; store.set('sec', id); atHub = true; store.set('athub', true);
-  sfx.pop(); render(); speak(APP.ui().sections[id] + '!', 80);
+  sfx.pop(); render(); speak(APP.exclaim(APP.ui().sections[id]), 80);
 }
 
 const VIEWS = Object.values(ABC.views);
@@ -138,6 +140,8 @@ function render() {
   document.querySelectorAll('.age').forEach(b => { const on = b.dataset.p === profile; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', profileName(b.dataset.p)); });
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
+  document.title = CFG.name;
+  document.querySelectorAll('[data-icon]').forEach(e => { e.innerHTML = APP.icon(e.dataset.icon); });
   $('ver').textContent = APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version });
   document.documentElement.lang = L.bcp47; document.documentElement.dir = L.dir || 'ltr';
   if (!atHub && !usable(tileOf(), mode === 'play')) { if (view() && view().leave) view().leave(); atHub = true; }
@@ -146,8 +150,8 @@ function render() {
   document.body.classList.toggle('lownav', !!(v && (v.arrows || v.nav)));
   $('ages').hidden = !atHub; $('barback').hidden = atHub;
   $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW;
-  $('barback').innerHTML = `‹ ${iconHTML(SECTIONS[sec].icon, 'bi')}`;
-  $('stars').textContent = '⭐ ' + APP.stars;
+  $('barback').innerHTML = APP.icon('back') + iconHTML(SECTIONS[sec].icon, 'bi');
+  $('stars').innerHTML = APP.icon('star') + APP.stars;
   $('hub').hidden = sc !== 'hub';
   VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); if (x.nav) $(x.nav).hidden = !(v && v === x); });
   $('stage').hidden = !!(v && v.fullHeight);
@@ -171,7 +175,7 @@ function setLang(code) {
   if (v0 && v0.keepScroll && view() === v0) $(v0.el).scrollTop = scroll;
   announce();
 }
-function announce() { const name = APP.L().name; if (atHub) speak(`${name}!`, 120); else view().announce(name); }
+function announce() { const name = APP.L().name; if (atHub) speak(APP.exclaim(name), 120); else view().announce(name); }
 
 let infoId = null, infoTok = 0;
 const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
@@ -200,7 +204,7 @@ async function playInfo() {
   if (tok === infoTok) { lightInf(-1); sfx.right(); }
 }
 
-const OTHER = '#';
+const OTHER = CFG.icons.other;
 const GROUP_OF = new Map(Object.entries(ABC.groups).flatMap(([g, ms]) => ms.map(m => [m, g])));
 const hasGroups = GROUP_OF.size > 0;
 let ixMode = store.get('ixmode', 'az');
@@ -224,10 +228,10 @@ function openIndex() {
     for (const [u, xs] of groups) {
       if (!xs.length) continue;
       const h = head(u), n = APP.t(U.words, { n: xs.length });
-      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${h.color}">${esc(h.text)}</b><span class="label">${esc(h.name ? `${h.name} · ${n}` : n)}</span></div>` + xs.map(btn).join('');
+      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${h.color}">${esc(h.text)}</b><span class="label">${esc(h.name ? APP.t(U.headCount, { name: h.name, n }) : n)}</span></div>` + xs.map(btn).join('');
     }
     az = [...groups.keys()].filter(u => u !== OTHER || groups.get(OTHER).length)
-      .map(u => `<span class="az${groups.get(u).length ? '' : ' off'}" data-u="${esc(u)}">${esc(head(u).text)}</span>`).join('');
+      .map(u => `<span class="az${groups.get(u).length ? '' : ' dim'}" data-u="${esc(u)}">${esc(head(u).text)}</span>`).join('');
   } else html = list.map(btn).join('');
   $('ixgrid').innerHTML = html; $('ixaz').innerHTML = az; $('ixaz').hidden = !az;
   $('ixsearch').querySelector('span').textContent = U.search.placeholder;
@@ -252,7 +256,7 @@ $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); 
   const jump = y => {
     const bar = $('ixaz'), all = [...bar.children]; if (!all.length) return;
     const r = bar.getBoundingClientRect(), k = Math.max(0, Math.min(all.length - 1, Math.floor((y - r.top) / r.height * all.length)));
-    const el = all.slice(k).find(x => !x.classList.contains('off')) || [...all].reverse().find(x => !x.classList.contains('off'));
+    const el = all.slice(k).find(x => !x.classList.contains('dim')) || [...all].reverse().find(x => !x.classList.contains('dim'));
     if (!el || el.dataset.u === last) return; last = el.dataset.u;
     const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 });
     syncAZ(); sfx.pop();
@@ -278,7 +282,7 @@ function searchPool() {
 }
 function runSearch() {
   const U = APP.ui(), q = fold($('sq').value.trim()), col = I18N.collator(APP.L().bcp47);
-  $('sqclear').classList.toggle('off', !q);
+  $('sqclear').hidden = !q;
   if (!q) { $('smeta').textContent = ''; $('sres').innerHTML = `<p class="shint">${esc(U.search.hint)}</p>`; return; }
   const score = s => { const f = fold(s); return f === q ? 3 : f.split(/[\s-]+/).some(w => w.startsWith(q)) ? 2 : q.length >= 4 && f.includes(q) ? 1 : 0; };
   const hits = searchPool().map(x => ({ x, s: Math.max(...x.names.map(n => score(n[1])), ...x.extra.map(score)) })).filter(h => h.s)
@@ -292,7 +296,7 @@ function runSearch() {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
     const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
     return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
-      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `${ABC.langs[c].flag} ${mark(n)}`).join(' · ')}</small></span>${icons}</div>`;
+      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `<span>${ABC.langs[c].flag}${mark(n)}</span>`).join('')}</small></span>${icons}</div>`;
   }).join('');
 }
 function openSearch() {
@@ -311,14 +315,14 @@ tapBtn('sclose', closeSearch);
 tapBtn('ixsearch', openSearch);
 
 $('ages').innerHTML = PROFILES.map(p => { const [a, b] = CFG.profiles[p].ages;
-  return `<button class="seg age" data-p="${p}" role="radio">${artSVG(p)}<small>${a}–${b}</small></button>`; }).join('');
+  return `<button class="seg age" data-p="${p}" role="radio">${artSVG(p)}<small>${esc(APP.t(APP.ui().range, { a, b }))}</small></button>`; }).join('');
 function setProfile(p) {
   if (!CFG.profiles[p]) return;
   profile = p; store.set('profile', p); atHub = true; store.set('athub', true);
-  sfx.pop(); render(); speak(profileName(p) + '!', 80);
+  sfx.pop(); render(); speak(APP.exclaim(profileName(p)), 80);
 }
 
-$('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv">🔇</i></button>`).join('');
+$('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv">${esc(CFG.icons.mute)}</i></button>`).join('');
 $('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">${iconHTML(s.icon, 'ti')}<span class="tl"></span></button>`).join('');
 function markVoices() {
   document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); });
@@ -386,7 +390,7 @@ document.addEventListener('visibilitychange', () => {
   let deferred = null;
   if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) return;
   try { if (sessionStorage.getItem('install-dismissed')) return; } catch (e) {}
-  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; msg.textContent = APP.ui().install; bar.hidden = false; });
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; msg.textContent = APP.t(APP.ui().install, { app: CFG.name }); bar.hidden = false; });
   bar.addEventListener('pointerdown', e => e.stopPropagation());
   btn.addEventListener('click', () => { if (!deferred) return; deferred.prompt(); deferred.userChoice.then(() => { deferred = null; bar.hidden = true; }); });
   dismiss.addEventListener('click', () => { bar.hidden = true; try { sessionStorage.setItem('install-dismissed', '1'); } catch (e) {} });

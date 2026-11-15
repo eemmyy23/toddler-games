@@ -21,7 +21,7 @@
     const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
     const ns = syl.length, sylFont = Math.max(16, Math.min(32, Math.floor((avail - ns * 20 - (ns - 1) * 22) / Math.max(1, word.length) * 1.55)));
     const capFirst = s => { const g = I18N.graphemes(s, loc); return g.length ? I18N.upper(g[0], null, loc) + s.slice(g[0].length) : s; };
-    const syls = syl.map((sy, i) => (i ? '<span class="rsep">·</span>' : '') + tile(i === 0 ? capFirst(sy) : sy, sy, 's', INK[(i * 3 + 4) % 8])).join('');
+    const syls = syl.map((sy, i) => (i ? `<span class="rsep">${esc(ABC.config.icons.sep)}</span>` : '') + tile(i === 0 ? capFirst(sy) : sy, sy, 's', ink((i * 3 + 4) * 360 / INK.length))).join('');
     $('read').innerHTML =
       `<div id="rpic" data-say="${esc(word)}">${pic}</div>` +
       `<div class="rrow let" id="rU" style="${lstyle}">${upper}</div>` +
@@ -31,11 +31,11 @@
       (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label rh">${esc(U.sgpl[0])}</div><div class="label rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
           ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
-          : `<div class="rc none">${r === 0 ? '— ' + esc(U.none[c]) : ''}</div>`).join('')).join('') + `</div>` : '') +
+          : `<div class="rc none">${r === 0 ? esc(APP.t(U.noneLine, { none: U.none[c] })) : ''}</div>`).join('')).join('') + `</div>` : '') +
       `<div class="links">${APP.links(e)}</div>`;
     fit();
     const [pv, nx] = APP.neighbors();
-    $('rprev').innerHTML = `‹ <b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b> ›`;
+    $('rprev').innerHTML = `${APP.icon('prev')}<b>${pv.pic}</b>`; $('rnext').innerHTML = `<b>${nx.pic}</b>${APP.icon('next')}`;
     APP.saveIdx();
     if (sayIt) speak(word, 150);
   }
@@ -69,7 +69,7 @@
     show(sayIt) { render(sayIt); },
     step(d) { APP.step(d); tok++; sfx.pop(); render(true); },
     play, leave() { tok++; }, resize() { tok++; render(false); },
-    announce(name) { speak(`${name}. ${cur().w}`, 120); },
+    announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().w }), 120); },
     onKey(k, e) { if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); play(); return true; } return false; },
     indexFace: it => `${it.pic}<small>${esc(it.w)}</small>`,
     indexSort: true

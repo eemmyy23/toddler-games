@@ -43,7 +43,7 @@
       g.className = it.bigClass || ''; g.innerHTML = it.big ?? esc(it.label); g.style.color = it.color || '';
       void g.offsetWidth; g.classList.add('pop');
       const [pv, nx] = APP.neighbors();
-      $('prev').innerHTML = `‹ ${nav(pv)}`; $('next').innerHTML = `${nav(nx)} ›`;
+      $('prev').innerHTML = APP.icon('prev') + nav(pv); $('next').innerHTML = nav(nx) + APP.icon('next');
       const ex = it.examples || [];
       $('pics').hidden = !!ex.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
@@ -58,7 +58,7 @@
       if (sayIt) speak(it.say, 120);
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
-    announce(name) { speak(`${name}. ${cur().say}`, 120); },
+    announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().say }), 120); },
     leave() { partsStop(); },
     resize() { APP.fit($('learn')); },
     onKey(k) {

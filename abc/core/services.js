@@ -104,7 +104,7 @@ function loop() {
     p.x += p.vx; p.y += p.vy; p.vy += 0.25; p.vx *= 0.98; p.r += p.vr; p.life -= 0.012;
     if (p.life <= 0 || p.y > H + 40) { fxParts.splice(i, 1); continue; }
     fctx.save(); fctx.globalAlpha = Math.min(1, p.life * 1.5); fctx.translate(p.x, p.y); fctx.rotate(p.r);
-    fctx.fillStyle = INK[(p.hue / 45 | 0) % 8];
+    fctx.fillStyle = ink(p.hue);
     if (p.star) { fctx.beginPath(); for (let k = 0; k < 10; k++) { const a = k * Math.PI / 5 - Math.PI / 2, rr = k % 2 ? p.s * .45 : p.s; fctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } fctx.closePath(); fctx.fill(); }
     else fctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
     fctx.restore();

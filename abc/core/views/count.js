@@ -29,7 +29,7 @@
   function render() {
     const list = APP.items();
     $('c-obj').classList.toggle('on', style === 'obj'); $('c-hand').classList.toggle('on', style === 'hand');
-    $('c-all').textContent = `▶ ${list[0].label}→${list[list.length - 1].label}`;
+    $('c-all').innerHTML = APP.icon('play') + esc(APP.t(APP.ui().countRange, { a: list[0].label, b: list[list.length - 1].label }));
     $('crows').innerHTML = list.map(it => {
       const objs = style === 'obj' ? (it.pics || []).map(p => `<span>${p}</span>`).join('') : it.n <= 5 ? hand(it.n, false) : hand(5, false) + hand(it.n - 5, true);
       return `<div class="crow" data-n="${it.n}"><div class="cnum"><div class="cdig" style="color:${it.color}">${esc(it.label)}</div><div class="cword">${esc(it.name)}</div></div>` +
@@ -64,7 +64,7 @@
   VIEW('count', {
     el: 'count', fullHeight: true,
     show() { render(); }, leave: stop,
-    announce(name) { speak(`${name}!`, 120); },
+    announce(name) { speak(APP.exclaim(name), 120); },
     onKey(k, e) {
       const it = APP.items().find(x => x.key === k); if (it) { APP.firstTouch(); one(it.n); return true; }
       if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); all(); return true; }

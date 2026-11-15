@@ -32,7 +32,7 @@
   function draw() {
     locked = false;
     const q = game().show(target, round, askLine(), subject());
-    $('ask').innerHTML = `<span class="q">🔊 ${esc(q.text)}</span>${q.picture || ''}`;
+    $('ask').innerHTML = `<span class="q">${APP.icon('speak')}${esc(q.text)}</span>${q.picture || ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');
     box.innerHTML = '';
@@ -62,7 +62,7 @@
         sfx.fanfare();
         for (let k = 0; k < 5; k++) setTimeout(() => confetti(Math.random() * W, H * 0.3 + Math.random() * H * 0.3, 60, 12), k * 180);
         said = speak(APP.t(U.wow, { n: APP.stars }), 700);
-      } else { sfx.right(); said = speak(`${U.cheers[Math.random() * U.cheers.length | 0]} ${target.name}!`, 400); }
+      } else { sfx.right(); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), 400); }
       const tok = ++roundTok;
       Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {
@@ -70,7 +70,7 @@
       if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(`${APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null })} ${askLine()}`, 350);
+      speak(APP.t(U.wrong, { thats: APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null }), ask: askLine() }), 350);
     }
   }
   $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); if (target) speak(askLine()); });
@@ -79,7 +79,7 @@
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },
     leave() { roundTok++; },
     resize() { if (target) APP.fit($('play')); },
-    announce(name) { if (target) speak(`${name}. ${askLine()}`, 250); },
+    announce(name) { if (target) speak(APP.t(APP.ui().then, { a: name, b: askLine() }), 250); },
     beforeLang() { return { target: !locked && target && target.id, opts: opts.map(o => o.id) }; },
     afterLang(s) {
       if (!s || !s.target) return;
