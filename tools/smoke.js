@@ -18,6 +18,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await p.goto(URL); await p.waitForFunction(() => typeof APP === 'object');
   const ev = (f, a) => p.evaluate(f, a);
   const said = () => ev(() => __said.slice());
+  const until = (f, arg) => p.waitForFunction(f, arg, { timeout: 15000 });
+  const spoken = (n = 1) => until(n => __said.length >= n, n);
   const clear = () => ev(() => { __said.length = 0; });
   const show = i => ev(i => { APP.idx = i; ABC.views[APP.screen()].show(false); }, i);
   const find = (pred) => ev(src => APP.items().findIndex(new Function('x', 'return ' + src)), pred);
@@ -51,7 +53,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     return { one: Math.abs(f.top - a.top) < 2, gap: a.left - f.right, right: innerWidth - a.right, n: document.querySelectorAll('.age').length }; });
   ok(bar.n === 3 && bar.one && bar.gap >= 0 && bar.right >= 0, `3 bikes on the same row as the flags (gap ${bar.gap | 0}px, right ${bar.right | 0}px)`);
   for (const pr of ['scientist', 'explorer', 'little']) {
-    await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await p.waitForTimeout(150);
+    await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await spoken();
     const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht:not(.soon)')].length }));
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
@@ -67,9 +69,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
   ok((await p.$$eval('.ex .ew', e => e.map(x => x.textContent).join())) === 'albină,arici,ananas,avion', 'A examples');
-  await clear(); await p.keyboard.press('m'); await p.waitForTimeout(150);
+  await clear(); await p.keyboard.press('m'); await spoken();
   ok((await said()).pop() === 'mî, de la minge!', 'key m → mî, de la minge!');
-  await ev(() => setLang('de')); await p.waitForTimeout(150);
+  await ev(() => setLang('de'));
   ok((await p.innerText('#glyph')).replace(/\s/g, '') === 'Mm', 'language switch keeps letter M');
   await ev(() => openTile('letters', false, true)); await show(await find("x.id === 'ß'"));
   ok((await p.innerText('#glyph')).replace(/\s/g, '') === 'ß', 'German ß stays ß (not SS)');
@@ -77,7 +79,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('read');
   await ev(() => openTile('read', false, true)); await show(await find("x.w === 'câine'"));
-  await clear(); await p.locator('#rplay').dispatchEvent('pointerdown'); await p.waitForTimeout(6000);
+  await clear(); await p.locator('#rplay').dispatchEvent('pointerdown'); await spoken(13);
   ok(JSON.stringify(await said()) === JSON.stringify(['cî', 'â', 'i', 'nî', 'e', 'câine', 'câi', 'ne', 'câine', 'un câine', 'doi câini', 'câinele', 'câinii']), 'câine ▶ sequence: ' + (await said()).join(', '));
   await show(await find("x.w === 'urs'"));
   ok(!(await p.$('#rS')), 'one-syllable word has no syllable row');
@@ -89,10 +91,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   const names = [];
   for (let i = 0; i < 7; i++) {
     const pt = await p.$eval(`#glyph .part[data-part="${i}"]`, el => { const L = el.getTotalLength(), q = el.getPointAtLength(L * .3), m = el.getScreenCTM(); return { x: q.x * m.a + m.e, y: q.y * m.d + m.f }; });
-    await clear(); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(80); names.push((await said())[0]);
+    await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,oranj,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
-  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await p.waitForTimeout(200);
+  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('pointerdown');
 
@@ -105,7 +107,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   for (const l of ['ro', 'en', 'de']) {
     await ev(x => setLang(x), l);
     for (const [id, re] of ASK[l]) {
-      await clear(); await ev(i => openTile(i, true, true), id); await p.waitForTimeout(350);
+      await clear(); await ev(i => openTile(i, true, true), id); await spoken();
       const s = await said(), n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
       ok(re.test(last) && !/undefined|\{/.test(last) && n >= 2, `${l} game ${id}: "${last}" with ${n} bubbles`);
     }
@@ -134,12 +136,12 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(/^\d+ (de )?cuvinte$/.test(ix.c), `section count: "C · ${ix.c}"`);
   const azb = await p.$eval('#ixaz', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, h: r.height }; });
   const n = await ev(() => document.querySelectorAll('#ixaz .az').length), k = await ev(() => [...document.querySelectorAll('#ixaz .az')].findIndex(a => a.dataset.u === 'V'));
-  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
+  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n);
   const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
   ok(vis, 'tap V on the side bar jumps to the V section');
   ok(await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u === 'V'), 'side bar lights V after the jump');
   for (const u of ['M', 'C', 'T']) {
-    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
+    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await until(u => document.querySelector('#ixaz .az.on')?.dataset.u === u, u).catch(() => {});
     const cur = await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u);
     ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
   }
@@ -154,7 +156,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
   await ev(() => { document.querySelector('.sr').click(); });
   ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');
-  await ev(() => { openSearch(); }); await p.waitForTimeout(150); await p.keyboard.type('m');
+  await ev(() => { openSearch(); }); await until(() => document.activeElement === $('sq')); await p.keyboard.type('m');
   ok(await ev(() => !$('search').hidden && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
   await p.keyboard.press('Escape');
 
@@ -189,14 +191,14 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
-  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(1400);
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await until(() => document.querySelector('.crow.on')?.dataset.n === '2');
   const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.on')?.dataset.n }));
   ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
   const rows = [];
-  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
+  for (let k = 3; k <= 10; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
     const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
   ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
-  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(100);
+  await p.locator('#c-all').dispatchEvent('pointerdown');
   ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');

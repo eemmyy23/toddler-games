@@ -343,7 +343,8 @@ render();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
-  navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+  const updating = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (updating) location.reload(); });
 }
 (function () {
   const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');
