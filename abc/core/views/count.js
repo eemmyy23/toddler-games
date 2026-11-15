@@ -57,7 +57,7 @@
     timers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); stop(); }, 250 + n * 1000));
   }
   $('crows').addEventListener('click', e => { const r = e.target.closest('.crow'); if (r) { APP.firstTouch(); one(+r.dataset.n); } });
-  const btn = (id, fn) => $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); APP.firstTouch(); fn(); });
+  const btn = (id, fn) => onTap(id, () => { APP.firstTouch(); fn(); });
   btn('c-obj', () => { style = 'obj'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
   btn('c-hand', () => { style = 'hand'; store.set('cstyle', style); stop(); sfx.pop(); render(); });
   btn('c-all', all);

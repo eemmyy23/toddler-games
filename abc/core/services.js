@@ -1,4 +1,5 @@
 const $ = id => document.getElementById(id);
+function onTap(el, fn) { const b = typeof el === 'string' ? $(el) : el; b.addEventListener('pointerdown', e => e.preventDefault()); b.addEventListener('click', e => { e.stopPropagation(); fn(e); }); }
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
@@ -84,7 +85,9 @@ let W, H;
 function resizeFx() { W = fx.width = innerWidth; H = fx.height = innerHeight; }
 resizeFx();
 const fxParts = [];
+const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 function confetti(x, y, n = 40, spread = 9) {
+  if (calm()) return;
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * spread;
     fxParts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4, life: 1, s: 6 + Math.random() * 10,

@@ -61,7 +61,7 @@ const APP = {
     el.style.transform = ''; el.style.transformOrigin = '';
     const kids = [...el.children]; if (!kids.length) return;
     const lim0 = $('bar').getBoundingClientRect().bottom + 4;
-    const low = [...document.querySelectorAll('[data-low]')].filter(e => !e.hidden && e.getClientRects().length);
+    const low = [...document.querySelectorAll('[data-low]')].filter(e => !e.hidden && e.getClientRects().length && e.getBoundingClientRect().top > innerHeight / 2);
     const lim1 = Math.min($('tabs').getBoundingClientRect().top, ...low.map(e => e.getBoundingClientRect().top)) - 4;
     const span = () => [Math.min(...kids.map(k => k.getBoundingClientRect().top)), Math.max(...kids.map(k => k.getBoundingClientRect().bottom))];
     let [top, bot] = span();
@@ -70,7 +70,7 @@ const APP = {
     const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
-  addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.textContent = '⭐ ' + APP.stars; s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
+  addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.textContent = '⭐ ' + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
 const tileOf = () => TILE[tileId];
 const itemsOf = t => Tiles.items(t, lang);
@@ -133,8 +133,8 @@ const VIEWS = Object.values(ABC.views);
 function render() {
   const U = APP.ui(), L = APP.L();
   const sec = sectionNow();
-  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', sec === s.id); b.querySelector('.tl').textContent = U.sections[s.id]; });
-  document.querySelectorAll('.flag').forEach(f => { f.classList.toggle('on', f.dataset.lang === lang); f.title = f.classList.contains('novoice') ? U.noVoice : ''; });
+  CFG.sections.forEach(s => { const b = $('t-' + s.id); b.classList.toggle('on', sec === s.id); b.setAttribute('aria-current', sec === s.id ? 'page' : 'false'); b.querySelector('.tl').textContent = U.sections[s.id]; });
+  document.querySelectorAll('.flag').forEach(f => { f.classList.toggle('on', f.dataset.lang === lang); f.setAttribute('aria-pressed', f.dataset.lang === lang); f.title = f.classList.contains('novoice') ? U.noVoice : ''; });
   document.querySelectorAll('.age').forEach(b => { const on = b.dataset.p === profile; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); b.setAttribute('aria-label', profileName(b.dataset.p)); });
   document.querySelectorAll('[data-aria]').forEach(e => e.setAttribute('aria-label', U.aria[e.dataset.aria] || ''));
   document.querySelectorAll('[data-text]').forEach(e => { e.textContent = U[e.dataset.text] || ''; });
@@ -193,7 +193,7 @@ async function playInfo() {
   const tok = ++infoTok, I = infoFor(infoId);
   for (let i = 0; i < I.lines.length; i++) {
     if (tok !== infoTok) return;
-    lightInf(i); document.querySelector(`.inf[data-i="${i}"]`).scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    lightInf(i); document.querySelector(`.inf[data-i="${i}"]`).scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' });
     await speak(I.lines[i][1], i ? 250 : 80);
   }
   if (tok === infoTok) { lightInf(-1); sfx.right(); }
@@ -329,7 +329,7 @@ markVoices();
 function firstTouch() { started = true; ensureAudio(); }
 addEventListener('pointerdown', firstTouch, true);
 addEventListener('keydown', firstTouch, true);
-function tapBtn(el, fn) { (typeof el === 'string' ? $(el) : el).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); fn(); }); }
+function tapBtn(el, fn) { onTap(el, () => { firstTouch(); fn(); }); }
 document.querySelectorAll('.flag').forEach(f => tapBtn(f, () => setLang(f.dataset.lang)));
 CFG.sections.forEach(s => tapBtn('t-' + s.id, () => setSection(s.id)));
 tapBtn('barback', goHub);

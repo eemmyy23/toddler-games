@@ -21,7 +21,7 @@ abc/core/registry.js        global ABC + the registration functions (contracts: 
 abc/core/i18n.js            templates + Intl (PluralRules, Segmenter, ListFormat, Collator), letter units, upper()
 abc/core/content.js         ITEM fields; word items; the alphabet of a language (units, colours, letter names); ink palette
 abc/core/tiles.js           the one rule set "what a tile shows and when" — used by the app AND tools/check.js
-abc/core/services.js        $, storage, sound effects, speech (local voices first), confetti
+abc/core/services.js        $, onTap (acts on click: keyboard + no palm taps), storage, sound effects, speech (local voices first), confetti, calm (reduced motion)
 abc/core/views/*.js         VIEW(): card, read, count, play
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, language switch, index, search, info cards, input, APP
@@ -46,13 +46,13 @@ tools/smoke.js              browser test: every language, every game, speech, of
   (left → right in profile order). A tile that is not complete in a language is not shown at all (no "coming soon").
 - **Speech** uses only a voice of the current language (local first, `LANG.voices` preferred). No voice → 🔇 on the flag.
 - **Globals.** Content files only call the registry. Views and games use `APP`, `CONTENT`, `I18N`, `esc` and the services
-  (`$`, `speak`, `sfx`, `store`, `confetti` …). The shell keeps its state (language, profile, section, hub) private; `APP.set({ profile, section, hub })` changes it (tests use it, then `render()`).
+  (`$`, `onTap`, `speak`, `sfx`, `store`, `confetti`, `calm` …). The shell keeps its state (language, profile, section, hub) private; `APP.set({ profile, section, hub })` changes it (tests use it, then `render()`).
 
 ## UI rules
 - **One class and one base style per component** (`.pill`, `.rbtn`, `.seg`, `.group`, `.sheet`, `.ht` tile, `.label`, `.dot`, `.scroll`).
   No per-screen or per-section overrides; a variant is a modifier class (`.primary`, `.small`, `.accent`).
-- **Tokens.** Colours, radii, type, spacing, sizes and z-index live in `:root`. The three breakpoints
-  (width ≤ 440, width ≤ 350, height ≤ 700) only reassign tokens.
+- **Tokens.** Colours, radii, type, spacing, sizes and z-index live in `:root`. The four breakpoints
+  (width ≤ 440, width ≤ 350, height ≤ 700, landscape height ≤ 450) only reassign tokens.
 - **One selected look**: `.on` (ring + raised card) for everything that can be picked or is being read aloud.
 - **One visibility mechanism**: the `hidden` attribute, set by the shell (`[hidden]` wins over any display).
 - **One content column**: `--col` / `--gut` place the top bar, every screen, the ‹ › arrows, the sheets and the tab bar.

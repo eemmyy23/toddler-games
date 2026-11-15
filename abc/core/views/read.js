@@ -62,7 +62,7 @@
     const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
     setTimeout(() => { if (alive()) lit(null); }, 800);
   }
-  const btn = (id, fn) => $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); APP.firstTouch(); fn(); });
+  const btn = (id, fn) => onTap(id, () => { APP.firstTouch(); fn(); });
   btn('rprev', () => VIEW_READ.step(-1)); btn('rnext', () => VIEW_READ.step(1)); btn('rplay', play);
   const VIEW_READ = {
     el: 'read', nav: 'rnav', swipe: true,

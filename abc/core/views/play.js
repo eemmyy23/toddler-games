@@ -50,6 +50,7 @@
   }
   function choose(it, el) {
     APP.firstTouch(); if (locked) return;
+    if (it !== target && el) { const now = Date.now(); if (+(el.dataset.cool || 0) > now) return; el.dataset.cool = now + 700; }
     const U = APP.ui();
     if (it === target) {
       locked = true; APP.streak++; APP.addStar();
@@ -66,7 +67,7 @@
       Promise.all([said, wait(big ? 2400 : 1200)]).then(() => wait(350)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {
       APP.streak = 0;
-      weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights);
+      if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
       speak(`${APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null })} ${askLine()}`, 350);

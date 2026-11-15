@@ -12,6 +12,6 @@ STRINGS('en', {
   install: 'Install ABC 123! on your device',
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
-  aria: { back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
+  aria: { search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
     objects: 'Objects', fingers: 'Fingers', countAll: 'Count all', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now' }
 });

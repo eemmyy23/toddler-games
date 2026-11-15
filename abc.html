@@ -28,7 +28,7 @@
     --col:640px; --gut:max(12px, calc((100% - var(--col)) / 2));
   --bar-pad:max(10px, env(safe-area-inset-top));
   --pill-h:54px; --pill-fs:22px; --seg-w:52px; --seg-h:44px; --seg-fs:26px;
-  --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --bot:calc(70px + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --hero-h:72px;
+  --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --tabbar-h:70px; --tab-h:62px; --tl-fs:var(--fs-xs); --bot:calc(var(--tabbar-h) + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --nav-w:112px; --nav-y:calc(var(--bot) + var(--nav-gap)); --low-h:calc(var(--nav-gap) * 2 + var(--nav-h)); --side:var(--gut); --hero-h:72px;
   --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-toast:11;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
   --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw); --pset:.62em;
@@ -42,7 +42,9 @@
 @media (max-height:700px){:root{--tile-fs:17px;--tile-icon:36px;--tile-gap:4px;--hub-gap:10px;--glyph:min(24vh,42vw);
   --rt-h:42px;--rt-fs:24px;--rpic:9vh;--rc-h:44px;--rc-fs:17px;--rce:20px;--read-gap:1vh;
   --ex-dir:row;--ex-min:0px;--ex-pad:6px 12px 6px 8px;--ex-pic:26px;--ex-fs:16px;--inf-fs:17px;--inf-pad:9px 12px;--inf-pic:28px;--hero-h:60px}}
-@media (max-width:350px){:root{--seg-w:40px;--seg-h:40px;--seg-fs:22px;--pill-h:46px;--pill-fs:19px}}
+@media (max-width:350px){:root{--seg-w:42px;--seg-h:44px;--seg-fs:22px;--pill-h:46px;--pill-fs:19px;--fs-xs:12px}}
+@media (max-height:450px) and (orientation:landscape){:root{--tabbar-h:50px;--tab-h:44px;--tl-fs:0px;--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-h:44px;--seg-w:44px;--seg-fs:22px;
+  --nav-w:56px;--nav-y:calc(var(--bot) + (100% - var(--bot) - var(--top)) / 2 - var(--nav-h) / 2);--side:calc(var(--gut) + 64px);--glyph:min(30vh,22vw);--rt-h:40px;--rt-fs:22px;--rc-h:40px;--rc-fs:16px;--rpic:14vh;--read-gap:4px;--tile-min:96px;--hub-gap:8px}}
 
 *{margin:0;padding:0;box-sizing:border-box}
 [hidden]{display:none!important} html,body{width:100%;height:100%;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -62,10 +64,10 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 .label{font-size:var(--fs-s);font-weight:600;color:var(--muted)}
 .pill{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-1);height:var(--pill-h);padding:0 var(--sp-4);border-radius:var(--r-pill);
   background:var(--card);color:var(--text);font-size:var(--pill-fs);font-weight:600;white-space:nowrap;box-shadow:var(--shadow)}
-.pill.small{--pill-h:40px;--pill-fs:var(--fs-s)}
+.pill.small{--pill-h:44px;--pill-fs:var(--fs-s)}
 .rbtn{display:inline-flex;align-items:center;justify-content:center;flex:0 0 var(--pill-h);width:var(--pill-h);height:var(--pill-h);border-radius:50%;
   background:var(--card);color:var(--text);font-size:var(--fs-l);box-shadow:var(--shadow)}
-.rbtn.small{--pill-h:36px;font-size:16px;background:var(--card2);box-shadow:none}
+.rbtn.small{--pill-h:44px;font-size:16px;background:var(--card2);box-shadow:none}
 .rbtn.primary{--pill-h:var(--hero-h);font-size:32px;box-shadow:var(--shadow-lg)}
 :is(.pill,.rbtn).primary,.pill.on{background:var(--amber);color:var(--amber-ink)}
 .accent{color:var(--amber)}
@@ -102,7 +104,8 @@ button{font:inherit;border:none;background:none;color:inherit;cursor:pointer;tou
 .bi{--icon:var(--pill-fs);--txt:.82}
 
 #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) var(--gut) calc(var(--bot) + var(--nav-gap))}
-body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--nav-h))} #hub{display:grid;width:100%;height:100%;grid-template-columns:1fr 1fr;grid-auto-rows:auto;align-content:start;gap:var(--hub-gap);padding:4px 2px 8px}
+body.lownav #stage{padding-left:var(--side);padding-right:var(--side)}
+body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:grid;width:100%;height:100%;grid-template-columns:1fr 1fr;grid-auto-rows:auto;align-content:start;gap:var(--hub-gap);padding:4px 2px 8px}
 .hsearch{grid-column:1/-1}
 .hh{grid-column:1/-1;text-transform:uppercase;letter-spacing:.06em;padding:6px 6px 0;align-self:end}
 .hi{--icon:1em;--txt:1}
@@ -118,9 +121,9 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 
 #tabs{position:fixed;left:0;right:0;bottom:0;z-index:var(--z-tabs);height:var(--bot);padding:4px var(--gut) min(env(safe-area-inset-bottom), 8px);display:flex;justify-content:space-around;align-items:flex-start;
   background:var(--tabbar);border-top:1px solid var(--line);backdrop-filter:blur(8px)}
-.tab{flex:1;max-width:120px;height:62px;border-radius:var(--r);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.tab{flex:1;max-width:120px;height:var(--tab-h);border-radius:var(--r);color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .ti{--icon:28px;--txt:.75;height:28px;display:flex;align-items:center;filter:saturate(.75)}
-.tl{font-size:var(--fs-xs);font-weight:600}
+.tl{font-size:var(--tl-fs);font-weight:600}
 .tab.on{background:var(--amber-soft);color:var(--amber)}
 .tab.on .ti{filter:none;transform:scale(1.08)}
 
@@ -149,9 +152,9 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
 .ep{font-size:var(--ex-pic);line-height:1.1}
 .ew{font-size:var(--ex-fs);font-weight:500;white-space:nowrap}
 .ew b{font-weight:700}
-.nav{--pill-h:var(--nav-h);min-width:112px;color:var(--muted);font-size:var(--fs-l)}
+.nav{--pill-h:var(--nav-h);min-width:var(--nav-w);color:var(--muted);font-size:var(--fs-l)}
 .nav b{font-size:40px;font-weight:700}
-#prev,#next{position:fixed;bottom:calc(var(--bot) + var(--nav-gap));z-index:var(--z-float)}
+#prev,#next{position:fixed;bottom:var(--nav-y);z-index:var(--z-float)}
 #prev{left:var(--gut)} #next{right:var(--gut)}
 .links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2)}
 .links:empty{display:none}
@@ -299,17 +302,17 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--nav-gap) * 2 + var(--n
   <button id="rplay" class="rbtn primary" data-aria="play">▶</button>
   <button class="pill nav" id="rnext" data-aria="next"></button>
 </div>
-<div id="info" class="sheet" hidden>
+<div id="info" class="sheet" role="dialog" aria-modal="true" aria-labelledby="infotitle" hidden>
   <div class="sheet-head"><span id="infotitle"></span><button id="infoclose" class="rbtn" data-aria="close">✕</button></div>
   <div id="infolist" class="scroll"></div>
   <div id="infofoot"><button id="infoplay" class="rbtn primary" data-aria="play">▶</button></div>
 </div>
-<div id="index" class="sheet" hidden>
+<div id="index" class="sheet" role="dialog" aria-modal="true" hidden>
   <div class="sheet-head"><button id="ixsearch" class="pill sbox"><span></span></button><div id="ixmode" class="group" hidden><button class="seg txt" data-m="az"></button><button class="seg txt" data-m="grp"></button></div><button id="ixclose" class="rbtn" data-aria="close">✕</button></div>
   <div id="ixbody"><div id="ixgrid" class="scroll"></div><div id="ixaz" hidden></div></div>
 </div>
-<div id="search" class="sheet" hidden>
-  <div class="sheet-head"><div class="pill sbox"><input id="sq" type="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" class="rbtn small off" data-aria="clear">✕</button></div><button id="sclose" class="rbtn" data-aria="close">✕</button></div>
+<div id="search" class="sheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-head"><div class="pill sbox"><input id="sq" type="search" data-aria="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" class="rbtn small off" data-aria="clear">✕</button></div><button id="sclose" class="rbtn" data-aria="close">✕</button></div>
   <div id="smeta" class="label"></div>
   <div id="sres" class="scroll"></div>
 </div>
