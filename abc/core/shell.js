@@ -41,6 +41,7 @@ const APP = {
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
   firstTouch,
+  set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
   links(it) {
     const t = tileOf(), play = mode === 'play', out = [];
     const chip = (x, id, toPlay) => `<button class="pill small link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;

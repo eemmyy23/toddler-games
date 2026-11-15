@@ -46,7 +46,7 @@ tools/smoke.js              browser test: every language, every game, speech, of
   (left → right in profile order). A tile that is not complete in a language is not shown at all (no "coming soon").
 - **Speech** uses only a voice of the current language (local first, `LANG.voices` preferred). No voice → 🔇 on the flag.
 - **Globals.** Content files only call the registry. Views and games use `APP`, `CONTENT`, `I18N`, `esc` and the services
-  (`$`, `speak`, `sfx`, `store`, `confetti` …). The shell keeps its state in script-scope variables; the tests drive it directly.
+  (`$`, `speak`, `sfx`, `store`, `confetti` …). The shell keeps its state (language, profile, section, hub) private; `APP.set({ profile, section, hub })` changes it (tests use it, then `render()`).
 
 ## UI rules
 - **One class and one base style per component** (`.pill`, `.rbtn`, `.seg`, `.group`, `.sheet`, `.ht` tile, `.label`, `.dot`, `.scroll`).

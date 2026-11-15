@@ -12,7 +12,7 @@ function audit() {
     const content = kids.length ? Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0;
     return R(t).height > Math.max(parseFloat(cs.minHeight) || 0, content) + 2; };
   const screens = [];
-  for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { section = s.id; atHub = true; render(); }]);
+  for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { APP.set({ section: s.id }); APP.set({ hub: true }); render(); }]);
   for (const t of TILES) {
     if (learnOk(t)) { const n = itemsOf(t).length, picks = t.view === 'read' ? itemsOf(t).map((x, i) => [x.w.length + (x.forms ? 20 : 0), i]).sort((a, b) => b[0] - a[0]).slice(0, 6).map(x => x[1]) : [0, n - 1];
       for (const i of picks) screens.push([`${t.id}#${i}`, () => { openTile(t.id, false, true); APP.idx = i; view().show(false); }]); }
@@ -51,14 +51,14 @@ function audit() {
   await p.addInitScript(() => { localStorage.clear(); speechSynthesis.speak = () => {}; });
   await p.goto('file://' + path.join(__dirname, '..', 'abc.html'), { waitUntil: 'load' });
   await p.waitForFunction(() => typeof APP === 'object');
-  await p.evaluate(() => { setLang('ro'); profile = 'scientist'; });
+  await p.evaluate(() => { setLang('ro'); APP.set({ profile: 'scientist' }); });
   const bad = [];
   for (const [w, h] of SIZES) {
     await p.setViewportSize({ width: w, height: h });
     bad.push(...(await p.evaluate(audit)).map(m => `${w}x${h} ${m}`));
   }
   const [w, h] = SIZES[SIZES.length - 1];
-  for (const [n, f] of [['hub', () => { section = 'num'; atHub = true; render(); }], ['read', () => { openTile('read', false, true); APP.idx = 0; view().show(false); }]])
+  for (const [n, f] of [['hub', () => { APP.set({ section: 'num' }); APP.set({ hub: true }); render(); }], ['read', () => { openTile('read', false, true); APP.idx = 0; view().show(false); }]])
     { await p.evaluate(f); await p.screenshot({ path: path.join(out, `fast-${w}-${n}.png`) }); }
   await b.close();
   const ok = !bad.length && !errs.length;

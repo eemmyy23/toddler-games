@@ -31,18 +31,18 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(await ev(() => !!self.MANIFEST.version), 'manifest loaded');
 
   console.log('hubs');
-  const hub = async sec => { await ev(s => { section = s; atHub = true; render(); }, sec);
+  const hub = async sec => { await ev(s => { APP.set({ section: s }); APP.set({ hub: true }); render(); }, sec);
     return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
   ok(['Găsește cifra', 'Câte sunt?', 'Găsește litera', 'Găsește cuvântul', 'Găsește grupul', 'Găsește culoarea'].every(g => play.includes(g)), `Play hub: ${play.filter(x => x[0] !== '#').length} games`);
   for (const prof of ['curious', 'explorer']) {
-    const pair = await ev(pr => { profile = pr; const learn = [], games = [];
-      for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
-      section = 'play'; games.push(...hubTiles().filter(x => x.t).map(x => x.t.id)); return [learn.join(), games.join()]; }, prof);
+    const pair = await ev(pr => { APP.set({ profile: pr }); const learn = [], games = [];
+      for (const s of ABC.config.sections.filter(s => !s.play)) { APP.set({ section: s.id }); learn.push(...hubTiles().map(x => x.t.id)); }
+      APP.set({ section: 'play' }); games.push(...hubTiles().filter(x => x.t).map(x => x.t.id)); return [learn.join(), games.join()]; }, prof);
     ok(pair[0] === pair[1], `${prof}: Learn ↔ Play 1:1 (${pair[0].split(',').length} tiles)`);
   }
-  await ev(() => { profile = 'curious'; });
+  await ev(() => { APP.set({ profile: 'curious' }); });
   console.log('age profiles (bikes in the bar)');
   await hub('num');
   const bar = await ev(() => { const R = e => e.getBoundingClientRect(), f = R($('flags')), a = R($('ages'));
@@ -53,9 +53,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht')].length }));
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
-  const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t).length; }));
+  const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { APP.set({ profile: pr }); APP.set({ section: 'play' }); return hubTiles().filter(x => x.t).length; }));
   ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] >= 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
-  await ev(() => { profile = 'curious'; });
+  await ev(() => { APP.set({ profile: 'curious' }); });
   await ev(() => openTile('letters', false, true));
   ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
   await ev(() => setLang('en'));
@@ -100,7 +100,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^Where is the .+\?$/], ['clock', /^Where is .+ o'clock\?$/], ['halves', /^Where is half past .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /], ['planets', /^Where is .+\?$/], ['clean', /^Where is .+\?$/], ['immune', /^(What|Where) .+\?$/], ['elements', /^Find the symbol for .+!$/]],
     de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^Wo ist (der|die|das) .+\?$/], ['clock', /^Wo ist .+ Uhr\?$/], ['halves', /^Wo ist halb .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /], ['planets', /^Wo ist .+\?$/], ['clean', /^Wo ist .+\?$/], ['immune', /^(Was|Wo) .+\?$/], ['elements', /^Finde das Symbol für .+!$/]]
   };
-  await ev(() => { profile = 'scientist'; });
+  await ev(() => { APP.set({ profile: 'scientist' }); });
   for (const l of ['ro', 'en', 'de']) {
     await ev(x => setLang(x), l);
     for (const [id, re] of ASK[l]) {
@@ -109,7 +109,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
       ok(re.test(last) && !/undefined|\{/.test(last) && n >= 2, `${l} game ${id}: "${last}" with ${n} bubbles`);
     }
   }
-  await ev(() => { setLang('ro'); profile = 'curious'; });
+  await ev(() => { setLang('ro'); APP.set({ profile: 'curious' }); });
   await ev(() => openTile('colors', true, true));
   const seen = await ev(() => { const s = new Set(); for (let k = 0; k < 150; k++) { APP.streak = 9; ABC.views.play.newRound(); ABC.views.play.state().opts.forEach(x => s.add(x.id)); } return [...s]; });
   ok(!seen.includes('rainbow') && seen.length === 10, `Find the colour: 10 plain colours, never the rainbow (${seen.length})`);
@@ -160,7 +160,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('hubs: tiles look like buttons (not stretched)');
   for (const sec of ['num', 'abc', 'disc']) {
-    await ev(s => { section = s; atHub = true; render(); }, sec);
+    await ev(s => { APP.set({ section: s }); APP.set({ hub: true }); render(); }, sec);
     const hs = await p.$$eval('#hub .ht', t => t.map(x => { const R = e => e.getBoundingClientRect(), cs = getComputedStyle(x), kids = [...x.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
       const content = Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
       return [R(x).height | 0, Math.max(parseFloat(cs.minHeight), content) + 2]; }));
@@ -168,24 +168,24 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   }
   ok(await p.isVisible('.hsearch'), 'search pill on the hub');
   ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
-  await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
+  await ev(() => { APP.set({ profile: 'scientist' }); APP.set({ section: 'disc' }); APP.set({ hub: true }); render(); });
   const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
     return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));
   const where = { curious: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
-  await ev(() => { profile = 'scientist'; section = 'disc'; render(); });
+  await ev(() => { APP.set({ profile: 'scientist' }); APP.set({ section: 'disc' }); render(); });
   ok(badges.length && badges.every(b => where[b.p](b.x)), 'age badges placed by age: ' + badges.map(b => `${b.id}=${b.p}@${b.x.toFixed(2)}`).join(' '));
   ok(badges.find(b => b.id === 'colors').p === 'curious' && badges.find(b => b.id === 'families').p === 'curious', 'colours, families = curious');
-  await ev(() => { section = 'num'; render(); });
+  await ev(() => { APP.set({ section: 'num' }); render(); });
   const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
   ok(nb.digits === 'curious' && nb.teens === 'explorer' && nb.clock === 'curious' && nb.halves === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
   const over = [];
   for (const pr of ['curious', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
-    await ev(([pr, sec]) => { profile = pr; section = sec; atHub = true; render(); }, [pr, sec]);
+    await ev(([pr, sec]) => { APP.set({ profile: pr }); APP.set({ section: sec }); APP.set({ hub: true }); render(); }, [pr, sec]);
     over.push(...await ev(() => [...document.querySelectorAll('#hub .ht')].filter(t => { const r = t.getBoundingClientRect(), b = t.querySelector('.agebadge').getBoundingClientRect();
       return t.scrollHeight > t.clientHeight + 1 || [...t.querySelectorAll('.hp,.hl,.badge')].some(e => { const q = e.getBoundingClientRect(); return q.top < b.bottom - 1 && q.right > b.left && q.left < b.right; }); }).map(t => t.dataset.id)));
   }
   ok(!over.length, 'hub tiles: nothing overflows or sits under the age badge' + (over.length ? ': ' + [...new Set(over)].join(' ') : ''));
-  await ev(() => { profile = 'curious'; render(); });
+  await ev(() => { APP.set({ profile: 'curious' }); render(); });
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
