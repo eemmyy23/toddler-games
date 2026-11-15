@@ -1,4 +1,4 @@
-const THINGS = ['sun', 'chick', 'fish', 'strawberry', 'star', 'balloon', 'ladybird', 'biscuit', 'car', 'butterfly'];
+const THINGS = ['apple', 'chick', 'fish', 'strawberry', 'star', 'balloon', 'ladybird', 'biscuit', 'car', 'butterfly'];
 MODULE('numbers', {
   section: 'num', ages: [2, 6], needs: ['numbers'],
   build(code) {

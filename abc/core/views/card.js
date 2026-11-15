@@ -45,7 +45,7 @@
       const [pv, nx] = APP.neighbors();
       $('prev').innerHTML = `‹ ${nav(pv)}`; $('next').innerHTML = `${nav(nx)} ›`;
       const ex = it.examples || [];
-      $('pics').hidden = $('word').hidden = !!ex.length;
+      $('pics').hidden = !!ex.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
       $('pics').innerHTML = (it.pics || []).map((pc, i) => `<span style="animation-delay:${(i * 0.12).toFixed(2)}s">${pc}</span>`).join('');
       $('examples').innerHTML = ex.map(([w, pic], i) => {
@@ -64,8 +64,7 @@
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;
     },
-    indexFace: it => it.examples ? `<span style="color:${it.color}">${esc(it.label)}</span>${it.examples[0] ? `<small>${it.examples[0][1]}</small>` : ''}`
-      : `${it.nav || esc(it.label)}<small>${esc(it.name)}</small>`
+    indexFace: it => `${it.nav ?? esc(it.label)}<small>${it.word ? esc(it.word) : it.examples && it.examples[0] ? it.examples[0][1] : esc(it.name)}</small>`
   };
   VIEW('card', VIEW_CARD);
 })();

@@ -335,10 +335,11 @@ tapBtn('gridbtn', openIndex); tapBtn('ixclose', closeIndex);
 document.querySelectorAll('.age').forEach(b => tapBtn(b, () => setProfile(b.dataset.p)));
 addEventListener('resize', () => { resizeFx(); if (!atHub && view().resize) view().resize(); });
 let sx = null;
-$('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
+$('stage').addEventListener('pointerdown', e => { sx = e.clientX; }, true);
 $('stage').addEventListener('pointerup', e => {
-  const v = view(); if (sx == null || !v || !v.swipe) return;
-  const dx = e.clientX - sx; sx = null;
+  const v = view(), start = sx; sx = null;
+  if (start == null || !v || !v.swipe) return;
+  const dx = e.clientX - start;
   if (Math.abs(dx) > 50) v.step((dx < 0) !== (APP.L().dir === 'rtl') ? 1 : -1);
 });
 addEventListener('keydown', e => {
