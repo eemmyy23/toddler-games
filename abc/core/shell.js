@@ -184,24 +184,8 @@ const closeIndex = () => $('index').classList.remove('open');
 $('ixgrid').addEventListener('click', e => { const b = e.target.closest('.ix'); if (!b) return; firstTouch(); closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
 
 // ---- age profiles: three bikes in the top bar, visible on every hub; anyone may switch ----
-const K = '#ffc94d', BW = '#e8ecff', SKIN = '#f2c49b';
-const wheel = (x, y, r, knob) => `<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${BW}" stroke-width="${knob ? 3.2 : 2.4}"${knob ? ' stroke-dasharray="2.2 1.6"' : ''}/><circle cx="${x}" cy="${y}" r="1.3" fill="${BW}"/>`;
-const rider = (hx, hy, limbs, helmet) => `<circle cx="${hx}" cy="${hy}" r="4.2" fill="${SKIN}"/>` +
-  (helmet ? `<path d="M${hx - 4.6} ${hy - 0.5} a4.6 4.6 0 0 1 9.2 0 z" fill="${K}"/>` : `<path d="M${hx - 4.2} ${hy - 1} a4.2 4.2 0 0 1 8.4 0 q-4 -2 -8.4 0z" fill="#8a5a3c"/>`) +
-  `<path d="${limbs}" fill="none" stroke="${K}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-const frame = (d, c) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
-const AGE_ICON = { // balance bike · training wheels · mountain bike
-  little: wheel(11, 31, 6.5) + wheel(37, 31, 6.5) + frame('M11 31 L20 23 L33 23 L37 31 M33 23 L31 15 M28 15 h6', '#7fb4ff') +
-    `<path d="M17 22 h7" stroke="${K}" stroke-width="3" stroke-linecap="round"/>` + rider(22, 8, 'M21 13 L21 21 M21 15 L30 16 M21 21 L18 30 L16 37 M21 21 L26 29 L27 37'),
-  explorer: wheel(11, 29, 8) + wheel(37, 29, 8) + wheel(3, 34, 3.4) + `<path d="M11 29 L3 34" stroke="${BW}" stroke-width="2"/>` +
-    frame('M11 29 L19 18 L32 18 L37 29 M19 18 L23 29 L32 18 M32 18 L30 11 M27 11 h6', '#93d98f') +
-    `<path d="M16 16 h6" stroke="${K}" stroke-width="3" stroke-linecap="round"/>` + rider(21, 4.5, 'M20 9 L20 16 M20 11 L29 12 M20 16 L25 23 L23 29'),
-  scientist: wheel(10, 29, 9, 1) + wheel(38, 29, 9, 1) + frame('M10 29 L19 17 L33 16 L38 29 M19 17 L24 29 L33 16 M33 16 L31 9 M28 9 h7', '#f38fc4') +
-    `<path d="M34.5 20 L36.5 25" stroke="${BW}" stroke-width="2.4" stroke-linecap="round"/><path d="M15 15 h6" stroke="${K}" stroke-width="3" stroke-linecap="round"/>` +
-    rider(26, 4.5, 'M24 8 L18 14 M22 10 L31 10 M18 14 L25 21 L24 29', 1)
-};
 $('ages').innerHTML = Object.keys(CFG.profiles).map(p => { const [a, b] = CFG.profiles[p];
-  return `<button class="age" data-p="${p}" role="radio"><svg viewBox="-2 -3 52 43" aria-hidden="true">${AGE_ICON[p] || ''}</svg><small>${a}–${b}</small></button>`; }).join('');
+  return `<button class="age" data-p="${p}" role="radio"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none">${AGE_ICON[p] || ''}</g></svg><small>${a}–${b}</small></button>`; }).join('');
 function setProfile(p) {
   if (!CFG.profiles[p]) return;
   profile = p; store.set('profile', p); atHub = true; store.set('athub', true);

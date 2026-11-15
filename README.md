@@ -16,7 +16,7 @@ Tiny, no-instructions web games for very small children. Each one is a single se
   - **🔤 Letters:** big letter with example words (RO school sounds bî, cî, zî; RO letter groups ce/ci/che/chi/ge/gi/ghe/ghi); **Read**: a word as CAPITALS, small letters, syllables, whole word and a singular/plural table.
   - **🔎 Discover:** colours and a tappable rainbow; "What is it?" cards read aloud.
   - **🎯 Play:** one game for every learn screen, paired automatically; stars.
-  Switching the flag keeps the same item (and the same question in a game). The three bikes next to the flags pick the age: balance bike 2–4 · training wheels 4–7 · mountain bike 7–12. Anyone can switch; a higher age only adds topics.
+  Switching the flag keeps the same item (and the same question in a game). The three bikes next to the flags pick the age: balance bike 2–4 · training wheels 4–7 · mountain bike 7–12 (icons built from Microsoft Fluent Emoji, MIT). Anyone can switch; a higher age only adds topics.
 
 ## Installing
 

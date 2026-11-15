@@ -27,7 +27,7 @@ for (const m of CFG.modules) {
   scripts.push(...ls(`abc/modules/${m}`, /^(?!module\.js).*\.js$/), `abc/modules/${m}/module.js`);
   for (const c of CFG.languages) { const p = `abc/modules/${m}/lang/${c}.js`; if (exists(p)) scripts.push(p); }
 }
-scripts.push('abc/core/services.js', ...ls('abc/core/views', /\.js$/), ...ls('abc/core/games', /\.js$/), 'abc/core/shell.js');
+scripts.push('abc/core/services.js', 'abc/core/art.js', ...ls('abc/core/views', /\.js$/), ...ls('abc/core/games', /\.js$/), 'abc/core/shell.js');
 // files cached for offline use (every language, every module)
 const files = ['abc.html', 'abc/manifest.js', ...scripts, 'manifest-abc.json', 'abc-icon-192.png', 'abc-icon-512.png',
   ...ls('fonts', /\.woff2$/), 'rocket.html', 'paint.html', 'manifest.json', 'manifest-paint.json',
@@ -40,7 +40,7 @@ if (FIX) { fs.writeFileSync(path.join(root, 'abc/manifest.js'), manifest); conso
 else if (!exists('abc/manifest.js') || read('abc/manifest.js') !== manifest) err('abc/manifest.js is out of date — run `node tools/check.js --fix`');
 
 // ---------- 2. load content (no DOM files) ----------
-for (const f of scripts.slice(3)) { if (/^abc\/core\/(services|shell|views\/)/.test(f)) continue; run(f); }
+for (const f of scripts.slice(3)) { if (/^abc\/core\/(services|art|shell|views\/)/.test(f)) continue; run(f); }
 const ABC = ctx.ABC, langs = CFG.languages, base = CFG.baseLanguage;
 ABC.errors.forEach(err);
 const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && typeof v === 'object' && !Array.isArray(v) && !('other' in v) ? keysOf(v, p + k + '.') : [p + k]);
