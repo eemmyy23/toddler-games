@@ -6,6 +6,7 @@ const SECTIONS = Object.fromEntries(CFG.sections.map(s => [s.id, s]));
 const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
+const PLAY_SECTION = CFG.sections.find(s => s.play).id;
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
   const d = document.createElement('div'); d.id = v.el; d.hidden = true;
@@ -100,7 +101,7 @@ function openTile(id, play, quiet) {
   if (view() && view().leave) view().leave();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
-  if (!play) { section = t.section; store.set('sec', section); }
+  section = play ? PLAY_SECTION : t.section; store.set('sec', section);
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); if (!quiet) sfx.pop(); render();
   return true;
