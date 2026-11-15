@@ -63,7 +63,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => openTile('letters', false, true));
   ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
   await ev(() => setLang('en'));
-  ok(!(await hub('abc')).some(x => /group/i.test(x)), 'EN hides RO-only letter groups');
+  ok((await hub('abc')).some(x => /group/i.test(x)), 'EN has letter groups too');
   await ev(() => setLang('ro'));
 
   console.log('learn card');

@@ -3,7 +3,7 @@
   function examples(L, words, piece, isGroup) {
     const low = x => x.toLocaleLowerCase(L.bcp47), p = low(piece);
     const groups = (L.groups || '').split(/\s+/).filter(Boolean), inGroup = w => groups.some(g => low(w).startsWith(g));
-    let ex = words.filter(x => !x.noLetter && low(x.w).startsWith(p) && (isGroup || !inGroup(x.w))).map(x => [x.w, x.pic, false]);
+    let ex = words.filter(x => (isGroup || !x.noLetter) && low(x.w).startsWith(p) && (isGroup || !inGroup(x.w))).map(x => [x.w, x.pic, false]);
     if (!ex.length) ex = words.filter(x => low(x.w).includes(p)).map(x => [x.w, x.pic, true]);
     return ex.slice(0, MAX_EX);
   }
@@ -21,7 +21,7 @@
       });
       const groups = (L.groups || '').split(/\s+/).filter(Boolean).map((g, i, a) => {
         const ex = examples(L, words, g, true), [w] = ex[0] || [g], color = ink((i * 360 / a.length + 20) | 0);
-        return { id: 'grp-' + g, label: g, name: g, say: L.sayLetter(g, low(w), false), big: esc(g), bigClass: 'grp',
+        return { id: 'grp-' + g, label: g, name: g, say: L.sayGroup ? L.sayGroup(g, low(w)) : L.sayLetter(g, low(w), false), big: esc(g), bigClass: 'grp',
           color, nav: CONTENT.navText(g, color), examples: ex, bubble: g, bubbleColor: color, prompt: g, smallBubble: true };
       });
       const read = words.map(x => Object.assign({}, x, { label: x.w, name: x.w }));
@@ -39,7 +39,7 @@
         game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'], lower: true, ask: (it, r) => r.lower ? 'lettersSmall' : 'letters' } },
       { id: 'read', icon: '📚', view: 'read', items: S => S.words, index: true, search: true,
         game: { type: 'find', items: S => S.wordGame, prompts: ['glyph', 'glyph', 'glyph', 'voice'], ask: it => it.the ? 'read' : 'readBare' } },
-      { id: 'groups', icon: 'ce·ci', view: 'card', items: S => S.groups, index: true,
+      { id: 'groups', icon: 'ch', view: 'card', items: S => S.groups, index: true,
         game: { type: 'find', prompts: ['glyph', 'glyph', 'voice'] } }
     ]
   });

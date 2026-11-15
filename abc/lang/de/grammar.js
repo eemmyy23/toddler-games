@@ -3,6 +3,8 @@ LANG('de', {
   voices: /anna|female/i,
   fold: s => s.replace(/ß/g, 'ss'),
   letters: 'A Ä B C D E F G H I J K L M N O Ö P Q R S ß T U Ü V W X Y Z',
+  groups: 'sch ei au eu st pf',
+  sayGroup: (g, w) => `${w}!`,
   numbers: ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun', 'zehn'],
   keepCase: true,
   sayLetter: (c, w, inside) => `${c} wie ${w}!`,

@@ -1,10 +1,10 @@
 const COLOR_DATA = [
-  { id: 'red', hex: '#e53935', pics: '🍎🍓🚒' }, { id: 'blue', hex: '#1e88e5', pics: '🫐💧🦋' },
-  { id: 'yellow', hex: '#fdd835', pics: '🍌🐤🌻' }, { id: 'green', hex: '#43a047', pics: '🥒🐸🍃' },
-  { id: 'orange', concept: 'orange-colour', hex: '#fb8c00', pics: '🍊🥕🎃' }, { id: 'purple', hex: '#8e24aa', pics: '🍇🍆🔮' },
-  { id: 'pink', hex: '#f48fb1', pics: '🐷🌸🦩' }, { id: 'brown', hex: '#8d6e63', pics: '🐻🌰🍫' },
-  { id: 'black', hex: '#111111', pics: '🐈‍⬛🎩🎱' }, { id: 'white', hex: '#f5f5f5', pics: '☁️⛄🐑' },
-  { id: 'rainbow', concept: 'rainbow', pics: '🌈🌦️☔', noPlay: true, bands: true }
+  { id: 'red', hex: '#e53935', things: 'apple strawberry tomato cherry' }, { id: 'blue', hex: '#1e88e5', things: 'whale dolphin butterfly jeans' },
+  { id: 'yellow', hex: '#fdd835', things: 'banana lemon chick sun' }, { id: 'green', hex: '#43a047', things: 'cucumber frog leaf grass' },
+  { id: 'orange', concept: 'orange-colour', hex: '#fb8c00', things: 'orange pumpkin fox' }, { id: 'purple', hex: '#8e24aa', things: 'grape umbrella' },
+  { id: 'pink', hex: '#f48fb1', things: 'pig flower donut' }, { id: 'brown', hex: '#8d6e63', things: 'bear horse teddy hedgehog' },
+  { id: 'black', hex: '#111111', things: 'hat penguin' }, { id: 'white', hex: '#f5f5f5', things: 'sheep cloud egg milk' },
+  { id: 'rainbow', concept: 'rainbow', things: 'sun cloud umbrella', noPlay: true, bands: true }
 ];
 const RAINBOW_HEX = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#3949ab', '#8e24aa'];
 const RAINBOW_DOT = 'conic-gradient(#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#3949ab,#8e24aa,#e53935)';
@@ -18,13 +18,14 @@ MODULE('colors', {
     const s = this.strings[code], loc = ABC.langs[code].bcp47;
     if (!s) return { colors: [] };
     const colors = COLOR_DATA.filter(c => s.colors[c.id]).map(c => {
-      const name = s.colors[c.id], pics = I18N.graphemes(c.pics, loc);
+      const name = s.colors[c.id], words = new Map(CONTENT.words(code).map(x => [x.id, x]));
+      const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => [x.w, x.pic, false]), pics = examples.map(x => x[1]);
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
       if (c.bands && !parts) return null;
       return { id: c.id, label: name, name, say: parts ? `${name}: ${I18N.list(s.rainbow, loc)}!` : `${name}!`,
         big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`,
         nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>`,
-        word: name, pics, concept: c.concept || c.id, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
+        word: name, pics, examples, concept: c.concept || c.id, parts, noPlay: !!c.noPlay, bubble: '', bubbleColor: c.hex, prompt: name };
     }).filter(Boolean);
     return { colors };
   },
