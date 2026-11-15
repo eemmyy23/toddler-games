@@ -35,9 +35,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
-  ok(!play.some(x => x[0] === '~'), 'Little profile: no "coming soon" tiles');
+  ok(!play.some(x => x[0] === '~'), 'Adventurer profile: no "coming soon" tiles');
   ok(play.filter(x => x[0] !== '#').join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', 'Play hub: the 6 games');
-  for (const prof of ['little', 'explorer']) {
+  for (const prof of ['adventurer', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
       for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
       section = 'play'; games.push(...hubTiles().filter(x => x.t).map(x => x.t.id)); return [learn.join(), games.join()]; }, prof);
@@ -46,20 +46,20 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => { profile = 'explorer'; });
   play = await hub('play');
   ok(play.some(x => x[0] === '~'), 'Explorer profile shows "coming soon" tiles');
-  await ev(() => { profile = 'little'; });
+  await ev(() => { profile = 'adventurer'; });
   console.log('age profiles (bikes in the bar)');
   await hub('num');
   const bar = await ev(() => { const R = e => e.getBoundingClientRect(), f = R($('flags')), a = R($('ages'));
     return { one: Math.abs(f.top - a.top) < 2, gap: a.left - f.right, right: innerWidth - a.right, n: document.querySelectorAll('.age').length }; });
   ok(bar.n === 3 && bar.one && bar.gap >= 0 && bar.right >= 0, `3 bikes on the same row as the flags (gap ${bar.gap | 0}px, right ${bar.right | 0}px)`);
-  for (const pr of ['scientist', 'explorer', 'little']) {
+  for (const pr of ['scientist', 'explorer', 'adventurer']) {
     await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await spoken();
     const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht:not(.soon)')].length }));
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
-  const counts = await ev(() => ['little', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
+  const counts = await ev(() => ['adventurer', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
   ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] === 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
-  await ev(() => { profile = 'little'; });
+  await ev(() => { profile = 'adventurer'; });
   await ev(() => openTile('letters', false, true));
   ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
   await ev(() => setLang('en'));
@@ -173,21 +173,21 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
   const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
     return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));
-  const where = { little: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
+  const where = { adventurer: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
   await ev(() => { profile = 'scientist'; section = 'disc'; render(); });
   ok(badges.length && badges.every(b => where[b.p](b.x)), 'age badges placed by age: ' + badges.map(b => `${b.id}=${b.p}@${b.x.toFixed(2)}`).join(' '));
-  ok(badges.find(b => b.id === 'colors').p === 'little' && badges.find(b => b.id === 'families').p === 'little', 'colours, families = little');
+  ok(badges.find(b => b.id === 'colors').p === 'adventurer' && badges.find(b => b.id === 'families').p === 'adventurer', 'colours, families = adventurer');
   await ev(() => { section = 'num'; render(); });
   const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
-  ok(nb.digits === 'little' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
+  ok(nb.digits === 'adventurer' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
   const over = [];
-  for (const pr of ['little', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
+  for (const pr of ['adventurer', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
     await ev(([pr, sec]) => { profile = pr; section = sec; atHub = true; render(); }, [pr, sec]);
     over.push(...await ev(() => [...document.querySelectorAll('#hub .ht')].filter(t => { const r = t.getBoundingClientRect(), b = t.querySelector('.agebadge').getBoundingClientRect();
       return t.scrollHeight > t.clientHeight + 1 || [...t.querySelectorAll('.hp,.hl,.badge')].some(e => { const q = e.getBoundingClientRect(); return q.top < b.bottom - 1 && q.right > b.left && q.left < b.right; }); }).map(t => t.dataset.id)));
   }
   ok(!over.length, 'hub tiles: nothing overflows or sits under the age badge' + (over.length ? ': ' + [...new Set(over)].join(' ') : ''));
-  await ev(() => { profile = 'little'; render(); });
+  await ev(() => { profile = 'adventurer'; render(); });
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
