@@ -209,8 +209,8 @@ i('cow', { title: 'Die Kuh', lines: [
 ] });
 i('cat', { title: 'Die Katze', lines: [
   ['😺', 'Wenn die Katze glücklich ist, schnurrt sie.'],
-  ['🌙', 'Katzen sehen auch im Dunkeln gut.'],
-  ['〰️', 'Mit den Schnurrhaaren spürt sie, wo sie durchpasst.']
+  ['🌙', 'Katzen sehen auch bei sehr wenig Licht gut.'],
+  ['〰️', 'Mit ihren Schnurrhaaren spürt die Katze, wo sie durchpasst.']
 ] });
 i('dog', { title: 'Der Hund', lines: [
   ['👃', 'Ein Hund riecht viel besser als wir.'],
@@ -218,13 +218,13 @@ i('dog', { title: 'Der Hund', lines: [
   ['🦮', 'Manche Hunde helfen Menschen, die nicht sehen können.']
 ] });
 i('bear', { title: 'Der Bär', lines: [
-  ['😴', 'Im Winter schläft der Bär viel in seiner Höhle.'],
+  ['😴', 'Viele Bären halten im Winter Winterruhe in einer Höhle.'],
   ['🍯', 'Bären fressen Beeren, Fisch und Honig.'],
   ['🐾', 'Ein Bär ist sehr stark.']
 ] });
 i('elephant', { title: 'Der Elefant', lines: [
   ['🐘', 'Der Elefant ist das größte Tier an Land.'],
-  ['💧', 'Mit dem Rüssel trinkt er und greift Dinge.'],
+  ['💧', 'Mit dem Rüssel holt er Wasser zum Trinken und hebt Dinge auf.'],
   ['👂', 'Seine großen Ohren helfen ihm, sich abzukühlen.']
 ] });
 i('giraffe', { title: 'Die Giraffe', lines: [
@@ -244,11 +244,11 @@ i('dolphin', { title: 'Der Delfin', lines: [
 ] });
 i('whale', { title: 'Der Wal', lines: [
   ['🐳', 'Der Blauwal ist das größte Tier der Welt.'],
-  ['💨', 'Ein Wal atmet Luft und bläst Wasser aus dem Kopf wie ein Springbrunnen.'],
-  ['🎵', 'Wale singen, um miteinander zu sprechen.']
+  ['💨', 'Ein Wal atmet Luft. Beim Ausatmen macht er eine große Fontäne wie ein Springbrunnen.'],
+  ['🎵', 'Manche Wale singen, um miteinander zu sprechen.']
 ] });
-i('octopus', { title: 'Der Krake', lines: [
-  ['🐙', 'Ein Krake hat acht Arme.'],
+i('octopus', { title: 'Der Oktopus', lines: [
+  ['🐙', 'Ein Oktopus hat acht Arme.'],
   ['❤️', 'Er hat drei Herzen.'],
   ['🖤', 'Wenn er sich erschreckt, spritzt er Tinte und schwimmt weg.']
 ] });
@@ -258,9 +258,9 @@ i('lion', { title: 'Der Löwe', lines: [
   ['🐾', 'Meistens jagen die Löwinnen.']
 ] });
 i('owl', { title: 'Die Eule', lines: [
-  ['🦉', 'Die Eule jagt in der Nacht.'],
+  ['🦉', 'Die meisten Eulen jagen in der Nacht.'],
   ['🔄', 'Sie kann ihren Kopf sehr weit drehen.'],
-  ['🤫', 'Sie fliegt ganz ohne Geräusch.']
+  ['🤫', 'Sie fliegt fast lautlos.']
 ] });
 i('ant', { title: 'Die Ameise', lines: [
   ['🐜', 'Eine Ameise kann Dinge tragen, die schwerer sind als sie.'],
@@ -302,10 +302,10 @@ i('egg', { title: 'Das Ei', lines: [
   ['🐣', 'Aus manchen Eiern schlüpfen Küken.'],
   ['🍳', 'Wir essen Eier gekocht oder gebraten.']
 ] });
-i('bread', { title: 'Das Brot', lines: [
-  ['🌾', 'Brot macht man aus Weizenmehl.'],
+i('bread', { title: 'Das Brötchen', lines: [
+  ['🌾', 'Brötchen macht man aus Weizenmehl.'],
   ['🥣', 'Wir mischen das Mehl mit Wasser und Hefe.'],
-  ['🔥', 'Dann backen wir es im Ofen.']
+  ['🔥', 'Dann backen wir sie im Ofen.']
 ] });
 i('carrot', { title: 'Die Karotte', lines: [
   ['🥕', 'Die Karotte wächst in der Erde.'],
@@ -314,7 +314,7 @@ i('carrot', { title: 'Die Karotte', lines: [
 ] });
 i('watermelon', { title: 'Die Wassermelone', lines: [
   ['🍉', 'Die Wassermelone ist voller Wasser.'],
-  ['☀️', 'Sie schmeckt im Sommer, wenn es heiß ist.'],
+  ['☀️', 'Sie schmeckt besonders gut im Sommer, wenn es heiß ist.'],
   ['⚫', 'Sie hat schwarze Kerne.']
 ] });
 }

@@ -209,7 +209,7 @@ i('cow', { title: 'Vaca', lines: [
 ] });
 i('cat', { title: 'Pisica', lines: [
   ['😺', 'Când e fericită, pisica toarce.'],
-  ['🌙', 'Pisica vede bine și pe întuneric.'],
+  ['🌙', 'Pisica vede bine și când e foarte puțină lumină.'],
   ['〰️', 'Cu mustățile simte pe unde poate trece.']
 ] });
 i('dog', { title: 'Câinele', lines: [
@@ -218,13 +218,13 @@ i('dog', { title: 'Câinele', lines: [
   ['🦮', 'Unii câini ajută oamenii care nu văd.']
 ] });
 i('bear', { title: 'Ursul', lines: [
-  ['😴', 'Iarna, ursul doarme mult în bârlog.'],
+  ['😴', 'Mulți urși dorm toată iarna în bârlog.'],
   ['🍯', 'Ursul mănâncă fructe de pădure, pește și miere.'],
   ['🐾', 'Ursul e foarte puternic.']
 ] });
 i('elephant', { title: 'Elefantul', lines: [
   ['🐘', 'Elefantul este cel mai mare animal de pe uscat.'],
-  ['💧', 'Cu trompa bea apă și apucă lucruri.'],
+  ['💧', 'Cu trompa duce apa la gură și apucă lucruri.'],
   ['👂', 'Urechile mari îl ajută să se răcorească.']
 ] });
 i('giraffe', { title: 'Girafa', lines: [
@@ -244,8 +244,8 @@ i('dolphin', { title: 'Delfinul', lines: [
 ] });
 i('whale', { title: 'Balena', lines: [
   ['🐳', 'Balena albastră este cel mai mare animal din lume.'],
-  ['💨', 'Balena respiră aer și scoate apă pe cap, ca o fântână.'],
-  ['🎵', 'Balenele cântă ca să vorbească între ele.']
+  ['💨', 'Balena respiră aer. Când expiră, face un jet mare, ca o fântână.'],
+  ['🎵', 'Unele balene cântă ca să vorbească între ele.']
 ] });
 i('octopus', { title: 'Caracatița', lines: [
   ['🐙', 'Caracatița are opt brațe.'],
@@ -258,9 +258,9 @@ i('lion', { title: 'Leul', lines: [
   ['🐾', 'De obicei, leoaicele vânează.']
 ] });
 i('owl', { title: 'Bufnița', lines: [
-  ['🦉', 'Bufnița vânează noaptea.'],
+  ['🦉', 'Cele mai multe bufnițe vânează noaptea.'],
   ['🔄', 'Își poate întoarce capul foarte mult.'],
-  ['🤫', 'Zboară fără niciun zgomot.']
+  ['🤫', 'Zboară aproape fără zgomot.']
 ] });
 i('ant', { title: 'Furnica', lines: [
   ['🐜', 'Furnica poate căra lucruri mai grele decât ea.'],
@@ -305,7 +305,7 @@ i('egg', { title: 'Oul', lines: [
 i('bread', { title: 'Pâinea', lines: [
   ['🌾', 'Pâinea se face din făină de grâu.'],
   ['🥣', 'Amestecăm făina cu apă și drojdie.'],
-  ['🔥', 'Apoi o coacem în cuptor.']
+  ['🔥', 'Apoi coacem aluatul în cuptor.']
 ] });
 i('carrot', { title: 'Morcovul', lines: [
   ['🥕', 'Morcovul crește în pământ.'],

@@ -209,7 +209,7 @@ i('cow', { title: 'The cow', lines: [
 ] });
 i('cat', { title: 'The cat', lines: [
   ['😺', 'When a cat is happy, it purrs.'],
-  ['🌙', 'Cats can see well in the dark.'],
+  ['🌙', 'Cats can see well when there is very little light.'],
   ['〰️', 'A cat uses its whiskers to feel where it can fit.']
 ] });
 i('dog', { title: 'The dog', lines: [
@@ -218,13 +218,13 @@ i('dog', { title: 'The dog', lines: [
   ['🦮', 'Some dogs help people who cannot see.']
 ] });
 i('bear', { title: 'The bear', lines: [
-  ['😴', 'In winter, a bear sleeps a lot in its den.'],
+  ['😴', 'Many bears sleep through the winter in a den.'],
   ['🍯', 'Bears eat berries, fish and honey.'],
   ['🐾', 'A bear is very strong.']
 ] });
 i('elephant', { title: 'The elephant', lines: [
   ['🐘', 'The elephant is the biggest animal on land.'],
-  ['💧', 'It drinks water and picks things up with its trunk.'],
+  ['💧', 'It uses its trunk to bring water to its mouth and to pick things up.'],
   ['👂', 'Its big ears help it keep cool.']
 ] });
 i('giraffe', { title: 'The giraffe', lines: [
@@ -235,7 +235,7 @@ i('giraffe', { title: 'The giraffe', lines: [
 i('penguin', { title: 'The penguin', lines: [
   ['🐧', 'A penguin is a bird that cannot fly.'],
   ['🏊', 'But it swims very fast.'],
-  ['🥚', 'In some penguins, the dad keeps the egg warm.']
+  ['🥚', 'In some kinds of penguin, the dad keeps the egg warm.']
 ] });
 i('dolphin', { title: 'The dolphin', lines: [
   ['🐬', 'A dolphin lives in water but breathes air.'],
@@ -244,8 +244,8 @@ i('dolphin', { title: 'The dolphin', lines: [
 ] });
 i('whale', { title: 'The whale', lines: [
   ['🐳', 'The blue whale is the biggest animal in the world.'],
-  ['💨', 'A whale breathes air and blows water out of its head like a fountain.'],
-  ['🎵', 'Whales sing to talk to each other.']
+  ['💨', 'A whale breathes air. When it breathes out, it makes a big spray like a fountain.'],
+  ['🎵', 'Some whales sing to talk to each other.']
 ] });
 i('octopus', { title: 'The octopus', lines: [
   ['🐙', 'An octopus has eight arms.'],
@@ -258,9 +258,9 @@ i('lion', { title: 'The lion', lines: [
   ['🐾', 'Most of the hunting is done by the lionesses.']
 ] });
 i('owl', { title: 'The owl', lines: [
-  ['🦉', 'An owl hunts at night.'],
+  ['🦉', 'Most owls hunt at night.'],
   ['🔄', 'It can turn its head a very long way round.'],
-  ['🤫', 'It flies without making a sound.']
+  ['🤫', 'It flies almost without a sound.']
 ] });
 i('ant', { title: 'The ant', lines: [
   ['🐜', 'An ant can carry things heavier than itself.'],
