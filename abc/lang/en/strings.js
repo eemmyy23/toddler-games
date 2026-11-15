@@ -1,6 +1,6 @@
 STRINGS('en', {
   sections: { num: 'Numbers', abc: 'Letters', disc: 'Discover', play: 'Play' },
-  find: 'Find', soon: 'soon', info: 'What is it?', noVoice: 'no voice for this language',
+  find: 'Find', info: 'What is it?', noVoice: 'no voice for this language',
   sgpl: ['Singular', 'Plural'], none: ['no singular', 'no plural'],
   thats: { pl: 'Those are {name}.', other: "That's {name}." },
   cheers: ['Yay!', 'Great job!', 'You did it!', 'Super!', 'Hooray!'],

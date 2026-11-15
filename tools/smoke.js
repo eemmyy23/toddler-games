@@ -32,10 +32,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('hubs');
   const hub = async sec => { await ev(s => { section = s; atHub = true; render(); }, sec);
-    return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
+    return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
-  ok(!play.some(x => x[0] === '~'), 'Curious profile: no "coming soon" tiles');
   ok(['Găsește cifra', 'Câte sunt?', 'Găsește litera', 'Găsește cuvântul', 'Găsește grupul', 'Găsește culoarea'].every(g => play.includes(g)), `Play hub: ${play.filter(x => x[0] !== '#').length} games`);
   for (const prof of ['curious', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
@@ -51,10 +50,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(bar.n === 3 && bar.one && bar.gap >= 0 && bar.right >= 0, `3 bikes on the same row as the flags (gap ${bar.gap | 0}px, right ${bar.right | 0}px)`);
   for (const pr of ['scientist', 'explorer', 'curious']) {
     await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await spoken();
-    const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht:not(.soon)')].length }));
+    const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht')].length }));
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
-  const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
+  const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t).length; }));
   ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] >= 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
   await ev(() => { profile = 'curious'; });
   await ev(() => openTile('letters', false, true));
@@ -97,9 +96,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('games (every language)');
   const ASK = {
-    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^Unde e .+\?$/], ['clock', /^Unde e ora .+\?$/], ['halves', /^Unde e .+ și jumătate\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /]],
-    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^Where is the .+\?$/], ['clock', /^Where is .+ o'clock\?$/], ['halves', /^Where is half past .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /]],
-    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^Wo ist (der|die|das) .+\?$/], ['clock', /^Wo ist .+ Uhr\?$/], ['halves', /^Wo ist halb .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /]]
+    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^Unde e .+\?$/], ['clock', /^Unde e ora .+\?$/], ['halves', /^Unde e .+ și jumătate\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /], ['planets', /^Unde e .+\?$/]],
+    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^Where is the .+\?$/], ['clock', /^Where is .+ o'clock\?$/], ['halves', /^Where is half past .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /], ['planets', /^Where is .+\?$/]],
+    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^Wo ist (der|die|das) .+\?$/], ['clock', /^Wo ist .+ Uhr\?$/], ['halves', /^Wo ist halb .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /], ['planets', /^Wo ist .+\?$/]]
   };
   await ev(() => { profile = 'scientist'; });
   for (const l of ['ro', 'en', 'de']) {

@@ -1,7 +1,7 @@
 MSTRINGS('numbers', 'en', {
-  tiles: { digits: ['Digits', 'Find the number'], count: ['Count', 'How many?'], teens: ['Numbers 11–20', 'Find the number'], tens: ['Tens', 'Find the tens'], big: ['Big numbers', 'Find the big number'] },
+  tiles: { digits: ['Digits', 'Find the number'], count: ['Count', 'How many?'], teens: ['Numbers 11–20', 'Find 11–20'], tens: ['Tens', 'Find the tens'], big: ['Big numbers', 'Find the big number'] },
   bigNames: ['one hundred', 'one thousand', 'ten thousand', 'one hundred thousand', 'one million', 'infinity'],
-  bigSay: ['One hundred! Ten tens.', 'One thousand! Ten hundreds.', 'Ten thousand! Ten thousands.', 'One hundred thousand! Ten ten-thousands.',
+  bigSay: ['One hundred! Ten groups of ten.', 'One thousand! Ten groups of a hundred.', 'Ten thousand! Ten groups of a thousand.', 'One hundred thousand! Ten groups of ten thousand.',
            'One million! A thousand thousands. Counting to a million would take you weeks!',
            'Infinity! Numbers never end: after every number comes one more.'],
   teenSay: '{name}! Ten and {ones}.',

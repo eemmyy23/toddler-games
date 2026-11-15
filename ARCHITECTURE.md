@@ -43,7 +43,7 @@ tools/smoke.js              browser test: every language, every game, speech, of
 - **Age profiles** (config, ascending): curious 2–4 · explorer 4–7 · scientist 7–12, shown as bikes in the top bar on every
   hub; anyone may switch. A tile's start age (`tile.ages` or `module.ages`) picks its profile (start < upper: 4 → explorer);
   the tile shows from that profile upwards (higher profiles add, never remove) and wears that profile's badge
-  (left → right in profile order). A profile with `soon: false` (Curious) never shows "coming soon" tiles.
+  (left → right in profile order). A tile that is not complete in a language is not shown at all (no "coming soon").
 - **Speech** uses only a voice of the current language (local first, `LANG.voices` preferred). No voice → 🔇 on the flag.
 - **Globals.** Content files only call the registry. Views and games use `APP`, `CONTENT`, `I18N`, `esc` and the services
   (`$`, `speak`, `sfx`, `store`, `confetti` …). The shell keeps its state in script-scope variables; the tests drive it directly.
@@ -83,7 +83,7 @@ flags `arrows, nav (id of its own bottom bar), swipe, fullHeight, keepScroll, in
 `{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
-**config** — `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art?, soon? } }` (ascending), `defaultProfile, baseLanguage`.
+**config** — `languages, modules, sections [{ id, icon, play? }], profiles { id: { ages, art? } }` (ascending), `defaultProfile, baseLanguage`.
 
 ## Recipes
 **Add a word** — `abc/concepts.js`: `C('wolf', '🐺');` then in each `abc/lang/<code>/words.js`:

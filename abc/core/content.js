@@ -20,7 +20,7 @@ const CONTENT = {
   things(code, ids) { const by = new Map(this.words(code).map(x => [x.id, x])); return ids.map(id => by.get(id)).filter(Boolean); },
   pic: id => ABC.art[id] ? `<svg class="art" viewBox="0 0 32 32" aria-hidden="true">${ABC.art[id]}</svg>` : ABC.conceptById[id].pic,
   the: x => x.forms && x.forms.sg ? x.forms.sg[1] : null,
-  thing: (x, more) => Object.assign({ id: x.id, label: x.w, name: x.w, say: `${x.w}!`, big: CONTENT.pic(x.id), word: x.w, nav: x.pic, pic: x.pic,
+  thing: (x, more) => Object.assign({ id: x.id, label: x.w, name: x.w, say: `${x.w}!`, big: CONTENT.pic(x.id), word: x.w, nav: ABC.art[x.id] ? CONTENT.pic(x.id) : x.pic, pic: x.pic,
     concept: x.id, the: CONTENT.the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? CONTENT.pic(x.id) : null, pictureBubble: true, prompt: x.w, plural: !!x.entry.plOnly, a: x.forms && x.forms.sg ? x.forms.sg[0] : null, g: x.entry.g }, more),
   set(code, spec, s) {
     const by = new Map(this.words(code).map(x => [x.id, x])), ex = ids => (ids || '').split(' ').map(i => by.get(i)).filter(Boolean).map(y => [y.w, y.pic, false]);

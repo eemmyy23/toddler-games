@@ -1,6 +1,6 @@
 STRINGS('ro', {
   sections: { num: 'Numere', abc: 'Litere', disc: 'Descoperă', play: 'Joacă' },
-  find: 'Găsește', soon: 'în curând', info: 'Ce este?', noVoice: 'nu există voce pentru această limbă',
+  find: 'Găsește', info: 'Ce este?', noVoice: 'nu există voce pentru această limbă',
   sgpl: ['Singular', 'Plural'], none: ['nu are singular', 'nu are plural'],
   thats: { m: 'Acesta e {name}.', n: 'Acesta e {name}.', pl: 'Acestea sunt {name}.', other: 'Aceasta e {name}.' },
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],

@@ -79,13 +79,7 @@ const gameOk = t => Tiles.gameOk(t, lang);
 const label = (t, i) => Tiles.label(t, lang, i);
 const view = () => ABC.views[APP.screen()];
 const ageOk = t => Tiles.ageOk(t, profile);
-const showsSoon = () => CFG.profiles[profile].soon !== false;
 const usable = (t, play) => !!t && ageOk(t) && (play ? gameOk(t) : learnOk(t));
-function listed(t, play) {
-  if (!ageOk(t) || !label(t, play ? 1 : 0)) return false;
-  if (play ? gameOk(t) : learnOk(t)) return true;
-  return showsSoon() && (!t.view || (play && !t.game));
-}
 function loadIdx() { const i = APP.indexOf(store.get('pos_' + tileId, null)); APP.idx = i >= 0 ? i : 0; }
 
 const artSVG = p => `<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none">${ABC.art[CFG.profiles[p].art || p] || ''}</g></svg>`;
@@ -96,10 +90,10 @@ const iconHTML = (icon, cls) => `<span class="${cls} ico${/[\p{L}\p{N}]/u.test(i
 const tileIcon = (t, cls) => iconHTML(t.icon, cls);
 
 function hubTiles() {
-  if (!SECTIONS[section].play) return TILES.filter(t => t.section === section && listed(t, false)).map(t => ({ t, ok: learnOk(t), lbl: label(t, 0), play: false }));
+  if (!SECTIONS[section].play) return TILES.filter(t => t.section === section && usable(t, false)).map(t => ({ t, lbl: label(t, 0), play: false }));
   const out = [];
   for (const s of CFG.sections.filter(s => !s.play)) {
-    const games = TILES.filter(t => t.section === s.id && listed(t, true)).map(t => ({ t, ok: gameOk(t), lbl: label(t, 1), play: true }));
+    const games = TILES.filter(t => t.section === s.id && usable(t, true)).map(t => ({ t, lbl: label(t, 1), play: true }));
     if (games.length) out.push({ header: s }, ...games);
   }
   return out;
@@ -108,7 +102,7 @@ function renderHub() {
   const U = APP.ui();
   $('hub').innerHTML = `<button class="pill sbox hsearch" id="hsearch"><span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="label hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
-    : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
+    : `<button class="ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
 function openTile(id, play, quiet) {
@@ -124,7 +118,6 @@ $('hub').addEventListener('click', e => {
   if (e.target.closest('.hsearch')) { firstTouch(); openSearch(); return; }
   const b = e.target.closest('.ht'); if (!b) return;
   firstTouch();
-  if (b.classList.contains('soon')) { const l = b.querySelector('.hl').textContent; speak(l + (/[.!?。？！]$/.test(l) ? ' ' : '. ') + APP.ui().soon); return; }
   openTile(b.dataset.id, b.dataset.play === '1');
 });
 function goHub() { if (view() && view().leave) view().leave(); section = sectionNow(); atHub = true; store.set('sec', section); store.set('athub', true); sfx.pop(); render(); speak(APP.ui().sections[section] + '!', 80); }
@@ -271,7 +264,7 @@ const fold = s => FOLDS.reduce((x, f) => f(x), String(s || '').replace(/\//g, ''
 function searchPool() {
   const out = [];
   for (const t of TILES) {
-    if (!t.search || !listed(t, false) || !learnOk(t)) continue;
+    if (!t.search || !usable(t, false)) continue;
     const per = LANGS.map(c => [c, new Map(Tiles.items(t, c).map(it => [it.id, it]))]);
     for (const it of itemsOf(t)) {
       const names = per.map(([c, m]) => { const x = m.get(it.id); return [c, x ? x.name : null]; }).filter(x => x[1]);
@@ -361,7 +354,7 @@ addEventListener('keydown', e => {
   if (v && v.onKey && v.onKey(k, e)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;
   const play = APP.screen() === GAME_VIEW || (atHub && SECTIONS[section].play);
-  const t = TILES.find(t => (play || t.section === sectionNow()) && listed(t, play) && usable(t, play) &&
+  const t = TILES.find(t => (play || t.section === sectionNow()) && usable(t, play) &&
     ABC.views[play ? GAME_VIEW : t.view].onKey && (play ? gameItemsOf(t) : itemsOf(t)).some(it => it.key === k));
   if (!t || (t.id === tileId && !atHub)) return;
   openTile(t.id, play, true);

@@ -218,4 +218,11 @@ w('day', { w: 'day', art: 'a', pl: 'days' });
 w('night', { w: 'night', art: 'a', pl: 'nights' });
 w('carrot', { w: 'car/rot', art: 'a', pl: 'carrots' });
 w('potato', { w: 'po/ta/to', art: 'a', pl: 'potatoes' });
+w('mercury', { w: 'Mer/cu/ry', ex: false });
+w('venus', { w: 'Ve/nus', ex: false });
+w('mars', { w: 'Mars', ex: false });
+w('jupiter', { w: 'Ju/pi/ter', ex: false });
+w('saturn', { w: 'Sat/urn', ex: false });
+w('uranus', { w: 'U/ra/nus', ex: false });
+w('neptune', { w: 'Nep/tune', ex: false });
 }

@@ -68,7 +68,7 @@
       weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights);
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(`${APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.g })} ${askLine()}`, 350);
+      speak(`${APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null })} ${askLine()}`, 350);
     }
   }
   $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); if (target) speak(askLine()); });

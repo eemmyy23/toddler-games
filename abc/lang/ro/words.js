@@ -217,4 +217,11 @@ w('day', { w: 'zi', def: 'ziua', pl: 'zile', g: 'f', plDef: 'zilele' });
 w('night', { w: 'noap/te', def: 'noaptea', pl: 'nopți', g: 'f', plDef: 'nopțile' });
 w('carrot', { w: 'mor/cov', def: 'morcovul', pl: 'morcovi', g: 'm', plDef: 'morcovii' });
 w('potato', { w: 'car/tof', def: 'cartoful', pl: 'cartofi', g: 'm', plDef: 'cartofii' });
+w('mercury', { w: 'Mer/cur', ex: false });
+w('venus', { w: 'Ve/nus', ex: false });
+w('mars', { w: 'Mar/te', ex: false });
+w('jupiter', { w: 'Ju/pi/ter', ex: false });
+w('saturn', { w: 'Sa/turn', ex: false });
+w('uranus', { w: 'U/ra/nus', ex: false });
+w('neptune', { w: 'Nep/tun', ex: false });
 }

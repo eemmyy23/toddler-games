@@ -11,14 +11,14 @@
         const n = i + 1, pic = ABC.conceptById[THINGS[i]].pic, thing = L.words.find(e => e.id === THINGS[i] && e.pl);
         return num(n, w, ink((n * 36) % 360), { key: n === 10 ? '0' : String(n), pics: Array(n).fill(pic), pic, pl: thing && thing.pl, g: thing && thing.g });
       });
-      const teens = L.teens.map((w, i) => num(i + 11, w, ink(((i + 11) * 36) % 360),
-        { say: I18N.t(s.teenSay, { name: w, ones: i === 9 ? L.numbers[9] : L.numbers[i] }), pics: [TEN, ...Array(i + 1).fill(ONE)] }));
+      const teens = L.teens.map((w, i) => num(i + 11, w, ink(((i + 11) * 36) % 360), i < 9
+        ? { say: I18N.t(s.teenSay, { name: w, ones: L.numbers[i] }), pics: [TEN, ...Array(i + 1).fill(ONE)] }
+        : { say: s.tensSay[1], pics: [TEN, TEN] }));
       const tens = L.tens.map((w, i) => num((i + 1) * 10, w, ink(((i + 1) * 36) % 360),
         { id: 't' + (i + 1) * 10, say: s.tensSay[i], pics: Array(i + 1).fill(TEN) }));
-      const big = BIG.map((n, i) => s.bigNames && s.bigNames[i] && num(n, s.bigNames[i], ink((i * 60 + 200) % 360),
-        { id: 'b' + (n === Infinity ? 'inf' : n), label: n === Infinity ? '∞' : n.toLocaleString(L.bcp47), big: n === Infinity ? '∞' : n.toLocaleString(L.bcp47),
-          bigClass: 'grp', noPlay: n === Infinity, bubble: n === Infinity ? '∞' : n.toLocaleString(L.bcp47), prompt: n === Infinity ? '∞' : n.toLocaleString(L.bcp47), say: s.bigSay[i], smallBubble: true,
-          nav: CONTENT.navText(n === Infinity ? '∞' : n.toLocaleString(L.bcp47), ink((i * 60 + 200) % 360)) })).filter(Boolean);
+      const big = BIG.map((n, i) => { const t = n === Infinity ? '∞' : n.toLocaleString(L.bcp47), color = ink((i * 60 + 200) % 360);
+        return s.bigNames && s.bigNames[i] && s.bigSay && s.bigSay[i] && num(n, s.bigNames[i], color, { id: 'b' + (n === Infinity ? 'inf' : n), label: t, big: t,
+          bigClass: 'grp', noPlay: n === Infinity, bubble: t, prompt: t, say: s.bigSay[i], smallBubble: true, nav: CONTENT.navText(t, color) }); }).filter(Boolean);
       return { numbers, teens, tens, big };
     },
     check(code, S, s, report) {

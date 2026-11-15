@@ -214,4 +214,11 @@ w('day', { w: 'Tag', g: 'm', pl: 'Tage' });
 w('night', { w: 'Nacht', g: 'f', pl: 'Nächte' });
 w('carrot', { w: 'Ka/rot/te', g: 'f', pl: 'Karotten' });
 w('potato', { w: 'Kar/tof/fel', g: 'f', pl: 'Kartoffeln' });
+w('mercury', { w: 'Mer/kur', g: 'm', mass: true, ex: false });
+w('venus', { w: 'Ve/nus', g: 'f', mass: true, ex: false });
+w('mars', { w: 'Mars', g: 'm', mass: true, ex: false });
+w('jupiter', { w: 'Ju/pi/ter', g: 'm', mass: true, ex: false });
+w('saturn', { w: 'Sa/turn', g: 'm', mass: true, ex: false });
+w('uranus', { w: 'U/ra/nus', g: 'm', mass: true, ex: false });
+w('neptune', { w: 'Nep/tun', g: 'm', mass: true, ex: false });
 }
