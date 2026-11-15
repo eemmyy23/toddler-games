@@ -41,7 +41,7 @@
       b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else { b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label); b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || ink(i * 90)); b.style.animationDelay = (i * 0.4) + 's';
-      b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); choose(it, b); });
+      onTap(b, () => choose(it, b));
       box.appendChild(b);
     });
     $('plinks').innerHTML = APP.links(target);
@@ -73,7 +73,7 @@
       speak(APP.t(U.wrong, { thats: APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null }), ask: askLine() }), 350);
     }
   }
-  $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); if (target) speak(askLine()); });
+  onTap('ask', () => { if (target) speak(askLine()); });
   VIEW('play', {
     el: 'play',
     show() { if (keep && target) draw(); else { target = null; newRound(); } keep = false; },

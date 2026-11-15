@@ -40,9 +40,8 @@
     if (sayIt) speak(word, 150);
   }
   const fit = () => APP.fit($('read'), 'tight');
-  $('read').addEventListener('pointerdown', e => {
-    const el = e.target.closest('[data-say]'); if (!el) return;
-    e.stopPropagation(); APP.firstTouch(); tok++;
+  onTapIn('read', '[data-say]', el => {
+    APP.firstTouch(); tok++;
     lit(el.classList.contains('rt') || el.classList.contains('rc') ? el : null);
     sfx.pop(); speak(el.dataset.say, 60);
   });

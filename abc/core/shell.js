@@ -187,12 +187,12 @@ function openInfo(c) {
 }
 function closeInfo() { infoTok++; $('info').hidden = true; }
 const lightInf = i => document.querySelectorAll('.inf').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
-document.addEventListener('pointerdown', e => {
-  const b = e.target.closest('.link'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch();
+onTapIn(document, '.link', b => {
+  firstTouch();
   const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
   if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
-}, true);
-document.addEventListener('pointerdown', e => { const b = e.target.closest('.infobtn'); if (!b) return; e.preventDefault(); e.stopPropagation(); firstTouch(); openInfo(b.dataset.c); }, true);
+});
+onTapIn(document, '.infobtn', b => { firstTouch(); openInfo(b.dataset.c); });
 $('infolist').addEventListener('click', e => { const b = e.target.closest('.inf'); if (!b) return; firstTouch(); infoTok++; lightInf(+b.dataset.i); speak(infoFor(infoId).lines[+b.dataset.i][1], 40); });
 async function playInfo() {
   const tok = ++infoTok, I = infoFor(infoId);
@@ -208,7 +208,7 @@ const OTHER = CFG.icons.other;
 const GROUP_OF = new Map(Object.entries(ABC.groups).flatMap(([g, ms]) => ms.map(m => [m, g])));
 const hasGroups = GROUP_OF.size > 0;
 let ixMode = store.get('ixmode', 'az');
-$('ixmode').addEventListener('pointerdown', e => { const b = e.target.closest('.seg'); if (!b) return; e.preventDefault(); firstTouch(); ixMode = b.dataset.m; store.set('ixmode', ixMode); openIndex(); });
+onTapIn('ixmode', '.seg', b => { firstTouch(); ixMode = b.dataset.m; store.set('ixmode', ixMode); openIndex(); });
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const face = it => v.indexFace ? v.indexFace(it) : esc(it.label);

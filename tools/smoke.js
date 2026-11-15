@@ -90,7 +90,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,oranj,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
-  await p.locator('#links .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
+  await p.locator('#links .infobtn').dispatchEvent('click'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('click');
 
@@ -121,6 +121,30 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => setLang('de')); const after = await ev(() => ABC.views.play.state().target.id);
   ok(before === after, `language switch keeps the question (${before} → ${after})`);
   await ev(() => setLang('ro'));
+
+  console.log('choice rules (every game, every language, 40 rounds)');
+  const rules = await ev(() => { const look = it => it.bubbleArt || (it.bubble ?? it.label) || it.bubbleColor, bad = [];
+    APP.set({ profile: 'scientist' });
+    for (const c of ABC.config.languages) { setLang(c);
+      for (const t of Tiles.list().filter(t => t.game && usable(t, true))) { openTile(t.id, true, true);
+        for (let k = 0; k < 40; k++) { APP.streak = k % 12; ABC.views.play.newRound(); const { target, opts } = ABC.views.play.state();
+          const ok1 = opts.filter(o => o === target).length === 1, ok2 = new Set(opts.map(look)).size === opts.length,
+            ok3 = new Set(opts.map(o => o.sound || o.id)).size === opts.length, ok4 = !target.among || opts.every(o => o.among === target.among);
+          if (!(ok1 && ok2 && ok3 && ok4)) { bad.push(`${c}/${t.id}`); break; } } } }
+    setLang('ro'); return bad; });
+  ok(!rules.length, 'one right answer, no two choices look or sound alike, pairs stay pairs' + (rules.length ? ': ' + rules.join(' ') : ''));
+  await ev(() => openTile('colors', true, true));
+  const tapRes = await ev(async () => { const { target } = ABC.views.play.state(), s0 = APP.stars, b = document.querySelector(`.bub[data-id="${CSS.escape(target.id)}"]`);
+    b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); const s1 = APP.stars; b.click(); return [s0, s1, APP.stars]; });
+  ok(tapRes[1] === tapRes[0] && tapRes[2] === tapRes[0] + 1, `a choice answers on click (keyboard too), not on a bare touch (stars ${tapRes.join(' → ')})`);
+  const prof = await ev(() => { const has = p => { APP.set({ profile: p, section: 'play', hub: true }); return hubTiles().filter(x => x.t).map(x => x.t.id); };
+    const c = has('curious'), s = has('scientist'); APP.set({ profile: 'curious' }); return { c: c.length, s: s.length, gated: s.filter(id => !c.includes(id)).length, extra: c.filter(id => !s.includes(id)).length }; });
+  ok(prof.gated > 0 && prof.extra === 0, `the youngest profile hides older games (${prof.c} of ${prof.s}, ${prof.gated} hidden)`);
+  const voice = await ev(() => { const real = speechSynthesis.getVoices;
+    speechSynthesis.getVoices = () => [{ lang: 'en-GB', name: 'A', localService: true }, { lang: 'ro_RO', name: 'B', localService: false }, { lang: 'de-DE', name: 'C', localService: true }];
+    SPEECH.pick('ro-RO'); const ro = SPEECH.voice && SPEECH.voice.name; SPEECH.pick('fr-FR'); const fr = [SPEECH.voice, SPEECH.noVoice];
+    speechSynthesis.getVoices = real; SPEECH.pick(APP.L().bcp47, APP.L().voices); return { ro, fr }; });
+  ok(voice.ro === 'B' && voice.fr[0] === null && voice.fr[1] === true, `speech uses only a voice of the current language (ro → ${voice.ro}, fr → none)`);
 
   console.log('index, A–Z bar, universal search');
   await ev(() => setLang('ro'));

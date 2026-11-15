@@ -24,11 +24,10 @@
       partTimers.push(setTimeout(() => { partLight(-1); confetti(W / 2, H / 3, 60, 10); }, 900 + it.parts.length * 850 + 300));
     } else { VIEW_CARD.show(true); sfx.pop(); confetti(e.clientX || W / 2, e.clientY || H / 3, 18, 6); }
   }
-  $('glyph').addEventListener('pointerdown', tapBig);
-  $('word').addEventListener('pointerdown', e => { if (APP.screen() === 'card' && cur().parts) tapBig(e); });
-  $('examples').addEventListener('pointerdown', e => {
-    const b = e.target.closest('.ex'); if (!b) return;
-    e.stopPropagation(); APP.firstTouch();
+  onTap('glyph', tapBig);
+  onTap('word', e => { if (APP.screen() === 'card' && cur().parts) tapBig(e); });
+  onTapIn('examples', '.ex', b => {
+    APP.firstTouch();
     const ex = cur().examples[+b.dataset.i];
     document.querySelectorAll('.ex.on').forEach(x => x.classList.remove('on'));
     b.classList.add('on'); setTimeout(() => b.classList.remove('on'), 900);
