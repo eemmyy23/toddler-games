@@ -1,5 +1,5 @@
 {
-  const SHAPES = [{ id: 'circle', ex: 'ball orange clock' }, { id: 'square', ex: 'gift box dice' }, { id: 'triangle', ex: 'pizza' },
+  const SHAPES = [{ id: 'circle', ex: 'ball orange clock' }, { id: 'square' }, { id: 'triangle', ex: 'pizza' },
     { id: 'star' }, { id: 'heart' }, { id: 'diamond', ex: 'kite' }];
   MODULE('shapes', {
     section: 'disc', ages: [2, 6],

@@ -9,6 +9,7 @@ LANG('de', {
   keepCase: true,
   sayLetter: (c, w, inside) => `${c} wie ${w}!`,
   forms(e, w) {
+    if (e.plOnly) return { sg: null, pl: [w, `die ${w}`] };
     if (!e.g) return null;
     const art = { m: 'der', f: 'die', n: 'das' }[e.g];
     if (e.mass || !e.pl) return { sg: [w, `${art} ${w}`], pl: null };

@@ -175,7 +175,7 @@ w('storm', { w: 'Ge/wit/ter', g: 'n', pl: 'Gewitter' });
 w('cap', { w: 'Kap/pe', g: 'f', pl: 'Kappen' });
 w('sunglasses', { w: 'Son/nen/bril/le', g: 'f', pl: 'Sonnenbrillen' });
 w('boots', { w: 'Stie/fel', g: 'm', pl: 'Stiefel' });
-w('gloves', { w: 'Hand/schuh', g: 'm', pl: 'Handschuhe' });
+w('gloves', { w: 'Hand/schu/he', plOnly: true });
 w('scarf', { w: 'Schal', g: 'm', pl: 'Schals' });
 w('chicken-chick', { w: 'Hüh/ner/kü/ken', g: 'n', pl: 'Hühnerküken' });
 w('circle', { w: 'Kreis', g: 'm', pl: 'Kreise' });
@@ -188,4 +188,8 @@ w('tooth', { w: 'Zahn', g: 'm', pl: 'Zähne' });
 w('tongue', { w: 'Zun/ge', g: 'f', pl: 'Zungen' });
 w('hand', { w: 'Hand', g: 'f', pl: 'Hände' });
 w('arm', { w: 'Arm', g: 'm', pl: 'Arme' });
+w('spring', { w: 'Früh/ling', g: 'm', pl: 'Frühlinge' });
+w('summer', { w: 'Som/mer', g: 'm', pl: 'Sommer' });
+w('autumn', { w: 'Herbst', g: 'm', pl: 'Herbste' });
+w('winter', { w: 'Win/ter', g: 'm', pl: 'Winter' });
 }

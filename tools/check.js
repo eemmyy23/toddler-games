@@ -117,6 +117,8 @@ for (const c of langs) {
     const s = m.strings[c];
     if (!s) { warn(`module ${m.id}: no strings for ${c} → hidden in ${c}`); continue; }
     if (m.check) m.check(c, S[m.id], s, msg => err(`module ${m.id}/${c}: ${msg}`));
+    const base = (m.strings[CFG.baseLanguage] || {}).say || {}, miss = Object.keys(base).filter(k => !(s.say || {})[k]);
+    if (miss.length) err(`module ${m.id}/${c}: say.${miss.join(', say.')} missing`);
   }
   for (const t of Tiles.list()) {
     const s = t.module.strings[c]; if (!s) continue;
@@ -126,7 +128,7 @@ for (const c of langs) {
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }
     const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => t.game.ask ? t.game.ask(it, { lower }) : t.id)));
-    for (const k of asks) if (!(s.games || {})[k]) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
+    for (const k of asks) if (!k.split('.').reduce((o, x) => o && o[x], s.games || {})) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
   }
 }
 console.log(errors ? `\n${errors} error(s), ${warnings} warning(s)` : `\nOK — ${warnings} warning(s)`);

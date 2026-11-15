@@ -67,7 +67,8 @@ Module data, only when a module lists it in `needs`: `numbers` (10 words), `sayL
 **WORDS** — `w(id, { w: 'va/că', … })`, `/` marks syllables. **INFO** — `i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })`. **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
 
 **MODULE** — `{ section, ages: [from, to], needs?: [LANG fields], build(code) → S, tiles: [TILE], check?(code, S, strings, report) }`.
-Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key>: spoken question with {name} / {the} } }`.
+Module strings: `{ tiles: { <tileId>: [learn label, game label] }, games: { <key or group.key>: spoken question with {name} / {the} }, say?: { <concept>: Learn line } }`
+(`say` is read by `CONTENT.set`; every language must have the base language's `say` keys).
 
 **TILE** — `{ id, icon (emoji or short text), view?, items?: S → ITEM[], game?: { type, items?, prompts?: ['glyph'|'word'|'voice'], lower?, ask?(item, round) → key }, index?, search?, section?, ages? }`.
 

@@ -192,4 +192,8 @@ w('tooth', { w: 'tooth', art: 'a', pl: 'teeth' });
 w('tongue', { w: 'tongue', art: 'a', pl: 'tongues' });
 w('hand', { w: 'hand', art: 'a', pl: 'hands' });
 w('arm', { w: 'arm', art: 'an', pl: 'arms' });
+w('spring', { w: 'spring', art: 'a', pl: 'springs' });
+w('summer', { w: 'sum/mer', art: 'a', pl: 'summers' });
+w('autumn', { w: 'au/tumn', art: 'an', pl: 'autumns' });
+w('winter', { w: 'win/ter', art: 'a', pl: 'winters' });
 }

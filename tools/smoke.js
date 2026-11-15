@@ -100,9 +100,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('games (every language)');
   const ASK = {
-    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e \S+\?$/], ['weather', /^Unde e \S+\?$/], ['shapes', /^Unde e \S+\?$/], ['body', /^Unde e \S+\?$/]],
-    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the \S+\?$/], ['weather', /^Where is the \S+\?$/], ['shapes', /^Where is the \S+\?$/], ['body', /^Where is the \S+\?$/]],
-    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) \S+\?$/], ['weather', /^Wo ist (der|die|das) \S+\?$/], ['shapes', /^Wo ist (der|die|das) \S+\?$/], ['body', /^Wo ist (der|die|das) \S+\?$/]]
+    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/]],
+    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/]],
+    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/]]
   };
   for (const l of ['ro', 'en', 'de']) {
     await ev(x => setLang(x), l);
