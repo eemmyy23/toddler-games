@@ -41,6 +41,13 @@ const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && t
 const html = read('abc.html'), css = (html.match(/<style>([\s\S]*?)<\/style>/) || [, ''])[1];
 const markup = html.replace(/<style>[\s\S]*?<\/style>/g, '').replace(/<script[\s\S]*?<\/script>/g, '').replace(/<title>[^<]*<\/title>/, '').replace(/<!doctype[^>]*>/i, '');
 for (const m of markup.matchAll(/>([^<]*[^<\s][^<]*)</gu)) err(`abc.html: hard-coded text "${m[1].trim()}" — text comes from strings/config`);
+{ const body = css.replace(/@media[^{]*\{:root\{[^}]*\}\}/g, '').replace(/:root\{[^}]*\}/g, '').replace(/@media \(prefers-reduced-motion:reduce\)\{[^{]*\{[^}]*\}\}/, '');
+  for (const m of body.matchAll(/@media[^{]*\{(?!:root)/g)) err(`abc.html CSS: "${m[0].trim()}" sets more than tokens — breakpoints only reassign :root tokens`);
+  for (const m of body.matchAll(/[^{}]+\{[^}]*\}/g)) {
+    const raw = [...m[0].matchAll(/(?<![\w.#-])-?(\d+(?:\.\d+)?)(px|vh|vw)\b/g)].filter(x => x[2] !== 'px' || +x[1] > 2).map(x => x[0]);
+    const col = m[0].match(/#[0-9a-fA-F]{3,8}\b|rgba?\(/g) || [];
+    if (raw.length || col.length) err(`abc.html CSS: raw ${[...raw, ...col].join(' ')} in "${m[0].trim().split('{')[0].slice(0, 50)}" — sizes and colours are :root tokens`);
+  } }
 for (const m of css.matchAll(/content\s*:\s*(['"])(.+?)\1/g)) err(`abc.html CSS: hard-coded content "${m[2]}" — icons come from config.icons`);
 const appMan = JSON.parse(read('manifest-abc.json')), title = (html.match(/<title>([^<]*)<\/title>/) || [])[1], apple = (html.match(/apple-mobile-web-app-title" content="([^"]*)"/) || [])[1];
 const theme = (html.match(/name="theme-color" content="([^"]*)"/) || [])[1], bg0 = (css.match(/--bg0:([^;]+);/) || [])[1];

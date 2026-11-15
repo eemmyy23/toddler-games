@@ -134,8 +134,8 @@ function hubTiles() {
 function renderHub() {
   const U = APP.ui();
   $('hub').innerHTML = `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
-    ? `<div class="label hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
-    : `<button class="ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
+    ? `<div class="label caps hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
+    : `<button class="card ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('') +
     `<div id="ver" class="label" aria-hidden="true">${esc(APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version }))}</div>`;
 }
@@ -209,7 +209,7 @@ const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
 function openInfo(c) {
   const I = infoFor(c); if (!I) return;
   infoId = c; $('infotitle').textContent = I.title;
-  $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
+  $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="card inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
   $('info').hidden = false; sfx.pop(); speak(I.title, 100);
 }
 function closeInfo() { if (!$('info').hidden) APP.stop(); $('info').hidden = true; }
@@ -232,7 +232,7 @@ onTapIn('ixmode', '.seg', b => { ixMode = b.dataset.m; store.set('ixmode', ixMod
 function openIndex() {
   const v = view(), L = APP.L(), U = APP.ui(), list = APP.items().map((it, i) => ({ it, i }));
   const face = it => v.indexFace ? v.indexFace(it) : esc(it.label);
-  const btn = ({ it, i }) => `<button class="ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${face(it)}</button>`;
+  const btn = ({ it, i }) => `<button class="card ix${i === APP.idx ? ' on' : ''}" data-i="${i}">${face(it)}</button>`;
   let html = '', az = '';
   const byGroup = !!(v.indexSort && hasGroups && ixMode === 'grp');
   $('ixmode').hidden = !(v.indexSort && hasGroups);
@@ -315,7 +315,7 @@ function runSearch() {
   $('sres').innerHTML = rows.map(([x, ...more]) => {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
     const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
-    return `<div class="sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
+    return `<div class="card sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
       `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `<span><i>${ABC.langs[c].flag}</i>${mark(n)}</span>`).join('')}</small></span>${icons}</div>`;
   }).join('');
 }
@@ -342,10 +342,10 @@ function setProfile(p) {
   sfx.pop(); render(); speak(APP.exclaim(profileName(p)), 80);
 }
 
-$('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv">${esc(CFG.icons.mute)}</i></button>`).join('');
+$('flags').innerHTML = LANGS.map(c => `<button class="seg flag" data-lang="${c}" aria-label="${esc(ABC.langs[c].name)}">${ABC.langs[c].flag}<i class="nv" hidden>${esc(CFG.icons.mute)}</i></button>`).join('');
 $('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">${iconHTML(s.icon, 'ti')}<span class="tl"></span></button>`).join('');
 function markVoices() {
-  document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); });
+  document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); f.querySelector('.nv').hidden = has !== false; });
 }
 SPEECH.pick(APP.L().bcp47, APP.L().voices);
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices(); };

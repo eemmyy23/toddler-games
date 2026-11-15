@@ -22,9 +22,9 @@
       $('pics').hidden = !(it.pics || []).length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
       $('pics').innerHTML = (it.pics || []).map((pc, i) => `<span style="animation-delay:${(i * 0.12).toFixed(2)}s">${pc}</span>`).join('');
-      $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color
+      $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="card ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color
         ? I18N.highlight(low(w), it.unit ? it.unit.lower : it.label, low, s => `<b style="color:${it.color}">${s}</b>`) : esc(low(w))}</span></button>`).join('');
-      $('links').innerHTML = APP.links(it);
+      $('links').innerHTML = APP.links(it); $('links').hidden = !$('links').innerHTML;
       APP.fitText(g);
       APP.fit($('learn'));
       APP.shown();

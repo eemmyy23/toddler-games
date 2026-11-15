@@ -4,7 +4,7 @@
     const L = APP.L(), loc = L.bcp47, A = APP.alphabet(), e = cur(), syl = e.syl, word = e.w, forms = e.forms, pic = e.pic, U = APP.ui();
     const colorOf = u => (u && A.color(u.id)) || 'var(--text)';
     const parts = I18N.splitUnits(word, A.units, loc).filter(p => /[\p{L}\p{M}]/u.test(p.text));
-    const tile = (txt, say, cls = '', color = '') => `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
+    const tile = (txt, say, cls = '', color = '') => `<button class="card rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
     const avail = ($('read').clientWidth || innerWidth) / (+getComputedStyle($('read')).getPropertyValue('--read-split') || 1), nl = parts.length, gap = nl > 8 ? 3 : 6;
     const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
     const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
@@ -25,11 +25,11 @@
       `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
       (syl.length > 1 ? `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` : '') +
       `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div></div><div class="rcol">` +
-      (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label rh">${esc(U.sgpl[0])}</div><div class="label rh">${esc(U.sgpl[1])}</div>` +
+      (forms ? `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="label caps rh">${esc(U.sgpl[0])}</div><div class="label caps rh">${esc(U.sgpl[1])}</div>` +
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
-          ? `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
+          ? `<button class="card rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
           : `<div class="rc none">${r === 0 ? esc(APP.t(U.noneLine, { none: U.none[c] })) : ''}</div>`).join('')).join('') + `</div>` : '') +
-      `<div class="links">${APP.links(e)}</div></div>`;
+      `<div class="links"${APP.links(e) ? '' : ' hidden'}>${APP.links(e)}</div></div>`;
     fit();
     APP.shown();
     if (sayIt) speak(word, 150);

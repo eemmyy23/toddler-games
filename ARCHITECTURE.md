@@ -54,12 +54,13 @@ tools/smoke.js              browser test: every language, every game, speech, of
   (`$`, `onTap`, `speak`, `sfx`, `store`, `confetti`, `calm` …). The shell keeps its state (language, profile, section, hub) private; `APP.set({ profile, section, hub })` changes it (tests use it, then `render()`).
 
 ## UI rules
-- **One class and one base style per component** (`.pill`, `.rbtn`, `.seg`, `.group`, `.sheet`, `.ht` tile, `.label`, `.dot`, `.scroll`).
-  No per-screen or per-section overrides; a variant is a modifier class (`.primary`, `.small`, `.accent`).
-- **Tokens.** Colours, radii, type, spacing, sizes and z-index live in `:root`. The four breakpoints
-  (width ≤ 440, width ≤ 350, height ≤ 700, landscape height ≤ 450) only reassign tokens.
-- **One selected look**: `.on` (ring + raised card) for everything that can be picked or is being read aloud.
-- **One visibility mechanism**: the `hidden` attribute, set by the shell (`[hidden]` wins over any display).
+- **One class and one base style per component** (`.pill`, `.rbtn`, `.seg`, `.group`, `.sheet`, `.card`, `.label`, `.dot`, `.scroll`).
+  Every tappable surface (hub tile, example, letter tile, form, count row, info line, index cell, search row, question) is a `.card`: one background,
+  shadow, transition and pressed look. A variant is a modifier class (`.primary`, `.small`, `.link`, `.caps`); a component may only reassign tokens.
+- **Tokens.** Colours, radii, type, spacing, sizes and shadows live in `:root`; `check.js` rejects any px/vh/vw (above 2px hairlines) or colour
+  outside `:root`. The breakpoints (width ≤ 440, width ≤ 350, height ≤ 700, landscape height ≤ 450, portrait) only reassign tokens (checked).
+- **One selected look**: `.on` — the amber ring (`--ring` outline) and a small lift — for everything picked or being read aloud.
+- **One visibility mechanism**: the `hidden` attribute (`[hidden]` wins over any display); breakpoints may size a token to 0, never hide.
 - **One content column**: `--col` / `--gut` place the top bar, every screen, the ‹ › arrows, the sheets and the tab bar.
   Controls fixed above the tab bar carry `data-low`; a screen too tall for the space calls `APP.fit(el, compactClass)`
   (compact first, then scale to fit) instead of its own sizing code.
