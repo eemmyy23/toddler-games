@@ -68,7 +68,7 @@
       weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights);
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(`${APP.t(U.thats, { name: it.name })} ${askLine()}`, 350);
+      speak(`${APP.t(U.thats, { name: it.name, g: it.plural ? 'pl' : null })} ${askLine()}`, 350);
     }
   }
   $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); if (target) speak(askLine()); });
@@ -84,7 +84,9 @@
       const p = pool(), t = p.find(x => x.id === s.target); if (!t) return;
       const o = s.opts.map(id => p.find(x => x.id === id)), spare = shuffle(p.filter(x => !o.includes(x)));
       target = t; opts = o.map(x => x || spare.pop()).filter(Boolean);
-      if (round.lower && !t.lower) round.lower = false; keep = true;
+      if (round.lower && !t.lower) round.lower = false;
+      if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = t.members && t.members.length ? t.members[Math.random() * t.members.length | 0].id : null;
+      keep = true;
     },
     reset() { target = null; },
     onKey(k, e) {

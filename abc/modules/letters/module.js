@@ -10,7 +10,7 @@
   MODULE('letters', {
     section: 'abc', ages: [2, 7], needs: ['sayLetter'],
     build(code) {
-      const L = ABC.langs[code], words = CONTENT.words(code), A = CONTENT.alphabet(code);
+      const L = ABC.langs[code], words = CONTENT.words(code).filter(x => !ABC.groups[x.id]), A = CONTENT.alphabet(code);
       const low = x => x.toLocaleLowerCase(L.bcp47);
       const alike = (L.alike || '').split(/\s+/).filter(Boolean), sound = u => alike.find(s => s.split('=').includes(u.lower)) || u.id;
       const letters = A.units.map(u => {
@@ -25,7 +25,7 @@
         return { id: 'grp-' + g, label: g, name: g, say: L.sayGroup ? L.sayGroup(g, low(w)) : L.sayLetter(g, low(w), false), big: esc(g), bigClass: 'grp',
           color, nav: CONTENT.navText(g, color), examples: ex, bubble: g, bubbleColor: color, prompt: g, smallBubble: true };
       });
-      const read = words.filter(x => !ABC.groups[x.id]).map(x => Object.assign({}, x, { label: x.w, name: x.w }));
+      const read = words.map(x => Object.assign({}, x, { label: x.w, name: x.w }));
       const wordGame = words.filter(x => /^[\p{L}\p{M}][\p{L}\p{M}\s'’-]*$/u.test(x.w))
         .map((x, i) => CONTENT.thing(x, { bubbleColor: ink((i * 47) % 360) }));
       return { letters, groups, words: read, wordGame };

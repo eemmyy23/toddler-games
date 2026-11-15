@@ -218,12 +218,12 @@ function openIndex() {
   $('ixmode').hidden = !(v.indexSort && hasGroups);
   $('ixmode').querySelectorAll('.seg').forEach(b => { b.classList.toggle('on', (b.dataset.m === 'grp') === byGroup); b.textContent = U.index[b.dataset.m]; });
   if (v.indexSort) {
-    const col = I18N.collator(L.bcp47), A = APP.alphabet(), names = new Map(CONTENT.words(lang).map(x => [x.id, x.w]));
+    const col = I18N.collator(L.bcp47), A = APP.alphabet(), names = byGroup ? new Map(CONTENT.words(lang).map(x => [x.id, x.w])) : null;
     const first = s => { const p = I18N.splitUnits(s, A.units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : OTHER; };
     list.sort((a, b) => col.compare(a.it.label, b.it.label));
     const keys = byGroup ? Object.keys(ABC.groups) : A.units.map(u => u.id), groups = new Map(keys.map(k => [k, []])); groups.set(OTHER, []);
     list.forEach(x => groups.get(byGroup ? GROUP_OF.get(x.it.concept) || OTHER : first(x.it.label)).push(x));
-    const head = u => { if (byGroup) return { text: u === OTHER ? u : ABC.conceptById[u].pic, color: 'inherit', name: names.get(u) };
+    const head = u => { if (byGroup) return { text: u === OTHER ? u : ABC.conceptById[u].pic, color: 'inherit', name: u === OTHER ? U.index.other : names.get(u) };
       const unit = A.unit(u); return { text: unit ? unit.upper : u, color: A.color(u) || 'var(--muted)' }; };
     for (const [u, xs] of groups) {
       if (!xs.length) continue;

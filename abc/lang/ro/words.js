@@ -46,7 +46,7 @@ w('turtle', { w: 'țes/toa/să', def: 'țestoasa', pl: 'țestoase', g: 'f', plDe
 w('mouse', { w: 'șoa/re/ce', def: 'șoarecele', pl: 'șoareci', g: 'm', plDef: 'șoarecii' });
 w('ship', { w: 'va/por', def: 'vaporul', pl: 'vapoare', g: 'n', plDef: 'vapoarele' });
 w('cloud', { w: 'nor', def: 'norul', pl: 'nori', g: 'm', plDef: 'norii' });
-w('teddy', { w: 'ju/că/ri/e', def: 'jucăria', pl: 'jucării', g: 'f', plDef: 'jucăriile' });
+w('teddy', { w: 'ur/su/leț', def: 'ursulețul', pl: 'ursuleți', g: 'm', plDef: 'ursuleții' });
 w('koala', { w: 'ko/a/la' });
 w('xylophone', { w: 'xi/lo/fon', def: 'xilofonul', pl: 'xilofoane', g: 'n', plDef: 'xilofoanele' });
 w('yoga', { w: 'yo/ga', mass: true, def: 'yoga' });
@@ -83,7 +83,7 @@ w('island', { w: 'in/su/lă', def: 'insula', pl: 'insule', g: 'f', plDef: 'insul
 w('angel', { w: 'în/ger', def: 'îngerul', pl: 'îngeri', g: 'm', plDef: 'îngerii' });
 w('jaguar', { w: 'ja/gu/ar', def: 'jaguarul', pl: 'jaguari', g: 'm', plDef: 'jaguarii' });
 w('jacket', { w: 'gea/că', def: 'geaca', pl: 'geci', g: 'f', plDef: 'gecile' });
-w('kiwi', { w: 'ki/wi' });
+w('kiwi', { w: 'ki/wi', def: 'kiwiul', pl: 'kiwi', g: 'm', plDef: 'kiwii' });
 w('karate', { w: 'ka/ra/te' });
 w('lemon', { w: 'lă/mâ/ie', def: 'lămâia', pl: 'lămâi', g: 'f', plDef: 'lămâile' });
 w('monkey', { w: 'mai/mu/ță', def: 'maimuța', pl: 'maimuțe', g: 'f', plDef: 'maimuțele' });
@@ -212,4 +212,9 @@ w('snail', { w: 'melc', def: 'melcul', pl: 'melci', g: 'm', plDef: 'melcii' });
 w('stone', { w: 'pia/tră', def: 'piatra', pl: 'pietre', g: 'f', plDef: 'pietrele' });
 w('feather', { w: 'pa/nă', def: 'pana', pl: 'pene', g: 'f', plDef: 'penele' });
 w('anchor', { w: 'an/co/ră', def: 'ancora', pl: 'ancore', g: 'f', plDef: 'ancorele' });
+w('earth', { w: 'Pă/mânt', def: 'Pământul', g: 'n', mass: true });
+w('day', { w: 'zi', def: 'ziua', pl: 'zile', g: 'f', plDef: 'zilele' });
+w('night', { w: 'noap/te', def: 'noaptea', pl: 'nopți', g: 'f', plDef: 'nopțile' });
+w('carrot', { w: 'mor/cov', def: 'morcovul', pl: 'morcovi', g: 'm', plDef: 'morcovii' });
+w('potato', { w: 'car/tof', def: 'cartoful', pl: 'cartofi', g: 'm', plDef: 'cartofii' });
 }

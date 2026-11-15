@@ -213,4 +213,9 @@ w('snail', { w: 'snail', art: 'a', pl: 'snails' });
 w('stone', { w: 'stone', art: 'a', pl: 'stones' });
 w('feather', { w: 'feath/er', art: 'a', pl: 'feathers' });
 w('anchor', { w: 'an/chor', art: 'an', pl: 'anchors' });
+w('earth', { w: 'Earth', mass: true });
+w('day', { w: 'day', art: 'a', pl: 'days' });
+w('night', { w: 'night', art: 'a', pl: 'nights' });
+w('carrot', { w: 'car/rot', art: 'a', pl: 'carrots' });
+w('potato', { w: 'po/ta/to', art: 'a', pl: 'potatoes' });
 }
