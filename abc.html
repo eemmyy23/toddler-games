@@ -241,7 +241,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.7.1</div>
+<div id="ver">v0.7.2</div>
 
 <script>
 // ====== DATA ======
@@ -505,8 +505,8 @@ function buildSets(code) {
     return { ch: g, key: null, pic, hue: (i * 360 / a.length + 20) | 0, word: w,
              say: L.sayLetter(g, low(w), false), name: g, ex };
   });
-  // Read: every countable word (has article + plural) written only with letters
-  sets.read = WL.filter(x => x.forms && /^\p{L}+$/u.test(x.w));
+  // Read: every word in the dictionary (the singular/plural table shows only when it has forms)
+  sets.read = WL;
   return sets;
 }
 
@@ -844,7 +844,8 @@ function letterInk(ch) {
 }
 function renderRead(sayIt = true) {
   const { t, syl, word, pic, shown, forms } = readData();
-  const chars = Array.from(word);
+  const isL = c => /\p{L}/u.test(c);
+  const chars = Array.from(word).filter(isL);
   const tile = (txt, say, cls = '', color = '') =>
     `<button class="rt ${cls}" data-say="${esc(say)}"${color ? ` style="color:${color}"` : ''}>${esc(txt)}</button>`;
   // Long words (Wassermelone, caracatiță) shrink the tiles so a whole word always fits on one line
@@ -852,9 +853,9 @@ function renderRead(sayIt = true) {
   const tw = Math.min(54, Math.floor((avail - (nl - 1) * gap) / nl));
   const lstyle = `--tw:${tw}px;--tf:${Math.min(32, Math.round(tw * 0.62))}px;gap:${gap}px`;
   const upper = chars.map(c => tile(c.toLocaleUpperCase(t), letterSay(c), 'u', letterInk(c))).join('');
-  const lower = Array.from(shown).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
+  const lower = Array.from(shown).filter(isL).map(c => tile(c, letterSay(c), 'l', letterInk(c))).join('');
   // Singular/plural table: long phrases put the picture above the text and shrink the font to fit
-  const longest = Math.max(...[...forms.sg, ...forms.pl].map(x => x.length));
+  const longest = forms ? Math.max(...[...forms.sg, ...forms.pl].map(x => x.length)) : 0;
   const chipW = (Math.min(innerWidth, 520) - 24 - 8) / 2, em = longest * 0.66;
   const side = Math.floor((chipW - 2 * 26 - 30) / em), tall = side < 15; // 2 pictures + padding beside the text
   const cf = Math.max(11, Math.min(20, tall ? Math.floor((chipW - 22) / em) : side));
@@ -867,10 +868,11 @@ function renderRead(sayIt = true) {
     `<div class="rrow let" id="rL" style="${lstyle}">${lower}</div>` +
     `<div class="rrow syl" id="rS" style="--sf:${sylFont}px">${syls}</div>` +
     `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
+    (forms ? (
     `<div id="rC" class="${tall ? 'tall' : ''}" style="--cf:${cf}px"><div class="rh">${esc(LANGS[lang].sgpl[0])}</div><div class="rh">${esc(LANGS[lang].sgpl[1])}</div>` +
       [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n]) =>
         `<button class="rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`).join('')).join('') +
-    `</div>`;
+    `</div>`) : '');
   const R = SETS.read, n = R.length;
   $('rprev').innerHTML = `‹ <b>${R[(readIdx - 1 + n) % n].pic}</b>`;
   $('rnext').innerHTML = `<b>${R[(readIdx + 1) % n].pic}</b> ›`;
