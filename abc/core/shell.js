@@ -52,8 +52,17 @@ const learnOk = t => !!(t.view && ABC.views[t.view] && label(t, 0) && itemsOf(t)
 const gameOk = t => !!(learnOk(t) && t.game && ABC.games[t.game.type] && label(t, 1) &&
   ABC.games[t.game.type].pool(gameItemsOf(t), 99).length >= (ABC.games[t.game.type].needs || 2));
 // cumulative: a profile shows every module that starts at or below its upper age (a curious 3-year-old on 🚵 still has numbers)
-const ageOk = t => (t.module.ages || [0])[0] <= CFG.profiles[profile][1];
 const littleProfile = () => profile === CFG.defaultProfile;
+// age: a tile's ages (or its module's); its profile is the one its start age falls in (start < upper: 4 → explorer, 7 → scientist).
+// One rule for both: the badge shows that profile, and the tile is listed from that profile upwards (higher profiles add, never remove).
+const PROFILES = Object.keys(CFG.profiles);
+const tileProfile = t => { const start = (t.ages || t.module.ages || [0])[0];
+  return PROFILES.find(p => start < CFG.profiles[p][1]) || PROFILES[PROFILES.length - 1]; };
+const ageOk = t => PROFILES.indexOf(profile) >= PROFILES.indexOf(tileProfile(t));
+const ageSVG = p => `<svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none">${AGE_ICON[p] || ''}</g></svg>`;
+// age badge on a tile: the profile's bike, placed left → right in profile order (little · explorer · scientist)
+const ageBadge = t => { const p = tileProfile(t), i = PROFILES.indexOf(p);
+  return `<span class="agebadge" data-p="${p}" style="--ax:${PROFILES.length > 1 ? i / (PROFILES.length - 1) : 0}" title="${esc(APP.ui().profile[p])}">${ageSVG(p)}</span>`; };
 // a tile is listed if: right age, has its label in this language, and it works —
 // or it is planned ("coming soon"), which is shown only outside the Little profile (a toddler can't tell "soon" from "broken")
 function listed(t, play) {
@@ -83,7 +92,7 @@ function renderHub() {
   const U = APP.ui();
   $('hub').innerHTML = `<button class="sbox hsearch" id="hsearch"><span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
-    : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
+    : `<button class="ht${x.ok ? '' : ' soon'}" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}${x.ok ? '' : `<span class="badge">${esc(U.soon)}</span>`}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
 function openTile(id, play, quiet) {
@@ -279,8 +288,8 @@ tapBtn('sclose', closeSearch);
 tapBtn('ixsearch', openSearch);
 
 // ---- age profiles: three bikes in the top bar, visible on every hub; anyone may switch ----
-$('ages').innerHTML = Object.keys(CFG.profiles).map(p => { const [a, b] = CFG.profiles[p];
-  return `<button class="age" data-p="${p}" role="radio"><svg viewBox="0 0 32 32" aria-hidden="true"><g fill="none">${AGE_ICON[p] || ''}</g></svg><small>${a}–${b}</small></button>`; }).join('');
+$('ages').innerHTML = PROFILES.map(p => { const [a, b] = CFG.profiles[p];
+  return `<button class="age" data-p="${p}" role="radio">${ageSVG(p)}<small>${a}–${b}</small></button>`; }).join('');
 function setProfile(p) {
   if (!CFG.profiles[p]) return;
   profile = p; store.set('profile', p); atHub = true; store.set('athub', true);
@@ -348,7 +357,7 @@ render();
 
 // ---- PWA ----
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {}); // offline cache is a bonus (e.g. file:// has none)
   navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
 }
 (function () {

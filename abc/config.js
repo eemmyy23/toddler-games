@@ -4,7 +4,8 @@
 // sections:  bottom tabs; play: true → its hub is generated (one game per learn tile of all other sections)
 //            icon: an emoji or a short text ("123", "ABC") — text icons get the text style everywhere
 // profiles:  age profiles, picked with the bike buttons in the top bar (anyone may switch — curiosity is welcome);
-//            a module shows if it starts at or below the profile's upper age (higher profiles add, never take away)
+//            a tile (ages on the tile, else on its module) belongs to the profile its start age falls in (4 → explorer);
+//            it shows from that profile upwards (higher profiles add, never take away) and wears that profile's bike badge
 // After editing: `node tools/check.js --fix` (regenerates abc/manifest.js).
 CONFIG({
   languages: ['en', 'ro', 'de'],

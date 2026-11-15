@@ -172,6 +172,25 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   }
   ok(await p.isVisible('.hsearch'), 'search pill on the hub');
   ok(await ev(() => !ABC.config.sections.some(s => /🔍|🔎/u.test(s.icon))), 'no tab uses a magnifier (it would look like search)');
+  // age badge on every tile: little left · explorer centre · scientist right (from module.ages + config order)
+  await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
+  const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
+    return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));
+  const where = { little: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
+  await ev(() => { profile = 'scientist'; section = 'disc'; render(); });
+  ok(badges.length && badges.every(b => where[b.p](b.x)), 'age badges placed by age: ' + badges.map(b => `${b.id}=${b.p}@${b.x.toFixed(2)}`).join(' '));
+  ok(badges.find(b => b.id === 'colors').p === 'little' && badges.find(b => b.id === 'families').p === 'little', 'colours, families = little');
+  await ev(() => { section = 'num'; render(); });
+  const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
+  ok(nb.digits === 'little' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
+  const over = [];
+  for (const pr of ['little', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
+    await ev(([pr, sec]) => { profile = pr; section = sec; atHub = true; render(); }, [pr, sec]);
+    over.push(...await ev(() => [...document.querySelectorAll('#hub .ht')].filter(t => { const r = t.getBoundingClientRect(), b = t.querySelector('.agebadge').getBoundingClientRect();
+      return t.scrollHeight > t.clientHeight + 1 || [...t.querySelectorAll('.hp,.hl,.badge')].some(e => { const q = e.getBoundingClientRect(); return q.top < b.bottom - 1 && q.right > b.left && q.left < b.right; }); }).map(t => t.dataset.id)));
+  }
+  ok(!over.length, 'hub tiles: nothing overflows or sits under the age badge' + (over.length ? ': ' + [...new Set(over)].join(' ') : ''));
+  await ev(() => { profile = 'little'; render(); });
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
