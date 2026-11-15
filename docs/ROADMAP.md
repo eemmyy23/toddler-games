@@ -7,45 +7,44 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
 2. **Few languages, done perfectly** — RO / EN / DE; a new language needs a native reviewer and a voice tested on the family's devices.
 3. **Everything is data, config or a module** — new content never edits `abc/core/`, `abc.html` or `sw.js`.
 4. **Every learn screen has exactly one game**, paired automatically.
-5. **Nothing unfinished in front of a toddler** — no "coming soon" in the Curious profile (2–4).
+5. **Nothing unfinished in front of a child** — a tile that is not complete in a language is not shown.
 
 ## Done
 - **v1.0** — modular architecture (languages, modules, views, games), stable ids, offline precache from a generated manifest, local voices only, age profiles.
 - **v1.1** — A–Z index with side letter bar, universal search in all languages, age badges, one layout column (320×480 → 1920×1080), tokens + one class per component, no code comments.
-- **After v1.1** — one question line for every game, "Câți pui sunt?" with gender agreement, Lexend font (full RO/DE), section derived from the screen.
-- Content today: numbers 1–10 (digits, counting), letters, letter groups (RO), reading with singular/plural, colours + rainbow; one "What is it?" card (rainbow).
+- **After v1.1** — one question line for every game, gender agreement, Lexend font (full RO/DE), section derived from the screen, links between modules (same concept, lesson ↔ game).
+- **Roadmap 2026-11 (all content, RO/EN/DE, each with its game, each audited by an independent reviewer):**
 
-## Next — content (in this order, for the child's age)
-Each is a module (`abc/modules/<id>/`) with a learn screen, its game, RO/EN/DE text and an age.
-
-| # | Module | Age | What the child sees and hears |
+| Module | Age | Learn | Game |
 |---|---|---|---|
-| 1 | Animal families | 2+ | Male · female · young per animal (țap · capră · ied), each tappable and spoken with its article; ‹ › to the next animal. Game: "Unde e iedul?" |
-| 2 | Weather | 2+ | Sun, rain, snow, clouds, wind, rainbow — tap to hear; each shows what to wear (cap, umbrella, gloves). Game: "Unde e ploaia?" |
-| 3 | Shapes | 2+ | Circle, square, triangle, star, heart… Game: find the shape. |
-| 4 | Body parts | 2+ | Tappable child figure: each part lights and is named. Needs a diagram view. |
-| 5 | Seasons | 3+ | Four seasons with their signs (flowers, sun, leaves, snow), spoken. Game: "Când ninge?" |
-| 6 | Categories | 3+ | Sorting game: put the animal / fruit / vehicle in its group. Needs a sort game. |
-| 7 | Opposites (physics) | 3+ | Big/small, heavy/light, floats/sinks, hot/cold. |
-| 8 | Sky | 3–4 | Sun, moon, stars, day and night. |
-| 9 | Clock | 3+ → 5+ | Level 1: full hours with the part of day (morning, noon, evening, night). Level 2: half past. Game: "Unde e ora 3?" between two clocks. |
-| 10 | Numbers 11–20, tens | 4–5+ | 11–20 as ten + ones (dots), tens as bundles of ten; ‹ › and ▶ like digits. |
-| 11 | Big numbers | 7+ | 100, 1 000, … "numbers never end" (∞). |
-| later | Solar system (5+), immune system (7+; "germs & handwashing" card at 3+), periodic table (9+) | | |
+| Animal families | 2+ | father · mother · young, tappable | "Unde e iedul?" |
+| Weather | 2+ | sun, rain, snow, cloud, wind, storm, rainbow + what to wear | "Unde e ploaia?" |
+| Shapes | 2+ | 6 drawn shapes + objects | "Unde e cercul?" |
+| My body | 2+ | 9 parts + what each does (cards; no drawn figure) | "Unde e nasul?" |
+| Seasons | 3+ | 4 seasons + signs | "Când ninge?" |
+| Groups | 3+ | 12 groups from the shared dictionary (`GROUP`) | sort: "Unde punem vaca?" |
+| Opposites | 3+ | 6 pairs | "Care e greu?" (only between the pair) |
+| The sky | 3+ | sun, moon, stars, Earth, day, night, rocket | "Unde e luna?" |
+| Germs and washing | 3+ | germs, soap, water, toothbrush | "Unde e săpunul?" |
+| The clock / Half past | 3+ / 5+ | drawn faces, the day's routine | "Unde e ora trei?" |
+| Numbers 11–20 / Tens | 4+ / 5+ | ten + ones, groups of ten | find the number |
+| Solar System | 5+ | the Sun + 8 drawn planets | "Unde e Marte?" |
+| Big numbers | 7+ | 100 … 1 000 000, ∞ | find the number |
+| Immune system | 7+ | germs, white blood cells, fever, vaccines, plasters | questions by function |
+| Chemical elements | 9+ | 1–20 + Fe, Cu, Ag, Au with one fact | "Găsește simbolul pentru oxigen!" |
 
-Across all modules:
-- [ ] Index: **A–Z / Categories** switch (words grouped as farm animals, wild animals, birds, insects, sea, fruit, vegetables, food …).
-- [ ] "What is it?" spoken cards for every key concept (≤ 3 short sentences, right for the age).
+- Index **A–Z / Groups** switch; 18 "What is it?" cards (sky, weather, seasons, bees, butterflies) plus the rainbow.
+- Platform: items from the shared dictionary (`CONTENT.set`), sort game, `members`/`among`/`sound`/`bubbleArt`, bubble text fits its length,
+  choices never look or sound the same, shell state behind `APP.set`, no "coming soon" (an incomplete tile is not shown).
 
-## Next — platform
-- [ ] Views: grid, diagram (body), sequence (clock / routine); games: sort, order, pairs, find-region.
-- [ ] Load modules lazily; precache per active profile.
-- [ ] Readiness level per language: hide a topic in a language until it is complete and reviewed.
-- [ ] Parent review tools: `tools/show.js <id>` (one concept in all languages), `tools/review.js <lang>` (review sheet, approval by hash).
-- [ ] Shell state (lang, profile, section) behind `APP` instead of script-scope variables the tests set directly.
+## Next
+- [ ] More "What is it?" cards (animals, food, body).
+- [ ] Parent review tools (`tools/show.js`, `tools/review.js`) — on hold, by request.
+- Not needed now (measured): lazy loading — the whole offline set is 103 files, 539 KB (JS 199 KB).
+- Not needed now: extra views/games (grid, sequence, pairs, order, find-region) — no module needs them yet; add with the module that does.
 
 ## Definition of done (every module)
-- Learn screen + its game; nothing "coming soon" visible in the Curious profile (2–4).
+- Learn screen + its game; nothing unfinished is shown.
 - Every spoken line works with the offline voice on the family's devices, in RO / EN / DE; grammar correct (articles, plurals, agreement).
 - `node tools/check.js`, `tools/fast.js` and `tools/smoke.js` pass.
 - Age declared; the tile appears from that profile upwards and wears its badge.
