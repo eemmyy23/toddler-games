@@ -60,7 +60,7 @@
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().say }), 120); },
     leave() { partsStop(); }, pause() { partsStop(); },
-    resize() { APP.fit($('learn')); },
+    resize() { APP.fitText($('glyph')); APP.fitText($('prev')); APP.fitText($('next')); APP.fit($('learn')); },
     onKey(k) {
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;

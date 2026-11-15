@@ -30,7 +30,7 @@ const APP = {
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
   icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
   exclaim: name => APP.t(APP.ui().exclaim, { name }),
-  fitText(el) { el.style.setProperty('--fit', 1); if (el.scrollWidth > el.clientWidth + 1) el.style.setProperty('--fit', (el.clientWidth / el.scrollWidth).toFixed(3)); },
+  fitText(el) { let k = 1; el.style.setProperty('--fit', k); for (let i = 0; i < 4 && el.scrollWidth > el.clientWidth + 1; i++) { k *= el.clientWidth / el.scrollWidth; el.style.setProperty('--fit', k.toFixed(3)); } },
   mt(key, vars) {
     const m = tileOf().module, get = code => key.split('.').reduce((o, k) => o && o[k], m.strings[code]);
     return I18N.t(get(lang) ?? get(CFG.baseLanguage), vars, ABC.langs[lang].bcp47);
@@ -373,6 +373,7 @@ addEventListener('contextmenu', e => e.preventDefault());
 
 loadIdx();
 render();
+if (document.fonts) document.fonts.ready.then(() => { if (!atHub && view().resize) view().resize(); });
 
 if ('serviceWorker' in navigator) {
   const reg = navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => null);
