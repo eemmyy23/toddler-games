@@ -26,4 +26,5 @@ Each game is a Progressive Web App. Open the link, then use your browser's "Inst
 
 All words live in one dictionary, `WORDS` in `abc.html`: one row per picture, `[emoji, en, ro, de]`.
 Syllables are split with `/`, forms follow `|` (EN `a|plural`, RO `un/o|definite|plural`, DE `der/die/das|plural`); a leading `!` keeps the word out of first-letter examples.
+Defective nouns: plural `-` = no plural (milk, lapte, Milch; use article `-` for mass nouns), article `pl` = no singular (glasses, ochelari, blugi). Read then shows "— no plural" / "— nu are singular" in the table.
 A word added there appears automatically under its letter in Learn, in the RO letter groups, in Read (if it has forms) and in the index.
