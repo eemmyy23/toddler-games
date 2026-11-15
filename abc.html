@@ -246,7 +246,8 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .srp b{font-size:var(--fs-xl)}
 .srt{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-1)}
 .srt b{font-size:var(--fs-l);line-height:1.1}
-.srt small{font-size:var(--fs-s);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srt small{display:flex;gap:var(--sp-3);font-size:var(--fs-s);color:var(--muted);overflow:hidden;white-space:nowrap}
+.srt small span{display:inline-flex;gap:var(--sp-1);min-width:0;overflow:hidden;text-overflow:ellipsis}
 .sr mark{background:none;color:var(--amber);font-weight:700}
 .srk{flex:0 0 auto;opacity:.85;padding:var(--sp-1)}
 .ico-s{--icon:22px}
