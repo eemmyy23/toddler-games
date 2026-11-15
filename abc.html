@@ -34,7 +34,7 @@ body{color:var(--text);font-family:var(--font);background:var(--bg0);
     radial-gradient(1.5px 1.5px at 22% 66%,rgba(255,240,200,.3),transparent 60%),
     radial-gradient(ellipse at 50% 0%,#1b2156 0%,transparent 60%),
     linear-gradient(180deg,var(--bg1),var(--bg0))}
-body[data-mode=count],body[data-mode=read]{--top:70px}
+body{--top:70px} /* one top row everywhere: flags · back · (index) · (stars) */
 button{font-family:var(--font)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
 
@@ -45,20 +45,15 @@ button{font-family:var(--font)}
 #flags{gap:6px}
 .flag{border:none;background:transparent;border-radius:999px;width:52px;height:44px;font-size:26px;line-height:1;cursor:pointer;touch-action:manipulation;opacity:.5;filter:saturate(.7);transition:opacity .15s,background .15s}
 .flag.on{opacity:1;filter:none;background:var(--amber-soft);box-shadow:inset 0 0 0 2px var(--amber)}
-#gridbtn{margin-left:auto;width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
-body[data-mode=play] #gridbtn,body[data-mode=count] #gridbtn{display:none}
-body[data-mode=play] #stars,body[data-mode=count] #stars{margin-left:auto}
+#gridbtn{width:54px;height:54px;border:none;border-radius:50%;background:var(--card);color:var(--amber);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#gridbtn,#barback{display:none}
+body:not([data-mode=play]) #stars{display:none}
+body.topic #barback{display:flex;margin-left:auto}
+body.idx #gridbtn{display:flex}
+#barback{height:54px;padding:0 14px;border:none;border-radius:999px;background:var(--card);color:var(--amber);font-size:22px;font-weight:600;align-items:center;gap:4px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
+#setgrp,.brk{display:none!important}
 #stars{background:var(--card);border-radius:999px;height:54px;padding:0 16px;display:flex;align-items:center;gap:6px;font-size:22px;font-weight:600;box-shadow:var(--shadow)}
 #setgrp{margin:0 auto}
-/* Learn = hub of topics; a topic shows a back chip + title instead of the set switcher */
-body[data-mode=learn] #setgrp{display:none}
-#lhead{display:none;margin:0 auto;align-items:center;gap:10px}
-body[data-mode=learn]:not([data-view=hub]) #lhead{display:flex}
-#hubback{border:none;height:50px;padding:0 16px;border-radius:999px;background:var(--card);color:var(--amber);font-size:22px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow)}
-#ltitle{font-size:22px;font-weight:600;background:var(--card);border-radius:999px;height:50px;line-height:50px;padding:0 20px;box-shadow:var(--shadow)}
-body[data-view=hub]{--top:70px}
-body[data-mode=learn][data-view=hub] .brk,body[data-mode=learn][data-view=hub] #gridbtn{display:none}
-body[data-mode=learn][data-view=hub] #stars{margin-left:auto}
 #hub{display:none;width:100%;max-width:640px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(92px,1fr);gap:12px;padding:4px 2px 8px}
 .ht{position:relative;border:none;border-radius:26px;background:var(--card);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);font-size:19px;font-weight:600;padding:8px;text-align:center;line-height:1.15}
 .ht .hp{font-size:48px;line-height:1}
@@ -78,7 +73,7 @@ body[data-mode=count] #setgrp,body[data-mode=read] #setgrp,body[data-mode=count]
 .tab.on .ti{filter:none;transform:scale(1.08)}
 
 #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--top) 12px calc(var(--bot) + 12px)}
-body[data-mode=learn]:not([data-view=hub]) #stage{padding-bottom:calc(var(--bot) + 100px)}
+body[data-mode=learn] #stage{padding-bottom:calc(var(--bot) + 100px)}
 body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 
 /* Learn */
@@ -196,7 +191,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
-@media (max-width:350px){.flag{width:40px;height:40px;font-size:22px}#gridbtn{width:46px;height:46px}#stars{height:46px;padding:0 10px;font-size:19px}#bar{gap:6px}}
+@media (max-width:350px){.flag{width:40px;height:40px;font-size:22px}#gridbtn{width:46px;height:46px}#stars{height:46px;padding:0 10px;font-size:19px}#bar{gap:6px}#barback{height:46px;padding:0 10px;font-size:19px}}
 </style>
 </head>
 <body>
@@ -206,10 +201,10 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
     <button class="flag" data-lang="ro" aria-label="Română">🇷🇴</button>
     <button class="flag" data-lang="de" aria-label="Deutsch">🇩🇪</button>
   </div>
+  <button id="barback" aria-label="Back"></button>
   <button id="gridbtn" aria-label="Index"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="3" width="8" height="8" rx="2.5"/><rect x="3" y="13" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/></svg></button>
   <div id="stars">⭐ 0</div>
   <div class="brk"></div>
-  <div id="lhead"><button id="hubback" aria-label="Back">‹ 📖</button><span id="ltitle"></span></div>
   <div class="group" id="setgrp">
     <button class="tbtn on" id="s-abc">ABC</button>
     <button class="tbtn" id="s-123">123</button>
@@ -248,10 +243,10 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 </div>
 <div id="index"><div id="ixhead"><button id="ixclose" aria-label="Close">✕</button></div><div id="ixgrid"></div></div>
 <nav id="tabs">
-  <button class="tab" id="m-learn"><span class="ti">📖</span><span class="tl"></span></button>
-  <button class="tab" id="m-count"><span class="ti">🧮</span><span class="tl"></span></button>
-  <button class="tab" id="m-read"><span class="ti">📚</span><span class="tl"></span></button>
-  <button class="tab" id="m-play"><span class="ti">🎯</span><span class="tl"></span></button>
+  <button class="tab" id="t-num"><span class="ti">🔢</span><span class="tl"></span></button>
+  <button class="tab" id="t-abc"><span class="ti">🔤</span><span class="tl"></span></button>
+  <button class="tab" id="t-disc"><span class="ti">🔎</span><span class="tl"></span></button>
+  <button class="tab" id="t-play"><span class="ti">🎯</span><span class="tl"></span></button>
 </nav>
 <canvas id="fx"></canvas>
 
@@ -260,7 +255,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.8.0-preview</div>
+<div id="ver">v0.8.1-preview</div>
 
 <script>
 // ====== DATA ======
@@ -268,8 +263,11 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 const LANGS = {
   en: {
     tts: 'en-US', html: 'en', langName: 'English', col: 1,
-    tabs: ['Learn', 'Count', 'Read', 'Play'],
-    hub: { abc: 'Letters', num: 'Numbers', grp: 'Letter groups', clock: 'The clock', seasons: 'Seasons', weather: 'Weather', families: 'Animal families', soon: 'soon' },
+    tabs: ['Numbers', 'Letters', 'Discover', 'Play'],
+    hub: { digits: 'Digits', count: 'Count', teens: '11 – 20', tens: 'Tens', big: 'Big numbers', clock: 'The clock',
+           letters: 'Alphabet', read: 'Read', groups: 'Letter groups', words: 'All words',
+           families: 'Animal families', seasons: 'Seasons', weather: 'Weather', cats: 'Categories',
+           pabc: 'Find the letter', pnum: 'Find the number', pgrp: 'Find the group', pclock: 'What time is it?', soon: 'soon' },
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     nums: ['one','two','three','four','five','six','seven','eight','nine','ten'],
     sayLetter: (c, w, like) => like ? `${c}, like in ${w}!` : `${c} is for ${w}!`,
@@ -288,8 +286,11 @@ const LANGS = {
   },
   ro: {
     tts: 'ro-RO', html: 'ro', langName: 'Română', col: 2,
-    tabs: ['Învață', 'Numără', 'Citește', 'Joacă'],
-    hub: { abc: 'Litere', num: 'Cifre', grp: 'Grupuri de litere', clock: 'Ceasul', seasons: 'Anotimpurile', weather: 'Vremea', families: 'Familiile animalelor', soon: 'în curând' },
+    tabs: ['Numere', 'Litere', 'Descoperă', 'Joacă'],
+    hub: { digits: 'Cifre', count: 'Numără', teens: '11 – 20', tens: 'Zeci', big: 'Numere mari', clock: 'Ceasul',
+           letters: 'Alfabetul', read: 'Citește', groups: 'Grupuri de litere', words: 'Toate cuvintele',
+           families: 'Familiile animalelor', seasons: 'Anotimpurile', weather: 'Vremea', cats: 'Categorii',
+           pabc: 'Găsește litera', pnum: 'Găsește cifra', pgrp: 'Găsește grupul', pclock: 'Unde e ora?', soon: 'în curând' },
     alphabet: 'AĂÂBCDEFGHIÎJKLMNOPQRSȘTȚUVWXYZ',
     nums: ['unu','doi','trei','patru','cinci','șase','șapte','opt','nouă','zece'],
     // Advanced: special letter groups (examples come from WORDS)
@@ -318,8 +319,11 @@ const LANGS = {
   },
   de: {
     tts: 'de-DE', html: 'de', langName: 'Deutsch', col: 3,
-    tabs: ['Lernen', 'Zählen', 'Lesen', 'Spielen'],
-    hub: { abc: 'Buchstaben', num: 'Zahlen', grp: 'Buchstabengruppen', clock: 'Die Uhr', seasons: 'Jahreszeiten', weather: 'Wetter', families: 'Tierfamilien', soon: 'bald' },
+    tabs: ['Zahlen', 'Buchstaben', 'Entdecken', 'Spielen'],
+    hub: { digits: 'Ziffern', count: 'Zählen', teens: '11 – 20', tens: 'Zehner', big: 'Große Zahlen', clock: 'Die Uhr',
+           letters: 'Alphabet', read: 'Lesen', groups: 'Buchstabengruppen', words: 'Alle Wörter',
+           families: 'Tierfamilien', seasons: 'Jahreszeiten', weather: 'Wetter', cats: 'Kategorien',
+           pabc: 'Finde den Buchstaben', pnum: 'Finde die Zahl', pgrp: 'Finde die Gruppe', pclock: 'Wie spät ist es?', soon: 'bald' },
     alphabet: 'AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ',
     nums: ['eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn'],
     sayLetter: (c, w) => `${c} wie ${w}!`,
@@ -558,7 +562,9 @@ function defaultLang() {
 }
 let lang = store.get('lang', defaultLang()); if (!LANGS[lang]) lang = 'en';
 let SETS = buildSets(lang);
-let learnView = store.get('lview', 'hub'); // 'hub' or a set: 'abc' | 'num' | 'grp'
+// Navigation: 4 sections (tabs); each opens a hub of tiles; a tile opens a screen (mode + set)
+let section = store.get('sec', 'num'), atHub = store.get('athub', true);
+let lastTile = store.get('ltile', {}); // section → last opened tile id
 let mode = store.get('mode', 'learn');   // 'learn' | 'play' | 'count' | 'read'
 if (!['learn', 'play', 'count', 'read'].includes(mode)) mode = 'learn';
 let setName = store.get('set', 'abc');   // 'abc' | 'num' | 'grp' (letter groups, RO only)
@@ -830,10 +836,9 @@ function updateStars() {
 // ====== MODE / SET SWITCHING ======
 let keepRound = false;
 function render() {
-  document.body.dataset.mode = mode;
-  ['learn', 'count', 'read', 'play'].forEach((m, i) => {
-    $('m-' + m).classList.toggle('on', mode === m);
-    $('m-' + m).querySelector('.tl').textContent = LANGS[lang].tabs[i];
+  SECTION_IDS.forEach((id, i) => {
+    $('t-' + id).classList.toggle('on', section === id);
+    $('t-' + id).querySelector('.tl').textContent = LANGS[lang].tabs[i];
   });
   $('s-abc').classList.toggle('on', setName === 'abc');
   $('s-123').classList.toggle('on', setName === 'num');
@@ -841,20 +846,18 @@ function render() {
   $('s-grp').style.display = SETS.grp ? '' : 'none';
   document.querySelectorAll('.flag').forEach(f => f.classList.toggle('on', f.dataset.lang === lang));
   document.documentElement.lang = LANGS[lang].html;
-  if (learnView !== 'hub' && !SETS[learnView]) learnView = 'abc';
-  const hub = mode === 'learn' && learnView === 'hub';
-  document.body.dataset.view = hub ? 'hub' : 'topic';
-  if (mode === 'learn' && !hub) {
-    if (setName !== learnView) { setName = learnView; loadIdx(); }
-    $('ltitle').textContent = LANGS[lang].hub[learnView];
-  }
+  const hub = atHub;
+  document.body.dataset.mode = hub ? 'hub' : mode;
+  document.body.classList.toggle('topic', !hub);
+  document.body.classList.toggle('idx', !hub && ((mode === 'learn' && setName === 'abc') || mode === 'read'));
+  $('barback').innerHTML = `‹ ${SECTIONS[section].icon}`;
   $('hub').style.display = hub ? 'grid' : 'none';
-  $('learn').style.display = mode === 'learn' && !hub ? 'flex' : 'none';
-  $('play').style.display = mode === 'play' ? 'flex' : 'none';
-  $('read').style.display = mode === 'read' ? 'flex' : 'none';
-  $('rnav').style.display = mode === 'read' ? 'flex' : 'none';
-  $('count').style.display = mode === 'count' ? 'block' : 'none';
-  $('stage').style.display = mode === 'count' ? 'none' : 'flex';
+  $('learn').style.display = !hub && mode === 'learn' ? 'flex' : 'none';
+  $('play').style.display = !hub && mode === 'play' ? 'flex' : 'none';
+  $('read').style.display = !hub && mode === 'read' ? 'flex' : 'none';
+  $('rnav').style.display = !hub && mode === 'read' ? 'flex' : 'none';
+  $('count').style.display = !hub && mode === 'count' ? 'block' : 'none';
+  $('stage').style.display = !hub && mode === 'count' ? 'none' : 'flex';
   $('prev').style.display = $('next').style.display = mode === 'learn' && !hub ? 'block' : 'none';
   stopCount(); readTok++; closeIndex();
   if (hub) renderHub();
@@ -1082,28 +1085,52 @@ function countAll() {
   countTimers.push(setTimeout(() => { sfx.fanfare(); confetti(W / 2, H / 2, 80, 12); }, 10 * 1000));
 }
 
-// ====== LEARN HUB ======
-// Big topic tiles. Letters / numbers / letter groups work now; the others are shown as "coming soon".
-const HUB = [['abc', '🔤'], ['num', '🔢'], ['grp', 'ce·ci'], ['clock', '⏰', 1], ['seasons', '🌷', 1], ['weather', '🌦️', 1], ['families', '🐐', 1]];
+// ====== SECTIONS & HUBS ======
+// Each tab is a subject; its hub shows big tiles. go = which screen a tile opens; soon = shown dimmed ("coming soon").
+const SECTION_IDS = ['num', 'abc', 'disc', 'play'];
+const SECTIONS = {
+  num:  { icon: '🔢', tiles: [['digits', '🔢', { mode: 'learn', set: 'num' }], ['count', '🧮', { mode: 'count' }],
+                               ['teens', '🔟'], ['tens', '💯'], ['big', '✨'], ['clock', '⏰']] },
+  abc:  { icon: '🔤', tiles: [['letters', '🔤', { mode: 'learn', set: 'abc' }], ['read', '📚', { mode: 'read' }],
+                               ['groups', 'ce·ci', { mode: 'learn', set: 'grp' }], ['words', '🗂️']] },
+  disc: { icon: '🔎', tiles: [['families', '🐐'], ['seasons', '🌷'], ['weather', '🌦️'], ['cats', '🧩']] },
+  play: { icon: '🎯', tiles: [['pabc', '🔤', { mode: 'play', set: 'abc' }], ['pnum', '🔢', { mode: 'play', set: 'num' }],
+                               ['pgrp', 'ce·ci', { mode: 'play', set: 'grp' }], ['pclock', '⏰']] }
+};
+if (!SECTIONS[section]) section = 'num';
+const tileUsable = t => t[2] && (!t[2].set || SETS[t[2].set]); // e.g. letter groups only exist in RO
+const tileFind = id => SECTIONS[section].tiles.find(t => t[0] === id);
 function renderHub() {
   const H = LANGS[lang].hub;
-  $('hub').innerHTML = HUB.filter(([id, , soon]) => soon || SETS[id]).map(([id, pic, soon]) =>
-    `<button class="ht${soon ? ' soon' : ''}" data-id="${id}">${soon ? `<span class="badge">${esc(H.soon)}</span>` : ''}` +
-    `<span class="hp"${id === 'grp' ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${pic}</span><span>${esc(H[id])}</span></button>`).join('');
+  $('hub').innerHTML = SECTIONS[section].tiles.filter(t => !t[2] || tileUsable(t)).map(([id, pic, go]) =>
+    `<button class="ht${go ? '' : ' soon'}" data-id="${id}">${go ? '' : `<span class="badge">${esc(H.soon)}</span>`}` +
+    `<span class="hp"${pic.length > 3 ? ' style="font-size:34px;font-weight:700;color:var(--amber)"' : ''}>${pic}</span><span>${esc(H[id])}</span></button>`).join('');
+}
+function openTile(id, quiet) {
+  const t = tileFind(id); if (!t || !tileUsable(t)) return false;
+  const go = t[2];
+  mode = go.mode; store.set('mode', mode);
+  if (go.set && go.set !== setName) { setName = go.set; store.set('set', setName); loadIdx(); target = null; }
+  atHub = false; store.set('athub', false);
+  lastTile[section] = id; store.set('ltile', lastTile);
+  streak = 0; if (!quiet) sfx.pop(); render();
+  return true;
 }
 $('hub').addEventListener('click', e => {
   const b = e.target.closest('.ht'); if (!b) return;
   firstTouch(); const id = b.dataset.id, H = LANGS[lang].hub;
-  if (b.classList.contains('soon')) { speak(`${H[id]}. ${H.soon}`); return; }
-  learnView = id; store.set('lview', id); setName = id; store.set('set', id); loadIdx();
-  sfx.pop(); render();
+  if (b.classList.contains('soon')) { speak(H[id] + (/[.!?]$/.test(H[id]) ? ' ' : '. ') + H.soon); return; }
+  openTile(id);
 });
-function goHub() { learnView = 'hub'; store.set('lview', 'hub'); sfx.pop(); render(); }
-function setMode(m) {
-  if (m === 'learn' && mode === 'learn' && learnView !== 'hub') { goHub(); return; } // tap Învață again → hub
-  mode = m; store.set('mode', m); streak = 0; sfx.pop(); render();
+function goHub() { atHub = true; store.set('athub', true); sfx.pop(); render(); speak(LANGS[lang].tabs[SECTION_IDS.indexOf(section)] + '!', 80); }
+function setSection(id) {
+  if (id === section) { if (!atHub) goHub(); return; } // tap the active tab → back to its hub
+  section = id; store.set('sec', id); atHub = true; store.set('athub', true);
+  sfx.pop(); render(); speak(LANGS[lang].tabs[SECTION_IDS.indexOf(id)] + '!', 80);
 }
-function setSet(s) { if (mode === 'learn') { learnView = s; store.set('lview', s); } setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
+// keep old name used by tests / keyboard
+function setMode(m) { mode = m; store.set('mode', m); atHub = false; streak = 0; sfx.pop(); render(); }
+function setSet(s) { setName = s; store.set('set', s); loadIdx(); target = null; streak = 0; sfx.pop(); render(); }
 function setLang(l) {
   if (l === lang) { sfx.pop(); render(); announceLang(); return; } // tap current flag → repeat
   const oldLearn = items()[idx], oldTarget = target, oldOpts = curOpts;
@@ -1134,7 +1161,7 @@ function setLang(l) {
 // Say the language name in that language, then the current item ("Română. a, de la albină!")
 function announceLang() {
   const name = LANGS[lang].langName;
-  if (mode === 'learn' && learnView === 'hub') speak(`${name}!`, 120);
+  if (atHub) speak(`${name}!`, 120);
   else if (mode === 'learn') speak(`${name}. ${items()[idx].say}`, 120);
   else if (mode === 'play' && target) speak(`${name}. ${askLine()}`, 250);
   else if (mode === 'read') speak(`${name}. ${readData().word}`, 120);
@@ -1156,11 +1183,8 @@ addEventListener('keydown', firstTouch, true);
 function tapBtn(id, fn) {
   $(id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); firstTouch(); fn(); });
 }
-tapBtn('m-learn', () => setMode('learn'));
-tapBtn('m-play', () => setMode('play'));
-tapBtn('m-count', () => setMode('count'));
-tapBtn('m-read', () => setMode('read'));
-tapBtn('hubback', () => goHub());
+SECTION_IDS.forEach(id => tapBtn('t-' + id, () => setSection(id)));
+tapBtn('barback', () => goHub());
 tapBtn('rprev', () => readStep(-1));
 tapBtn('rnext', () => readStep(1));
 tapBtn('rplay', () => playRead());
@@ -1181,7 +1205,7 @@ $('ask').addEventListener('pointerdown', e => { e.stopPropagation(); speak(askLi
 let sx = null;
 $('stage').addEventListener('pointerdown', e => { sx = e.clientX; });
 $('stage').addEventListener('pointerup', e => {
-  if (sx == null || (mode !== 'learn' && mode !== 'read') || (mode === 'learn' && learnView === 'hub')) return;
+  if (sx == null || atHub || (mode !== 'learn' && mode !== 'read')) return;
   const dx = e.clientX - sx; sx = null;
   if (Math.abs(dx) > 50) (mode === 'read' ? readStep : step)(dx < 0 ? 1 : -1);
 });
@@ -1207,6 +1231,12 @@ addEventListener('keydown', e => {
   if (!isLetter && !isDigit) {
     if (k === ' ' || k === 'enter') { e.preventDefault(); if (mode === 'learn') step(1); else speak(askLine()); }
     return;
+  }
+  if (atHub) { // on a hub: a typed letter/digit opens the matching screen of this section
+    if (section === 'abc' && isLetter) openTile('letters', true);
+    else if (section === 'num' && isDigit) openTile('digits', true);
+    else if (section === 'play') openTile(isLetter ? 'pabc' : 'pnum', true);
+    else return;
   }
   const want = isLetter ? 'abc' : 'num';
   if (!SETS[want].some(it => it.key === k)) return; // letter not in this language's alphabet
