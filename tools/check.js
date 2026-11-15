@@ -39,6 +39,8 @@ const ABC = ctx.ABC, Tiles = vm.runInContext('Tiles', ctx), langs = CFG.language
 for (const f of VIEW_FILES) ABC.views[path.basename(f, '.js')] = {};
 const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && typeof v === 'object' && !Array.isArray(v) && !('other' in v) ? keysOf(v, p + k + '.') : [p + k]);
 
+const markup = read('abc.html').split('<body')[1].split('<script')[0].replace(/<style[\s\S]*?<\/style>/g, '');
+for (const m of markup.matchAll(/>([^<]*[\p{L}\p{N}][^<]*)</gu)) err(`abc.html: hard-coded text "${m[1].trim()}" — text comes from strings/config`);
 console.log('config');
 if (!/^\d+\.\d+\.\d+$/.test(CFG.version || '')) err('config.version must be x.y.z');
 if (!langs.includes(base)) err(`config.baseLanguage "${base}" is not in config.languages`);
