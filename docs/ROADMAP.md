@@ -38,7 +38,7 @@ The one plan for the app. Architecture and rules: [ARCHITECTURE.md](../ARCHITECT
   choices never look or sound the same, shell state behind `APP.set`, no "coming soon" (an incomplete tile is not shown).
 
 ## Next
-- [ ] More "What is it?" cards (animals, food, body).
+- [x] More "What is it?" cards: planets, body, health, animals, food (61 in total).
 - [ ] Parent review tools (`tools/show.js`, `tools/review.js`) — on hold, by request.
 - Not needed now (measured): lazy loading — the whole offline set is 103 files, 539 KB (JS 199 KB).
 - Not needed now: extra views/games (grid, sequence, pairs, order, find-region) — no module needs them yet; add with the module that does.

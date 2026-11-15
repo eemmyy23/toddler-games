@@ -100,4 +100,221 @@ i('butterfly', { title: 'Der Schmetterling', lines: [
   ['🐛', 'Die Raupe wird zur Puppe und verwandelt sich darin.'],
   ['🦋', 'Aus der Puppe schlüpft ein Schmetterling!']
 ] });
+i('mercury', { title: 'Der Merkur', lines: [
+  ['☀️', 'Der Merkur ist der Planet, der der Sonne am nächsten ist.'],
+  ['🤏', 'Er ist der kleinste Planet.'],
+  ['📅', 'Er kreist in nur 88 Tagen einmal um die Sonne.'],
+  ['🌡️', 'Am Tag ist es sehr heiß und in der Nacht sehr kalt.']
+] });
+i('venus', { title: 'Die Venus', lines: [
+  ['🔥', 'Die Venus ist der heißeste Planet.'],
+  ['☁️', 'Ihre dicken Wolken halten die Wärme fest wie eine Decke.'],
+  ['🌍', 'Sie ist fast so groß wie die Erde.'],
+  ['✨', 'Abends oder morgens sehen wir sie am Himmel wie einen hellen Stern.']
+] });
+i('mars', { title: 'Der Mars', lines: [
+  ['🔴', 'Der Mars heißt der rote Planet.'],
+  ['🏜️', 'Der Staub auf dem Mars ist rot wie Rost.'],
+  ['🌙', 'Der Mars hat zwei kleine Monde.'],
+  ['🤖', 'Roboter von uns Menschen fahren auf dem Mars und machen Fotos.']
+] });
+i('jupiter', { title: 'Der Jupiter', lines: [
+  ['🪐', 'Der Jupiter ist der größte Planet.'],
+  ['💨', 'Er besteht aus Gas, deshalb kann man nirgends darauf stehen.'],
+  ['🌀', 'Der rote Fleck auf ihm ist ein Sturm, größer als die Erde.'],
+  ['🌙', 'Er hat ganz viele Monde.']
+] });
+i('saturn', { title: 'Der Saturn', lines: [
+  ['💍', 'Der Saturn hat schöne Ringe um sich herum.'],
+  ['🧊', 'Die Ringe bestehen aus Stücken von Eis und Gestein.'],
+  ['🪐', 'Er ist der zweitgrößte Planet.']
+] });
+i('uranus', { title: 'Der Uranus', lines: [
+  ['🔵', 'Der Uranus ist blaugrün.'],
+  ['🔄', 'Er rollt auf der Seite wie ein Ball.'],
+  ['🥶', 'Dort ist es sehr, sehr kalt.']
+] });
+i('neptune', { title: 'Der Neptun', lines: [
+  ['🔭', 'Der Neptun ist der Planet, der am weitesten von der Sonne entfernt ist.'],
+  ['🔵', 'Er ist blau.'],
+  ['🌬️', 'Er hat die stärksten Winde.'],
+  ['📅', 'Ein Jahr auf dem Neptun dauert 165 Jahre auf der Erde.']
+] });
+i('eye', { title: 'Das Auge', lines: [
+  ['👀', 'Mit den Augen sehen wir.'],
+  ['😉', 'Wenn wir blinzeln, schützen die Lider unsere Augen.'],
+  ['👁️', 'Die Wimpern halten Staub von den Augen fern.']
+] });
+i('ear', { title: 'Das Ohr', lines: [
+  ['👂', 'Mit den Ohren hören wir.'],
+  ['🎵', 'Wir hören Musik, Stimmen und Vögel.'],
+  ['🔊', 'Sehr lauter Lärm tut den Ohren weh.']
+] });
+i('nose', { title: 'Die Nase', lines: [
+  ['👃', 'Mit der Nase riechen wir.'],
+  ['🌸', 'Wir riechen Blumen und gutes Essen.'],
+  ['🌬️', 'Durch die Nase atmen wir.']
+] });
+i('mouth', { title: 'Der Mund', lines: [
+  ['👄', 'Mit dem Mund essen und sprechen wir.'],
+  ['😊', 'Mit dem Mund lächeln wir.'],
+  ['🦷', 'Im Mund sind unsere Zähne und die Zunge.']
+] });
+i('tooth', { title: 'Der Zahn', lines: [
+  ['🦷', 'Mit den Zähnen beißen und kauen wir.'],
+  ['👶', 'Kinder haben 20 Milchzähne.'],
+  ['🧒', 'Mit etwa 6 Jahren fangen sie an auszufallen, und neue Zähne wachsen nach.'],
+  ['🪥', 'Wir putzen morgens und abends die Zähne.']
+] });
+i('tongue', { title: 'Die Zunge', lines: [
+  ['👅', 'Mit der Zunge schmecken wir das Essen.'],
+  ['🍬', 'Wir schmecken süß, salzig, sauer, bitter und umami.'],
+  ['🗣️', 'Die Zunge hilft uns beim Sprechen.']
+] });
+i('hand', { title: 'Die Hand', lines: [
+  ['✋', 'Eine Hand hat fünf Finger.'],
+  ['👍', 'Der Daumen hilft uns, Dinge zu greifen.'],
+  ['🧼', 'Vor dem Essen waschen wir die Hände.']
+] });
+i('foot', { title: 'Der Fuß', lines: [
+  ['🦶', 'Mit den Füßen gehen, rennen und springen wir.'],
+  ['🦴', 'Jeder Fuß hat 26 Knochen.'],
+  ['👟', 'Wir tragen Schuhe, um unsere Füße zu schützen.']
+] });
+i('germ', { title: 'Die Keime', lines: [
+  ['🦠', 'Keime sind so klein, dass wir sie nicht sehen können.'],
+  ['🔬', 'Wir sehen sie nur mit einem Mikroskop.'],
+  ['🤧', 'Manche Keime machen uns krank.'],
+  ['💪', 'Viele andere winzige Mikroben sind gut und helfen unserem Bauch.']
+] });
+i('soap', { title: 'Die Seife', lines: [
+  ['🧼', 'Seife fängt Keime und Schmutz.'],
+  ['💧', 'Das Wasser spült sie weg.'],
+  ['🎶', 'Wir reiben die Hände mit Seife, solange wir zweimal „Zum Geburtstag viel Glück“ singen.']
+] });
+i('vaccine', { title: 'Die Impfung', lines: [
+  ['💉', 'Eine Impfung bringt dem Körper bei, gegen einen Keim zu kämpfen.'],
+  ['🛡️', 'So ist der Körper bereit, bevor er den Keim trifft.'],
+  ['🤏', 'Der kleine Pikser dauert nur einen Moment.']
+] });
+i('fever', { title: 'Das Fieber', lines: [
+  ['🤒', 'Wenn wir Fieber haben, wird unser Körper wärmer.'],
+  ['⚔️', 'Die Wärme hilft dem Körper, gegen Keime zu kämpfen.'],
+  ['🛌', 'Wir ruhen uns aus, trinken Wasser und sagen es einem Erwachsenen.']
+] });
+i('cow', { title: 'Die Kuh', lines: [
+  ['🥛', 'Die Kuh gibt uns Milch.'],
+  ['🌿', 'Die Kuh frisst den ganzen Tag Gras.'],
+  ['4️⃣', 'Ihr Magen hat vier Teile.']
+] });
+i('cat', { title: 'Die Katze', lines: [
+  ['😺', 'Wenn die Katze glücklich ist, schnurrt sie.'],
+  ['🌙', 'Katzen sehen auch im Dunkeln gut.'],
+  ['〰️', 'Mit den Schnurrhaaren spürt sie, wo sie durchpasst.']
+] });
+i('dog', { title: 'Der Hund', lines: [
+  ['👃', 'Ein Hund riecht viel besser als wir.'],
+  ['🐕', 'Wenn er sich freut, wedelt er mit dem Schwanz.'],
+  ['🦮', 'Manche Hunde helfen Menschen, die nicht sehen können.']
+] });
+i('bear', { title: 'Der Bär', lines: [
+  ['😴', 'Im Winter schläft der Bär viel in seiner Höhle.'],
+  ['🍯', 'Bären fressen Beeren, Fisch und Honig.'],
+  ['🐾', 'Ein Bär ist sehr stark.']
+] });
+i('elephant', { title: 'Der Elefant', lines: [
+  ['🐘', 'Der Elefant ist das größte Tier an Land.'],
+  ['💧', 'Mit dem Rüssel trinkt er und greift Dinge.'],
+  ['👂', 'Seine großen Ohren helfen ihm, sich abzukühlen.']
+] });
+i('giraffe', { title: 'Die Giraffe', lines: [
+  ['🦒', 'Die Giraffe ist das höchste Tier.'],
+  ['🌳', 'Mit ihrem langen Hals erreicht sie die Blätter an den Bäumen.'],
+  ['👅', 'Sie hat eine sehr lange Zunge.']
+] });
+i('penguin', { title: 'Der Pinguin', lines: [
+  ['🐧', 'Der Pinguin ist ein Vogel, der nicht fliegen kann.'],
+  ['🏊', 'Dafür schwimmt er sehr schnell.'],
+  ['🥚', 'Bei manchen Pinguinen hält der Papa das Ei warm.']
+] });
+i('dolphin', { title: 'Der Delfin', lines: [
+  ['🐬', 'Der Delfin lebt im Wasser, atmet aber Luft.'],
+  ['💨', 'Er atmet durch ein Loch oben auf dem Kopf.'],
+  ['🧠', 'Delfine sind sehr klug.']
+] });
+i('whale', { title: 'Der Wal', lines: [
+  ['🐳', 'Der Blauwal ist das größte Tier der Welt.'],
+  ['💨', 'Ein Wal atmet Luft und bläst Wasser aus dem Kopf wie ein Springbrunnen.'],
+  ['🎵', 'Wale singen, um miteinander zu sprechen.']
+] });
+i('octopus', { title: 'Der Krake', lines: [
+  ['🐙', 'Ein Krake hat acht Arme.'],
+  ['❤️', 'Er hat drei Herzen.'],
+  ['🖤', 'Wenn er sich erschreckt, spritzt er Tinte und schwimmt weg.']
+] });
+i('lion', { title: 'Der Löwe', lines: [
+  ['🦁', 'Löwen leben in Gruppen.'],
+  ['📢', 'Das Brüllen des Löwen hört man sehr weit.'],
+  ['🐾', 'Meistens jagen die Löwinnen.']
+] });
+i('owl', { title: 'Die Eule', lines: [
+  ['🦉', 'Die Eule jagt in der Nacht.'],
+  ['🔄', 'Sie kann ihren Kopf sehr weit drehen.'],
+  ['🤫', 'Sie fliegt ganz ohne Geräusch.']
+] });
+i('ant', { title: 'Die Ameise', lines: [
+  ['🐜', 'Eine Ameise kann Dinge tragen, die schwerer sind als sie.'],
+  ['🏠', 'Ameisen leben zusammen im Ameisenhaufen.'],
+  ['👑', 'Im Ameisenhaufen gibt es eine Königin, die Eier legt.']
+] });
+i('frog', { title: 'Der Frosch', lines: [
+  ['🥚', 'Ein Frosch ist zuerst eine Kaulquappe im Wasser.'],
+  ['🦵', 'Ein Frosch springt sehr weit.'],
+  ['👅', 'Er fängt Insekten mit seiner klebrigen Zunge.']
+] });
+i('turtle', { title: 'Die Schildkröte', lines: [
+  ['🐢', 'Der Panzer gehört zum Körper der Schildkröte.'],
+  ['🐌', 'An Land geht die Schildkröte langsam.'],
+  ['🎂', 'Manche Schildkröten werden über hundert Jahre alt.']
+] });
+i('apple', { title: 'Der Apfel', lines: [
+  ['🌳', 'Äpfel wachsen an Bäumen.'],
+  ['💧', 'Wir waschen den Apfel, bevor wir ihn essen.'],
+  ['🍎', 'Äpfel können rot, grün oder gelb sein.']
+] });
+i('banana', { title: 'Die Banane', lines: [
+  ['🌴', 'Bananen wachsen in warmen Ländern.'],
+  ['🍌', 'Sie wachsen in großen Büscheln.'],
+  ['💛', 'Eine Banane ist reif, wenn sie gelb ist.']
+] });
+i('milk', { title: 'Die Milch', lines: [
+  ['🐄', 'Milch kommt von Kühen, Ziegen oder Schafen.'],
+  ['🦴', 'Milch hilft uns, starke Knochen und Zähne zu haben.'],
+  ['🧀', 'Aus Milch macht man Käse, Joghurt und Butter.']
+] });
+i('honey', { title: 'Der Honig', lines: [
+  ['🐝', 'Bienen machen Honig.'],
+  ['🌸', 'Sie machen ihn aus dem Nektar der Blumen.'],
+  ['🍯', 'Honig ist süß und klebrig.']
+] });
+i('egg', { title: 'Das Ei', lines: [
+  ['🐔', 'Hühner legen Eier.'],
+  ['🐣', 'Aus manchen Eiern schlüpfen Küken.'],
+  ['🍳', 'Wir essen Eier gekocht oder gebraten.']
+] });
+i('bread', { title: 'Das Brot', lines: [
+  ['🌾', 'Brot macht man aus Weizenmehl.'],
+  ['🥣', 'Wir mischen das Mehl mit Wasser und Hefe.'],
+  ['🔥', 'Dann backen wir es im Ofen.']
+] });
+i('carrot', { title: 'Die Karotte', lines: [
+  ['🥕', 'Die Karotte wächst in der Erde.'],
+  ['🌱', 'Wir essen ihre orange Wurzel.'],
+  ['🐰', 'Kaninchen mögen Karotten.']
+] });
+i('watermelon', { title: 'Die Wassermelone', lines: [
+  ['🍉', 'Die Wassermelone ist voller Wasser.'],
+  ['☀️', 'Sie schmeckt im Sommer, wenn es heiß ist.'],
+  ['⚫', 'Sie hat schwarze Kerne.']
+] });
 }

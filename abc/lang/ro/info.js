@@ -100,4 +100,221 @@ i('butterfly', { title: 'Fluturele', lines: [
   ['🐛', 'Omida se face crisalidă și se schimbă pe dinăuntru.'],
   ['🦋', 'Din crisalidă iese un fluture!']
 ] });
+i('mercury', { title: 'Mercur', lines: [
+  ['☀️', 'Mercur este planeta cea mai apropiată de Soare.'],
+  ['🤏', 'Este cea mai mică planetă.'],
+  ['📅', 'Face un drum în jurul Soarelui în doar 88 de zile.'],
+  ['🌡️', 'Ziua e foarte cald, iar noaptea e foarte frig.']
+] });
+i('venus', { title: 'Venus', lines: [
+  ['🔥', 'Venus este cea mai fierbinte planetă.'],
+  ['☁️', 'Norii ei groși țin căldura ca o pătură.'],
+  ['🌍', 'Este aproape cât Pământul de mare.'],
+  ['✨', 'Seara sau dimineața o vedem pe cer ca pe o stea strălucitoare.']
+] });
+i('mars', { title: 'Marte', lines: [
+  ['🔴', 'Marte se numește planeta roșie.'],
+  ['🏜️', 'Praful de pe Marte e roșu, ca rugina.'],
+  ['🌙', 'Marte are două luni mici.'],
+  ['🤖', 'Roboți trimiși de oameni merg pe Marte și fac fotografii.']
+] });
+i('jupiter', { title: 'Jupiter', lines: [
+  ['🪐', 'Jupiter este cea mai mare planetă.'],
+  ['💨', 'Este făcut din gaz, așa că nu ai unde să pui piciorul.'],
+  ['🌀', 'Pata roșie de pe el e o furtună mai mare decât Pământul.'],
+  ['🌙', 'Are foarte multe luni.']
+] });
+i('saturn', { title: 'Saturn', lines: [
+  ['💍', 'Saturn are inele frumoase în jurul lui.'],
+  ['🧊', 'Inelele sunt făcute din bucăți de gheață și piatră.'],
+  ['🪐', 'Este a doua planetă ca mărime.']
+] });
+i('uranus', { title: 'Uranus', lines: [
+  ['🔵', 'Uranus are culoarea albastru-verzui.'],
+  ['🔄', 'Se rostogolește pe o parte, ca o minge.'],
+  ['🥶', 'Este foarte, foarte frig acolo.']
+] });
+i('neptune', { title: 'Neptun', lines: [
+  ['🔭', 'Neptun este planeta cea mai îndepărtată de Soare.'],
+  ['🔵', 'Este albastru.'],
+  ['🌬️', 'Are cele mai puternice vânturi.'],
+  ['📅', 'Un an pe Neptun durează 165 de ani pe Pământ.']
+] });
+i('eye', { title: 'Ochiul', lines: [
+  ['👀', 'Cu ochii vedem.'],
+  ['😉', 'Când clipim, pleoapele ne apără ochii.'],
+  ['👁️', 'Genele opresc praful să intre în ochi.']
+] });
+i('ear', { title: 'Urechea', lines: [
+  ['👂', 'Cu urechile auzim.'],
+  ['🎵', 'Auzim muzică, vorbe și păsări.'],
+  ['🔊', 'Zgomotul prea tare ne face rău la urechi.']
+] });
+i('nose', { title: 'Nasul', lines: [
+  ['👃', 'Cu nasul mirosim.'],
+  ['🌸', 'Mirosim florile și mâncarea bună.'],
+  ['🌬️', 'Prin nas respirăm.']
+] });
+i('mouth', { title: 'Gura', lines: [
+  ['👄', 'Cu gura mâncăm și vorbim.'],
+  ['😊', 'Cu gura zâmbim.'],
+  ['🦷', 'În gură avem dinții și limba.']
+] });
+i('tooth', { title: 'Dintele', lines: [
+  ['🦷', 'Cu dinții mușcăm și mestecăm mâncarea.'],
+  ['👶', 'Copiii au 20 de dinți de lapte.'],
+  ['🧒', 'Pe la 6 ani încep să cadă și cresc dinți noi.'],
+  ['🪥', 'Ne spălăm pe dinți dimineața și seara.']
+] });
+i('tongue', { title: 'Limba', lines: [
+  ['👅', 'Cu limba simțim gustul mâncării.'],
+  ['🍬', 'Simțim dulce, sărat, acru, amar și umami.'],
+  ['🗣️', 'Limba ne ajută să vorbim.']
+] });
+i('hand', { title: 'Mâna', lines: [
+  ['✋', 'O mână are cinci degete.'],
+  ['👍', 'Degetul mare ne ajută să apucăm lucrurile.'],
+  ['🧼', 'Ne spălăm pe mâini înainte de masă.']
+] });
+i('foot', { title: 'Piciorul', lines: [
+  ['🦶', 'Cu picioarele mergem, alergăm și sărim.'],
+  ['🦴', 'Laba fiecărui picior are 26 de oase.'],
+  ['👟', 'Purtăm pantofi ca să ne apărăm picioarele.']
+] });
+i('germ', { title: 'Microbul', lines: [
+  ['🦠', 'Microbii sunt atât de mici încât nu-i vedem.'],
+  ['🔬', 'Îi vedem doar cu microscopul.'],
+  ['🤧', 'Unii microbi ne îmbolnăvesc.'],
+  ['💪', 'Mulți microbi sunt buni și ne ajută burtica.']
+] });
+i('soap', { title: 'Săpunul', lines: [
+  ['🧼', 'Săpunul prinde microbii și murdăria.'],
+  ['💧', 'Apa îi spală și îi duce departe.'],
+  ['🎶', 'Frecăm mâinile cu săpun cât cântăm „La mulți ani” de două ori.']
+] });
+i('vaccine', { title: 'Vaccinul', lines: [
+  ['💉', 'Vaccinul învață corpul să lupte cu un microb.'],
+  ['🛡️', 'Așa corpul e pregătit înainte să întâlnească microbul.'],
+  ['🤏', 'Înțepătura durează doar o clipă.']
+] });
+i('fever', { title: 'Febra', lines: [
+  ['🤒', 'Când avem febră, corpul se încălzește.'],
+  ['⚔️', 'Căldura ajută corpul să lupte cu microbii.'],
+  ['🛌', 'Ne odihnim, bem apă și îi spunem unui adult.']
+] });
+i('cow', { title: 'Vaca', lines: [
+  ['🥛', 'Vaca ne dă lapte.'],
+  ['🌿', 'Vaca mănâncă iarbă toată ziua.'],
+  ['4️⃣', 'Stomacul ei are patru părți.']
+] });
+i('cat', { title: 'Pisica', lines: [
+  ['😺', 'Când e fericită, pisica toarce.'],
+  ['🌙', 'Pisica vede bine și pe întuneric.'],
+  ['〰️', 'Cu mustățile simte pe unde poate trece.']
+] });
+i('dog', { title: 'Câinele', lines: [
+  ['👃', 'Câinele miroase mult mai bine decât noi.'],
+  ['🐕', 'Când e bucuros, dă din coadă.'],
+  ['🦮', 'Unii câini ajută oamenii care nu văd.']
+] });
+i('bear', { title: 'Ursul', lines: [
+  ['😴', 'Iarna, ursul doarme mult în bârlog.'],
+  ['🍯', 'Ursul mănâncă fructe de pădure, pește și miere.'],
+  ['🐾', 'Ursul e foarte puternic.']
+] });
+i('elephant', { title: 'Elefantul', lines: [
+  ['🐘', 'Elefantul este cel mai mare animal de pe uscat.'],
+  ['💧', 'Cu trompa bea apă și apucă lucruri.'],
+  ['👂', 'Urechile mari îl ajută să se răcorească.']
+] });
+i('giraffe', { title: 'Girafa', lines: [
+  ['🦒', 'Girafa este cel mai înalt animal.'],
+  ['🌳', 'Cu gâtul lung ajunge la frunzele din copaci.'],
+  ['👅', 'Are o limbă foarte lungă.']
+] });
+i('penguin', { title: 'Pinguinul', lines: [
+  ['🐧', 'Pinguinul este o pasăre care nu zboară.'],
+  ['🏊', 'În schimb, înoată foarte repede.'],
+  ['🥚', 'La unii pinguini, tata ține oul la cald.']
+] });
+i('dolphin', { title: 'Delfinul', lines: [
+  ['🐬', 'Delfinul trăiește în apă, dar respiră aer.'],
+  ['💨', 'Respiră printr-o gaură din creștetul capului.'],
+  ['🧠', 'Delfinii sunt foarte deștepți.']
+] });
+i('whale', { title: 'Balena', lines: [
+  ['🐳', 'Balena albastră este cel mai mare animal din lume.'],
+  ['💨', 'Balena respiră aer și scoate apă pe cap, ca o fântână.'],
+  ['🎵', 'Balenele cântă ca să vorbească între ele.']
+] });
+i('octopus', { title: 'Caracatița', lines: [
+  ['🐙', 'Caracatița are opt brațe.'],
+  ['❤️', 'Are trei inimi.'],
+  ['🖤', 'Când se sperie, aruncă cerneală și fuge.']
+] });
+i('lion', { title: 'Leul', lines: [
+  ['🦁', 'Leii trăiesc în grupuri.'],
+  ['📢', 'Răgetul leului se aude de foarte departe.'],
+  ['🐾', 'De obicei, leoaicele vânează.']
+] });
+i('owl', { title: 'Bufnița', lines: [
+  ['🦉', 'Bufnița vânează noaptea.'],
+  ['🔄', 'Își poate întoarce capul foarte mult.'],
+  ['🤫', 'Zboară fără niciun zgomot.']
+] });
+i('ant', { title: 'Furnica', lines: [
+  ['🐜', 'Furnica poate căra lucruri mai grele decât ea.'],
+  ['🏠', 'Furnicile trăiesc împreună în furnicar.'],
+  ['👑', 'În furnicar e o regină care face ouă.']
+] });
+i('frog', { title: 'Broasca', lines: [
+  ['🥚', 'Broasca începe ca un mormoloc în apă.'],
+  ['🦵', 'Broasca sare foarte departe.'],
+  ['👅', 'Prinde insecte cu limba ei lipicioasă.']
+] });
+i('turtle', { title: 'Țestoasa', lines: [
+  ['🐢', 'Carapacea face parte din corpul țestoasei.'],
+  ['🐌', 'Pe uscat, țestoasa merge încet.'],
+  ['🎂', 'Unele țestoase trăiesc mai mult de o sută de ani.']
+] });
+i('apple', { title: 'Mărul', lines: [
+  ['🌳', 'Merele cresc în pomi.'],
+  ['💧', 'Spălăm mărul înainte să-l mâncăm.'],
+  ['🍎', 'Merele pot fi roșii, verzi sau galbene.']
+] });
+i('banana', { title: 'Banana', lines: [
+  ['🌴', 'Bananele cresc în țările calde.'],
+  ['🍌', 'Cresc în ciorchini mari.'],
+  ['💛', 'Banana e bună de mâncat când e galbenă.']
+] });
+i('milk', { title: 'Laptele', lines: [
+  ['🐄', 'Laptele vine de la vacă, de la capră sau de la oaie.'],
+  ['🦴', 'Laptele ne ajută să avem oase și dinți puternici.'],
+  ['🧀', 'Din lapte se fac brânza, iaurtul și untul.']
+] });
+i('honey', { title: 'Mierea', lines: [
+  ['🐝', 'Albinele fac mierea.'],
+  ['🌸', 'O fac din nectarul florilor.'],
+  ['🍯', 'Mierea e dulce și lipicioasă.']
+] });
+i('egg', { title: 'Oul', lines: [
+  ['🐔', 'Găina face ouă.'],
+  ['🐣', 'Din unele ouă ies pui.'],
+  ['🍳', 'Oul se mănâncă fiert sau ochi.']
+] });
+i('bread', { title: 'Pâinea', lines: [
+  ['🌾', 'Pâinea se face din făină de grâu.'],
+  ['🥣', 'Amestecăm făina cu apă și drojdie.'],
+  ['🔥', 'Apoi o coacem în cuptor.']
+] });
+i('carrot', { title: 'Morcovul', lines: [
+  ['🥕', 'Morcovul crește în pământ.'],
+  ['🌱', 'Mâncăm rădăcina lui portocalie.'],
+  ['🐰', 'Iepurilor le plac morcovii.']
+] });
+i('watermelon', { title: 'Pepenele', lines: [
+  ['🍉', 'Pepenele roșu e plin de apă.'],
+  ['☀️', 'Este bun vara, când e cald.'],
+  ['⚫', 'Are sâmburi negri.']
+] });
 }
