@@ -135,7 +135,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
 .rc{border:none;display:flex;align-items:center;gap:8px;background:var(--card);color:var(--text);border-radius:999px;height:52px;padding:0 16px 0 10px;font-size:20px;font-weight:600;cursor:pointer;touch-action:manipulation;box-shadow:var(--shadow);white-space:nowrap;transition:transform .15s,background .15s,box-shadow .15s}
 .rc .rce{font-size:26px;letter-spacing:-2px}
 .rc.lit{background:var(--card2);box-shadow:inset 0 0 0 2px var(--amber),var(--shadow);transform:translateY(-3px)}
-#rC{gap:10px}
+#rC{gap:8px 8px;flex-wrap:wrap;max-width:560px}
 #index{position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:rgba(9,12,31,.97);padding:max(12px,env(safe-area-inset-top)) 12px 12px}
 #index.open{display:flex}
 #ixhead{display:flex;justify-content:flex-end;padding-bottom:8px}
@@ -234,7 +234,7 @@ body[data-mode=read] #stage{padding-bottom:calc(var(--bot) + 96px)}
   <button id="install-btn">Install App</button>
   <button id="dismiss-btn">&times;</button>
 </div>
-<div id="ver">v0.6.1</div>
+<div id="ver">v0.6.2</div>
 
 <script>
 // ====== DATA ======
@@ -257,11 +257,11 @@ const LANGS = {
     },
     // Reading words, split into syllables (same pictures/order in every language)
     read: ['cow','house','moon','cat','dog','ba-na-na','ball','fish','sun','flow-er','ap-ple','bear','sheep','duck','car','egg','bun-ny','goat'],
-    // Article + counting (one / two), same order as `read`
-    count: [['a cow','two cows'],['a house','two houses'],['a moon','two moons'],['a cat','two cats'],['a dog','two dogs'],
-      ['a banana','two bananas'],['a ball','two balls'],['a fish','two fish'],['a sun','two suns'],['a flower','two flowers'],
-      ['an apple','two apples'],['a bear','two bears'],['a sheep','two sheep'],['a duck','two ducks'],['a car','two cars'],
-      ['an egg','two eggs'],['a bunny','two bunnies'],['a goat','two goats']],
+    // Article + counting: [indefinite, definite, two], same order as `read`
+    count: [['a cow','the cow','two cows'],['a house','the house','two houses'],['a moon','the moon','two moons'],['a cat','the cat','two cats'],['a dog','the dog','two dogs'],
+      ['a banana','the banana','two bananas'],['a ball','the ball','two balls'],['a fish','the fish','two fish'],['a sun','the sun','two suns'],['a flower','the flower','two flowers'],
+      ['an apple','the apple','two apples'],['a bear','the bear','two bears'],['a sheep','the sheep','two sheep'],['a duck','the duck','two ducks'],['a car','the car','two cars'],
+      ['an egg','the egg','two eggs'],['a bunny','the bunny','two bunnies'],['a goat','the goat','two goats']],
     letters: [
       ['A','Apple','🍎'],['B','Ball','⚽'],['C','Cat','🐱'],['D','Dog','🐶'],['E','Elephant','🐘'],
       ['F','Fish','🐟'],['G','Grapes','🍇'],['H','House','🏠'],['I','Ice cream','🍦'],['J','Juice','🧃'],
@@ -295,10 +295,10 @@ const LANGS = {
       Z: [['zmeu','🪁'],['zar','🎲']]
     },
     read: ['va-că','ca-să','lu-nă','pi-si-că','câi-ne','ba-na-nă','min-ge','peș-te','soa-re','floa-re','măr','urs','oa-ie','ra-ță','ma-și-nă','ou','ie-pu-re','ca-pră'],
-    count: [['o vacă','două vaci'],['o casă','două case'],['o lună','două luni'],['o pisică','două pisici'],['un câine','doi câini'],
-      ['o banană','două banane'],['o minge','două mingi'],['un pește','doi pești'],['un soare','doi sori'],['o floare','două flori'],
-      ['un măr','două mere'],['un urs','doi urși'],['o oaie','două oi'],['o rață','două rațe'],['o mașină','două mașini'],
-      ['un ou','două ouă'],['un iepure','doi iepuri'],['o capră','două capre']],
+    count: [['o vacă','vaca','două vaci'],['o casă','casa','două case'],['o lună','luna','două luni'],['o pisică','pisica','două pisici'],['un câine','câinele','doi câini'],
+      ['o banană','banana','două banane'],['o minge','mingea','două mingi'],['un pește','peștele','doi pești'],['un soare','soarele','doi sori'],['o floare','floarea','două flori'],
+      ['un măr','mărul','două mere'],['un urs','ursul','doi urși'],['o oaie','oaia','două oi'],['o rață','rața','două rațe'],['o mașină','mașina','două mașini'],
+      ['un ou','oul','două ouă'],['un iepure','iepurele','doi iepuri'],['o capră','capra','două capre']],
     letters: [
       ['A','Albină','🐝'],['Ă','mașină','🚗',1],['Â','câine','🐕',1],['B','Banană','🍌'],['C','Cal','🐴'],
       ['D','Delfin','🐬'],['E','Elefant','🐘'],['F','Fluture','🦋'],['G','Gunoi','🗑️'],['H','Hipopotam','🦛'],
@@ -340,11 +340,11 @@ const LANGS = {
       V: [['Vulkan','🌋']], W: [['Wolke','☁️'],['Wurm','🪱']], Y: [['Yoga','🧘']], Z: [['Zug','🚂'],['Zitrone','🍋']]
     },
     read: ['Kuh','Haus','Mond','Kat-ze','Hund','Ba-na-ne','Ball','Fisch','Son-ne','Blu-me','Ap-fel','Bär','Schaf','En-te','Au-to','Ei','Ha-se','Zie-ge'],
-    // der / die / das shows the gender; then counting
-    count: [['die Kuh','zwei Kühe'],['das Haus','zwei Häuser'],['der Mond','zwei Monde'],['die Katze','zwei Katzen'],['der Hund','zwei Hunde'],
-      ['die Banane','zwei Bananen'],['der Ball','zwei Bälle'],['der Fisch','zwei Fische'],['die Sonne','zwei Sonnen'],['die Blume','zwei Blumen'],
-      ['der Apfel','zwei Äpfel'],['der Bär','zwei Bären'],['das Schaf','zwei Schafe'],['die Ente','zwei Enten'],['das Auto','zwei Autos'],
-      ['das Ei','zwei Eier'],['der Hase','zwei Hasen'],['die Ziege','zwei Ziegen']],
+    // ein/eine, der/die/das (shows the gender), then counting
+    count: [['eine Kuh','die Kuh','zwei Kühe'],['ein Haus','das Haus','zwei Häuser'],['ein Mond','der Mond','zwei Monde'],['eine Katze','die Katze','zwei Katzen'],['ein Hund','der Hund','zwei Hunde'],
+      ['eine Banane','die Banane','zwei Bananen'],['ein Ball','der Ball','zwei Bälle'],['ein Fisch','der Fisch','zwei Fische'],['eine Sonne','die Sonne','zwei Sonnen'],['eine Blume','die Blume','zwei Blumen'],
+      ['ein Apfel','der Apfel','zwei Äpfel'],['ein Bär','der Bär','zwei Bären'],['ein Schaf','das Schaf','zwei Schafe'],['eine Ente','die Ente','zwei Enten'],['ein Auto','das Auto','zwei Autos'],
+      ['ein Ei','das Ei','zwei Eier'],['ein Hase','der Hase','zwei Hasen'],['eine Ziege','die Ziege','zwei Ziegen']],
     letters: [
       ['A','Apfel','🍎'],['Ä','Ähre','🌾'],['B','Ball','⚽'],['C','Clown','🤡'],['D','Delfin','🐬'],
       ['E','Elefant','🐘'],['F','Fisch','🐟'],['G','Gurke','🥒'],['H','Haus','🏠'],['I','Igel','🦔'],
@@ -733,7 +733,7 @@ function renderRead(sayIt = true) {
     `<div class="rrow syl" id="rS">${syls}</div>` +
     `<div class="rrow" id="rW">${tile(shown, word, 'word')}</div>` +
     `<div class="rrow" id="rC">` + LANGS[lang].count[readIdx].map((ph, i) =>
-      `<button class="rc" data-say="${esc(ph)}"><span class="rce">${pic.repeat(i + 1)}</span><span>${esc(ph)}</span></button>`).join('') + `</div>`;
+      `<button class="rc" data-say="${esc(ph)}"><span class="rce">${pic.repeat(i === 2 ? 2 : 1)}</span><span>${esc(ph)}</span></button>`).join('') + `</div>`;
   const n = READ_PICS.length;
   $('rprev').innerHTML = `‹ <b>${READ_PICS[(readIdx - 1 + n) % n]}</b>`;
   $('rnext').innerHTML = `<b>${READ_PICS[(readIdx + 1) % n]}</b> ›`;
@@ -769,7 +769,7 @@ async function playRead() {
   const w = document.querySelector('#rW .rt'); lightTile(w);
   sfx.right(); await speak(word, 350);
   if (!alive()) return; await wait(300);
-  // article + counting: "un câine", "doi câini"
+  // articles + counting: "un câine", "câinele", "doi câini"
   for (const el of document.querySelectorAll('#rC .rc')) {
     if (!alive()) return; lightTile(el); await speak(el.dataset.say); await wait(250);
   }
