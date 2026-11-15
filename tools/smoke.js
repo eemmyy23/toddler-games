@@ -15,9 +15,11 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     speechSynthesis.speak = u => { __said.push(u.said); setTimeout(() => u.onend && u.onend(), 20); };
     speechSynthesis.cancel = () => {};
   });
-  await p.goto(URL); await p.waitForTimeout(500);
+  await p.goto(URL); await p.waitForFunction(() => typeof APP === 'object');
   const ev = (f, a) => p.evaluate(f, a);
   const said = () => ev(() => __said.slice());
+  const until = (f, arg) => p.waitForFunction(f, arg, { timeout: 15000 });
+  const spoken = (n = 1) => until(n => __said.length >= n, n);
   const clear = () => ev(() => { __said.length = 0; });
   const show = i => ev(i => { APP.idx = i; ABC.views[APP.screen()].show(false); }, i);
   const find = (pred) => ev(src => APP.items().findIndex(new Function('x', 'return ' + src)), pred);
@@ -33,9 +35,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     return p.$$eval('#hub > :not(.hsearch)', t => t.map(x => x.classList.contains('hh') ? '#' + x.textContent : (x.classList.contains('soon') ? '~' : '') + x.querySelector('.hl').textContent)); };
   ok((await hub('abc')).join('|') === 'Alfabetul|Citește|Grupuri de litere', 'Litere hub');
   let play = await hub('play');
-  ok(!play.some(x => x[0] === '~'), 'Little profile: no "coming soon" tiles');
+  ok(!play.some(x => x[0] === '~'), 'Curious profile: no "coming soon" tiles');
   ok(play.filter(x => x[0] !== '#').join('|') === 'Găsește cifra|Câte sunt?|Găsește litera|Găsește cuvântul|Găsește grupul|Găsește culoarea', 'Play hub: the 6 games');
-  for (const prof of ['little', 'explorer']) {
+  for (const prof of ['curious', 'explorer']) {
     const pair = await ev(pr => { profile = pr; const learn = [], games = [];
       for (const s of ABC.config.sections.filter(s => !s.play)) { section = s.id; learn.push(...hubTiles().map(x => x.t.id)); }
       section = 'play'; games.push(...hubTiles().filter(x => x.t).map(x => x.t.id)); return [learn.join(), games.join()]; }, prof);
@@ -44,20 +46,20 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => { profile = 'explorer'; });
   play = await hub('play');
   ok(play.some(x => x[0] === '~'), 'Explorer profile shows "coming soon" tiles');
-  await ev(() => { profile = 'little'; });
+  await ev(() => { profile = 'curious'; });
   console.log('age profiles (bikes in the bar)');
   await hub('num');
   const bar = await ev(() => { const R = e => e.getBoundingClientRect(), f = R($('flags')), a = R($('ages'));
     return { one: Math.abs(f.top - a.top) < 2, gap: a.left - f.right, right: innerWidth - a.right, n: document.querySelectorAll('.age').length }; });
   ok(bar.n === 3 && bar.one && bar.gap >= 0 && bar.right >= 0, `3 bikes on the same row as the flags (gap ${bar.gap | 0}px, right ${bar.right | 0}px)`);
-  for (const pr of ['scientist', 'explorer', 'little']) {
-    await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await p.waitForTimeout(150);
+  for (const pr of ['scientist', 'explorer', 'curious']) {
+    await clear(); await p.locator(`.age[data-p="${pr}"]`).dispatchEvent('pointerdown'); await spoken();
     const st = await ev(() => ({ p: profile, on: document.querySelector('.age.on').dataset.p, hub: [...document.querySelectorAll('#hub .ht:not(.soon)')].length }));
     ok(st.p === pr && st.on === pr && st.hub >= 2, `tap ${pr}: selected, ${st.hub} working tiles, said "${(await said()).pop()}"`);
   }
-  const counts = await ev(() => ['little', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
+  const counts = await ev(() => ['curious', 'explorer', 'scientist'].map(pr => { profile = pr; section = 'play'; return hubTiles().filter(x => x.t && x.ok).length; }));
   ok(counts[0] <= counts[1] && counts[1] <= counts[2] && counts[0] === 6, `higher profiles add, never remove working games (${counts.join(' ≤ ')})`);
-  await ev(() => { profile = 'little'; });
+  await ev(() => { profile = 'curious'; });
   await ev(() => openTile('letters', false, true));
   ok(!(await p.isVisible('#ages')), 'bikes hidden inside a lesson (bar holds back/index/stars)');
   await ev(() => setLang('en'));
@@ -67,9 +69,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
   ok((await p.$$eval('.ex .ew', e => e.map(x => x.textContent).join())) === 'albină,arici,ananas,avion', 'A examples');
-  await clear(); await p.keyboard.press('m'); await p.waitForTimeout(150);
+  await clear(); await p.keyboard.press('m'); await spoken();
   ok((await said()).pop() === 'mî, de la minge!', 'key m → mî, de la minge!');
-  await ev(() => setLang('de')); await p.waitForTimeout(150);
+  await ev(() => setLang('de'));
   ok((await p.innerText('#glyph')).replace(/\s/g, '') === 'Mm', 'language switch keeps letter M');
   await ev(() => openTile('letters', false, true)); await show(await find("x.id === 'ß'"));
   ok((await p.innerText('#glyph')).replace(/\s/g, '') === 'ß', 'German ß stays ß (not SS)');
@@ -77,7 +79,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('read');
   await ev(() => openTile('read', false, true)); await show(await find("x.w === 'câine'"));
-  await clear(); await p.locator('#rplay').dispatchEvent('pointerdown'); await p.waitForTimeout(6000);
+  await clear(); await p.locator('#rplay').dispatchEvent('pointerdown'); await spoken(13);
   ok(JSON.stringify(await said()) === JSON.stringify(['cî', 'â', 'i', 'nî', 'e', 'câine', 'câi', 'ne', 'câine', 'un câine', 'doi câini', 'câinele', 'câinii']), 'câine ▶ sequence: ' + (await said()).join(', '));
   await show(await find("x.w === 'urs'"));
   ok(!(await p.$('#rS')), 'one-syllable word has no syllable row');
@@ -89,10 +91,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   const names = [];
   for (let i = 0; i < 7; i++) {
     const pt = await p.$eval(`#glyph .part[data-part="${i}"]`, el => { const L = el.getTotalLength(), q = el.getPointAtLength(L * .3), m = el.getScreenCTM(); return { x: q.x * m.a + m.e, y: q.y * m.d + m.f }; });
-    await clear(); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(80); names.push((await said())[0]);
+    await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,oranj,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
-  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await p.waitForTimeout(200);
+  await p.locator('#linfo .infobtn').dispatchEvent('pointerdown'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('pointerdown');
 
@@ -105,7 +107,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   for (const l of ['ro', 'en', 'de']) {
     await ev(x => setLang(x), l);
     for (const [id, re] of ASK[l]) {
-      await clear(); await ev(i => openTile(i, true, true), id); await p.waitForTimeout(350);
+      await clear(); await ev(i => openTile(i, true, true), id); await spoken();
       const s = await said(), n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
       ok(re.test(last) && !/undefined|\{/.test(last) && n >= 2, `${l} game ${id}: "${last}" with ${n} bubbles`);
     }
@@ -134,12 +136,12 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(/^\d+ (de )?cuvinte$/.test(ix.c), `section count: "C · ${ix.c}"`);
   const azb = await p.$eval('#ixaz', e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, top: r.top, h: r.height }; });
   const n = await ev(() => document.querySelectorAll('#ixaz .az').length), k = await ev(() => [...document.querySelectorAll('#ixaz .az')].findIndex(a => a.dataset.u === 'V'));
-  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n); await p.waitForTimeout(150);
+  await p.mouse.click(azb.x, azb.top + azb.h * (k + 0.5) / n);
   const vis = await ev(() => { const h = $('ixh-V').getBoundingClientRect(), g = $('ixgrid').getBoundingClientRect(); return h.top >= g.top - 2 && h.top < g.top + 40; });
   ok(vis, 'tap V on the side bar jumps to the V section');
   ok(await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u === 'V'), 'side bar lights V after the jump');
   for (const u of ['M', 'C', 'T']) {
-    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await p.waitForTimeout(120);
+    await ev(u => { $('ixgrid').scrollTo({ top: $('ixh-' + u).offsetTop + 30 }); }, u); await until(u => document.querySelector('#ixaz .az.on')?.dataset.u === u, u).catch(() => {});
     const cur = await ev(() => document.querySelector('#ixaz .az.on')?.dataset.u);
     ok(cur === u, `scrolling into ${u} lights ${u} in the side bar (got ${cur})`);
   }
@@ -154,7 +156,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
   await ev(() => { document.querySelector('.sr').click(); });
   ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');
-  await ev(() => { openSearch(); }); await p.waitForTimeout(150); await p.keyboard.type('m');
+  await ev(() => { openSearch(); }); await until(() => document.activeElement === $('sq')); await p.keyboard.type('m');
   ok(await ev(() => !$('search').hidden && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
   await p.keyboard.press('Escape');
 
@@ -171,32 +173,32 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await ev(() => { profile = 'scientist'; section = 'disc'; atHub = true; render(); });
   const badges = await ev(() => [...document.querySelectorAll('#hub .ht')].map(t => { const b = t.querySelector('.agebadge'), r = t.getBoundingClientRect(), q = b.getBoundingClientRect();
     return { id: t.dataset.id, p: b.dataset.p, x: (q.left + q.width / 2 - r.left) / r.width }; }));
-  const where = { little: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
+  const where = { curious: x => x < 0.3, explorer: x => x > 0.4 && x < 0.6, scientist: x => x > 0.7 };
   await ev(() => { profile = 'scientist'; section = 'disc'; render(); });
   ok(badges.length && badges.every(b => where[b.p](b.x)), 'age badges placed by age: ' + badges.map(b => `${b.id}=${b.p}@${b.x.toFixed(2)}`).join(' '));
-  ok(badges.find(b => b.id === 'colors').p === 'little' && badges.find(b => b.id === 'families').p === 'little', 'colours, families = little');
+  ok(badges.find(b => b.id === 'colors').p === 'curious' && badges.find(b => b.id === 'families').p === 'curious', 'colours, families = curious');
   await ev(() => { section = 'num'; render(); });
   const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
-  ok(nb.digits === 'little' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
+  ok(nb.digits === 'curious' && nb.teens === 'explorer' && nb.clock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
   const over = [];
-  for (const pr of ['little', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
+  for (const pr of ['curious', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
     await ev(([pr, sec]) => { profile = pr; section = sec; atHub = true; render(); }, [pr, sec]);
     over.push(...await ev(() => [...document.querySelectorAll('#hub .ht')].filter(t => { const r = t.getBoundingClientRect(), b = t.querySelector('.agebadge').getBoundingClientRect();
       return t.scrollHeight > t.clientHeight + 1 || [...t.querySelectorAll('.hp,.hl,.badge')].some(e => { const q = e.getBoundingClientRect(); return q.top < b.bottom - 1 && q.right > b.left && q.left < b.right; }); }).map(t => t.dataset.id)));
   }
   ok(!over.length, 'hub tiles: nothing overflows or sits under the age badge' + (over.length ? ': ' + [...new Set(over)].join(' ') : ''));
-  await ev(() => { profile = 'little'; render(); });
+  await ev(() => { profile = 'curious'; render(); });
 
   console.log('count ▶: pressed state, progress, starts at 1, tap again stops');
   await ev(() => { openTile('count', false, true); $('count').scrollTop = 9999; });
-  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(1400);
+  await p.locator('#c-all').dispatchEvent('pointerdown'); await until(() => document.querySelector('.crow.on')?.dataset.n === '2');
   const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('c-all').classList.contains('playing'), p: +getComputedStyle($('c-all')).getPropertyValue('--p'), act: document.querySelector('.crow.on')?.dataset.n }));
   ok(cp.top < 5 && cp.cls && cp.p > 0 && cp.p < 1 && cp.act === '2', `playing: scrolled to top, pressed, progress ${cp.p}, row ${cp.act}`);
   const rows = [];
-  for (let k = 0; k < 8; k++) { await p.waitForTimeout(1000); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
+  for (let k = 3; k <= 10; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
     const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
   ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');
-  await p.locator('#c-all').dispatchEvent('pointerdown'); await p.waitForTimeout(100);
+  await p.locator('#c-all').dispatchEvent('pointerdown');
   ok(await ev(() => !$('c-all').classList.contains('playing') && !document.querySelector('.crow.on')), 'tap ▶ again stops');
 
   console.log('stars text (plural rules)');
@@ -223,7 +225,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const k = (await caches.keys()).find(k => k === 'toddler-' + self.MANIFEST.version); if (!k) return 'no cache';
     const c = await caches.open(k), miss = []; for (const f of self.MANIFEST.files) if (!(await c.match(f))) miss.push(f); return miss.join(' '); });
   ok(cached === '', 'all manifest files cached' + (cached ? ': ' + cached : ''));
-  await p.context().setOffline(true); await p.reload(); await p.waitForTimeout(800);
+  await p.context().setOffline(true); await p.reload(); await p.waitForFunction(() => typeof APP === 'object', null, { timeout: 10000 }).catch(() => {});
   ok(await ev(() => typeof APP === 'object' && document.querySelectorAll('.flag').length === 3), 'reload works offline');
   await p.context().setOffline(false);
 

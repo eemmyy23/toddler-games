@@ -9,7 +9,7 @@ STRINGS('en', {
     results: { one: '1 result', other: '{n} results' } },
   words: { one: '1 word', other: '{n} words' },
   install: 'Install ABC 123! on your device',
-  profile: { little: 'Little', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
+  profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
   aria: { back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
     objects: 'Objects', fingers: 'Fingers', countAll: 'Count all', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now' }
