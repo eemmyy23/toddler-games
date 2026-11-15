@@ -38,20 +38,24 @@ Everything is built on the preview branch and merged only after the parent appro
 - [ ] `tools/show.js <id>` (one concept in all languages), `tools/review.js <lang>` (parent's review sheet; approves by hash).
 
 ### Stage 4 — Content (in this order, for the child's age)
-| # | Module | Profile |
-|---|---|---|
-| 1 | Shapes | Little 2+ |
-| 2 | Body parts (tappable diagram) | Little 2+ |
-| 3 | Animal families (male · female · baby) | Little 2+ |
-| 4 | Weather | Little 2+ |
-| 5 | Seasons | Little 3+ |
-| 6 | Physics as opposites (big/small, heavy/light, floats/sinks, hot/cold) | Little 3+ |
-| 7 | Sky: sun, moon, stars, day and night | Little/Explorer 3–4 |
-| 8 | Day routine → clock | Little 3+ / Explorer 5+ |
-| 9 | Numbers 11–20, tens (placeholders `teens`, `tens`) | Explorer 4–5+ |
-| 10 | Big numbers (`big`) | Scientist 7+ |
-| 11 | Categories (sorting, `cats`) | Little 3+ |
-| later | Solar system (Explorer 5+), immune system (Scientist 7+; "germs & handwashing" card under Body at 3+), periodic table (Scientist 9+) | |
+| # | Module | Profile | Mockup |
+|---|---|---|---|
+| 1 | Shapes | Little 2+ | — |
+| 2 | Body parts (tappable diagram) | Little 2+ | — |
+| 3 | Animal families (male · female · baby: țap · capră · ied) | Little 2+ | [09-families](mockups/09-families.html) |
+| 4 | Weather | Little 2+ | [14-weather](mockups/14-weather.html) |
+| 5 | Seasons | Little 3+ | [13-seasons](mockups/13-seasons.html) |
+| 6 | Physics as opposites (big/small, heavy/light, floats/sinks, hot/cold) | Little 3+ | — |
+| 7 | Sky: sun, moon, stars, day and night | Little/Explorer 3–4 | — |
+| 8 | Day routine → clock: full hours → halves and quarters → "set the time" game | Little 3+ / Explorer 5+ | [10-clock](mockups/10-clock.html), [11-clock-l2](mockups/11-clock-l2.html), [12-clock-game](mockups/12-clock-game.html) |
+| 9 | Numbers 11–20, tens (placeholders `teens`, `tens`) | Explorer 4–5+ | [15-numbers-l2](mockups/15-numbers-l2.html), [16-numbers-l3](mockups/16-numbers-l3.html) |
+| 10 | Big numbers — "up to infinity" (`big`) | Scientist 7+ | [17-numbers-l4](mockups/17-numbers-l4.html) |
+| 11 | Categories (sorting game, `cats`) | Little 3+ | — |
+| later | Solar system (Explorer 5+), immune system (Scientist 7+; "germs & handwashing" card under Body at 3+), periodic table (Scientist 9+) | | |
+
+### Across all modules
+- [ ] Index: **A–Z / Categories** switch — words grouped by category (animals, food, vehicles …) — [07-words-categories](mockups/07-words-categories.html).
+- [ ] "What is it?" spoken cards for every key concept (today only the rainbow), RO / EN / DE.
 
 ## Definition of done (every module)
 - [ ] Learn screen + its game; nothing "coming soon" visible to the child.
