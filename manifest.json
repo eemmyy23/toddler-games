@@ -3,7 +3,7 @@
   "name": "Rocket!",
   "short_name": "Rocket",
   "start_url": "/toddler-games/rocket.html",
-  "scope": "/toddler-games/",
+  "scope": "/toddler-games/rocket",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#080822",

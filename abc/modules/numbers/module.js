@@ -7,11 +7,11 @@
     build(code) {
       const L = ABC.langs[code], s = this.strings[code];
       const numbers = L.numbers.map((w, i) => {
-        const n = i + 1, pic = ABC.conceptById[THINGS[i]].pic, thing = CONTENT.things(code, [THINGS[i]]).map(x => x.entry).find(e => e.pl);
-        return num(code, n, w, n, { key: n === 10 ? '0' : String(n), pics: Array(n).fill(pic), pic, pl: thing && thing.pl, g: thing && thing.g });
+        const n = i + 1, x = CONTENT.things(code, [THINGS[i]])[0], e = x && x.entry.pl ? x.entry : {}, pic = ABC.conceptById[THINGS[i]].pic;
+        return num(code, n, w, n, { key: n === 10 ? '0' : String(n), pics: Array(n).fill(pic), pic, pl: e.pl, g: e.g });
       });
       const teens = L.teens.map((w, i) => num(code, i + 11, w, i + 11, i < 9
-        ? { say: I18N.t(s.teenSay, { name: w, ones: L.numbers[i] }), pics: [TEN, ...Array(i + 1).fill(ONE)] }
+        ? { say: I18N.t(s.teenSay, { name: w, ones: L.numbers[i] }, L.bcp47), pics: [TEN, ...Array(i + 1).fill(ONE)] }
         : { say: s.tensSay[1], pics: [TEN, TEN] }));
       const tens = L.tens.map((w, i) => num(code, (i + 1) * 10, w, i + 1,
         { say: s.tensSay[i], pics: Array(i + 1).fill(TEN) }, { id: 't' + (i + 1) * 10 }));

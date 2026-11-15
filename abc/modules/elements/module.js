@@ -7,7 +7,7 @@
       const s = this.strings[code], loc = ABC.langs[code].bcp47;
       return { elements: ELEMENTS.filter(([, sym]) => s.names[sym] && s.facts[sym]).map(([z, sym], i) => CONTENT.glyph(code,
         { id: sym, text: sym, name: s.names[sym], color: CONTENT.palette(i), small: z, word: s.names[sym] },
-        { say: I18N.t(s.intro, { name: I18N.capFirst(s.names[sym], loc), sym, z, fact: s.facts[sym] }) })) };
+        { say: I18N.t(s.intro, { name: I18N.capFirst(s.names[sym], loc), sym, z, fact: s.facts[sym] }, loc) })) };
     },
     tiles: [
       { id: 'elements', icon: '⚗️', view: 'card', items: S => S.elements, index: true, search: true,

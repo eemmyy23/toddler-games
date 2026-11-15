@@ -48,6 +48,11 @@ for (const [what, v] of [['<title>', title], ['apple-mobile-web-app-title', appl
 if (theme !== bg0 || appMan.theme_color !== bg0 || appMan.background_color !== bg0) err(`theme colour: meta ${theme}, manifest ${appMan.theme_color}/${appMan.background_color}, --bg0 ${bg0} must match`);
 if ((html.match(/<html lang="([^"]*)"/) || [])[1] !== CFG.baseLanguage) err('abc.html <html lang> must be config.baseLanguage');
 const usedKeys = { aria: [...html.matchAll(/data-aria="(\w+)"/g)].map(m => m[1]), text: [...html.matchAll(/data-text="(\w+)"/g)].map(m => m[1]), icon: [...html.matchAll(/data-icon="(\w+)"/g)].map(m => m[1]) };
+const apps = ['abc.html', 'paint.html', 'rocket.html'].filter(exists).map(f => { const href = (read(f).match(/rel="manifest" href="([^"]+)"/) || [])[1]; return href && Object.assign({ page: f }, JSON.parse(read(href))); }).filter(Boolean);
+for (const a of apps) {
+  if (!a.id || !a.start_url || !a.scope || !a.start_url.startsWith(a.scope)) err(`${a.page}: manifest needs id, start_url and a scope that contains start_url`);
+  for (const b of apps) if (a !== b && (b.start_url.startsWith(a.scope) || a.id === b.id)) err(`${a.page} and ${b.page}: installed apps overlap (scope ${a.scope} contains ${b.start_url}) — each app needs its own scope`);
+}
 console.log('config');
 if (!/^\d+\.\d+\.\d+$/.test(CFG.version || '')) err('config.version must be x.y.z');
 if (!langs.includes(base)) err(`config.baseLanguage "${base}" is not in config.languages`);
@@ -149,10 +154,10 @@ for (const c of langs) {
       const gone = [...new Set(langs.flatMap(l => Tiles.items(t, l).flatMap(ids)))].filter(id => !mine.has(id));
       if (gone.length) err(`${c}: tile ${t.id} is incomplete — missing ${gone.join(', ')} (another language has them)`);
     }
-    for (const it of [...items, ...(t.game ? Tiles.gameItems(t, c) : [])]) if (!CONTENT.made(it)) { err(`module ${t.module.id}: tile ${t.id} item "${it.id}" is not built by CONTENT (thing/glyph/picture/group)`); break; }
+    for (const it of [...items, ...(t.game ? Tiles.gameItems(t, c) : [])].flatMap(it => [it, ...(it.members || [])])) if (!CONTENT.made(it)) err(`module ${t.module.id}/${c}: tile ${t.id} item "${it.id}" is not built by CONTENT (thing/word/glyph/picture/group)`);
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }
-    const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => t.game.ask ? t.game.ask(it, { lower }) : t.id)));
+    const asks = new Set(Tiles.gameItems(t, c).flatMap(it => [false, true].map(lower => Tiles.ask(t, it, { lower }))));
     const spoken = v => typeof v === 'string' || (!!v && typeof v.other === 'string');
     for (const k of asks) if (!spoken(k.split('.').reduce((o, x) => o && o[x], s.games || {}))) err(`module ${t.module.id}/${c}: games.${k} (spoken question) missing`);
   }

@@ -3,8 +3,8 @@
   function examples(L, words, piece, isGroup) {
     const low = x => x.toLocaleLowerCase(L.bcp47), p = low(piece);
     const groups = (L.groups || '').split(/\s+/).filter(Boolean), inGroup = w => groups.some(g => low(w).startsWith(g));
-    let ex = words.filter(x => (isGroup || !x.noLetter) && low(x.w).startsWith(p) && (isGroup || !inGroup(x.w))).map(x => [x.w, x.pic, false]);
-    if (!ex.length) ex = words.filter(x => low(x.w).includes(p)).map(x => [x.w, x.pic, true]);
+    let ex = words.filter(x => (isGroup || !x.noLetter) && low(x.w).startsWith(p) && (isGroup || !inGroup(x.w))).map(x => CONTENT.example(x));
+    if (!ex.length) ex = words.filter(x => low(x.w).includes(p)).map(x => CONTENT.example(x, true));
     return ex.slice(0, MAX_EX);
   }
   MODULE('letters', {
@@ -24,7 +24,7 @@
         return CONTENT.glyph(code, { id: 'grp-' + g, text: g, name: g, color: CONTENT.palette(i), cls: 'grp' },
           { say: L.sayGroup ? L.sayGroup(g, low(w)) : L.sayLetter(g, low(w), false), examples: ex, smallBubble: true });
       });
-      const read = words.map(x => CONTENT.thing(x, { syl: x.syl, w: x.w, forms: x.forms, entry: x.entry }));
+      const read = words.map(x => CONTENT.word(x));
       const wordGame = words.filter(x => /^[\p{L}\p{M}][\p{L}\p{M}\s'’-]*$/u.test(x.w))
         .map((x, i) => CONTENT.thing(x, { bubbleColor: CONTENT.palette(i) }));
       return { letters, groups, words: read, wordGame };

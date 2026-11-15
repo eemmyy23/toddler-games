@@ -16,15 +16,15 @@ function rainbowSVG() {
 MODULE('colors', {
   section: 'disc', ages: [2, 6],
   build(code) {
-    const s = this.strings[code], loc = ABC.langs[code].bcp47, words = new Map(CONTENT.words(code).map(x => [x.id, x]));
+    const s = this.strings[code], loc = ABC.langs[code].bcp47, words = CONTENT.byId(code);
     const colors = COLOR_DATA.filter(c => s.colors[c.id]).map(c => {
       const name = s.colors[c.id];
-      const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => [x.w, x.pic, false]), pics = examples.map(x => x[1]);
+      const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => CONTENT.example(x));
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
       if (c.bands && !parts) return null;
       return CONTENT.picture(code, { id: c.id, name, concept: c.concept || c.id, bubbleColor: c.hex,
         big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`, nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>` },
-        { say: parts ? I18N.t(ABC.langs[code].strings.listing, { name, list: I18N.list(s.rainbow, loc) }) : undefined, pics, examples, parts, noPlay: !!c.noPlay });
+        { say: parts ? CONTENT.listing(code, name, s.rainbow) : undefined, examples, parts, noPlay: !!c.noPlay });
     }).filter(Boolean);
     return { colors };
   },

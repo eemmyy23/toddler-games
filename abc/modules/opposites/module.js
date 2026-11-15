@@ -5,10 +5,10 @@
   MODULE('opposites', {
     section: 'disc', ages: [3, 7],
     build(code) {
-      const s = this.strings[code], loc = ABC.langs[code].bcp47, by = new Map(CONTENT.words(code).map(x => [x.id, x]));
+      const s = this.strings[code], loc = ABC.langs[code].bcp47, by = CONTENT.byId(code);
       const pairs = PAIRS.map(([a, ca, b, cb]) => [[a, by.get(ca)], [b, by.get(cb)]]).filter(p => p.every(([k, x]) => x && s.word[k] && s.say[k]));
       return {
-        pairs: pairs.map(p => { const label = I18N.t(s.pair, { a: s.word[p[0][0]], b: s.word[p[1][0]] });
+        pairs: pairs.map(p => { const label = I18N.t(s.pair, { a: s.word[p[0][0]], b: s.word[p[1][0]] }, loc);
           return CONTENT.group(code, { id: p[0][0], things: p.map(([, x]) => x), sizes: p.map(([k]) => SIZE[k]), label, word: label,
             name: I18N.list(p.map(([k]) => s.word[k]), loc), says: p.map(([k]) => s.say[k]) }); }),
         sides: pairs.flatMap(p => p.map(([k, x]) => CONTENT.thing(x, { say: s.say[k], side: k, among: p[0][0], learn: p[0][0] })))

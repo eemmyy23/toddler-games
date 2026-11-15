@@ -3,7 +3,7 @@
   "name": "Paint!",
   "short_name": "Paint",
   "start_url": "/toddler-games/paint.html",
-  "scope": "/toddler-games/",
+  "scope": "/toddler-games/paint",
   "display": "fullscreen",
   "orientation": "any",
   "background_color": "#000010",

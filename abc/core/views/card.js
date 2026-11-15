@@ -39,7 +39,7 @@
     show(sayIt) {
       partsStop();
       const it = APP.items()[APP.idx], g = $('glyph'), L = APP.L();
-      g.className = it.bigClass || ''; g.innerHTML = it.big ?? esc(it.label); g.style.color = it.color || '';
+      g.className = it.bigClass || ''; g.innerHTML = it.big; g.style.color = it.color || '';
       void g.offsetWidth; g.classList.add('pop');
       const ex = it.examples || [];
       $('pics').hidden = !!ex.length; $('word').hidden = !it.word;
@@ -63,7 +63,7 @@
       const i = APP.items().findIndex(it => it.key === k); if (i < 0) return false;
       APP.idx = i; sfx.pop(); this.show(true); confetti(W / 2, H / 2, 24, 7); return true;
     },
-    indexFace: it => `${it.nav ?? esc(it.label)}<small>${it.word ? esc(it.word) : it.examples && it.examples[0] ? it.examples[0][1] : esc(it.name)}</small>`
+    indexFace: it => `${it.nav}<small>${it.word ? esc(it.word) : it.examples && it.examples[0] ? it.examples[0][1] : esc(it.name)}</small>`
   };
   VIEW('card', VIEW_CARD);
 })();

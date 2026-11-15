@@ -43,7 +43,11 @@
     sfx.pop(); speak(el.dataset.say, 60);
   });
   async function play() {
+    if ($('act').classList.contains('on')) { tok++; APP.playing(false); lit(null); return; }
     APP.playing(true);
+    try { await reading(); } finally { APP.playing(false); }
+  }
+  async function reading() {
     const t = ++tok, alive = () => t === tok && APP.screen() === 'read', word = cur().w;
     for (const el of document.querySelectorAll('#rU .rt')) { if (!alive()) return; lit(el); await speak(el.dataset.say); await wait(150); }
     if (!alive()) return; await wait(300);
@@ -58,12 +62,11 @@
     if (!alive()) return;
     const r = w.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top, 40, 8);
     setTimeout(() => { if (alive()) lit(null); }, 800);
-    APP.playing(false);
   }
   const VIEW_READ = {
     el: 'read', arrows: true, swipe: true, navFace: x => `<b>${x.pic}</b>`,
     show(sayIt) { render(sayIt); },
-    step(d) { APP.step(d); tok++; sfx.pop(); render(true); },
+    step(d) { APP.step(d); tok++; APP.playing(false); sfx.pop(); render(true); },
     play, leave() { tok++; }, pause() { tok++; lit(null); }, resize() { tok++; render(false); },
     announce(name) { speak(APP.t(APP.ui().then, { a: name, b: cur().w }), 120); },
     onKey(k, e) { if (k === ' ' || k === 'enter') { e.preventDefault(); APP.firstTouch(); play(); return true; } return false; },

@@ -16,6 +16,7 @@ const Tiles = {
   },
   label: (t, code, i) => { const s = t.module.strings[code]; return s && s.tiles && s.tiles[t.id] ? s.tiles[t.id][i] : null; },
   items(t, code) { return t.items ? t.items(this.content(code)[t.module.id]) || [] : []; },
+  ask(t, it, round) { const a = t.game.ask; return typeof a === 'function' ? a(it, round || {}) : a || t.id; },
   gameItems(t, code) {
     if (!t.game) return [];
     return ((t.game.items || t.items)(this.content(code)[t.module.id]) || []).filter(it => !it.noPlay);

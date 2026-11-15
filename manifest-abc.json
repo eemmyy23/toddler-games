@@ -3,7 +3,7 @@
   "name": "ABC 123!",
   "short_name": "ABC 123",
   "start_url": "/toddler-games/abc.html",
-  "scope": "/toddler-games/",
+  "scope": "/toddler-games/abc",
   "display": "fullscreen",
   "orientation": "any",
   "background_color": "#090c1f",

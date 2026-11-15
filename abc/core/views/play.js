@@ -4,7 +4,7 @@
   const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
   const nChoices = () => APP.streak >= 8 ? 4 : APP.streak >= 3 ? 3 : 2;
-  const look = it => it.bubbleArt || (it.bubble ?? it.label) || it.bubbleColor;
+  const look = it => it.bubbleArt || it.bubble || it.bubbleColor;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
   const fits = (it, t, os) => (!t.among || it.among === t.among) && !os.some(o => o === it || (o.sound && o.sound === it.sound) || look(o) === look(it));
   function pickTarget() {
@@ -16,7 +16,7 @@
   const pickSubject = t => { const m = t.members || []; return m.length ? m[Math.random() * m.length | 0].id : null; };
   const subject = () => round.subject && target.members ? target.members.find(m => m.id === round.subject) || null : null;
   function askLine() {
-    const g = APP.tile().game, key = g.ask ? g.ask(target, round) : APP.tile().id, it = subject() || target;
+    const key = Tiles.ask(APP.tile(), target, round), it = subject() || target;
     return APP.mt('games.' + key, Object.assign({}, it, { the: it.the || it.name }));
   }
   function newRound() {
@@ -38,7 +38,7 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else { b.textContent = round.lower && it.lower ? it.lower : (it.bubble ?? it.label); b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
+      b.className = 'bub'; if (it.bubbleArt) b.innerHTML = it.bubbleArt; else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.animationDelay = (i * 0.4) + 's';
       onTap(b, () => choose(it, b));
@@ -70,7 +70,7 @@
       if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(5, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
-      speak(APP.t(U.wrong, { thats: APP.t(U.thats, { name: it.a || it.name, g: it.plural ? 'pl' : it.a ? it.g : null }), ask: askLine() }), 350);
+      speak(APP.t(U.wrong, { thats: APP.t(U.thats, it.thats), ask: askLine() }), 350);
     }
   }
   onTap('ask', () => { if (target) speak(askLine()); });
