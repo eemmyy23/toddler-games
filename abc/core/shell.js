@@ -96,6 +96,14 @@ const APP = {
       const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)));
       if (other) out.push(chip(x, other.id, false));
     }
+    for (const c of it.related || []) {
+      if (c === it.concept) continue;
+      for (const x of TILES) {
+        if (!usable(x, false)) continue;
+        const xs = itemsOf(x), y = xs.find(y => y.id === c) || xs.find(y => y.concept === c);
+        if (y) { out.push(`<button class="pill link" data-t="${x.id}" data-id="${esc(y.id)}" data-play="0">${CONTENT.pic(c)} ${esc(y.name)}</button>`); break; }
+      }
+    }
     const home = it.learn ?? it.id;
     if (play && usable(t, false) && itemsOf(t).some(y => y.id === home)) out.push(chip(t, home, false));
     if (!play && usable(t, true)) out.push(chip(t, it.id, true));

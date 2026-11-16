@@ -58,14 +58,14 @@
       const s = this.strings[code], T = speech(code, s), loc = ABC.langs[code].bcp47;
       const card = (v, what) => CONTENT.picture(code, { id: idOf(v), label: T.digital(v), name: T.name(v), big: still(v), nav: CONTENT.navText(T.digital(v), tint(v)), word: T.digital(v),
         bubbleArt: still(v), bubbleColor: tint(v), concept: conceptOf(v) },
-        { say: what ? I18N.t(s.say, { when: I18N.capFirst(T.name(v), loc), what }, loc) : T.say(v), backdrop: sky(v), pics: [band(PICS, v)[1]], concepts: related(v, []) });
+        { say: what ? I18N.t(s.say, { when: I18N.capFirst(T.name(v), loc), what }, loc) : T.say(v), backdrop: sky(v), pics: [band(PICS, v)[1]], concepts: related(v, []), related: ['clock', ...related(v, LINKS.extra)] });
       const dial = Object.freeze({ aria: { less: s.less, more: s.more }, face: FACE_SVG, cap: CAP, cycle: DAY, step: STEP, hands: HANDS.map(h => Object.freeze({ turn: h.turn, snap: h.snap, len: h.len, body: h.body + h.knob })),
         read: v => ({ text: T.digital(v), name: T.name(v), say: T.say(v), pic: band(PICS, v)[1], backdrop: sky(v) }) });
       return {
         hours: CLOCK.map(v => card(v, s.day['h' + v / HOUR])),
         halves: HALVES.map(v => card(v, null)),
         dial: DIAL.map(v => CONTENT.glyph(code, { id: idOf(v), text: T.digital(v), name: T.name(v), color: tint(v) },
-          { say: T.say(v), bubbleArt: still(v), at: v, dial, backdrop: sky(v), concept: 'clock', concepts: related(v, LINKS.extra) }))
+          { say: T.say(v), bubbleArt: still(v), at: v, dial, backdrop: sky(v), concept: 'clock', concepts: related(v, LINKS.extra), related: related(v, LINKS.extra) }))
       };
     },
     check(code, S, s, report) {

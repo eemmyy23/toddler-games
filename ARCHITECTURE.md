@@ -116,7 +116,7 @@ every other tile has every item in every language (checked).
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass`, `color`, `nav`,
 `key` (the keyboard key that picks it, and from a hub opens its tile), `word`, `pic`, `pics` (objects in the card, Count row and how-many question),
-`pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `alts` (the concept's other names: `[{ id, w }]`, built),
+`pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `related` (concepts to link to by picture and word, e.g. a clock → hourglass, sundial; each opens that word's page), `alts` (the concept's other names: `[{ id, w }]`, built),
 `parts [{ say, color? }]` (the card's parts explorer, below), `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 `backdrop` (a CSS background the card and dial views paint behind the whole screen via `APP.backdrop`, e.g. the sky at that hour; it must keep `--text` ≥ 4.5:1
 and `--muted` ≥ 3:1 — the hub and every other view clear it), `at` + `dial` (dial view: the item's value and the shared dial `{ face, cap, cycle, step, aria { less, more },
