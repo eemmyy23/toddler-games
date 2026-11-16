@@ -131,9 +131,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
 
   console.log('games (every language)');
   const ASK = {
-    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^(Unde e|Când e) .+\?$/], ['clock', /^Unde e ora .+\?$/], ['halves', /^Unde e .+ și jumătate\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /], ['planets', /^Unde e .+\?$/], ['clean', /^Unde e .+\?$/], ['immune', /^(Ce|Unde) .+\?$/], ['elements', /^Găsește simbolul pentru .+!$/]],
-    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['groups', /^Find \S+!$/], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^(Where is the .+|When is it \w+ outside)\?$/], ['clock', /^Where is .+ o'clock\?$/], ['halves', /^Where is half past .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /], ['planets', /^Where is .+\?$/], ['clean', /^Where is .+\?$/], ['immune', /^(What|Where) .+\?$/], ['elements', /^Find the symbol for .+!$/]],
-    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['groups', /^Finde \S+!$/], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^(Wo ist (der|die|das) .+|Wann ist es draußen \w+)\?$/], ['clock', /^Wo ist .+ Uhr\?$/], ['halves', /^Wo ist halb .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /], ['planets', /^Wo ist .+\?$/], ['clean', /^Wo ist .+\?$/], ['immune', /^(Was|Wo) .+\?$/], ['elements', /^Finde das Symbol für .+!$/]]
+    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) \S+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^(Unde e|Când e) .+\?$/], ['clock', /^Unde e ora .+\?$/], ['halves', /^Unde e .+ și jumătate .+\?$/], ['setclock', /^Care ceas arată .+\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /], ['planets', /^Unde e .+\?$/], ['clean', /^Unde e .+\?$/], ['immune', /^(Ce|Unde) .+\?$/], ['elements', /^Găsește simbolul pentru .+!$/]],
+    en: [['digits', /^Find the number /], ['count', /^How many \S+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['groups', /^Find \S+!$/], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^(Where is the .+|When is it \w+ outside)\?$/], ['clock', /^Where is .+ o'clock .+\?$/], ['halves', /^Where is half past .+\?$/], ['setclock', /^Which clock shows .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /], ['planets', /^Where is .+\?$/], ['clean', /^Where is .+\?$/], ['immune', /^(What|Where) .+\?$/], ['elements', /^Find the symbol for .+!$/]],
+    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele \S+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['groups', /^Finde \S+!$/], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^(Wo ist (der|die|das) .+|Wann ist es draußen \w+)\?$/], ['clock', /^Wo ist .+ Uhr \S+\?$/], ['halves', /^Wo ist halb .+\?$/], ['setclock', /^Welche Uhr zeigt .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /], ['planets', /^Wo ist .+\?$/], ['clean', /^Wo ist .+\?$/], ['immune', /^(Was|Wo) .+\?$/], ['elements', /^Finde das Symbol für .+!$/]]
   };
   await ev(() => { APP.set({ profile: 'scientist' }); });
   for (const l of ['ro', 'en', 'de']) {
@@ -200,6 +200,48 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     speechSynthesis.getVoices = real; SPEECH.pick(APP.L().bcp47, APP.L().voices); return { ro, fr }; });
   ok(voice.ro === 'B' && voice.fr[0] === null && voice.fr[1] === true, `speech uses only a voice of the current language (ro → ${voice.ro}, fr → none)`);
 
+  console.log('clock: hour cycle per language, setting the clock by hand, day/night backdrop');
+  await ev(() => { APP.set({ profile: 'scientist' }); });
+  const cyc = await ev(() => { const r = {}; for (const c of ABC.config.languages) { setLang(c); openTile('clock', false, true); APP.idx = APP.indexOf('15:00'); view().show(false); r[c] = $('word').textContent; } return r; });
+  ok(/^3:00\s?pm$/i.test(cyc.en) && cyc.ro === '15:00' && cyc.de === '15:00', `15:00 per language, hour cycle from the module strings (${JSON.stringify(cyc)})`);
+  const fb = await ev(() => { const s = ABC.modules.find(m => m.id === 'clock').strings.ro, hc = s.hourCycle, L = ABC.langs.ro, b0 = L.bcp47;
+    const at = loc => { delete s.hourCycle; L.bcp47 = loc; delete Tiles._content.ro; return Tiles.items(TILE.clock, 'ro').find(x => x.id === '15:00').word; };
+    const r = { us: at('en-US'), ro: at('ro-RO') }; s.hourCycle = hc; L.bcp47 = b0; delete Tiles._content.ro; return r; });
+  ok(/^3:00\s?PM$/i.test(fb.us) && fb.ro === '15:00', `without hourCycle data the locale decides via Intl (en-US ${fb.us}, ro-RO ${fb.ro})`);
+  const talk = await ev(() => { const r = {}; for (const c of ['en', 'ro', 'de']) { const d = Tiles.content(c).clock.dial[0].dial; r[c] = [210, 165, 750, 765].map(v => d.read(v).say); } return r; });
+  ok(/^Half past three at night/.test(talk.en[0]) && /^Trei fără un sfert/.test(talk.ro[1]) && /^Halb vier/.test(talk.de[0]) && /^Halb eins mittags/.test(talk.de[2]) && /^Unu fără un sfert/.test(talk.ro[3]),
+    `spoken times by rule: ${talk.en[0]} | ${talk.ro[1]} | ${talk.de[0]} | ${talk.de[2]} | ${talk.ro[3]}`);
+  const nights = await ev(() => { openTile('clock', false, true); const bg = id => { APP.idx = APP.indexOf(id); view().show(false); return $('backdrop').hidden ? '' : $('backdrop').style.background; };
+    const r = { day: bg('12:00'), night: bg('20:00') }; goHub(); r.hub = $('backdrop').hidden; return r; });
+  ok(nights.day && nights.night && nights.day !== nights.night && /radial/.test(nights.night) && !/radial/.test(nights.day) && nights.hub, 'card backdrop: day sky at 12:00, starry night at 20:00, none on the hub');
+  await ev(() => { setLang('en'); openTile('setclock', false, true); APP.idx = APP.indexOf('15:20'); view().show(false); });
+  const box = await p.$eval('#dface', e => { const r = e.getBoundingClientRect(); return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, R: r.width / 2 }; });
+  const pt = (deg, k) => [box.cx + box.R * k * Math.sin(deg * Math.PI / 180), box.cy - box.R * k * Math.cos(deg * Math.PI / 180)];
+  const drag = async (path, k) => { await p.mouse.move(...pt(path[0], k)); await p.mouse.down(); for (const d of path.slice(1)) await p.mouse.move(...pt(d, k), { steps: 4 }); await p.mouse.up(); };
+  const dialNow = () => ev(() => ({ t: $('dtime').textContent, v: ABC.views.dial.state().value, hour: parseFloat(document.querySelector('#dface .dhand').style.transform.slice(7)) % 360, bg: $('backdrop').style.background }));
+  const d0 = await dialNow();
+  await clear(); await drag([120, 160, 200, 240, 268], 0.72); await spoken();
+  const d1 = await dialNow(), s1 = (await said()).pop();
+  ok(d1.v === 945 && /3:45\s?pm$/i.test(d1.t) && Math.abs(d1.hour - 112.5) < 0.01 && s1 === 'Quarter to four in the afternoon!',
+    `dragging the minute hand 15:20 → ${d1.t} (snapped to 5), the hour hand follows (${d1.hour}°), said on release: "${s1}"`);
+  await clear(); await drag([112.5, 150, 190, 202.5], 0.35); await spoken();
+  const d2 = await dialNow(), s2 = (await said()).pop();
+  ok(d2.v === 1125 && /6:45\s?pm$/i.test(d2.t) && s2 === 'Quarter to seven in the evening!' && d2.bg !== d0.bg, `dragging the hour hand keeps the minutes (${d2.t}, "${s2}") and the background changes`);
+  await clear(); await p.mouse.click(...pt(0, 0.62)); await spoken();
+  const d3 = await dialNow();
+  await clear(); await p.locator('#dmore').dispatchEvent('click'); await spoken();
+  const d4 = await dialNow(), s4 = (await said()).pop();
+  ok(d3.v === 1425 && d4.v === 1430 && /night/.test(s4) && /radial/.test(d4.bg), `tap alternatives: tap the 12 → ${d3.t}, + → ${d4.t} ("${s4}"), starry night`);
+  const rays = await ev(() => { const d = APP.items()[0].dial, rgb = s => [...s.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)].map(m => m.slice(1).map(Number));
+    const lum = c => c.map(x => x / 255).map(x => x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4).reduce((a, x, i) => a + x * [0.2126, 0.7152, 0.0722][i], 0);
+    const con = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+    const e = document.createElement('span'); e.className = 'label'; document.body.appendChild(e); const muted = rgb(getComputedStyle(e).color)[0]; e.remove();
+    const text = rgb(getComputedStyle(document.body).color)[0]; let t = 99, m = 99;
+    for (let v = 0; v < d.cycle; v += d.step) { const [top, bot] = rgb(d.read(v).backdrop).slice(-2); t = Math.min(t, con(text, top), con(text, bot)); m = Math.min(m, con(muted, bot)); }
+    return { t: +t.toFixed(2), m: +m.toFixed(2) }; });
+  ok(rays.t >= 4.5 && rays.m >= 3, `backdrop contrast at every 5 minutes: text ≥ 4.5 (${rays.t}), muted text on the lower sky ≥ 3 (${rays.m})`);
+  await ev(() => { setLang('ro'); APP.set({ profile: 'curious' }); });
+
   console.log('index, A–Z bar, universal search');
   await ev(() => setLang('ro'));
   for (const id of ['digits', 'letters', 'read', 'colors']) {
@@ -257,7 +299,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(badges.find(b => b.id === 'colors').p === 'curious' && badges.find(b => b.id === 'families').p === 'curious', 'colours, families = curious');
   await ev(() => { APP.set({ section: 'num' }); render(); });
   const nb = await ev(() => Object.fromEntries([...document.querySelectorAll('#hub .ht')].map(t => [t.dataset.id, t.querySelector('.agebadge').dataset.p])));
-  ok(nb.digits === 'curious' && nb.teens === 'explorer' && nb.clock === 'curious' && nb.halves === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
+  ok(nb.digits === 'curious' && nb.teens === 'explorer' && nb.clock === 'curious' && nb.halves === 'explorer' && nb.setclock === 'explorer' && nb.big === 'scientist', 'numbers hub: ' + JSON.stringify(nb));
   const over = [];
   for (const pr of ['curious', 'explorer', 'scientist']) for (const sec of ['num', 'abc', 'disc', 'play']) {
     await ev(([pr, sec]) => { APP.set({ profile: pr }); APP.set({ section: sec }); APP.set({ hub: true }); render(); }, [pr, sec]);
