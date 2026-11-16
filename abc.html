@@ -27,7 +27,7 @@
   --sp-0:2px; --sp-1:4px; --sp-2:6px; --sp-3:10px; --sp-4:16px; --sp-5:20px; --sp-6:28px;
     --col:640px; --gut:max(12px, calc((100% - var(--col)) / 2));
   --bar-pad:max(10px, env(safe-area-inset-top));
-  --pill-h:54px; --pill-fs:22px; --link-h:40px; --sbox-min:min(100%, 220px); --az-fs:var(--fs-xs); --link-fs:var(--fs-xs); --link-gap:var(--sp-4); --seg-w:52px; --seg-h:44px; --seg-fs:26px;
+  --pill-h:54px; --pill-fs:22px; --link-h:40px; --cap-fs:.2em; --cap-w:4.5em; --part-min:72px; --sbox-min:min(100%, 220px); --az-fs:var(--fs-xs); --link-fs:var(--fs-xs); --link-gap:var(--sp-4); --seg-w:52px; --seg-h:44px; --seg-fs:26px;
   --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --tabbar-h:70px; --tab-h:62px; --tl-fs:var(--fs-xs); --bot:calc(var(--tabbar-h) + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --nav-w:112px; --nav-y:calc(var(--bot) + var(--nav-gap)); --low-h:calc(var(--nav-gap) * 2 + var(--nav-h)); --side:var(--gut); --hero-h:72px;
   --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-toast:11;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
@@ -135,8 +135,10 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .sw{--dot:var(--swatch);border-width:var(--sp-0);box-shadow:var(--shadow-inset),var(--shadow-lg)}
 .rbsvg{display:block;width:var(--rainbow);height:auto;overflow:visible}
 .rbb{fill:none;stroke-width:10.6}
-.pset{display:inline-flex;align-items:flex-end;gap:.08em;font-size:var(--pset);text-shadow:none}
-.pset .part{font-size:calc(var(--s,1) * 1em)}
+.pset{display:inline-flex;align-items:flex-end;gap:.2em;font-size:var(--pset);text-shadow:none}
+.pset .part{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:var(--sp-1);min-width:var(--part-min);min-height:var(--part-min)}
+.pset .pic{font-size:calc(var(--s,1) * 1em);line-height:1}
+.pset .caption{font-size:var(--cap-fs);font-weight:700;line-height:1.1;text-align:center;white-space:normal;max-width:var(--cap-w)}
 .ic{font-style:normal;margin-inline:.15em}
 .art{width:1em;height:1em;vertical-align:middle;overflow:visible;text-shadow:none}
 .part{cursor:pointer;transition:opacity .2s,filter .2s}

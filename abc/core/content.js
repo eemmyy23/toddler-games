@@ -55,12 +55,12 @@ const CONTENT = (() => {
       bubble: text, bubbleColor: color, prompt: text, promptWord: name }, extra),
     picture: (code, { id, label, name, big, nav, bubble, bubbleArt, bubbleColor, concept }, extra) => seal({ id, label: label ?? name, name, say: C.exclaim(code, name),
       big, nav, word: name, bubble: bubble ?? '', bubbleArt: bubbleArt || null, bubbleColor: bubbleColor || null, pictureBubble: !!(bubble || bubbleArt), prompt: name, the: name, concept: concept || null }, extra),
-    group(code, { id, things, lead, sizes, label, name, word, says, parts }, extra) {
-      const x0 = things[lead || 0];
+    group(code, { id, things, lead, sizes, label, name, word, says, parts, captions }, extra) {
+      const x0 = things[lead || 0], caps = captions || things.map(x => x.w);
       const faces = parts || things.map(x => pic(x.id));
       return seal({ id, label, name, say: says.join(' '), concept: x0.id, concepts: things.map(x => x.id), nav: x0.pic, word: word || '',
-        big: `<span class="pset">${faces.map((f, i) => `<span class="part" data-part="${i}" style="--s:${(sizes || [])[i] ?? 1}">${f}</span>`).join('')}</span>`,
-        parts: says.map((say, i) => ({ say, face: faces[i] })) }, extra);
+        big: `<span class="pset">${faces.map((f, i) => `<span class="part" data-part="${i}"><span class="pic" style="--s:${(sizes || [])[i] ?? 1}">${f}</span><span class="caption">${esc(caps[i])}</span></span>`).join('')}</span>`,
+        parts: says.map(say => ({ say })) }, extra);
     },
     sayThe: (code, x) => C.exclaim(code, I18N.capFirst(the(x) || x.w, ABC.langs[code].bcp47)),
     set(code, spec, s) {

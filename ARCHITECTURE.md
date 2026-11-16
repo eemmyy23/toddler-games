@@ -115,7 +115,7 @@ every other tile has every item in every language (checked).
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass`, `color`, `nav`,
 `key` (the keyboard key that picks it, and from a hub opens its tile), `word`, `pic`, `pics` (objects in the card, Count row and how-many question),
 `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `alts` (the concept's other names: `[{ id, w }]`, built),
-`parts [{ say, face?, color? }]` (the card's parts explorer, below), `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
+`parts [{ say, color? }]` (the card's parts explorer, below), `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 games: `bubble`, `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs),
 `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game; built by CONTENT too),
 `plural`, `a` + `g`, `thats` ({ name, g } for "That's …", built). Two choices in one round never share a `sound` or a look.
@@ -130,12 +130,11 @@ previous one; the shell calls `APP.stop()` on leave, language switch and backgro
 Other `APP` helpers: `L, ui, t, mt, icon, exclaim, items, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, links, addStar, fit, fitText`.
 
 **Parts explorer** (card view, any item with `parts`: rainbow bands, animal families, opposite pairs) — one engine feature driven by data.
-A part is `{ say }` plus optional `face` (HTML shown on its button; `CONTENT.group` fills it with the member's picture) and `color` (the button's fill: the
-rainbow's bands). Under the big picture the card draws one strip of contiguous part buttons (`#parts .pt`, ≥ `--tap` each, the strip bleeds into the gutter
-by `--bleed` so 7 bands fit at 320 px). Tap or drag a finger across the strip (`onScrub`): each part lights (`.on` on its button and on `#glyph .part[data-part]`,
-the others dim) and is spoken, held for `PAUSE.hold`. Tapping a part in the picture says that part; tapping the picture anywhere else steps to the next part
-(no dead taps — the whole picture is one big target); ▶ (shown only for items with parts) says the name and every part in order. Until the child uses a part,
-an idle hint (👆 `icons.drag` sliding across + a nudge wave, after 3 s, 3 times, static under reduced motion) shows the strip can be touched.
+A part is `{ say }` plus optional `color`. Every part is shown once: `CONTENT.group` draws each member's picture with its caption under it (`captions`,
+default the member's word) and each part is at least `--part-min`; tapping a part says it, tapping the picture anywhere else steps to the next part
+(no dead taps). Parts with a `color` (the rainbow's bands) also get a strip of contiguous swatches under the picture (`#parts .pt`, ≥ `--tap`, bleeding by
+`--bleed`): tap or drag a finger across it (`onScrub`), each part lights (`.on`, the others dim) and is spoken, held for `PAUSE.hold`; until it is used an idle
+hint (👆 `icons.drag`, after 3 s, 3 times, static under reduced motion) shows it can be touched. ▶ (items with parts) says the name and every part in order.
 A learn card too tall for the screen first takes the `#learn.tight` tokens, then scales (`APP.fit`).
 
 **GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):

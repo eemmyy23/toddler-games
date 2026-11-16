@@ -30,8 +30,8 @@
       g.className = it.bigClass || ''; g.innerHTML = it.big; g.style.color = it.color || '';
       void g.offsetWidth; g.classList.add('pop');
       const ex = it.examples || [];
-      const P = it.parts || [], hint = P.length > 0; at = -1;
-      $('parts').hidden = !P.length; $('parts').classList.remove('hint');
+      const P = it.parts || [], strip = P.length > 0 && P.every(x => x.color), hint = strip; at = -1;
+      $('parts').hidden = !strip; $('parts').classList.remove('hint');
       $('parts').innerHTML = P.map((x, i) => `<button class="card pt" data-part="${i}" aria-label="${esc(x.say)}" style="--i:${i}${x.color ? `;background:${x.color}` : ''}">${x.face || ''}</button>`).join('')
         + (hint ? `<span class="tip">${APP.icon('drag')}</span>` : '');
       if (hint) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }

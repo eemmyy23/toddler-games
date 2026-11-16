@@ -116,10 +116,11 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await said()).join() === 'curcubeu,' + BANDS, '▶ plays the name and every part: ' + (await said()).join());
   await until(() => !$('act').classList.contains('on'));
   for (const [t, n] of [['families', 3], ['opposites', 2]]) {
-    await ev(t => openTile(t, false, true), t); await show(0); pc = await cells();
+    await ev(t => openTile(t, false, true), t); await show(0); await ev(() => Promise.all($('glyph').getAnimations().map(a => a.finished))); pc = await p.$$eval('#glyph .part', els => els.map(e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }));
+    ok(await p.isHidden('#parts'), `${t}: no extra strip — the picture itself is tapped, each part captioned`);
     const sayN = await ev(() => APP.items()[APP.idx].parts.map(x => x.say));
     await clear(); await p.mouse.click(pc[n - 1].x, pc[n - 1].y); await spoken();
-    ok(pc.length === n && pc.every(c => c.w >= 44 && c.h >= 44) && (await said())[0] === sayN[n - 1], `${t}: ${n} part buttons ≥ 44px (${pc.map(c => (c.w | 0) + 'x' + (c.h | 0)).join(' ')}), the last says "${(await said())[0]}"`);
+    ok(pc.length === n && pc.every(c => c.w >= 44 && c.h >= 44) && (await said())[0] === sayN[n - 1], `${t}: ${n} captioned parts in the picture ≥ 44px (${pc.map(c => (c.w | 0) + 'x' + (c.h | 0)).join(' ')}), the last says "${(await said())[0]}"`);
   }
   await ev(() => openTile('colors', false, true)); await show(await find("x.id === 'red'"));
   ok(!(await p.isVisible('#act')) && !(await p.isVisible('#parts')), 'a plain colour has no ▶ and no part strip');
