@@ -60,6 +60,47 @@ i('day', { title: 'Day', lines: [
   ['☀️', 'The side facing the Sun has day.'],
   ['🌃', 'The other side has night.']
 ] });
+i('clock', { title: 'Clock', lines: [
+  ['⏰', 'A clock shows us the time.'],
+  ['🌍', 'A day has 24 hours.'],
+  ['🕛', 'The clock face shows only 12, so the short hand goes round twice a day.'],
+  ['🌅', 'The first time round is the night and the morning, the second is the afternoon and the evening.'],
+  ['🇬🇧', 'In English-speaking countries we say a.m. before noon and p.m. after noon.'],
+  ['🔢', 'In many other countries the hours go on counting after noon: 13, 14 … up to 24.'],
+  ['⏱️', 'The long hand shows the minutes.'],
+  ['🔁', 'When the long hand goes all the way round, one hour has passed: 60 minutes make 1 hour.']
+] });
+i('hourglass', { title: 'Hourglass', lines: [
+  ['⌛', 'An hourglass measures a short time with sand.'],
+  ['⏳', 'The sand falls slowly through a tiny hole in the middle.'],
+  ['🔄', 'When all the sand is at the bottom, the time is up. Turn it over to start again!'],
+  ['🪥', 'A small one helps you brush your teeth long enough.']
+] });
+i('sundial', { title: 'Sundial', lines: [
+  ['☀️', 'A sundial uses the Sun to show the time.'],
+  ['📍', 'A stick in the middle makes a shadow.'],
+  ['🌍', 'As the Earth turns, the Sun seems to cross the sky, and the shadow moves round to point at the hours.'],
+  ['☁️', 'It does not work at night or when it is cloudy.'],
+  ['🏛️', 'People used sundials thousands of years ago.']
+] });
+i('clock-tower', { title: 'Clock tower', lines: [
+  ['🏙️', 'A clock tower is a tall tower with a big clock at the top.'],
+  ['👀', 'It is high and big so that everyone in town can see the time.'],
+  ['🔔', 'Many clock towers have bells that ring the hours.'],
+  ['🇬🇧', 'In London, the great bell Big Ben rings in a famous clock tower.']
+] });
+i('noon', { title: 'Noon', lines: [
+  ['🕛', 'Noon is 12 o\'clock in the middle of the day.'],
+  ['☀️', 'Around noon the Sun is at its highest in the sky.'],
+  ['👤', 'Then shadows are at their shortest.'],
+  ['🍽️', 'Many people have lunch around noon.']
+] });
+i('midnight', { title: 'Midnight', lines: [
+  ['🕛', 'Midnight is 12 o\'clock in the middle of the night.'],
+  ['📅', 'At midnight a new day begins.'],
+  ['😴', 'By then most children are fast asleep.'],
+  ['🎆', 'On New Year\'s Eve people celebrate at midnight.']
+] });
 i('night', { title: 'Night', lines: [
   ['🌃', 'At night, our side of the Earth cannot see the Sun.'],
   ['🌙', 'Then we see the Moon and the stars.'],
