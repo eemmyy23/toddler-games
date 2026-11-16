@@ -90,6 +90,40 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     await clear(); await p.mouse.click(pt.x, pt.y); await spoken(); names.push((await said())[0]);
   }
   ok(names.join() === 'roșu,portocaliu,galben,verde,albastru,indigo,violet', 'each rainbow band says its colour: ' + names.join());
+  const BANDS = 'roșu,portocaliu,galben,verde,albastru,indigo,violet';
+  const cells = () => p.$$eval('#parts .pt', c => c.map(e => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }));
+  let pc = await cells();
+  ok(pc.length === 7 && pc.every(c => c.w >= 44 && c.h >= 44), `rainbow strip: 7 bands, each ≥ 44px (${pc.map(c => (c.w | 0) + 'x' + (c.h | 0)).join(' ')})`);
+  await show(await find("x.id === 'rainbow'"));
+  ok(await p.isVisible('#parts .tip') && await ev(() => $('parts').classList.contains('hint')), 'first view shows the idle hint (👆 + nudge)');
+  await clear(); await p.mouse.click(pc[2].x, pc[2].y); await spoken();
+  ok((await said())[0] === 'galben' && await ev(() => document.querySelector('#parts .pt[data-part="2"]').classList.contains('on') && document.querySelector('#glyph .part[data-part="2"]').classList.contains('on')), 'tap a strip band: says "galben", lights the band and the arc');
+  ok(!(await p.$('#parts .tip')), 'the hint goes away once a part is used');
+  await clear(); await p.mouse.move(pc[0].x, pc[0].y); await p.mouse.down();
+  for (const c of pc) await p.mouse.move(c.x, c.y, { steps: 4 });
+  await p.mouse.up(); await spoken(7);
+  ok((await said()).join() === BANDS, 'drag a finger across the strip: says every colour in order: ' + (await said()).join());
+  ok(await ev(() => APP.items()[APP.idx].id === 'rainbow'), 'dragging the strip does not swipe to the next card');
+  await clear(); await p.locator('#parts .pt[data-part="5"]').dispatchEvent('click'); await spoken();
+  ok((await said())[0] === 'indigo', 'keyboard (click without pointer) on a band says it');
+  await show(await find("x.id === 'rainbow'"));
+  const hollow = await p.$eval('#glyph svg', el => { const m = el.getScreenCTM(); return { x: 100 * m.a + m.e, y: 96 * m.d + m.f }; });
+  const steps = [];
+  for (let k = 0; k < 2; k++) { await clear(); await p.mouse.click(hollow.x, hollow.y); await spoken(); steps.push((await said())[0]); }
+  ok(steps.join() === 'roșu,portocaliu', 'tapping the picture off a band steps through the parts: ' + steps.join());
+  ok(await p.isVisible('#act'), '▶ shown on a card with parts');
+  await clear(); await p.locator('#act').dispatchEvent('click'); await spoken(8);
+  ok((await said()).join() === 'curcubeu,' + BANDS, '▶ plays the name and every part: ' + (await said()).join());
+  await until(() => !$('act').classList.contains('on'));
+  for (const [t, n] of [['families', 3], ['opposites', 2]]) {
+    await ev(t => openTile(t, false, true), t); await show(0); pc = await cells();
+    const sayN = await ev(() => APP.items()[APP.idx].parts.map(x => x.say));
+    await clear(); await p.mouse.click(pc[n - 1].x, pc[n - 1].y); await spoken();
+    ok(pc.length === n && pc.every(c => c.w >= 44 && c.h >= 44) && (await said())[0] === sayN[n - 1], `${t}: ${n} part buttons ≥ 44px (${pc.map(c => (c.w | 0) + 'x' + (c.h | 0)).join(' ')}), the last says "${(await said())[0]}"`);
+  }
+  await ev(() => openTile('colors', false, true)); await show(await find("x.id === 'red'"));
+  ok(!(await p.isVisible('#act')) && !(await p.isVisible('#parts')), 'a plain colour has no ▶ and no part strip');
+  await show(await find("x.id === 'rainbow'"));
   await p.locator('#links .infobtn').dispatchEvent('click'); await until(() => !$('info').hidden);
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('click');

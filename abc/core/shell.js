@@ -9,6 +9,7 @@ const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
 const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50, STEM = 4;
 let seqTok = 0;
+const canPlay = v => !!(v && v.play && (!v.playable || v.playable(APP.items()[APP.idx])));
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
   const d = document.createElement('div'); d.id = v.el; d.hidden = true;
@@ -79,7 +80,7 @@ const APP = {
       return `<button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}${t ? `<i class="link" role="link" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</i>` : ''}</button>`; }).join('');
   },
   shown() {
-    APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
+    APP.saveIdx(); const v = view(); $('act').hidden = !canPlay(v); if (!v || !v.arrows) return;
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
     $('prev').innerHTML = APP.icon('prev') + face(pv); $('next').innerHTML = face(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
   },
@@ -102,7 +103,7 @@ const APP = {
   fit(el, compact) {
     if (compact) el.classList.remove(compact);
     el.style.transform = ''; el.style.transformOrigin = '';
-    const kids = [...el.children]; if (!kids.length) return;
+    const kids = [...el.children].filter(k => k.getClientRects().length); if (!kids.length) return;
     const lim0 = $('bar').getBoundingClientRect().bottom + 4;
     const low = [...document.querySelectorAll('[data-low]')].filter(e => !e.hidden && e.getClientRects().length && e.getBoundingClientRect().top > innerHeight / 2);
     const lim1 = Math.min($('tabs').getBoundingClientRect().top, ...low.map(e => e.getBoundingClientRect().top)) - 4;
@@ -192,7 +193,7 @@ function render() {
   $('hub').hidden = sc !== 'hub';
   VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); });
   $('stage').hidden = !!(v && v.fullHeight);
-  $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !(v && v.play); APP.playing(false);
+  $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !canPlay(v); APP.playing(false);
   closeIndex(); closeInfo(); closeSearch();
   if (sc === 'hub') renderHub(); else v.show(started);
 }
@@ -283,20 +284,13 @@ let azRaf = 0;
 $('ixgrid').addEventListener('scroll', () => { if (!azRaf) azRaf = requestAnimationFrame(() => { azRaf = 0; syncAZ(); }); }, { passive: true });
 const closeIndex = () => { $('index').hidden = true; };
 onTapIn('ixgrid', '.ix', b => { closeIndex(); APP.idx = +b.dataset.i; sfx.pop(); view().show(true); });
-(function () {
-  let last = null;
-  const jump = y => {
-    const bar = $('ixaz'), all = [...bar.children]; if (!all.length) return;
-    const r = bar.getBoundingClientRect(), k = Math.max(0, Math.min(all.length - 1, Math.floor((y - r.top) / r.height * all.length)));
-    const el = all.slice(k).find(x => !x.classList.contains('dim')) || [...all].reverse().find(x => !x.classList.contains('dim'));
-    if (!el || el.dataset.u === last) return; last = el.dataset.u;
-    const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 });
-    syncAZ(); sfx.pop();
-  };
-  $('ixaz').addEventListener('pointerdown', e => { e.preventDefault(); last = null; try { $('ixaz').setPointerCapture(e.pointerId); } catch (x) {} jump(e.clientY); });
-  $('ixaz').addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') jump(e.clientY); });
-  $('ixaz').addEventListener('pointerup', () => { last = null; });
-})();
+onScrub('ixaz', '.az', a => {
+  const all = [...$('ixaz').children], k = all.indexOf(a);
+  const el = all.slice(k).find(x => !x.classList.contains('dim')) || [...all].reverse().find(x => !x.classList.contains('dim'));
+  if (!el || el.classList.contains('on')) return;
+  const h = document.getElementById('ixh-' + el.dataset.u); if (h) $('ixgrid').scrollTo({ top: h.offsetTop - 4 });
+  syncAZ(); sfx.pop();
+});
 
 const FOLDS = LANGS.map(c => ABC.langs[c].fold).filter(Boolean);
 const fold = s => FOLDS.reduce((x, f) => f(x), String(s || '').replace(/\//g, '').replace(/[-‐]/g, ' ').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase());
@@ -391,7 +385,7 @@ addEventListener('keydown', e => {
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
   if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
   if (e.repeat) return;
-  if ((k === ' ' || k === 'enter') && v) { e.preventDefault(); if (v.play) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
+  if ((k === ' ' || k === 'enter') && v) { e.preventDefault(); if (canPlay(v)) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
   const pick = (vw, k) => { const it = (vw.choices ? vw.choices() : APP.items()).find(x => x.key === k); if (it && vw.select) vw.select(it); return !!it; };
   if (v && pick(v, k)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;

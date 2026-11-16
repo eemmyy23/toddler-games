@@ -24,7 +24,8 @@ abc/core/i18n.js            esc; I18N: t (string, function, or object chosen by 
 abc/core/content.js         INK palette; CONTENT: builders thing/word/glyph/picture/group/set and helpers words, byId, things, pic, svg,
                             the, example, exclaim, listing, sayThe, palette, alphabet, navText, made
 abc/core/tiles.js           the one rule set "what a tile shows and when" — used by the app AND tools/check.js
-abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no palm taps), wait, shuffle, PAUSE/TALK timings,
+abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no palm taps), onScrub (tap or drag a finger across a row/column of
+                            targets: each target acts once as the finger enters it; keyboard clicks too; never swipes the stage), wait, shuffle, PAUSE/TALK timings,
                             store (localStorage or session, `abc2.` keys), sound (sfx, tone), speech (SPEECH, speak, sayNow, hush),
                             audio (ensureAudio, quietAudio), confetti, calm (reduced motion)
 abc/core/views/*.js         VIEW(): card, read, count, play (a view's id is its file name)
@@ -114,19 +115,28 @@ every other tile has every item in every language (checked).
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass`, `color`, `nav`,
 `key` (the keyboard key that picks it, and from a hub opens its tile), `word`, `pic`, `pics` (objects in the card, Count row and how-many question),
 `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `alts` (the concept's other names: `[{ id, w }]`, built),
-`parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
+`parts [{ say, face?, color? }]` (the card's parts explorer, below), `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 games: `bubble`, `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs),
 `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game; built by CONTENT too),
 `plural`, `a` + `g`, `thats` ({ name, g } for "That's …", built). Two choices in one round never share a `sound` or a look.
 
 **VIEW** — required `el, show(sayIt)`; optional `line()` (what the language announcement and Space say), `select(item)` (a key picked this item; `choices()` limits which),
 `step(d), leave(), pause(), resize(), reset(), beforeLang() → state, afterLang(state)`, flags `arrows` (the shell draws ‹ › with `navFace(item)`, default `item.nav`),
-`play()` (the shell shows ▶ and toggles it), `swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
+`play()` (the shell shows ▶ and toggles it; with `playable(item)` only for the items it accepts — Space follows the same rule), `swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
 A single line is `speak(text, PAUSE.x)`. Anything multi-step goes through `APP.sequence(scope, steps, { button, finale, at })` with
 `steps = [{ light?, say?, pop?, delay?, pause? (default 200 ms) }]`: it speaks, lights (`.on`), reveals and celebrates step by step; a new sequence cancels the
 previous one; the shell calls `APP.stop()` on leave, language switch and background, and views call it when they step. One-off feedback is
 `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
 Other `APP` helpers: `L, ui, t, mt, icon, exclaim, items, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, links, addStar, fit, fitText`.
+
+**Parts explorer** (card view, any item with `parts`: rainbow bands, animal families, opposite pairs) — one engine feature driven by data.
+A part is `{ say }` plus optional `face` (HTML shown on its button; `CONTENT.group` fills it with the member's picture) and `color` (the button's fill: the
+rainbow's bands). Under the big picture the card draws one strip of contiguous part buttons (`#parts .pt`, ≥ `--tap` each, the strip bleeds into the gutter
+by `--bleed` so 7 bands fit at 320 px). Tap or drag a finger across the strip (`onScrub`): each part lights (`.on` on its button and on `#glyph .part[data-part]`,
+the others dim) and is spoken, held for `PAUSE.hold`. Tapping a part in the picture says that part; tapping the picture anywhere else steps to the next part
+(no dead taps — the whole picture is one big target); ▶ (shown only for items with parts) says the name and every part in order. Until the child uses a part,
+an idle hint (👆 `icons.drag` sliding across + a nudge wave, after 3 s, 3 times, static under reduced motion) shows the strip can be touched.
+A learn card too tall for the screen first takes the `#learn.tight` tokens, then scales (`APP.fit`).
 
 **GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):
 `{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
