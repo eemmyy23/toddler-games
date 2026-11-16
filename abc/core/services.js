@@ -5,8 +5,23 @@ function onTapIn(root, sel, fn) {
   r.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest(sel)) e.preventDefault(); }, true);
   r.addEventListener('click', e => { const b = e.target.closest && e.target.closest(sel); if (!b) return; e.stopPropagation(); fn(b, e); }, true);
 }
+function onScrub(root, sel, fn) {
+  const r = typeof root === 'string' ? $(root) : root, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  let last = null;
+  const pick = e => {
+    const all = [...r.querySelectorAll(sel)].map(x => x.getBoundingClientRect()); if (!all.length) return;
+    const x = clamp(e.clientX, Math.min(...all.map(q => q.left)) + 1, Math.max(...all.map(q => q.right)) - 1);
+    const y = clamp(e.clientY, Math.min(...all.map(q => q.top)) + 1, Math.max(...all.map(q => q.bottom)) - 1);
+    const at = document.elementFromPoint(x, y), hit = at && at.closest(sel);
+    if (hit && r.contains(hit) && hit !== last) { last = hit; fn(hit, e); }
+  };
+  r.addEventListener('pointerdown', e => { e.preventDefault(); last = null; try { r.setPointerCapture(e.pointerId); } catch (x) {} pick(e); });
+  r.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') pick(e); });
+  r.addEventListener('pointerup', e => { last = null; e.stopPropagation(); });
+  r.addEventListener('click', e => { e.stopPropagation(); const b = !e.detail && e.target.closest && e.target.closest(sel); if (b) fn(b, e); });
+}
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700 }, TALK = { base: 2000, perChar: 160, silent: 400 };
+const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {

@@ -60,7 +60,7 @@ const CONTENT = (() => {
       const faces = parts || things.map(x => pic(x.id));
       return seal({ id, label, name, say: says.join(' '), concept: x0.id, concepts: things.map(x => x.id), nav: x0.pic, word: word || '',
         big: `<span class="pset">${faces.map((f, i) => `<span class="part" data-part="${i}" style="--s:${(sizes || [])[i] ?? 1}">${f}</span>`).join('')}</span>`,
-        parts: says.map(say => ({ say })), examples: things.map(x => example(x)) }, extra);
+        parts: says.map((say, i) => ({ say, face: faces[i] })), examples: things.map(x => example(x)) }, extra);
     },
     sayThe: (code, x) => C.exclaim(code, I18N.capFirst(the(x) || x.w, ABC.langs[code].bcp47)),
     set(code, spec, s) {

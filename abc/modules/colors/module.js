@@ -22,7 +22,7 @@ MODULE('colors', {
     const colors = COLOR_DATA.filter(c => s.colors[c.id]).map(c => {
       const name = s.colors[c.id];
       const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => CONTENT.example(x));
-      const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map(b => ({ say: b })) : null;
+      const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map((b, i) => ({ say: b, color: RAINBOW_HEX[i] })) : null;
       if (c.bands && !parts) return null;
       return CONTENT.picture(code, { id: c.id, name, concept: c.concept || c.id, bubbleColor: c.hex,
         big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`, nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>` },
