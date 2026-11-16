@@ -155,8 +155,10 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .nav b{font-size:calc(var(--fs-xxl) * var(--fit,1));font-weight:700}
 #prev,#next{position:fixed;bottom:var(--nav-y);z-index:var(--z-float)}
 #prev{left:var(--gut)} #next{right:var(--gut)}
-.alt{display:inline-flex;align-items:center;gap:var(--sp-1)}
-.also{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:var(--sp-2);max-width:100%}
+.syn .link{font-style:normal;margin-inline-start:var(--sp-1);padding-inline-start:var(--sp-2);border-inline-start:1px solid var(--line-strong)}
+.also{display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:.4em;max-width:100%;font-size:calc(var(--fs-m) * var(--fit,1))}
+.also .label{font-size:.8em;white-space:nowrap}
+.pill.syn{--pill-fs:1em;--pill-h:var(--tap);padding:0 .7em}
 .links{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2);width:100%;margin-top:var(--link-gap);padding-top:var(--link-gap);border-top:1px solid var(--line)}
 .pill.link{--pill-h:var(--link-h);--pill-fs:var(--link-fs);background:transparent;box-shadow:none;border:1px solid var(--line-strong);color:var(--muted)}
 .li{--icon:var(--fs-s)}

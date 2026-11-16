@@ -22,7 +22,7 @@
           ? `<button class="card rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
           : `<div class="rc none">${r === 0 ? esc(APP.t(U.noneLine, { none: U.none[c] })) : ''}</div>`).join('')).join('') + `</div>` : '') +
       `<div class="links"${APP.links(e) ? '' : ' hidden'}>${APP.links(e)}</div></div>`;
-    ['rU', 'rL', 'rS', 'rW', 'rC'].forEach(id => $(id) && APP.fitText($(id), '.rt, .rc'));
+    ['rU', 'rL', 'rS', 'rW', 'rC', 'rA'].forEach(id => $(id) && APP.fitText($(id), '.rt, .rc'));
     fit();
     APP.shown();
     if (sayIt) speak(word, PAUSE.line);

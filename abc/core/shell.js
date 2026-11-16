@@ -76,7 +76,7 @@ const APP = {
     if (!it.alts || !it.alts.length) return '';
     const home = id => TILES.find(t => usable(t, false) && itemsOf(t).some(y => y.id === id));
     return `<span class="label">${esc(APP.ui().also)}</span>` + it.alts.map(a => { const t = home(a.id);
-      return `<span class="alt"><button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}</button>${t ? `<button class="pill link" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</button>` : ''}</span>`; }).join('');
+      return `<button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}${t ? `<i class="link" role="link" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</i>` : ''}</button>`; }).join('');
   },
   shown() {
     APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
@@ -229,7 +229,7 @@ onTapIn(document, '.link[data-t]', b => {
   if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
 });
 onTapIn(document, '.infobtn', b => openInfo(b.dataset.c));
-onTapIn(document, '.syn', b => APP.sequence(b.parentNode, [{ light: b, say: b.dataset.say, pop: true }]));
+onTapIn(document, '.syn', (b, e) => { if (!e.target.closest('.link')) APP.sequence(b.parentNode, [{ light: b, say: b.dataset.say, pop: true }]); });
 onTapIn('infolist', '.inf', b => APP.sequence('infolist', [{ light: b, say: infoFor(infoId).lines[+b.dataset.i][1] }]));
 function playInfo() {
   const I = infoFor(infoId);

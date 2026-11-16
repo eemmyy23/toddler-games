@@ -151,6 +151,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(sfold.gruen >= 1 && sfold.ice >= 1 && sfold.ten === 1 && sfold.syn === 'read:boots~1', `search: DE ue = ü, hyphen = space, one row per number, synonyms (ghete → the gheată page) (${JSON.stringify(sfold)})`);
   const syns = await ev(() => { setLang('ro'); openTile('read', false, true); APP.idx = APP.indexOf('boots'); view().show(false); return [...document.querySelectorAll('#rA .syn')].map(b => b.dataset.say).join(); });
   ok(syns === 'gheată,bocanc', `synonyms shown under the word in Read (${syns})`);
+  const stay = await ev(() => { document.querySelector('#rA .syn').click(); return APP.items()[APP.idx].id; });
+  ok(stay === 'boots', `tapping a synonym's word says it and stays on the page (${stay})`);
   await p.locator('#rA .link').first().dispatchEvent('click');
   const synPage = await ev(() => ({ id: APP.items()[APP.idx].id, w: APP.items()[APP.idx].w, back: [...document.querySelectorAll('#rA .syn')].map(b => b.dataset.say).join() }));
   ok(synPage.id === 'boots~1' && synPage.w === 'gheată' && synPage.back === 'cizmă,bocanc', `🔗 opens the synonym's own Read page, which links back (${JSON.stringify(synPage)})`);
