@@ -53,8 +53,8 @@ const CONTENT = (() => {
     glyph: (code, { id, text, name, color, small, word, cls }, extra) => seal({ id, label: text, name, say: C.exclaim(code, name),
       big: small != null ? `${esc(text)}<small>${esc(small)}</small>` : esc(text), bigClass: cls || '', color, nav: C.navText(text, color), word: word || '',
       bubble: text, bubbleColor: color, prompt: text, promptWord: name }, extra),
-    picture: (code, { id, label, name, big, nav, bubble, bubbleArt, bubbleColor, concept }, extra) => seal({ id, label: label ?? name, name, say: C.exclaim(code, name),
-      big, nav, word: name, bubble: bubble ?? '', bubbleArt: bubbleArt || null, bubbleColor: bubbleColor || null, pictureBubble: !!(bubble || bubbleArt), prompt: name, the: name, concept: concept || null }, extra),
+    picture: (code, { id, label, name, big, nav, word, bubble, bubbleArt, bubbleColor, concept }, extra) => seal({ id, label: label ?? name, name, say: C.exclaim(code, name),
+      big, nav, word: word ?? name, bubble: bubble ?? '', bubbleArt: bubbleArt || null, bubbleColor: bubbleColor || null, pictureBubble: !!(bubble || bubbleArt), prompt: name, the: name, concept: concept || null }, extra),
     group(code, { id, things, lead, sizes, label, name, word, says, parts }, extra) {
       const x0 = things[lead || 0];
       const faces = parts || things.map(x => pic(x.id));

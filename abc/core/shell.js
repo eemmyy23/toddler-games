@@ -71,6 +71,7 @@ const APP = {
       return true;
     } finally { if (opts.button && t === seqTok) APP.playing(false); }
   },
+  backdrop(css) { const b = $('backdrop'); b.hidden = !css; b.style.background = css || ''; },
   playing(on) { $('act').classList.toggle('on', !!on); $('act').setAttribute('aria-pressed', !!on); },
   synonyms(it) {
     if (!it.alts || !it.alts.length) return '';
@@ -193,7 +194,7 @@ function render() {
   VIEWS.forEach(x => { $(x.el).hidden = !(v && v === x); });
   $('stage').hidden = !!(v && v.fullHeight);
   $('prev').hidden = $('next').hidden = !(v && v.arrows); $('act').hidden = !(v && v.play); APP.playing(false);
-  closeIndex(); closeInfo(); closeSearch();
+  closeIndex(); closeInfo(); closeSearch(); APP.backdrop(null);
   if (sc === 'hub') renderHub(); else v.show(started);
 }
 

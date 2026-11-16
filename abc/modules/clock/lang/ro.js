@@ -1,10 +1,15 @@
 MSTRINGS('clock', 'ro', {
-  tiles: { clock: ['Ceasul', 'Găsește ora'], halves: ['Și jumătate', 'Găsește ora și jumătate'] },
-  games: { where: 'Unde e {name}?' },
-  hours: ['ora unu', 'ora două', 'ora trei', 'ora patru', 'ora cinci', 'ora șase', 'ora șapte', 'ora opt', 'ora nouă', 'ora zece', 'ora unsprezece', 'ora douăsprezece'],
-  halves: ['unu și jumătate', 'două și jumătate', 'trei și jumătate', 'patru și jumătate', 'cinci și jumătate', 'șase și jumătate',
-           'șapte și jumătate', 'opt și jumătate', 'nouă și jumătate', 'zece și jumătate', 'unsprezece și jumătate', 'douăsprezece și jumătate'],
-  say: ['Ora unu. La prânz mâncăm.', 'Ora două. După-amiaza ne odihnim.', 'Ora trei. După-amiaza ne jucăm.', 'Ora patru. Mâncăm o gustare.',
-        'Ora cinci. Mergem în parc.', 'Ora șase. Seara luăm cina.', 'Ora șapte. Dimineața ne trezim.', 'Ora opt. Seara mergem la culcare.',
-        'Ora nouă. Dimineața ne jucăm la grădiniță.', 'Ora zece. Mâncăm un fruct.', 'Ora unsprezece. Ieșim afară la joacă.', 'Ora douăsprezece. La amiază soarele e sus pe cer.']
+  tiles: { clock: ['Ceasul', 'Găsește ora'], halves: ['Și jumătate', 'Găsește ora și jumătate'], setclock: ['Potrivește ceasul', 'Citește ceasul'] },
+  games: { where: 'Unde e {name}?', which: 'Care ceas arată {name}?' },
+  hourCycle: 'h23',
+  hours: ['douăsprezece', 'unu', 'două', 'trei', 'patru', 'cinci', 'șase', 'șapte', 'opt', 'nouă', 'zece', 'unsprezece'],
+  oclock: ['ora douăsprezece', 'ora unu', 'ora două', 'ora trei', 'ora patru', 'ora cinci', 'ora șase', 'ora șapte', 'ora opt', 'ora nouă', 'ora zece', 'ora unsprezece'],
+  time: { m0: '{oclock}', m5: '{h} și cinci', m10: '{h} și zece', m15: '{h} și un sfert', m20: '{h} și douăzeci', m25: '{h} și douăzeci și cinci', m30: '{h} și jumătate',
+          m35: '{next} fără douăzeci și cinci', m40: '{next} fără douăzeci', m45: '{next} fără un sfert', m50: '{next} fără zece', m55: '{next} fără cinci' },
+  parts: { night: 'noaptea', morning: 'dimineața', noon: 'la prânz', afternoon: 'după-amiaza', evening: 'seara' },
+  less: 'Cu cinci minute înapoi', more: 'Cu cinci minute înainte',
+  when: '{time} {part}',
+  say: '{when}. {what}',
+  day: { h7: 'Ne trezim și ne întindem.', h8: 'Luăm micul dejun.', h9: 'Ne jucăm la grădiniță.', h10: 'Mâncăm un fruct.', h12: 'Luăm prânzul.', h13: 'Ne odihnim.',
+         h15: 'Ne jucăm în parc.', h16: 'Mâncăm o gustare.', h18: 'Luăm cina.', h19: 'Facem baie.', h20: 'Mergem la culcare. A răsărit luna.', h0: 'E miezul nopții. Toată lumea doarme.' }
 });

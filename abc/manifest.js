@@ -1,5 +1,5 @@
 self.MANIFEST = {
-  "version": "fa48c637b2",
+  "version": "c3f6ff9900",
   "scripts": [
     "abc/core/registry.js",
     "abc/core/i18n.js",
@@ -83,6 +83,7 @@ self.MANIFEST = {
     "abc/core/services.js",
     "abc/core/views/card.js",
     "abc/core/views/count.js",
+    "abc/core/views/dial.js",
     "abc/core/views/play.js",
     "abc/core/views/read.js",
     "abc/core/games/find.js",
@@ -175,6 +176,7 @@ self.MANIFEST = {
     "abc/core/services.js",
     "abc/core/views/card.js",
     "abc/core/views/count.js",
+    "abc/core/views/dial.js",
     "abc/core/views/play.js",
     "abc/core/views/read.js",
     "abc/core/games/find.js",

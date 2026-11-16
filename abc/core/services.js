@@ -29,6 +29,7 @@ function tone(freq, start, dur, vol = 0.18, type = 'sine') {
   o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.05);
 }
 const sfx = {
+  tick() { tone(1400, 0, 0.04, 0.05, 'triangle'); },
   pop() { tone(660, 0, 0.15, 0.15); tone(990, 0.04, 0.2, 0.08); },
   right() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.08, 0.35, 0.16, 'triangle')); },
   wrong() { tone(220, 0, 0.18, 0.12, 'triangle'); tone(196, 0.12, 0.25, 0.1, 'triangle'); },
