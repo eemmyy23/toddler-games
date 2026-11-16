@@ -1,6 +1,7 @@
 (function () {
   const GRIP = { tap: 16, near: 28, reach: 2, weight: 8, center: 1.5, outside: 17, half: 16 };
   let pos = 0, active = 0, grab = null, keep = false, bound = false;
+  const release = () => { grab = null; if ($('dface')) $('dface').classList.remove('drag'); };
   const cur = () => APP.items()[APP.idx];
   const D = () => cur().dial;
   const mod = (a, n) => ((a % n) + n) % n;
@@ -18,6 +19,7 @@
     document.querySelectorAll('#dface .dhand').forEach((g, i) => { g.style.transform = spin(d.hands[i]); g.classList.toggle('held', i === active); });
     const t = $('dtime'), html = `<i class="ic">${r.pic}</i>${esc(r.text)}`;
     if (t.dataset.v !== html) { t.dataset.v = html; t.innerHTML = html; t.setAttribute('aria-label', r.name); APP.fitText(t); }
+    $('dface').setAttribute('aria-valuetext', r.name);
     $('dsay').textContent = r.name;
     APP.backdrop(r.backdrop);
   }
@@ -46,14 +48,15 @@
   }
   function up(e, cancel) {
     if (!grab || e.pointerId !== grab.id) return;
-    const g = grab, hands = D().hands; grab = null; $('dface').classList.remove('drag');
+    const g = grab, hands = D().hands; release();
     if (g.moved) pos = g.start + g.k * hands[g.i].snap;
     else if (cancel) return;
     else if (g.i !== active) active = g.i;
-    else { const h = hands[active]; pos += Math.round(turn(angle(h, pos), g.q.deg) / 360 * h.turn / h.snap) * h.snap; }
+    else { const h = hands[active], base = pos - mod(pos, h.snap); pos += Math.round(turn(angle(h, base), g.q.deg) / 360 * h.turn / h.snap) * h.snap; }
     sfx.pop(); paint(); if (!cancel) say();
   }
-  function nudge(dir) { APP.stop(); pos = Math.round(pos / D().step) * D().step + dir * D().step; sfx.pop(); paint(); say(); }
+  function nudge(dir, size) { if (grab) return; const t = D().step; APP.stop(); pos = Math.round(pos / t) * t + dir * (size || t); sfx.pop(); paint(); say(); }
+  function refresh() { APP.links(cur(), $('dlinks')); paint(); APP.fit($('dial')); APP.shown(); }
   function bind() {
     if (bound) return; bound = true;
     const el = $('dial');
@@ -64,31 +67,35 @@
     onTapIn(el, '#dless', () => nudge(-1));
     onTapIn(el, '#dmore', () => nudge(1));
     onTapIn(el, '#dtime', b => { APP.celebrate(b); say(); });
+    el.addEventListener('keydown', e => {
+      if (!e.target.closest('#dface')) return;
+      const dir = { ArrowUp: 1, ArrowDown: -1, PageUp: 1, PageDown: -1 }[e.key], hands = D().hands;
+      if (dir) { e.preventDefault(); e.stopPropagation(); nudge(dir, hands[active].snap); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); active = (active + 1) % hands.length; sfx.pop(); paint(); }
+    });
   }
   VIEW('dial', {
     el: 'dial', arrows: true,
     show(sayIt) {
-      APP.stop(); bind(); grab = null;
+      APP.stop(); bind(); release();
       const it = cur(), d = it.dial;
       if (!keep) pos = it.at; keep = false;
-      $('dial').innerHTML = `<div class="dial" id="dface"><svg viewBox="0 0 32 32" aria-hidden="true">${d.face}${d.hands.map((h, i) => `<g transform="translate(16 16)"><g class="dhand" data-i="${i}" style="transform:${spin(h)}"><g transform="translate(-16 -16)">${h.body}</g></g></g>`).join('')}${d.cap}</svg></div>` +
+      $('dial').innerHTML = `<div class="dial" id="dface" role="slider" tabindex="0"><svg viewBox="0 0 32 32" aria-hidden="true">${d.face}${d.hands.map((h, i) => `<g transform="translate(16 16)"><g class="dhand" data-i="${i}" style="transform:${spin(h)}"><g transform="translate(-16 -16)">${h.body}</g></g></g>`).join('')}${d.cap}</svg></div>` +
         `<div class="dinfo"><div class="dctl"><button class="rbtn dstep" id="dless" aria-label="${esc(d.aria.less)}">${APP.icon('less')}</button>` +
         `<button class="pill dtime" id="dtime"></button><button class="rbtn dstep" id="dmore" aria-label="${esc(d.aria.more)}">${APP.icon('more')}</button></div>` +
         `<div class="label dsay" id="dsay"></div><div id="dlinks" class="links"></div></div>`;
-      $('dlinks').innerHTML = APP.links(it); $('dlinks').hidden = !$('dlinks').innerHTML;
-      paint(); APP.fit($('dial')); APP.shown();
+      refresh();
       if (sayIt) say();
     },
     step(dir) {
-      APP.stop(); grab = null; APP.step(dir); sfx.pop();
+      APP.stop(); release(); APP.step(dir); sfx.pop();
       const it = cur(), d = it.dial; let diff = mod(it.at - value(), d.cycle); if (diff > d.cycle / 2) diff -= d.cycle;
       pos += diff;
-      $('dlinks').innerHTML = APP.links(it); $('dlinks').hidden = !$('dlinks').innerHTML;
-      paint(); APP.fit($('dial')); APP.shown(); say();
+      refresh(); say();
     },
     line: () => read().say,
-    leave() { grab = null; },
-    resize() { APP.fit($('dial')); },
+    leave() { release(); },
+    resize() { APP.fitText($('dtime')); APP.fit($('dial')); },
     reset() { keep = false; active = 0; },
     beforeLang: () => ({ pos, active }),
     afterLang(s) { if (s) { pos = s.pos; active = s.active; keep = true; } },

@@ -140,18 +140,17 @@ body.lownav #stage{padding-bottom:calc(var(--bot) + var(--low-h))} #hub{display:
 .rbsvg{display:block;width:var(--rainbow);height:auto;overflow:visible}
 .rbb{fill:none;stroke-width:10.6}
 .pset{display:inline-flex;align-items:flex-end;gap:.2em;font-size:var(--pset);text-shadow:none}
-.pset .part{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:var(--sp-1);min-width:var(--part-min);min-height:var(--part-min)}
+.pset .part{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:var(--sp-1);min-width:var(--part-min);min-height:var(--part-min);padding:0}
 .pset .pic{font-size:calc(var(--s,1) * 1em);line-height:1}
 .pset .caption{font-size:var(--cap-fs);font-weight:700;line-height:1.1;text-align:center;white-space:nowrap}
 .ic{font-style:normal;margin-inline:.15em}
 .art{width:1em;height:1em;vertical-align:middle;overflow:visible;text-shadow:none}
 .part{cursor:pointer;transition:opacity .2s,filter .2s}
 #glyph:has(.part.on) .part:not(.on){opacity:.28}
-#glyph svg .part.on{outline:none;transform:none}
-#glyph .part.on{opacity:1;filter:drop-shadow(0 0 var(--sp-1) var(--amber))}
+#glyph svg .part.on{outline:none;transform:none;filter:drop-shadow(0 0 var(--sp-1) var(--amber))}
+#glyph .part.on{opacity:1}
 .strip{position:relative;display:flex;justify-content:center;width:calc(100% + 2 * var(--bleed));max-width:var(--col);touch-action:none;cursor:pointer}
-.pt{flex:1 1 0;min-width:var(--tap);max-width:var(--part-max);height:var(--part-h);display:flex;align-items:center;justify-content:center;font-size:var(--part-fs);line-height:1;
-  border-radius:0;border-inline-start:1px solid var(--line);transition:transform .15s,opacity .2s}
+.pt{flex:1 1 0;min-width:var(--tap);max-width:var(--part-max);height:var(--part-h);border-radius:0;border-inline-start:1px solid var(--line);transition:transform .15s,opacity .2s}
 .pt:first-child{border-start-start-radius:var(--r);border-end-start-radius:var(--r);border-inline-start:none}
 .pt:last-of-type{border-start-end-radius:var(--r);border-end-end-radius:var(--r)}
 .strip:has(.on) .pt:not(.on){opacity:.35}

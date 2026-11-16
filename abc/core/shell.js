@@ -87,13 +87,13 @@ const APP = {
   },
   firstTouch,
   set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
-  links(it) {
+  links(it, el) {
     const t = tileOf(), play = mode === 'play', out = [];
     const chip = (x, id, toPlay) => `<button class="pill link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
     if (!play && infoFor(it.concept)) out.push(`<button class="pill link infobtn" data-c="${esc(it.concept)}">${APP.icon('info')}${esc(APP.ui().info)}</button>`);
     if (it.concept) for (const x of TILES) {
       if (x === t || !usable(x, false)) continue;
-      const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)));
+      const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)) || (y.related && y.related.includes(it.concept)));
       if (other) out.push(chip(x, other.id, false));
     }
     for (const c of it.related || []) {
@@ -107,7 +107,9 @@ const APP = {
     const home = it.learn ?? it.id;
     if (play && usable(t, false) && itemsOf(t).some(y => y.id === home)) out.push(chip(t, home, false));
     if (!play && usable(t, true)) out.push(chip(t, it.id, true));
-    return out.join('');
+    const html = out.join('');
+    if (el) { el.innerHTML = html; el.hidden = !html; }
+    return html;
   },
   fit(el, compact) {
     if (compact) el.classList.remove(compact);
@@ -394,7 +396,7 @@ addEventListener('keydown', e => {
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
   if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
   if (e.repeat) return;
-  if ((k === ' ' || k === 'enter') && v) { e.preventDefault(); if (canPlay(v)) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
+  if ((k === ' ' || k === 'enter') && v && !(e.target.closest && e.target.closest('button, [role=link], [role=slider]'))) { e.preventDefault(); if (canPlay(v)) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
   const pick = (vw, k) => { const it = (vw.choices ? vw.choices() : APP.items()).find(x => x.key === k); if (it && vw.select) vw.select(it); return !!it; };
   if (v && pick(v, k)) return;
   if (k.length !== 1 && !/^\p{L}$/u.test(k)) return;

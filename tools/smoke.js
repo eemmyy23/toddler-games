@@ -227,11 +227,15 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   await clear(); await drag([112.5, 150, 190, 202.5], 0.35); await spoken();
   const d2 = await dialNow(), s2 = (await said()).pop();
   ok(d2.v === 1125 && /6:45\s?pm$/i.test(d2.t) && s2 === 'Quarter to seven in the evening!' && d2.bg !== d0.bg, `dragging the hour hand keeps the minutes (${d2.t}, "${s2}") and the background changes`);
-  await clear(); await p.mouse.click(...pt(0, 0.62)); await spoken();
+  await clear(); await p.mouse.click(...pt(330, 0.62)); await spoken();
   const d3 = await dialNow();
   await clear(); await p.locator('#dmore').dispatchEvent('click'); await spoken();
   const d4 = await dialNow(), s4 = (await said()).pop();
-  ok(d3.v === 1425 && d4.v === 1430 && /night/.test(s4) && /radial/.test(d4.bg), `tap alternatives: tap the 12 → ${d3.t}, + → ${d4.t} ("${s4}"), starry night`);
+  ok(d3.v === 1425 && d4.v === 1430 && /night/.test(s4) && /radial/.test(d4.bg), `tap alternatives: tap the 11 with the hour hand → ${d3.t}, + → ${d4.t} ("${s4}"), starry night`);
+  await p.focus('#dface'); await p.keyboard.press('ArrowUp'); const k1 = (await dialNow()).v;
+  await p.keyboard.press('Enter'); await p.keyboard.press('ArrowDown'); const k2 = (await dialNow()).v;
+  await p.focus('#dmore'); await p.keyboard.press('Space'); const k3 = (await dialNow()).v;
+  ok(k1 === 50 && k2 === 45 && k3 === 50, `keyboard: ↑ moves the held hour hand (${k1}), Enter picks the minute hand, ↓ (${k2}), Space presses a focused + (${k3})`);
   const rays = await ev(() => { const d = APP.items()[0].dial, rgb = s => [...s.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)].map(m => m.slice(1).map(Number));
     const lum = c => c.map(x => x / 255).map(x => x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4).reduce((a, x, i) => a + x * [0.2126, 0.7152, 0.0722][i], 0);
     const con = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);

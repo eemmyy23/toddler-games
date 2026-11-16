@@ -162,6 +162,7 @@ for (const c of langs) {
       const gone = [...new Set(langs.flatMap(l => Tiles.items(t, l).flatMap(ids)))].filter(id => !mine.has(id));
       if (gone.length) err(`${c}: tile ${t.id} is incomplete — missing ${gone.join(', ')} (another language has them)`);
     }
+    for (const it of items) for (const r of it.related || []) if (!ABC.conceptById[r]) err(`module ${t.module.id}/${c}: tile ${t.id} item "${it.id}" relates to "${r}", which is not a concept`);
     for (const it of [...items, ...(t.game ? Tiles.gameItems(t, c) : [])].flatMap(it => [it, ...(it.members || [])])) if (!CONTENT.made(it)) err(`module ${t.module.id}/${c}: tile ${t.id} item "${it.id}" is not built by CONTENT (thing/word/glyph/picture/group)`);
     if (!t.game) continue;
     if (!Tiles.gameOk(t, c)) { err(`${c}: game ${t.id} has too few playable items (needs ≥ ${ABC.games[t.game.type].needs || 2} at every level)`); continue; }

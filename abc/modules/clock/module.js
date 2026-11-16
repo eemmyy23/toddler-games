@@ -65,7 +65,7 @@
         hours: CLOCK.map(v => card(v, s.day['h' + v / HOUR])),
         halves: HALVES.map(v => card(v, null)),
         dial: DIAL.map(v => CONTENT.glyph(code, { id: idOf(v), text: T.digital(v), name: T.name(v), color: tint(v) },
-          { say: T.say(v), bubbleArt: still(v), at: v, dial, backdrop: sky(v), concept: 'clock', concepts: related(v, LINKS.extra), related: related(v, LINKS.extra) }))
+          { say: T.say(v), bubbleArt: still(v), at: v, dial, backdrop: sky(v), concept: 'clock', concepts: related(v, []), related: related(v, LINKS.extra) }))
       };
     },
     check(code, S, s, report) {

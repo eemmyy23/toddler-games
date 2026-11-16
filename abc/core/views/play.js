@@ -44,7 +44,7 @@
       b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.animationDelay = (i * 0.4) + 's';
       box.appendChild(b);
     });
-    $('plinks').innerHTML = APP.links(target); $('plinks').hidden = !$('plinks').innerHTML;
+    APP.links(target, $('plinks'));
     APP.fit($('play'));
     speak(askLine(), PAUSE.ask);
   }

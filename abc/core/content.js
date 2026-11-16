@@ -59,7 +59,7 @@ const CONTENT = (() => {
       const x0 = things[lead || 0], caps = captions || things.map(x => x.w);
       const faces = parts || things.map(x => pic(x.id));
       return seal({ id, label, name, say: says.join(' '), concept: x0.id, concepts: things.map(x => x.id), nav: x0.pic, word: word || '',
-        big: `<span class="pset">${faces.map((f, i) => `<span class="part" data-part="${i}"><span class="pic" style="--s:${(sizes || [])[i] ?? 1}">${f}</span><span class="caption">${esc(caps[i])}</span></span>`).join('')}</span>`,
+        big: `<span class="pset">${faces.map((f, i) => `<button class="part" data-part="${i}" aria-label="${esc(says[i])}"><span class="pic" style="--s:${(sizes || [])[i] ?? 1}">${f}</span><span class="caption">${esc(caps[i])}</span></button>`).join('')}</span>`,
         parts: says.map(say => ({ say })) }, extra);
     },
     sayThe: (code, x) => C.exclaim(code, I18N.capFirst(the(x) || x.w, ABC.langs[code].bcp47)),
