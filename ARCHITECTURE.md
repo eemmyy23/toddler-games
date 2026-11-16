@@ -44,7 +44,7 @@ tools/smoke.js              browser test: every language, every game, choice rul
 - **Ids, not words.** Words and info cards are keyed by concept id (`cow`); saved progress by tile id + stable item id — never by text or emoji.
 - **Explicit forms.** Each language writes its forms (RO `def`, `pl`, `plDef`, `g`, `mass`, `plOnly`; DE `g`, `pl`, `mass`, `plOnly`; EN `art`, `pl`, `mass`, `plOnly`;
   all: `unique` — one of a kind, so "That's …" uses the definite form: the sun, soarele, die Sonne; `ex: false` — never a letter example;
-  `also` — synonyms; `homonym` — same spelling as another concept). Grammar code only assembles them; school rules are checks:
+  `syn` — synonyms; `homonym` — same spelling as another concept). Grammar code only assembles them; school rules are checks:
   `checkForms` (warning) and `checkWord` (error), not generators.
 - **Base language.** Missing UI strings fall back to `config.baseLanguage` (en); `check.js` reports every missing key.
 - **Modules don't share data.** `build(code)` returns the module's own namespace; its tiles read only that.
@@ -93,7 +93,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
-(orange the colour / the fruit); `also: 'gheată|ghete, bocanc|bocanci'` lists synonyms (singular|plural) — same picture and concept, shown as "also called" under the word and found by search (with their plurals).
+(orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.
 **INFO** — `const i = INFO(code); i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })` (`gloss`: a note for translators, not read by the app).
 **GROUP** — `GROUP(id, 'member ids')`: the group is a concept too (its word names it); a concept is in at most one group (index Groups mode, Groups module).
 **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
@@ -113,7 +113,7 @@ every other tile has every item in every language (checked).
 
 **ITEM** — `id` (stable), `label` (short text, sort key), `name` (spoken), `say` (Learn line), `big`/`bigClass`, `color`, `nav`,
 `key` (the keyboard key that picks it, and from a hub opens its tile), `word`, `pic`, `pics` (objects in the card, Count row and how-many question),
-`pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `also` (synonyms, search),
+`pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `alts` (the concept's other names: `[{ id, w }]`, built),
 `parts [{ say }]`, `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 games: `bubble`, `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs),
 `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game; built by CONTENT too),

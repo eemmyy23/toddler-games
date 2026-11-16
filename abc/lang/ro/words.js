@@ -82,7 +82,7 @@ w('map', { w: 'har/tă', def: 'harta', pl: 'hărți', g: 'f', plDef: 'hărțile'
 w('island', { w: 'in/su/lă', def: 'insula', pl: 'insule', g: 'f', plDef: 'insulele' });
 w('angel', { w: 'în/ger', def: 'îngerul', pl: 'îngeri', g: 'm', plDef: 'îngerii' });
 w('jaguar', { w: 'ja/gu/ar', def: 'jaguarul', pl: 'jaguari', g: 'm', plDef: 'jaguarii' });
-w('jacket', { w: 'gea/că', def: 'geaca', pl: 'geci', g: 'f', plDef: 'gecile', also: 'jachetă|jachete' });
+w('jacket', { w: 'gea/că', def: 'geaca', pl: 'geci', g: 'f', plDef: 'gecile', syn: [{ w: 'ja/che/tă', def: 'jacheta', pl: 'jachete', g: 'f', plDef: 'jachetele' }] });
 w('kiwi', { w: 'ki/wi', def: 'kiwiul', pl: 'kiwi', g: 'm', plDef: 'kiwii' });
 w('karate', { w: 'ka/ra/te' });
 w('lemon', { w: 'lă/mâ/ie', def: 'lămâia', pl: 'lămâi', g: 'f', plDef: 'lămâile' });
@@ -142,7 +142,7 @@ w('butter', { w: 'unt', mass: true, def: 'untul' });
 w('salt', { w: 'sa/re', mass: true, def: 'sarea' });
 w('chick', { w: 'pui', def: 'puiul', pl: 'pui', g: 'm', plDef: 'puii' });
 w('strawberry', { w: 'căp/șu/nă', def: 'căpșuna', pl: 'căpșuni', g: 'f', plDef: 'căpșunile' });
-w('ladybird', { w: 'bu/bu/ru/ză', def: 'buburuza', pl: 'buburuze', g: 'f', plDef: 'buburuzele', also: 'gărgăriță|gărgărițe' });
+w('ladybird', { w: 'bu/bu/ru/ză', def: 'buburuza', pl: 'buburuze', g: 'f', plDef: 'buburuzele', syn: [{ w: 'găr/gă/ri/ță', def: 'gărgărița', pl: 'gărgărițe', g: 'f', plDef: 'gărgărițele' }] });
 w('biscuit', { w: 'bis/cu/it', def: 'biscuitul', pl: 'biscuiți', g: 'm', plDef: 'biscuiții' });
 w('red', { w: 'ro/șu' });
 w('blue', { w: 'al/bas/tru' });
@@ -176,7 +176,7 @@ w('wind', { w: 'vânt', def: 'vântul', pl: 'vânturi', g: 'n', plDef: 'vânturi
 w('storm', { w: 'fur/tu/nă', def: 'furtuna', pl: 'furtuni', g: 'f', plDef: 'furtunile' });
 w('cap', { w: 'șap/că', def: 'șapca', pl: 'șepci', g: 'f', plDef: 'șepcile' });
 w('sunglasses', { w: 'o/che/lari de soa/re', plOnly: true, plDef: 'ochelarii de soare' });
-w('boots', { w: 'ciz/mă', def: 'cizma', pl: 'cizme', g: 'f', plDef: 'cizmele', also: 'gheată|ghete, bocanc|bocanci' });
+w('boots', { w: 'ciz/mă', def: 'cizma', pl: 'cizme', g: 'f', plDef: 'cizmele', syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, { w: 'bo/canc', def: 'bocancul', pl: 'bocanci', g: 'm', plDef: 'bocancii' }] });
 w('gloves', { w: 'mă/nuși', plOnly: true, plDef: 'mănușile' });
 w('scarf', { w: 'fu/lar', def: 'fularul', pl: 'fulare', g: 'n', plDef: 'fularele' });
 w('chicken-chick', { w: 'pui de gă/i/nă', def: 'puiul de găină', pl: 'pui de găină', g: 'm', plDef: 'puii de găină', ex: false });

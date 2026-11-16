@@ -10,7 +10,7 @@
   MODULE('letters', {
     section: 'abc', ages: [2, 7], needs: ['sayLetter'],
     build(code) {
-      const L = ABC.langs[code], words = CONTENT.words(code).filter(x => !ABC.groups[x.id]), A = CONTENT.alphabet(code);
+      const L = ABC.langs[code], words = CONTENT.words(code).filter(x => !ABC.groups[x.concept]), A = CONTENT.alphabet(code);
       const low = x => x.toLocaleLowerCase(L.bcp47);
       const alike = (L.alike || '').split(/\s+/).filter(Boolean), sound = u => alike.find(s => s.split('=').includes(u.lower)) || u.id;
       const letters = A.units.map(u => {

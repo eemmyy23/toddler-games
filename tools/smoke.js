@@ -148,9 +148,12 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(keyGame[0] === 'letters' && keyGame[1] === 'play', `keys that are not a choice never leave the game (${keyGame.join('/')})`);
   const sfold = await ev(() => { const q = (c, v) => { setLang(c); openSearch(); $('sq').value = v; runSearch(); const r = [...document.querySelectorAll('#sres .sr')].map(x => x.dataset.t + ':' + x.dataset.id); closeSearch(); return r; };
     const r = { gruen: q('de', 'gruen').length, ice: q('en', 'ice-cream').length, ten: q('en', 'ten').filter(x => /^(digits|tens)/.test(x)).length, syn: q('ro', 'ghete').join() }; setLang('ro'); return r; });
-  ok(sfold.gruen >= 1 && sfold.ice >= 1 && sfold.ten === 1 && sfold.syn === 'read:boots', `search: DE ue = ü, hyphen = space, one row per number, synonyms (ghete → cizmă) (${JSON.stringify(sfold)})`);
+  ok(sfold.gruen >= 1 && sfold.ice >= 1 && sfold.ten === 1 && sfold.syn === 'read:boots~1', `search: DE ue = ü, hyphen = space, one row per number, synonyms (ghete → the gheată page) (${JSON.stringify(sfold)})`);
   const syns = await ev(() => { setLang('ro'); openTile('read', false, true); APP.idx = APP.indexOf('boots'); view().show(false); return [...document.querySelectorAll('#rA .syn')].map(b => b.dataset.say).join(); });
   ok(syns === 'gheată,bocanc', `synonyms shown under the word in Read (${syns})`);
+  await p.locator('#rA .link').first().dispatchEvent('click');
+  const synPage = await ev(() => ({ id: APP.items()[APP.idx].id, w: APP.items()[APP.idx].w, back: [...document.querySelectorAll('#rA .syn')].map(b => b.dataset.say).join() }));
+  ok(synPage.id === 'boots~1' && synPage.w === 'gheată' && synPage.back === 'cizmă,bocanc', `🔗 opens the synonym's own Read page, which links back (${JSON.stringify(synPage)})`);
   const prof = await ev(() => { const has = p => { APP.set({ profile: p, section: 'play', hub: true }); return hubTiles().filter(x => x.t).map(x => x.t.id); };
     const c = has('curious'), s = has('scientist'); APP.set({ profile: 'curious' }); return { c: c.length, s: s.length, gated: s.filter(id => !c.includes(id)).length, extra: c.filter(id => !s.includes(id)).length }; });
   ok(prof.gated > 0 && prof.extra === 0, `the youngest profile hides older games (${prof.c} of ${prof.s}, ${prof.gated} hidden)`);

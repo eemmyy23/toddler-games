@@ -72,7 +72,12 @@ const APP = {
     } finally { if (opts.button && t === seqTok) APP.playing(false); }
   },
   playing(on) { $('act').classList.toggle('on', !!on); $('act').setAttribute('aria-pressed', !!on); },
-  synonyms: it => it.also && it.also.length ? `<span class="label">${esc(APP.ui().also)}</span>${it.also.map(a => `<button class="pill small syn" data-say="${esc(a)}">${esc(a)}</button>`).join('')}` : '',
+  synonyms(it) {
+    if (!it.alts || !it.alts.length) return '';
+    const home = id => TILES.find(t => usable(t, false) && itemsOf(t).some(y => y.id === id));
+    return `<span class="label">${esc(APP.ui().also)}</span>` + it.alts.map(a => { const t = home(a.id);
+      return `<span class="alt"><button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}</button>${t ? `<button class="pill link" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</button>` : ''}</span>`; }).join('');
+  },
   shown() {
     APP.saveIdx(); const v = view(); if (!v || !v.arrows) return;
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
@@ -214,7 +219,8 @@ const infoFor = c => c && APP.L().info[c] ? APP.L().info[c] : null;
 function openInfo(c) {
   const I = infoFor(c); if (!I) return;
   infoId = c; $('infotitle').textContent = I.title;
-  $('infolist').innerHTML = I.lines.map(([e, t], i) => `<button class="card inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
+  const names = CONTENT.words(lang).filter(x => x.concept === c).map(x => x.w);
+  $('infolist').innerHTML = (names.length > 1 ? `<div class="label">${esc(APP.ui().also)} ${esc(I18N.list(names, APP.L().bcp47))}</div>` : '') + I.lines.map(([e, t], i) => `<button class="card inf" data-i="${i}"><span class="ie">${e}</span><span>${esc(t)}</span></button>`).join('');
   $('info').hidden = false; sfx.pop(); speak(I.title, PAUSE.tap);
 }
 function closeInfo() { if (!$('info').hidden) APP.stop(); $('info').hidden = true; }
@@ -301,8 +307,8 @@ function searchPool() {
     const per = LANGS.map(c => [c, new Map(Tiles.items(t, c).map(it => [it.id, it]))]);
     for (const it of itemsOf(t)) {
       const names = per.map(([c, m]) => { const x = m.get(it.id); return [c, x ? x.name : null]; }).filter(x => x[1]);
-      const forms = c => { const x = it.concept && CONTENT.byId(c).get(it.concept); return x && x.forms ? [...(x.forms.sg || []), ...(x.forms.pl || [])] : []; };
-      out.push({ t, it, names, extra: [it.label, ...per.flatMap(([c, m]) => [...((m.get(it.id) || {}).alsoForms || []), ...forms(c)])] });
+      const forms = c => { const x = CONTENT.byId(c).get(it.id) || (it.concept && CONTENT.byId(c).get(it.concept)); return x && x.forms ? [...(x.forms.sg || []), ...(x.forms.pl || [])] : []; };
+      out.push({ t, it, names, extra: [it.label, ...per.flatMap(([c]) => forms(c))] });
     }
   }
   return out;

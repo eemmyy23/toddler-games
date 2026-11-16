@@ -11,10 +11,13 @@ const CONTENT = (() => {
   function words(code) {
     if (wordCache[code]) return wordCache[code];
     const L = ABC.langs[code];
-    return (wordCache[code] = L.words.filter(e => ABC.conceptById[e.id]).map(e => {
+    const entries = L.words.filter(e => ABC.conceptById[e.id]).flatMap(e => [Object.assign({ key: e.id }, e),
+      ...(e.syn || []).map((s, i) => Object.assign({ id: e.id, ex: e.ex, unique: e.unique }, s, { key: `${e.id}~${i + 1}`, synOf: e.id }))]);
+    const list = entries.map(e => {
       const syl = e.w.split(/[/\s]+/), w = e.w.replace(/\//g, ''), c = ABC.conceptById[e.id];
-      return Object.freeze({ id: e.id, concept: e.id, pic: c.pic, w, syl, also: e.also ? e.also.split(',').map(s => s.trim().split('|')[0]) : [], alsoForms: e.also ? e.also.split(/[,|]/).map(s => s.trim()) : [], say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e });
-    }));
+      return { id: e.key, concept: e.id, pic: c.pic, w, syl, say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e };
+    });
+    return (wordCache[code] = list.map(x => Object.freeze(Object.assign(x, { alts: list.filter(y => y.concept === x.concept && y !== x).map(y => ({ id: y.id, w: y.w })) }))));
   }
   const idCache = {}, byId = code => idCache[code] || (idCache[code] = new Map(words(code).map(x => [x.id, x])));
   function seal(base, extra) {
@@ -43,8 +46,8 @@ const CONTENT = (() => {
       const name = u => L.spell ? L.spell(u.upper) : u.upper;
       return (abcCache[code] = { units, color, name, unit: id => units.find(u => u.id === id) || null });
     },
-    thing: (x, extra) => seal({ id: x.id, label: x.w, name: x.w, say: x.say, big: pic(x.id), word: x.w, nav: pic(x.id), pic: x.pic,
-      concept: x.id, the: the(x), bubble: x.pic, bubbleArt: ABC.art[x.id] ? pic(x.id) : null, pictureBubble: true, prompt: x.w, also: x.also, alsoForms: x.alsoForms, plural: !!x.entry.plOnly,
+    thing: (x, extra) => seal({ id: x.id, label: x.w, name: x.w, say: x.say, big: pic(x.concept), word: x.w, nav: pic(x.concept), pic: x.pic,
+      concept: x.concept, the: the(x), bubble: x.pic, bubbleArt: ABC.art[x.concept] ? pic(x.concept) : null, pictureBubble: true, prompt: x.w, alts: x.alts, plural: !!x.entry.plOnly,
       a: x.forms && x.forms.sg ? x.forms.sg[x.entry.unique ? 1 : 0] : null, g: x.entry.g }, extra),
     word: (x, extra) => C.thing(x, Object.assign({ syl: x.syl, w: x.w, forms: x.forms }, extra)),
     glyph: (code, { id, text, name, color, small, word, cls }, extra) => seal({ id, label: text, name, say: C.exclaim(code, name),

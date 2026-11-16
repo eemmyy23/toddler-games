@@ -107,7 +107,7 @@ for (const [g, ms] of Object.entries(ABC.groups)) {
 for (const c of langs) {
   const L = ABC.langs[c]; if (!L) continue;
   const seenW = new Map();
-  for (const e of L.words) {
+  for (const e of L.words.flatMap(e => [e, ...(e.syn || []).map(s => Object.assign({ id: e.id }, s))])) {
     used.add(e.id);
     if (!ABC.conceptById[e.id]) { err(`${c}/words.js: unknown concept "${e.id}" (add it to abc/concepts.js)`); continue; }
     const w = (e.w || '').split('/').join('');
@@ -119,7 +119,6 @@ for (const c of langs) {
     const key = w.toLocaleLowerCase(L.bcp47);
     if (seenW.has(key) && !(e.homonym && e.homonym === seenW.get(key))) err(`${c}/words.js: "${w}" is used for two concepts (${seenW.get(key)}, ${e.id}) — add a note or pick another word`);
     seenW.set(key, e.id);
-    for (const a of (e.also || '').split(/[,|]/).map(s => s.trim().toLocaleLowerCase(L.bcp47)).filter(Boolean)) { if (seenW.has(a) && seenW.get(a) !== e.id) err(`${c}/words.js ${e.id}: synonym "${a}" is the word of ${seenW.get(a)}`); }
   }
   for (const id of Object.keys(L.info || {})) {
     const I = L.info[id];

@@ -144,7 +144,7 @@ w('salt', { w: 'salt', mass: true });
 w('zero', { w: 'ze/ro', art: 'a', pl: 'zeros' });
 w('chick', { w: 'chick', art: 'a', pl: 'chicks' });
 w('strawberry', { w: 'straw/ber/ry', art: 'a', pl: 'strawberries' });
-w('ladybird', { w: 'la/dy/bird', art: 'a', pl: 'ladybirds' });
+w('ladybird', { syn: [{ w: 'la/dy/bug', art: 'a', pl: 'ladybugs' }], w: 'la/dy/bird', art: 'a', pl: 'ladybirds' });
 w('biscuit', { w: 'bis/cuit', art: 'a', pl: 'biscuits' });
 w('red', { w: 'red' });
 w('blue', { w: 'blue' });

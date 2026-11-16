@@ -1,6 +1,6 @@
 CONFIG({
   name: 'ABC 123!', version: '1.2.0',
-  icons: { info: '📖', star: '⭐', mute: '🔇', back: '‹', prev: '‹', next: '›', play: '▶', close: '✕', search: '🔍', speak: '🔊', listen: '👂', objects: '🍓', fingers: '✋', other: '#', sep: '·' },
+  icons: { info: '📖', star: '⭐', mute: '🔇', back: '‹', prev: '‹', next: '›', play: '▶', close: '✕', search: '🔍', speak: '🔊', listen: '👂', objects: '🍓', fingers: '✋', other: '#', sep: '·', link: '🔗' },
   languages: ['en', 'ro', 'de'],
   modules: ['numbers', 'letters', 'colors', 'families', 'weather', 'shapes', 'body', 'seasons', 'categories', 'opposites', 'sky', 'clock', 'planets', 'health', 'elements'],
   sections: [
