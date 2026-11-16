@@ -66,7 +66,7 @@ i('clock', { title: 'Ceasul', lines: [
   ['🕛', 'Pe cadranul ceasului sunt doar 12 ore, așa că limba mică face de două ori turul într-o zi.'],
   ['🌅', 'Prima dată arată noaptea și dimineața, a doua oară după-amiaza și seara.'],
   ['🇬🇧', 'În țările unde se vorbește engleza, se spune a.m. înainte de amiază și p.m. după amiază.'],
-  ['🔢', 'La noi, după amiază orele se numără mai departe: ora 13, ora 14 … până la 24.'],
+  ['🔢', 'La noi, după amiază orele se numără mai departe: ora 13, ora 14 … până la 23, iar la miezul nopții o iau de la 0.'],
   ['⏱️', 'Limba mare arată minutele.'],
   ['🔁', 'Când limba mare face un tur întreg, a trecut o oră: 60 de minute fac o oră.']
 ] });

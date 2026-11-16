@@ -17,7 +17,7 @@
   function paint() {
     const d = D(), r = read();
     document.querySelectorAll('#dface .dhand').forEach((g, i) => { g.style.transform = spin(d.hands[i]); g.classList.toggle('held', i === active); });
-    const t = $('dtime'), html = `<i class="ic">${r.pic}</i>${esc(r.text)}`;
+    const t = $('dtime'), html = esc(r.text);
     if (t.dataset.v !== html) { t.dataset.v = html; t.innerHTML = html; t.setAttribute('aria-label', r.name); APP.fitText(t); }
     $('dface').setAttribute('aria-valuetext', r.name);
     $('dsay').textContent = r.name;
@@ -49,6 +49,7 @@
   function up(e, cancel) {
     if (!grab || e.pointerId !== grab.id) return;
     const g = grab, hands = D().hands; release();
+    if (!g.moved && !cancel && g.q.r < GRIP.center * 2) { say(); return; }
     if (g.moved) pos = g.start + g.k * hands[g.i].snap;
     else if (cancel) return;
     else if (g.i !== active) active = g.i;
@@ -56,7 +57,7 @@
     sfx.pop(); paint(); if (!cancel) say();
   }
   function nudge(dir, size) { if (grab) return; const t = D().step; APP.stop(); pos = Math.round(pos / t) * t + dir * (size || t); sfx.pop(); paint(); say(); }
-  function refresh() { APP.links(cur(), $('dlinks')); paint(); APP.fit($('dial')); APP.shown(); }
+  function refresh() { APP.links(cur(), $('dlinks'), true); paint(); APP.fit($('dial')); APP.shown(); }
   function bind() {
     if (bound) return; bound = true;
     const el = $('dial');

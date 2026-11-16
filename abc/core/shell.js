@@ -87,21 +87,22 @@ const APP = {
   },
   firstTouch,
   set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
-  links(it, el) {
-    const t = tileOf(), play = mode === 'play', out = [];
+  links(it, el, brief) {
+    const t = tileOf(), play = mode === 'play', few = play || brief, out = [];
     const chip = (x, id, toPlay) => `<button class="pill link" data-t="${x.id}" data-id="${esc(id)}" data-play="${toPlay ? 1 : 0}">${iconHTML(x.icon, 'li')} ${esc(label(x, toPlay ? 1 : 0))}</button>`;
     if (!play && infoFor(it.concept)) out.push(`<button class="pill link infobtn" data-c="${esc(it.concept)}">${APP.icon('info')}${esc(APP.ui().info)}</button>`);
-    if (it.concept) for (const x of TILES) {
+    const near = (a, b) => it.at == null ? 0 : Math.abs((a.at ?? 1e9) - it.at) - Math.abs((b.at ?? 1e9) - it.at);
+    if (it.concept && !few) for (const x of TILES) {
       if (x === t || !usable(x, false)) continue;
-      const other = itemsOf(x).find(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)) || (y.related && y.related.includes(it.concept)));
+      const other = itemsOf(x).filter(y => y.concept === it.concept || (y.concepts && y.concepts.includes(it.concept)) || (y.related && y.related.includes(it.concept))).sort(near)[0];
       if (other) out.push(chip(x, other.id, false));
     }
-    for (const c of it.related || []) {
+    for (const c of few ? [] : it.related || []) {
       if (c === it.concept) continue;
       for (const x of TILES) {
         if (!usable(x, false)) continue;
         const xs = itemsOf(x), y = xs.find(y => y.id === c) || xs.find(y => y.concept === c);
-        if (y) { out.push(`<button class="pill link" data-t="${x.id}" data-id="${esc(y.id)}" data-play="0">${CONTENT.pic(c)} ${esc(y.name)}</button>`); break; }
+        if (y) { out.push(`<button class="pill link see" data-t="${x.id}" data-id="${esc(y.id)}" data-play="0" aria-label="${esc(y.name)}" title="${esc(y.name)}">${CONTENT.pic(c)}</button>`); break; }
       }
     }
     const home = it.learn ?? it.id;

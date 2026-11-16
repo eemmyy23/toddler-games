@@ -15,7 +15,7 @@ const CONTENT = (() => {
       ...(e.syn || []).map((s, i) => Object.assign({ id: e.id, ex: e.ex, unique: e.unique }, s, { key: `${e.id}~${i + 1}`, synOf: e.id }))]);
     const list = entries.map(e => {
       const syl = e.w.split(/[/\s]+/), w = e.w.replace(/\//g, ''), c = ABC.conceptById[e.id];
-      return { id: e.key, concept: e.id, pic: c.pic, w, syl, say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e };
+      return { id: e.key, concept: e.id, pic: pic(e.id), w, syl, say: t(code, 'exclaim', { name: w }), forms: L.forms(e, w), noLetter: e.ex === false, entry: e };
     });
     return (wordCache[code] = list.map(x => Object.freeze(Object.assign(x, { alts: list.filter(y => y.concept === x.concept && y !== x).map(y => ({ id: y.id, w: y.w })) }))));
   }

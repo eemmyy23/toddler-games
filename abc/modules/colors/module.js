@@ -1,5 +1,5 @@
 {
-const HEX = { red: '#e53935', orange: '#fb8c00', yellow: '#fdd835', green: '#43a047', blue: '#1e88e5', indigo: '#3949ab', purple: '#8e24aa',
+const HEX = { red: '#e53935', orange: '#fb8c00', yellow: '#fdd835', green: '#43a047', blue: '#1e88e5', indigo: '#3949ab', purple: '#8e24aa', violet: '#6c3ff0',
   pink: '#f48fb1', brown: '#8d6e63', black: '#111111', white: '#f5f5f5' };
 const COLOR_DATA = [
   { id: 'red', things: 'apple strawberry tomato cherry' }, { id: 'blue', things: 'whale dolphin butterfly jeans' },
@@ -9,7 +9,7 @@ const COLOR_DATA = [
   { id: 'black', things: 'hat penguin' }, { id: 'white', things: 'sheep cloud egg milk' },
   { id: 'rainbow', concept: 'rainbow', things: 'sun cloud umbrella', noPlay: true, bands: true }
 ].map(c => Object.assign({ hex: HEX[c.id] }, c));
-const RAINBOW_HEX = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'purple'].map(k => HEX[k]);
+const RAINBOW_HEX = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'].map(k => HEX[k]);
 const RAINBOW_DOT = `conic-gradient(${[...RAINBOW_HEX, RAINBOW_HEX[0]].join(',')})`;
 function rainbowSVG() {
   return `<svg class="rbsvg" viewBox="0 0 200 104">${RAINBOW_HEX.map((c, i) => { const r = 92 - i * 10;

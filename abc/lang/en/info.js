@@ -66,7 +66,7 @@ i('clock', { title: 'Clock', lines: [
   ['🕛', 'The clock face shows only 12, so the short hand goes round twice a day.'],
   ['🌅', 'The first time round is the night and the morning, the second is the afternoon and the evening.'],
   ['🇬🇧', 'In English-speaking countries we say a.m. before noon and p.m. after noon.'],
-  ['🔢', 'In many other countries the hours go on counting after noon: 13, 14 … up to 24.'],
+  ['🔢', 'In many other countries the hours go on counting after noon: 13, 14 … up to 23, and at midnight they start again at 0.'],
   ['⏱️', 'The long hand shows the minutes.'],
   ['🔁', 'When the long hand goes all the way round, one hour has passed: 60 minutes make 1 hour.']
 ] });

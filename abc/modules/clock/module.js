@@ -1,14 +1,14 @@
 {
-  const INK_FACE = '#1d2150', HAND_MIN = '#e5533d', FACE = '#fff8e7', BEZEL = '#f0b24a', BEZEL_EDGE = '#c98a22', TICK = '#b9b2cf', GLOW = '#fffdf6';
+  const INK_FACE = '#1d2150', HAND_MIN = '#e5533d', FACE = '#efe6d0', BEZEL = '#d9a04a', BEZEL_EDGE = '#a8742a', TICK = '#a59fbc', GLOW = '#f7f0de';
+  const SUN = '#ffd36b', SUN_GLOW = '#ffb347', MOON = '#efe9cf', MOON_SHADE = '#cfc8a8', HILLS = [['#1d4a37', '#163b2c'], ['#111d33', '#0b1426']];
   const DAY = 1440, HALF = 720, HOUR = 60, STEP = 5, R = 14;
   const CLOCK = [7, 8, 9, 10, 12, 13, 15, 16, 18, 19, 20, 0].map(h => h * HOUR);
   const HALVES = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(h => h * HOUR + 30);
   const DIAL = ['06:30', '07:45', '08:10', '09:25', '10:50', '12:15', '13:35', '14:05', '15:20', '16:55', '18:40', '21:00'].map(t => +t.slice(0, 2) * HOUR + +t.slice(3));
-  const PARTS = [[0, 'night'], [360, 'morning'], [720, 'noon'], [840, 'afternoon'], [1080, 'evening'], [1320, 'night']];
+  const PARTS = [[0, 'night'], [360, 'morning'], [540, 'forenoon'], [720, 'noon'], [725, 'lunch'], [840, 'afternoon'], [1080, 'evening'], [1320, 'night']];
   const SKY = [[0, '0d1233', '070a1f', .6], [300, '141a45', '0a0d28', .5], [360, '4a3f86', '5c2a44', .15], [420, '2f5fa0', '24346a', 0], [720, '2a68b2', '173a73', 0],
     [780, '2a68b2', '173a73', 0], [1020, '2d5ea6', '1d3a72', 0], [1080, '41508f', '6a2f42', 0], [1200, '2c2766', '22152f', .25], [1260, '121641', '0a0c26', .5], [DAY, '0d1233', '070a1f', .6]];
   const STARS = [[12, 14, 1.5], [78, 9, 1.5], [46, 24, 1], [88, 38, 1], [22, 58, 1.5], [64, 70, 1], [8, 84, 1], [92, 76, 1.5], [34, 40, 1], [56, 12, 1]];
-  const PICS = [[0, '🌙'], [360, '🌅'], [420, '☀️'], [1080, '🌇'], [1200, '🌙']];
   const TINT = [[0, 5], [360, 2], [720, 1], [1080, 6], [1260, 5]];
   const LINKS = { day: [360, 1200], extra: ['hourglass', 'sundial', 'clock-tower'], at: { 720: 'noon', 0: 'midnight' } };
   const band = (table, v) => table.filter(r => r[0] <= v).pop();
@@ -20,7 +20,7 @@
   const tick = i => { const big = i % 5 === 0, [x1, y1] = at(i * 6, 13.3), [x2, y2] = at(i * 6, big ? 11.9 : 12.6);
     return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${big ? INK_FACE : TICK}" stroke-width="${big ? .7 : .3}" stroke-linecap="round"/>`; };
   const FACE_SVG = `<circle cx="16" cy="16" r="15.4" fill="${BEZEL}" stroke="${BEZEL_EDGE}" stroke-width=".5"/><circle cx="16" cy="16" r="${R}" fill="${FACE}"/>` +
-    `<circle cx="16" cy="13" r="9" fill="${GLOW}" opacity=".7"/>` + Array.from({ length: 60 }, (_, i) => tick(i)).join('') +
+    `<circle cx="16" cy="13" r="9" fill="${GLOW}" opacity=".35"/>` + Array.from({ length: 60 }, (_, i) => tick(i)).join('') +
     Array.from({ length: 12 }, (_, i) => { const [x, y] = at((i + 1) * 30, 9.7); return `<text x="${x}" y="${y}" font-size="3.3" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="${INK_FACE}">${i + 1}</text>`; }).join('');
   const CAP = `<circle cx="16" cy="16" r="1.5" fill="${BEZEL}" stroke="${INK_FACE}" stroke-width=".5"/>`;
   const bar = (len, w, c) => `<line x1="16" y1="${16 + len * .18}" x2="16" y2="${16 - len}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
@@ -34,7 +34,15 @@
     const i = SKY.findIndex(r => r[0] > v), a = SKY[i - 1], b = SKY[i], k = (v - a[0]) / (b[0] - a[0]);
     const top = mix(hex(a[1]), hex(b[1]), k), bot = mix(hex(a[2]), hex(b[2]), k), stars = a[3] + (b[3] - a[3]) * k;
     const dots = stars > .02 ? STARS.map(([x, y, s]) => `radial-gradient(${s}px ${s}px at ${x}% ${y}%, rgba(255,240,200,${stars.toFixed(2)}), transparent 60%)`).join(', ') + ', ' : '';
-    return `${dots}linear-gradient(180deg, rgb(${top.join(', ')}), rgb(${bot.join(', ')}))`;
+    const lit = 1 - stars / .6, hill = k2 => '#' + mix(hex(HILLS[1][k2].slice(1)), hex(HILLS[0][k2].slice(1)), lit).map(x => x.toString(16).padStart(2, '0')).join('');
+    const sunUp = v >= 330 && v <= 1110, f = sunUp ? (v - 330) / 780 : ((v - 1110 + DAY) % DAY) / 660, x = 8 + 84 * f, y = 64 - 48 * Math.sin(Math.PI * f);
+    const body = sunUp
+      ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="${SUN_GLOW}" opacity=".2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${SUN}"/>`
+      : `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${MOON}"/><circle cx="${(x + 2.2).toFixed(1)}" cy="${(y - 1.4).toFixed(1)}" r="4.3" fill="${MOON_SHADE}" opacity=".55"/>`;
+    const land = `<path d="M0 20 Q22 0 46 16 T100 8 V68 H0Z" fill="${hill(0)}"/><path d="M0 34 Q30 16 60 32 T100 28 V68 H0Z" fill="${hill(1)}"/>`;
+    const url = (box, fit, inner) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" preserveAspectRatio="${fit}">${inner}</svg>`)}")`;
+    const art = `${url('0 0 100 100', 'xMidYMin meet', body)} center top / 100% 70% no-repeat, ${url('0 0 100 68', 'none', land)} center bottom / 100% 30% no-repeat, `;
+    return `${dots}${art}linear-gradient(180deg, rgb(${top.join(', ')}), rgb(${bot.join(', ')}))`;
   }
 
   function speech(code, s) {
@@ -56,16 +64,16 @@
     section: 'num', ages: [3, 10],
     build(code) {
       const s = this.strings[code], T = speech(code, s), loc = ABC.langs[code].bcp47;
-      const card = (v, what) => CONTENT.picture(code, { id: idOf(v), label: T.digital(v), name: T.name(v), big: still(v), nav: CONTENT.navText(T.digital(v), tint(v)), word: T.digital(v),
+      const card = (v, what) => CONTENT.picture(code, { id: idOf(v), label: T.digital(v), name: T.name(v), big: still(v), nav: still(v), word: T.digital(v),
         bubbleArt: still(v), bubbleColor: tint(v), concept: conceptOf(v) },
-        { say: what ? I18N.t(s.say, { when: I18N.capFirst(T.name(v), loc), what }, loc) : T.say(v), backdrop: sky(v), pics: [band(PICS, v)[1]], concepts: related(v, []), related: ['clock', ...related(v, LINKS.extra)] });
+        { say: what ? I18N.t(s.say, { when: I18N.capFirst(T.name(v), loc), what }, loc) : T.say(v), at: v, backdrop: sky(v), concepts: related(v, []), related: ['clock', ...related(v, LINKS.extra)] });
       const dial = Object.freeze({ aria: { less: s.less, more: s.more }, face: FACE_SVG, cap: CAP, cycle: DAY, step: STEP, hands: HANDS.map(h => Object.freeze({ turn: h.turn, snap: h.snap, len: h.len, body: h.body + h.knob })),
-        read: v => ({ text: T.digital(v), name: T.name(v), say: T.say(v), pic: band(PICS, v)[1], backdrop: sky(v) }) });
+        read: v => ({ text: T.digital(v), name: T.name(v), say: T.say(v), backdrop: sky(v) }) });
       return {
         hours: CLOCK.map(v => card(v, s.day['h' + v / HOUR])),
         halves: HALVES.map(v => card(v, null)),
-        dial: DIAL.map(v => CONTENT.glyph(code, { id: idOf(v), text: T.digital(v), name: T.name(v), color: tint(v) },
-          { say: T.say(v), bubbleArt: still(v), at: v, dial, backdrop: sky(v), concept: 'clock', concepts: related(v, []), related: related(v, LINKS.extra) }))
+        dial: DIAL.map(v => CONTENT.picture(code, { id: idOf(v), label: T.digital(v), name: T.name(v), big: still(v), nav: still(v), word: T.digital(v), bubbleArt: still(v), bubbleColor: tint(v), concept: 'clock' },
+          { say: T.say(v), at: v, dial, backdrop: sky(v), concepts: related(v, []), related: related(v, LINKS.extra) }))
       };
     },
     check(code, S, s, report) {
@@ -76,8 +84,8 @@
       if (s.hourCycle && !/^h(11|12|23|24)$/.test(s.hourCycle)) report(`hourCycle "${s.hourCycle}" must be h11, h12, h23 or h24`);
     },
     tiles: [
-      { id: 'clock', icon: '🕒', view: 'card', items: S => S.hours, ages: [3, 6], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'where' } },
-      { id: 'halves', icon: '🕞', view: 'card', items: S => S.halves, ages: [5, 9], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'where' } },
+      { id: 'clock', icon: '🕒', view: 'card', items: S => S.hours, ages: [3, 6], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'which' } },
+      { id: 'halves', icon: '🕞', view: 'card', items: S => S.halves, ages: [5, 9], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'which' } },
       { id: 'setclock', icon: '🕰️', view: 'dial', items: S => S.dial, ages: [6, 10], game: { type: 'find', prompts: ['glyph'], ask: () => 'which' } }
     ]
   });

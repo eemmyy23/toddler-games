@@ -119,8 +119,8 @@ every other tile has every item in every language (checked).
 `pl` (plural word, Count), `examples [[word, pic, inside]]`, `concept`, `concepts` (other concepts it shows — linked too), `related` (see-also concepts, linked by picture and word, e.g. a clock → hourglass, sundial; each opens that word's page, and that page links back to the item's tile; checked to be concepts), `alts` (the concept's other names: `[{ id, w }]`, built),
 `parts [{ say, color? }]` (the card's parts explorer, below), `unit`, `w`/`syl`/`forms` (Read), `n` (Count),
 `backdrop` (a CSS background the card and dial views paint behind the whole screen via `APP.backdrop`, e.g. the sky at that hour; it must keep `--text` ≥ 4.5:1
-and `--muted` ≥ 3:1 — the hub and every other view clear it), `at` + `dial` (dial view: the item's value and the shared dial `{ face, cap, cycle, step, aria { less, more },
-hands [{ turn, snap, len, body }], read(value) → { text, name, say, pic, backdrop } }` — the module draws, the view only turns),
+and `--muted` ≥ 3:1 — the hub and every other view clear it), `at` (the item's place on a scale, e.g. minutes of the day; links pick the nearest) + `dial` (dial view: the item's value and the shared dial `{ face, cap, cycle, step, aria { less, more },
+hands [{ turn, snap, len, body }], read(value) → { text, name, say, backdrop } }` — the module draws, the view only turns),
 games: `bubble`, `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`, `smallBubble`, `pictureBubble`, `learn` (id of its learn item when it differs),
 `sound`, `bubbleArt` (HTML picture), `among` (choices only from items with the same `among`), `members` (sort game; built by CONTENT too),
 `plural`, `a` + `g`, `thats` ({ name, g } for "That's …", built). Two choices in one round never share a `sound` or a look.
@@ -133,20 +133,19 @@ A single line is `speak(text, PAUSE.x)`. Anything multi-step goes through `APP.s
 previous one; the shell calls `APP.stop()` on leave, language switch and background, and views call it when they step. One-off feedback is
 `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
 Other `APP` helpers: `L, ui, t, mt, icon, exclaim, items, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
-`APP.links(item, el)` fills `el` with the item's link chips (info, same concept in other tiles, `related`, learn ↔ play) and hides it when empty — every view uses it.
+`APP.links(item, el, brief)` fills `el` with the item's link chips (info, same concept in other tiles — the one with the nearest `at` when items carry one —, `related` as picture-only chips, learn ↔ play) and hides it when empty — every view uses it; `brief` (dial) and play view keep only info and learn ↔ play. On a backdrop the chips get the `--card` background (contrast).
 Space/Enter on a focused button presses that button; elsewhere they play (▶) or say the view's `line()`.
 **dial** — a face with hands the child turns: a drag that starts anywhere on the face moves the hand nearest the finger (within `GRIP.near`°, else the held hand) by the finger's angle change (no jump to the finger);
 hands are geared through one value (minutes: the minute hand drives the hour hand, crossing 12 changes the hour, the day wraps at `cycle`); a drag snaps on
 release to the held hand's `snap` (hour hand: whole hours, minutes kept; minute hand: `step`) with a tick at each snap point; a movement under `GRIP.tap` px is a
 tap — on the other hand it picks that hand, elsewhere it turns the picked hand to the tapped number (hour hand: to that hour, minutes kept); − / + step by `step`; a second touch during a drag is ignored.
-Keyboard: the face is a focusable `role=slider`; ↑/↓ (PgUp/PgDn) step the held hand by its `snap`, Space/Enter switch the held hand. The digital time, part-of-day icon,
+Keyboard: the face is a focusable `role=slider`; ↑/↓ (PgUp/PgDn) step the held hand by its `snap`, Space/Enter switch the held hand. The digital time,
 spoken name and backdrop follow the value; the time is spoken on release only. ‹ › sweep the hands to the next item's `at`.
 
 **Parts explorer** (card view, any item with `parts`: rainbow bands, animal families, opposite pairs) — one engine feature driven by data.
 A part is `{ say }` plus optional `color`. Every part is shown once: `CONTENT.group` draws each member as a button (picture, caption under it) (`captions`,
 default the member's word) and each part is at least `--part-min`; tapping a part says it, tapping the picture anywhere else steps to the next part
-(no dead taps). Parts with a `color` (the rainbow's bands) also get a strip of contiguous swatches under the picture (`#parts .pt`, ≥ `--tap`, bleeding by
-`--bleed`): tap or drag a finger across it (`onScrub`), each part lights (`.on`, the others dim) and is spoken, held for `PAUSE.hold`; until it is used an idle
+(no dead taps). Parts with a `color` (the rainbow's bands) also get a strip of contiguous swatches under the picture (`#parts .pt`, ≥ `--tap`, the column's width — clear of the edge-swipe gesture): tap or drag a finger across it (`onScrub`), each part lights (`.on`, the others dim) and is spoken, held for `PAUSE.hold`; until it is used an idle
 hint (👆 `icons.drag`, after 3 s, 3 times, static under reduced motion) shows it can be touched. ▶ (items with parts) says the name and every part in order.
 A learn card too tall for the screen first takes the `#learn.tight` tokens, then scales (`APP.fit`).
 

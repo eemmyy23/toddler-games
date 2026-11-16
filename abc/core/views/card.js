@@ -54,7 +54,7 @@
     playable: it => !!(it && it.parts),
     resize() { APP.fitText($('glyph')); if (!$('also').hidden) APP.fitText($('also')); APP.fit($('learn'), 'tight'); },
     select(it) { APP.idx = APP.indexOf(it.id); this.show(true); APP.celebrate(null); },
-    indexFace: it => `${it.nav}<small>${it.word ? esc(it.word) : it.examples && it.examples[0] ? it.examples[0][1] : esc(it.name)}</small>`
+    indexFace: it => `${it.word && it.word === it.label ? it.big : it.nav}<small>${it.word ? esc(it.word) : it.examples && it.examples[0] ? it.examples[0][1] : esc(it.name)}</small>`
   };
   VIEW('card', VIEW_CARD);
 })();

@@ -66,7 +66,7 @@ i('clock', { title: 'Die Uhr', lines: [
   ['🕛', 'Auf dem Zifferblatt stehen aber nur 12, deshalb geht der kleine Zeiger zweimal am Tag herum.'],
   ['🌅', 'Beim ersten Mal zeigt er die Nacht und den Vormittag, beim zweiten Mal den Nachmittag und den Abend.'],
   ['🇬🇧', 'In englischsprachigen Ländern sagt man a.m. vor Mittag und p.m. nach Mittag.'],
-  ['🔢', 'Bei uns zählt man nach Mittag weiter: 13 Uhr, 14 Uhr … bis 24 Uhr.'],
+  ['🔢', 'Bei uns zählt man nach Mittag weiter: 13 Uhr, 14 Uhr … bis 23 Uhr, und um Mitternacht beginnt es wieder bei 0 Uhr.'],
   ['⏱️', 'Der große Zeiger zeigt die Minuten.'],
   ['🔁', 'Wenn der große Zeiger einmal ganz herumgeht, ist eine Stunde vorbei: 60 Minuten sind 1 Stunde.']
 ] });
