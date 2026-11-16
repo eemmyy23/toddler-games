@@ -60,6 +60,47 @@ i('day', { title: 'Ziua', lines: [
   ['☀️', 'Partea întoarsă spre Soare are zi.'],
   ['🌃', 'Partea cealaltă are noapte.']
 ] });
+i('clock', { title: 'Ceasul', lines: [
+  ['⏰', 'Ceasul ne arată cât e ora.'],
+  ['🌍', 'O zi are 24 de ore.'],
+  ['🕛', 'Pe cadranul ceasului sunt doar 12 ore, așa că limba mică face de două ori turul într-o zi.'],
+  ['🌅', 'Prima dată arată noaptea și dimineața, a doua oară după-amiaza și seara.'],
+  ['🇬🇧', 'În țările unde se vorbește engleza, se spune a.m. înainte de amiază și p.m. după amiază.'],
+  ['🔢', 'La noi, după amiază orele se numără mai departe: ora 13, ora 14 … până la 24.'],
+  ['⏱️', 'Limba mare arată minutele.'],
+  ['🔁', 'Când limba mare face un tur întreg, a trecut o oră: 60 de minute fac o oră.']
+] });
+i('hourglass', { title: 'Clepsidra', lines: [
+  ['⌛', 'Clepsidra măsoară un timp scurt cu ajutorul nisipului.'],
+  ['⏳', 'Nisipul curge încet printr-o gaură mică din mijloc.'],
+  ['🔄', 'Când tot nisipul a ajuns jos, timpul s-a terminat. O întorci și începe din nou!'],
+  ['🪥', 'Una mică te ajută să te speli pe dinți destul de mult.']
+] });
+i('sundial', { title: 'Ceasul solar', lines: [
+  ['☀️', 'Ceasul solar folosește Soarele ca să arate ora.'],
+  ['📍', 'Un băț din mijloc face o umbră.'],
+  ['🌍', 'Pământul se învârte, Soarele pare să treacă pe cer, iar umbra se mută și arată orele.'],
+  ['☁️', 'Nu merge noaptea și nici când e înnorat.'],
+  ['🏛️', 'Oamenii foloseau ceasuri solare acum mii de ani.']
+] });
+i('clock-tower', { title: 'Turnul cu ceas', lines: [
+  ['🏙️', 'Turnul cu ceas este un turn înalt cu un ceas mare sus.'],
+  ['👀', 'E înalt și mare, ca toată lumea din oraș să vadă ora.'],
+  ['🔔', 'Multe turnuri cu ceas au clopote care bat orele.'],
+  ['🇬🇧', 'La Londra, clopotul cel mare, Big Ben, bate într-un turn cu ceas foarte cunoscut.']
+] });
+i('noon', { title: 'Amiaza', lines: [
+  ['🕛', 'Amiaza este ora 12, la mijlocul zilei.'],
+  ['☀️', 'Pe la amiază, Soarele e cel mai sus pe cer.'],
+  ['👤', 'Atunci umbrele sunt cele mai scurte.'],
+  ['🍽️', 'Mulți oameni iau prânzul pe la amiază.']
+] });
+i('midnight', { title: 'Miezul nopții', lines: [
+  ['🕛', 'Miezul nopții este ora 12, la mijlocul nopții.'],
+  ['📅', 'La miezul nopții începe o zi nouă.'],
+  ['😴', 'Atunci majoritatea copiilor dorm adânc.'],
+  ['🎆', 'De Revelion, oamenii sărbătoresc la miezul nopții.']
+] });
 i('night', { title: 'Noaptea', lines: [
   ['🌃', 'Noaptea, partea noastră de Pământ nu vede Soarele.'],
   ['🌙', 'Atunci vedem Luna și stelele.'],

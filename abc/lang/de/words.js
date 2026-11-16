@@ -236,4 +236,10 @@ w('ice', { w: 'Eis/wür/fel', g: 'm', pl: 'Eiswürfel' });
 w('question', { w: 'Fra/ge/zei/chen', g: 'n', pl: 'Fragezeichen' });
 w('wifi', { w: 'WLAN', g: 'n', mass: true, ex: false });
 w('orange-colour', { w: 'o/ran/ge', homonym: 'orange' });
+w('hourglass', { w: 'Sand/uhr', g: 'f', pl: 'Sanduhren' });
+w('sundial', { w: 'Son/nen/uhr', g: 'f', pl: 'Sonnenuhren' });
+w('clock-tower', { w: 'Turm/uhr', g: 'f', pl: 'Turmuhren', syn: [{ w: 'Uhr/turm', g: 'm', pl: 'Uhrtürme' }] });
+w('noon', { w: 'Mit/tag', g: 'm', mass: true });
+w('midnight', { w: 'Mit/ter/nacht', g: 'f', mass: true });
+w('clocks', { w: 'Uh/ren', plOnly: true });
 }

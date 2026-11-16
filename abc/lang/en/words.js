@@ -236,4 +236,10 @@ w('wifi', { w: 'wi/fi', mass: true, ex: false });
 w('wheat-ear', { w: 'ear of wheat', art: 'an', pl: 'ears of wheat' });
 w('ufo', { w: 'U/FO', art: 'a', pl: 'UFOs', ex: false });
 w('orange-colour', { w: 'or/ange', homonym: 'orange' });
+w('hourglass', { w: 'hour/glass', art: 'an', pl: 'hourglasses', syn: [{ w: 'sand ti/mer', art: 'a', pl: 'sand timers' }] });
+w('sundial', { w: 'sun/di/al', art: 'a', pl: 'sundials' });
+w('clock-tower', { w: 'clock tow/er', art: 'a', pl: 'clock towers' });
+w('noon', { w: 'noon', mass: true, syn: [{ w: 'mid/day', mass: true }] });
+w('midnight', { w: 'mid/night', mass: true });
+w('clocks', { w: 'clocks', plOnly: true });
 }

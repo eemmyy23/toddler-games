@@ -60,6 +60,47 @@ i('day', { title: 'Der Tag', lines: [
   ['☀️', 'Die Seite, die zur Sonne schaut, hat Tag.'],
   ['🌃', 'Die andere Seite hat Nacht.']
 ] });
+i('clock', { title: 'Die Uhr', lines: [
+  ['⏰', 'Die Uhr zeigt uns, wie spät es ist.'],
+  ['🌍', 'Ein Tag hat 24 Stunden.'],
+  ['🕛', 'Auf dem Zifferblatt stehen aber nur 12, deshalb geht der kleine Zeiger zweimal am Tag herum.'],
+  ['🌅', 'Beim ersten Mal zeigt er die Nacht und den Vormittag, beim zweiten Mal den Nachmittag und den Abend.'],
+  ['🇬🇧', 'In englischsprachigen Ländern sagt man a.m. vor Mittag und p.m. nach Mittag.'],
+  ['🔢', 'Bei uns zählt man nach Mittag weiter: 13 Uhr, 14 Uhr … bis 24 Uhr.'],
+  ['⏱️', 'Der große Zeiger zeigt die Minuten.'],
+  ['🔁', 'Wenn der große Zeiger einmal ganz herumgeht, ist eine Stunde vorbei: 60 Minuten sind 1 Stunde.']
+] });
+i('hourglass', { title: 'Die Sanduhr', lines: [
+  ['⌛', 'Eine Sanduhr misst eine kurze Zeit mit Sand.'],
+  ['⏳', 'Der Sand rieselt langsam durch ein kleines Loch in der Mitte.'],
+  ['🔄', 'Wenn der ganze Sand unten ist, ist die Zeit um. Dreh sie um, und es geht von vorne los!'],
+  ['🪥', 'Eine kleine Sanduhr hilft dir, lange genug Zähne zu putzen.']
+] });
+i('sundial', { title: 'Die Sonnenuhr', lines: [
+  ['☀️', 'Eine Sonnenuhr zeigt die Zeit mithilfe der Sonne.'],
+  ['📍', 'Ein Stab in der Mitte wirft einen Schatten.'],
+  ['🌍', 'Die Erde dreht sich, die Sonne scheint über den Himmel zu wandern, und der Schatten wandert mit und zeigt auf die Stunden.'],
+  ['☁️', 'Nachts und wenn es bewölkt ist, geht sie nicht.'],
+  ['🏛️', 'Schon vor Tausenden von Jahren haben Menschen Sonnenuhren benutzt.']
+] });
+i('clock-tower', { title: 'Die Turmuhr', lines: [
+  ['🏙️', 'Eine Turmuhr ist eine große Uhr hoch oben an einem Turm.'],
+  ['👀', 'Sie ist hoch und groß, damit alle in der Stadt die Zeit sehen können.'],
+  ['🔔', 'Viele Uhrtürme haben Glocken, die die Stunden schlagen.'],
+  ['🇬🇧', 'In London schlägt die große Glocke Big Ben in einem berühmten Uhrturm.']
+] });
+i('noon', { title: 'Der Mittag', lines: [
+  ['🕛', 'Mittag ist um 12 Uhr, in der Mitte des Tages.'],
+  ['☀️', 'Um die Mittagszeit steht die Sonne am höchsten am Himmel.'],
+  ['👤', 'Dann sind die Schatten am kürzesten.'],
+  ['🍽️', 'Viele Menschen essen um diese Zeit zu Mittag.']
+] });
+i('midnight', { title: 'Die Mitternacht', lines: [
+  ['🕛', 'Mitternacht ist um 12 Uhr, in der Mitte der Nacht.'],
+  ['📅', 'Um Mitternacht beginnt ein neuer Tag.'],
+  ['😴', 'Dann schlafen die meisten Kinder tief und fest.'],
+  ['🎆', 'An Silvester feiern die Menschen um Mitternacht.']
+] });
 i('night', { title: 'Die Nacht', lines: [
   ['🌃', 'Nachts sieht unsere Seite der Erde die Sonne nicht.'],
   ['🌙', 'Dann sehen wir den Mond und die Sterne.'],
