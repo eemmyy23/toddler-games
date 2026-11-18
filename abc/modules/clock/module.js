@@ -84,9 +84,9 @@
       if (s.hourCycle && !/^h(11|12|23|24)$/.test(s.hourCycle)) report(`hourCycle "${s.hourCycle}" must be h11, h12, h23 or h24`);
     },
     tiles: [
-      { id: 'clock', icon: '🕒', view: 'card', items: S => S.hours, ages: [3, 6], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'which' } },
-      { id: 'halves', icon: '🕞', view: 'card', items: S => S.halves, ages: [5, 9], index: true, game: { type: 'find', prompts: ['voice'], ask: () => 'which' } },
-      { id: 'setclock', icon: '🕰️', view: 'dial', items: S => S.dial, ages: [6, 10], game: { type: 'find', prompts: ['glyph'], ask: () => 'which' } }
+      { id: 'clock', icon: '🕒', view: 'card', items: S => S.hours, ages: [3, 6], index: true, game: { type: 'find', caption: false, prompts: ['voice'], ask: () => 'which' } },
+      { id: 'halves', icon: '🕞', view: 'card', items: S => S.halves, ages: [5, 9], index: true, game: { type: 'find', caption: false, prompts: ['voice'], ask: () => 'which' } },
+      { id: 'setclock', icon: '🕰️', view: 'dial', items: S => S.dial, ages: [6, 10], game: { type: 'find', caption: false, prompts: ['glyph'], ask: () => 'which' } }
     ]
   });
 }

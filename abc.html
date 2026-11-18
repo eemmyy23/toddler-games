@@ -52,7 +52,7 @@
   --part-h:54px;--part-fs:30px;--ex-dir:row;--ex-min:0px;--ex-pad:6px 12px 6px 8px;--ex-pic:26px;--ex-fs:16px;--inf-fs:17px;--inf-pad:9px 12px;--inf-pic:28px;--hero-h:60px;
   --dial:min(40vh,76vw);--dial-gap:var(--sp-2);--dstep:min(72px,20vw);--dtime-h:min(72px,20vw);--dtime-fs:var(--fs-l);--dsay-fs:var(--fs-s)}}
 @media (max-width:350px){:root{--seg-w:42px;--seg-fs:22px;--pill-h:46px;--pill-fs:19px;--fs-xs:12px}}
-@media (max-height:450px) and (orientation:landscape){:root{--read-dir:row;--read-split:2;--part-h:44px;--part-fs:26px;--az-fs:9px;--tabbar-h:50px;--tab-h:44px;--tl-fs:0px;--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-w:44px;--seg-fs:22px;
+@media (max-height:450px) and (orientation:landscape){:root{--read-dir:row;--read-split:2;--part-h:44px;--part-fs:26px;--az-fs:9px;--tabbar-h:50px;--tab-h:46px;--tl-fs:var(--fs-xxs);--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-w:44px;--seg-fs:22px;
   --nav-w:56px;--nav-y:calc(var(--bot) + (100% - var(--bot) - var(--top)) / 2 - var(--nav-h) / 2);--low-h:0px;--act-l:auto;--act-r:var(--gut);--side:calc(var(--gut) + 64px);--glyph:min(30vh,22vw);--rt-h:40px;--rt-fs:22px;--rc-h:40px;--rc-fs:16px;--rpic:20vh;--read-gap:4px;--tile-min:96px;--hub-gap:8px;
   --dial-dir:row;--dial:min(64vh,40vw);--dstep:56px;--dtime-h:56px}}
 
@@ -184,7 +184,7 @@ body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 .pill.link{--pill-h:var(--link-h);--pill-fs:var(--link-fs);background:transparent;box-shadow:none;border:var(--hair) solid var(--line-strong);color:var(--muted)}
 .li{--icon:var(--fs-s)}
 body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
-.pill.link.see{min-width:var(--link-h);padding-inline:0;justify-content:center;font-size:calc(var(--link-fs) * 1.5)}
+.pill.link.see{min-width:var(--link-h);padding-inline:0;justify-content:center}
 .infobtn{color:var(--amber)}
 
 #play{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--play-gap)}

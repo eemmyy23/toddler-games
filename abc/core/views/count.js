@@ -5,7 +5,7 @@
     const list = APP.items();
     [['c-obj', 'obj'], ['c-hand', 'hand']].forEach(([id, s]) => { $(id).classList.toggle('on', style === s); $(id).setAttribute('aria-pressed', style === s); });
     $('crows').innerHTML = list.map(it => {
-      const objs = style === 'obj' ? (it.pics || []).map(p => `<span>${p}</span>`).join('') : APP.hands(it.n);
+      const objs = style === 'obj' ? APP.tally(it).map(p => `<span>${p}</span>`).join('') : APP.hands(it.n);
       return `<button class="card crow" data-n="${it.n}" aria-label="${esc(it.name)}"><span class="cnum"><span class="cdig ink" style="--c:${it.color}">${esc(it.label)}</span><span class="cword">${esc(it.name)}</span></span>` +
              `<span class="citems${style === 'obj' ? ' objs start' : ''}">${objs}</span></button>`;
     }).join('');

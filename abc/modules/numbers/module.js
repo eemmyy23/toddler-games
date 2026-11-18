@@ -1,15 +1,11 @@
 {
-  const THINGS = ['apple', 'chick', 'fish', 'strawberry', 'star', 'balloon', 'ladybird', 'biscuit', 'car', 'butterfly'];
   const TEN = '🔟', ONE = '🟡', BIG = [100, 1000, 10000, 100000, 1000000, Infinity];
   const num = (code, n, name, i, more, look) => CONTENT.glyph(code, Object.assign({ id: 'n' + n, text: String(n), name, color: CONTENT.palette(i), word: name }, look), Object.assign({ n }, more));
   MODULE('numbers', {
     section: 'num', ages: [2, 6], needs: ['numbers', 'teens', 'tens'],
     build(code) {
       const L = ABC.langs[code], s = this.strings[code];
-      const numbers = L.numbers.map((w, i) => {
-        const n = i + 1, x = CONTENT.things(code, [THINGS[i]])[0], e = x && x.entry.pl ? x.entry : {}, pic = ABC.conceptById[THINGS[i]].pic;
-        return num(code, n, w, n, { key: n === 10 ? '0' : String(n), pics: Array(n).fill(pic), pic, pl: e.pl, g: e.g });
-      });
+      const numbers = L.numbers.map((w, i) => num(code, i + 1, w, i + 1, { key: i === 9 ? '0' : String(i + 1), tally: i + 1 }));
       const teens = L.teens.map((w, i) => num(code, i + 11, w, i + 11, i < 9
         ? { say: I18N.t(s.teenSay, { name: w, ones: L.numbers[i] }, L.bcp47), pics: [TEN, ...Array(i + 1).fill(ONE)] }
         : { say: s.tensSay[1], pics: [TEN, TEN] }));
@@ -26,7 +22,7 @@
     },
     tiles: [
       { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
-      { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany', fingers: 'finger', ask: (it, round) => round.look || it.pl ? 'countThing' : 'count' } },
+      { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany', fingers: 'finger', ask: (it, round) => round.look ? 'countThing' : 'count' } },
       { id: 'teens', icon: '🔟', view: 'card', items: S => S.teens, ages: [4, 7], index: true, search: true,
         game: { type: 'find', prompts: ['glyph', 'word', 'voice'], ask: () => 'digits' } },
       { id: 'tens', icon: '💯', view: 'card', items: S => S.tens, ages: [5, 8], index: true, search: true,

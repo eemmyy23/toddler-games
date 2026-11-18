@@ -103,7 +103,7 @@ const APP = {
       for (const x of TILES) {
         if (!usable(x, false)) continue;
         const xs = itemsOf(x), y = xs.find(y => y.id === c) || xs.find(y => y.concept === c);
-        if (y) { out.push(`<button class="pill link see" data-t="${x.id}" data-id="${esc(y.id)}" data-play="0" aria-label="${esc(y.name)}" title="${esc(y.name)}">${CONTENT.pic(c)}</button>`); break; }
+        if (y) { out.push(`<button class="pill link" data-t="${x.id}" data-id="${esc(y.id)}" data-play="0"><span class="li">${CONTENT.pic(c)}</span> ${esc(y.name)}</button>`); break; }
       }
     }
     const home = it.learn ?? it.id;
@@ -128,6 +128,8 @@ const APP = {
     const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
+  countable() { const xs = CONTENT.countable(lang); return xs[Math.random() * xs.length | 0]; },
+  tally: it => it.tally ? Array(it.tally).fill(APP.countable().pic) : it.pics || [],
   hands(n) {
     const one = (raised, right) => `<svg class="hand" viewBox="0 0 32 32" aria-label="${esc(APP.ui().aria[right ? 'rightHand' : 'leftHand'])}"><g${right ? ' transform="translate(32 0) scale(-1 1)"' : ''}>${ABC.art['hand-' + raised]}</g></svg>`;
     return n <= HAND ? one(n, false) : one(HAND, false) + one(n - HAND, true);

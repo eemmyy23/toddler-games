@@ -19,6 +19,7 @@ const CONTENT = (() => {
     });
     return (wordCache[code] = list.map(x => Object.freeze(Object.assign(x, { alts: list.filter(y => y.concept === x.concept && y !== x).map(y => ({ id: y.id, w: y.w })) }))));
   }
+  const countCache = {}, countable = code => countCache[code] || (countCache[code] = words(code).filter(x => !x.synOf && x.forms && x.forms.pl && x.entry.pl && !x.entry.mass && !x.entry.unique && !x.entry.plOnly));
   const idCache = {}, byId = code => idCache[code] || (idCache[code] = new Map(words(code).map(x => [x.id, x])));
   function seal(base, extra) {
     for (const [k, v] of Object.entries(extra || {})) {
@@ -32,7 +33,7 @@ const CONTENT = (() => {
     return Object.freeze(base);
   }
   const C = {
-    words, byId, pic, svg, the, example,
+    words, byId, countable, pic, svg, the, example,
     exclaim: (code, name) => t(code, 'exclaim', { name }),
     listing: (code, name, list) => t(code, 'listing', { name, list: I18N.list(list, ABC.langs[code].bcp47) }),
     things: (code, ids) => { const by = byId(code); return ids.map(id => by.get(id)).filter(Boolean); },

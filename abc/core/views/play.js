@@ -6,6 +6,7 @@
   const RULES = { levels: [[8, 4], [3, 3], [0, 2]], maxWeight: 2, recent: 0.5, recentSubjects: 8, cooldown: 700, bigEvery: 10, next: 1200, nextBig: 2400, settle: 350 };
   const nChoices = () => RULES.levels.find(([s]) => APP.streak >= s)[1];
   const look = it => it.bubbleArt || it.bubble || it.bubbleColor;
+  const named = it => (it.pictureBubble || (!!it.bubbleColor && !it.bubble)) && APP.tile().game.caption !== false && !!(typeof game().caption === 'function' ? game().caption(round) : game().caption);
   const pool = () => game().pool(APP.gameItems(), APP.streak);
   const fits = (it, t, os) => (!t.among || it.among === t.among) && !os.some(o => o === it || (o.sound && o.sound === it.sound) || look(o) === look(it));
   const remember = (list, id, n) => { list.push(id); while (list.length > n) list.shift(); };
@@ -44,7 +45,7 @@
     opts.forEach((it, i) => {
       const b = document.createElement('button');
       b.className = 'bub'; if (it.bubbleArt) { b.innerHTML = it.bubbleArt; b.classList.add('drawn'); } else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--len', Math.max(1, [...b.textContent].length)); }
-      if (game().caption) { const c = document.createElement('span'); c.className = 'bname'; c.textContent = it.name; b.appendChild(c); b.classList.add('named'); }
+      if (named(it)) { const c = document.createElement('span'); c.className = 'bname'; c.textContent = it.name; b.appendChild(c); b.classList.add('named'); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.setProperty('--i', i);
       box.appendChild(b);

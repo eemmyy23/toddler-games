@@ -34,10 +34,10 @@
       $('parts').innerHTML = strip ? P.map((x, i) => `<button class="card pt" data-part="${i}" aria-label="${esc(x.say)}" style="--i:${i};--c:${x.color}"></button>`).join('')
         + `<span class="tip">${APP.icon('drag')}</span>` : '';
       if (strip) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }
-      $('pics').hidden = !(it.pics || []).length; $('word').hidden = !it.word;
+      const pics = APP.tally(it); $('pics').hidden = !pics.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
       $('also').innerHTML = APP.synonyms(it); $('also').hidden = !$('also').innerHTML; if (!$('also').hidden) APP.fitText($('also'));
-      $('pics').innerHTML = (it.pics || []).map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
+      $('pics').innerHTML = pics.map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
       $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="card ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color
         ? I18N.highlight(low(w), it.unit ? it.unit.lower : it.label, low, s => `<b class="ink" style="--c:${it.color}">${s}</b>`) : esc(low(w))}</span></button>`).join('');
       APP.links(it, $('links'));

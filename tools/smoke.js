@@ -186,8 +186,17 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
       else if (document.querySelectorAll('#ask .objs > span').length !== target.n) return 'wrong count'; lines.add($('ask').textContent); }
     return { things: things.size, hands, lines: lines.size }; });
   ok(counted.things >= 20 && counted.hands >= 5 && counted.lines >= 20, `"how many" counts any word and fingers, not one picture per number (${JSON.stringify(counted)})`);
-  const named = await ev(() => { openTile('cats', true, true); return [...document.querySelectorAll('#choices .bub')].every(b => b.querySelector('.bname') && b.querySelector('.bname').textContent === ABC.views.play.choices().find(o => o.id === b.dataset.id).name); });
-  ok(named, 'category bubbles show the category name under the picture');
+  const named = await ev(() => { const bad = [], seen = {};
+    for (const t of Tiles.list().filter(t => t.game && usable(t, true))) { openTile(t.id, true, true);
+      for (let k = 0; k < 12; k++) { ABC.views.play.newRound(); const { round } = ABC.views.play.state(), gc = ABC.games[t.game.type].caption, text = !(typeof gc === 'function' ? gc(round) : gc);
+        for (const b of document.querySelectorAll('#choices .bub')) { const it = ABC.views.play.choices().find(o => o.id === b.dataset.id), c = b.querySelector('.bname'), pic = it.pictureBubble || (!!it.bubbleColor && !it.bubble);
+          const want = pic && !text && t.game.caption !== false; if (want !== !!c || (c && c.textContent !== it.name)) { bad.push(`${t.id}:${it.id}`); break; } if (c) seen[t.id] = 1; } } }
+    return { bad, seen: Object.keys(seen).length }; });
+  ok(!named.bad.length && named.seen >= 8, `every picture/colour bubble is named unless the question shows the word or the name is the answer (${named.seen} games named; ${named.bad.slice(0, 4).join(' ') || 'no misses'})`);
+  const tallies = await ev(() => { openTile('count', false, true); const rows = [...document.querySelectorAll('.crow')].map(r => [+r.dataset.n, r.querySelectorAll('.objs > span').length, r.querySelector('.objs > span').innerHTML]);
+    openTile('digits', false, true); const pics = new Set(); for (let k = 0; k < 12; k++) { APP.idx = 2; view().show(false); pics.add($('pics').firstElementChild.innerHTML); }
+    return { right: rows.every(([n, c]) => n === c), kinds: new Set(rows.map(r => r[2])).size, cardKinds: pics.size }; });
+  ok(tallies.right && tallies.kinds >= 4 && tallies.cardKinds >= 4, `numbers draw n things of varying kinds in Count and on the cards (${JSON.stringify(tallies)})`);
   await ev(() => openTile('colors', true, true));
   const tapRes = await ev(async () => { const { target } = ABC.views.play.state(), s0 = APP.stars, b = document.querySelector(`.bub[data-id="${CSS.escape(target.id)}"]`);
     b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); const s1 = APP.stars; b.click(); return [s0, s1, APP.stars]; });
