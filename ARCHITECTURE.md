@@ -64,6 +64,8 @@ tools/smoke.js              browser test: every language, every game, choice rul
   the tile shows from that profile upwards (higher profiles add, never remove) and wears that profile's badge
   (left → right in profile order). A tile that is not complete in a language is not shown at all (no "coming soon").
 - **Speech** uses only a voice of the current language (local first, `LANG.voices` preferred, never another language's). No voice → 🔇 on the flag.
+- **Pronunciation** (contract **PRON** below): a word is spoken from a native recording when one exists, else by the voice; nothing about how a word sounds is
+  written from memory — every recording, IPA, stress and respelling carries the URL it was taken from.
 - **Globals.** Content files only call the registry. Views and games use `APP`, `CONTENT`, `I18N`, `Tiles`, `ABC` (read-only), `esc` and the services
   (`$`, `onTap`, `onTapIn`, `onScrub`, `speak`, `sfx`, `store`, `confetti`, `calm`, `wait`, `shuffle`, `PAUSE`). The shell owns its state (language, profile, section, hub);
   `APP.set({ profile, section, hub })` and `setLang(code)` change it (tests use them, then `render()`); `APP.set` does not persist.
@@ -98,6 +100,29 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
 (orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.
+**PRON** — every word and every synonym (its base form: `w` without `/`) has `pron`, one of:
+- `{ audio: '<lang>/<id>.mp3', file, author, license, src }` — a native speaker's recording from Wikimedia Commons, searched in this order: Lingua Libre
+  `LL-Q7913 (ron)` / `LL-Q1860 (eng)` / `LL-Q188 (deu)`, then `Ro-*.ogg` / `En-us-*.ogg` / `De-*.ogg`. `file` is the Commons title, `src` its page URL,
+  `license` one of CC0, CC BY, CC BY-SA (any version). The recording must say exactly the base form (not the plural, not with an article).
+- `{ ipa, stress, src }` — no recording: `stress` is the 0-based index of the stressed syllable in the `/` split of `w` (multi-word: of the main word),
+  `ipa` as the source writes it. Sources: RO dexonline.ro (the accent mark of the definition; `ipa` only when ro.wiktionary.org has it, with its URL), EN en.wiktionary.org, DE de.wiktionary.org.
+
+Optional `tts` (a respelling) with `voice` (the voice name and device it was heard wrong on) — only when that voice misplaces the stress of `ipa`/`stress`.
+Files: `audio/<lang>/<id>.mp3` (`<id>` = word key, synonyms `<concept>~<n>`), mono, 32 kbps, silence trimmed, loudness-normalised (ffmpeg from the Commons
+original; iOS Safari is why mp3, not ogg). They are offline files in the manifest like any other; `check.js --fix` reports their total MB.
+
+Playback (`speak` in services.js, no word or language named): an utterance whose text, without punctuation and case, equals a base form of the current
+language that has `audio` plays the file; if it cannot play (missing, blocked, decode error) it falls back to the voice with the same timing contract. Every
+other utterance (sentences, articulated and plural forms, syllables in Read, numbers, letters) goes to the voice, with each whole-word `tts` respelling
+substituted for its base form. Credits: the app lists every recording's word, author, license and Commons link (reached from the version line at the foot of the hubs),
+built from the `pron` data — no separate credits file.
+
+Letters: the spoken letter names (`spell`) are data with a source, the official name of the letter: RO dexonline.ro (DOOM entry of the letter), EN en.wiktionary.org,
+DE de.wiktionary.org (entry of the letter).
+
+`check.js` (errors): a word or synonym without `pron`; `audio` without its file, `file`, `author`, an allowed `license` or `src`; a file in `audio/` no word uses;
+`ipa`/`stress` without `src`; `stress` outside the syllables; any `src` that is not https on commons.wikimedia.org, dexonline.ro, ro/en/de.wiktionary.org; `tts` without `voice`.
+
 **INFO** — `const i = INFO(code); i(id, { title, lines: [[emoji, sentence], …] })`. **C** — `C(id, pic, { gloss })` (`gloss`: a note for translators, not read by the app).
 **GROUP** — `GROUP(id, 'member ids')`: the group is a concept too (its word names it); a concept is in at most one group (index Groups mode, Groups module).
 **ART** — `ART(id, svgBody)` (viewBox 0 0 32 32).
