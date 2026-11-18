@@ -122,6 +122,13 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     await clear(); await p.mouse.click(pc[n - 1].x, pc[n - 1].y); await spoken();
     ok(pc.length === n && pc.every(c => c.w >= 44 && c.h >= 44) && (await said())[0] === sayN[n - 1], `${t}: ${n} captioned parts in the picture ≥ 44px (${pc.map(c => (c.w | 0) + 'x' + (c.h | 0)).join(' ')}), the last says "${(await said())[0]}"`);
   }
+  { const vp = p.viewportSize(); await p.setViewportSize({ width: 568, height: 320 });
+    const least = await ev(() => { const min = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--part-min')), out = [];
+      for (const t of ['families', 'opposites']) { openTile(t, false, true); APP.items().forEach((it, i) => { APP.idx = i; view().show(false); $('glyph').getAnimations().forEach(a => a.finish());
+        document.querySelectorAll('#glyph .part').forEach(e => { const r = e.getBoundingClientRect(); if (Math.min(r.width, r.height) < min - 0.5) out.push(`${it.id} ${r.width | 0}x${r.height | 0}`); }); }); }
+      return out; });
+    await p.setViewportSize(vp);
+    ok(!least.length, `landscape 568×320: every family/opposite part ≥ --part-min, not shrunk for the side arrows (${least.slice(0, 4).join(', ') || 'all ok'})`); }
   await ev(() => openTile('colors', false, true)); await show(await find("x.id === 'red'"));
   ok(!(await p.isVisible('#act')) && !(await p.isVisible('#parts')), 'a plain colour has no ▶ and no part strip');
   await show(await find("x.id === 'rainbow'"));

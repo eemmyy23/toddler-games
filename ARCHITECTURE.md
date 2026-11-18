@@ -81,7 +81,7 @@ tools/smoke.js              browser test: every language, every game, choice rul
 - **Every tap target is a `<button>`** with a name (text or `aria-label`), never nested in another button; `#glyph` (it holds part buttons) is the one tappable box, and Space/Enter speak its line.
 - **One visibility mechanism**: the `hidden` attribute (`[hidden]` wins over any display); breakpoints and compact classes may size a token to 0, never hide.
 - **One content column**: `--col` / `--gut` place the top bar, every screen, the ‹ › arrows, the sheets and the tab bar.
-  Controls fixed above the tab bar carry `data-low`; a screen too tall for the space calls `APP.fit(el, compactClass)`
+  Controls fixed above the tab bar carry `data-low` (only those in the lower half that overlap the screen's column limit it — side arrows in landscape do not); a screen too tall for the space calls `APP.fit(el, compactClass)`
   (compact first, then scale to fit); text too wide for its box uses `APP.fitText(el, innerSelector)` (sets `--fit`) — no view has its own sizing code.
 
 ## Contracts

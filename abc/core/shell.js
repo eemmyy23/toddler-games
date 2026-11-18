@@ -118,7 +118,8 @@ const APP = {
     el.style.transform = ''; el.style.transformOrigin = '';
     const kids = [...el.children].filter(k => k.getClientRects().length); if (!kids.length) return;
     const lim0 = $('bar').getBoundingClientRect().bottom + 4;
-    const low = [...document.querySelectorAll('[data-low]')].filter(e => !e.hidden && e.getClientRects().length && e.getBoundingClientRect().top > innerHeight / 2);
+    const box = el.getBoundingClientRect(), across = r => r.right > box.left && r.left < box.right;
+    const low = [...document.querySelectorAll('[data-low]')].filter(e => !e.hidden && e.getClientRects().length && e.getBoundingClientRect().top > innerHeight / 2 && across(e.getBoundingClientRect()));
     const lim1 = Math.min($('tabs').getBoundingClientRect().top, ...low.map(e => e.getBoundingClientRect().top)) - 4;
     const span = () => [Math.min(...kids.map(k => k.getBoundingClientRect().top)), Math.max(...kids.map(k => k.getBoundingClientRect().bottom))];
     let [top, bot] = span();
