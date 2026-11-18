@@ -62,7 +62,7 @@ w('hedgehog', { w: 'a/rici', def: 'ariciul', pl: 'arici', g: 'm', plDef: 'aricii
 w('clown', { w: 'clovn', def: 'clovnul', pl: 'clovni', g: 'm', plDef: 'clovnii' });
 w('cucumber', { w: 'cas/tra/ve/te', def: 'castravetele', pl: 'castraveți', g: 'm', plDef: 'castraveții' });
 w('tiger', { w: 'ti/gru', def: 'tigrul', pl: 'tigri', g: 'm', plDef: 'tigrii' });
-w('yacht', { w: 've/li/er', def: 'velierul', pl: 'veliere', g: 'n', plDef: 'velierele' });
+w('yacht', { w: 'bar/că', def: 'barca', pl: 'bărci', g: 'f', plDef: 'bărcile', syn: [{ w: 've/li/er', def: 'velierul', pl: 'veliere', g: 'n', plDef: 'velierele' }] });
 w('jellyfish', { w: 'me/du/ză', def: 'meduza', pl: 'meduze', g: 'f', plDef: 'meduzele' });
 w('grape', { w: 'stru/gu/re', def: 'strugurele', pl: 'struguri', g: 'm', plDef: 'strugurii' });
 w('pineapple', { w: 'a/na/nas', def: 'ananasul', pl: 'ananași', g: 'm', plDef: 'ananașii' });
@@ -104,7 +104,7 @@ w('cherry', { w: 'ci/rea/șă', def: 'cireașa', pl: 'cireșe', g: 'f', plDef: '
 w('key', { w: 'che/ie', def: 'cheia', pl: 'chei', g: 'f', plDef: 'cheile' });
 w('guitar', { w: 'chi/ta/ră', def: 'chitara', pl: 'chitare', g: 'f', plDef: 'chitarele' });
 w('bag', { w: 'gean/tă', def: 'geanta', pl: 'genți', g: 'f', plDef: 'gențile' });
-w('ice', { w: 'ghea/ță' });
+w('ice', { w: 'ghea/ță', def: 'gheața', g: 'f', mass: true });
 w('yarn', { w: 'ghem', def: 'ghemul', pl: 'gheme', g: 'n', plDef: 'ghemele' });
 w('backpack', { w: 'ghioz/dan', def: 'ghiozdanul', pl: 'ghiozdane', g: 'n', plDef: 'ghiozdanele' });
 w('watermelon', { w: 'pe/pe/ne', def: 'pepenele', pl: 'pepeni', g: 'm', plDef: 'pepenii' });
@@ -117,7 +117,7 @@ w('bug', { w: 'o/mi/dă', def: 'omida', pl: 'omizi', g: 'f', plDef: 'omizile' })
 w('kangaroo', { w: 'can/gur', def: 'cangurul', pl: 'canguri', g: 'm', plDef: 'cangurii' });
 w('leaf', { w: 'frun/ză', def: 'frunza', pl: 'frunze', g: 'f', plDef: 'frunzele' });
 w('nest', { w: 'cuib', def: 'cuibul', pl: 'cuiburi', g: 'n', plDef: 'cuiburile' });
-w('nut', { w: 'a/ra/hi/dă', def: 'arahida', pl: 'arahide', g: 'f', plDef: 'arahidele' });
+w('nut', { w: 'a/lu/nă', def: 'aluna', pl: 'alune', g: 'f', plDef: 'alunele', syn: [{ w: 'a/ra/hi/dă', def: 'arahida', pl: 'arahide', g: 'f', plDef: 'arahidele' }] });
 w('owl', { w: 'buf/ni/ță', def: 'bufnița', pl: 'bufnițe', g: 'f', plDef: 'bufnițele' });
 w('orange', { w: 'por/to/ca/lă', def: 'portocala', pl: 'portocale', g: 'f', plDef: 'portocalele' });
 w('pig', { w: 'porc', def: 'porcul', pl: 'porci', g: 'm', plDef: 'porcii' });
@@ -134,12 +134,12 @@ w('spoon', { w: 'lin/gu/ră', def: 'lingura', pl: 'linguri', g: 'f', plDef: 'lin
 w('ladder', { w: 'sca/ră', def: 'scara', pl: 'scări', g: 'f', plDef: 'scările' });
 w('ear', { w: 'u/re/che', def: 'urechea', pl: 'urechi', g: 'f', plDef: 'urechile' });
 w('bouquet', { w: 'bu/chet', def: 'buchetul', pl: 'buchete', g: 'n', plDef: 'buchetele' });
-w('grass', { w: 'iar/bă' });
+w('grass', { w: 'iar/bă', def: 'iarba', g: 'f', mass: true });
 w('jeans', { w: 'blugi', plOnly: true, plDef: 'blugii' });
-w('milk', { w: 'lap/te', mass: true, def: 'laptele' });
-w('honey', { w: 'mie/re', mass: true, def: 'mierea' });
-w('butter', { w: 'unt', mass: true, def: 'untul' });
-w('salt', { w: 'sa/re', mass: true, def: 'sarea', pl: 'săruri', g: 'n', plDef: 'sărurile' });
+w('milk', { w: 'lap/te', mass: true, def: 'laptele', g: 'n' });
+w('honey', { w: 'mie/re', mass: true, def: 'mierea', g: 'f' });
+w('butter', { w: 'unt', mass: true, def: 'untul', g: 'n' });
+w('salt', { w: 'sa/re', mass: true, def: 'sarea', pl: 'săruri', g: 'f', plDef: 'sărurile' });
 w('chick', { w: 'pui', def: 'puiul', pl: 'pui', g: 'm', plDef: 'puii' });
 w('strawberry', { w: 'căp/șu/nă', def: 'căpșuna', pl: 'căpșuni', g: 'f', plDef: 'căpșunile' });
 w('ladybird', { w: 'bu/bu/ru/ză', def: 'buburuza', pl: 'buburuze', g: 'f', plDef: 'buburuzele', syn: [{ w: 'găr/gă/ri/ță', def: 'gărgărița', pl: 'gărgărițe', g: 'f', plDef: 'gărgărițele' }] });
@@ -237,7 +237,7 @@ w('watch', { w: 'ceas de mâ/nă', def: 'ceasul de mână', pl: 'ceasuri de mân
 w('up', { w: 'sus' });
 w('zero', { w: 'ze/ro', def: 'zeroul', pl: 'zerouri', g: 'n', plDef: 'zerourile' });
 w('ufo', { w: 'OZN', ex: false });
-w('hourglass', { w: 'clep/si/dră', def: 'clepsidra', pl: 'clepsidre', g: 'f', plDef: 'clepsidrele', syn: [{ w: 'ceas de ni/sip', def: 'ceasul de nisip', pl: 'ceasuri de nisip', g: 'n', plDef: 'ceasurile de nisip' }] });
+w('hourglass', { w: 'ceas de ni/sip', def: 'ceasul de nisip', pl: 'ceasuri de nisip', g: 'n', plDef: 'ceasurile de nisip', syn: [{ w: 'clep/si/dră', def: 'clepsidra', pl: 'clepsidre', g: 'f', plDef: 'clepsidrele' }] });
 w('sundial', { w: 'ceas so/lar', def: 'ceasul solar', pl: 'ceasuri solare', g: 'n', plDef: 'ceasurile solare' });
 w('clock-tower', { w: 'turn cu ceas', def: 'turnul cu ceas', pl: 'turnuri cu ceas', g: 'n', plDef: 'turnurile cu ceas', syn: [{ w: 'o/ro/lo/giu', def: 'orologiul', pl: 'orologii', g: 'n', plDef: 'orologiile' }] });
 w('noon', { w: 'a/mia/ză', def: 'amiaza', pl: 'amiezi', g: 'f', plDef: 'amiezile', unique: true, syn: [{ w: 'mie/zul zi/lei', def: 'miezul zilei', g: 'n', mass: true }] });
