@@ -116,7 +116,7 @@ C('nest', '🪺');
 C('nut', '🥜');
 C('owl', '🦉');
 C('orange', '🍊', { gloss: 'the fruit (the colour is in the colours module)' });
-C('pig', '🐷');
+C('pig', '🐖');
 C('pizza', '🍕');
 C('box', '📦', { gloss: 'cardboard box' });
 C('sofa', '🛋️');
