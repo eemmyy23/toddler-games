@@ -26,7 +26,7 @@
     },
     tiles: [
       { id: 'digits', icon: '🔢', view: 'card', items: S => S.numbers, index: true, search: true, game: { type: 'find', prompts: ['glyph', 'glyph', 'word', 'voice'] } },
-      { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany', ask: it => it.pl ? 'countThing' : 'count' } },
+      { id: 'count', icon: '🧮', view: 'count', items: S => S.numbers, game: { type: 'howmany', fingers: 'finger', ask: (it, round) => round.look || it.pl ? 'countThing' : 'count' } },
       { id: 'teens', icon: '🔟', view: 'card', items: S => S.teens, ages: [4, 7], index: true, search: true,
         game: { type: 'find', prompts: ['glyph', 'word', 'voice'], ask: () => 'digits' } },
       { id: 'tens', icon: '💯', view: 'card', items: S => S.tens, ages: [5, 8], index: true, search: true,

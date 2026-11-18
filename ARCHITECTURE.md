@@ -112,7 +112,7 @@ Every language must have every key the base language's module strings have (chec
 **TILE** — `{ id, icon (emoji or short text), view, items: S → ITEM[], game?: { type, items? (default: items; `noPlay` items dropped), prompts?, lower?, ask? },
 index?, search?, section?, ages?, perLanguage? }`.
 `prompts` (default `['glyph']`; repeats weight the draw): `glyph` shows `prompt`, `word` shows `promptWord`, `voice` shows the listen icon.
-`lower`: small letters in half the rounds. `ask`: a key, or `(item, round) → key` with `round = { lower, prompt, subject, missed }`; default the tile id.
+`lower`: small letters in half the rounds. `ask`: a key, or `(item, round) → key` with `round = { lower, prompt, subject, look, missed }`; default the tile id.
 `index`: the ⊞ button. `search`: its items in the universal search. `perLanguage`: its items differ by language (letters, the dictionary);
 every other tile has every item in every language (checked).
 
@@ -134,7 +134,7 @@ A single line is `speak(text, PAUSE.x)`. Anything multi-step goes through `APP.s
 `steps = [{ light?, say?, pop?, delay?, pause? (default 200 ms) }]`: it speaks, lights (`.on`), reveals and celebrates step by step; a new sequence cancels the
 previous one; the shell calls `APP.stop()` on leave, language switch and background, and views call it when they step. One-off feedback is
 `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
-State: `APP.idx` (current item), `APP.streak`, `APP.stars`. Other `APP` helpers: `L, ui, t, mt, icon, exclaim, alphabet, items, item, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
+State: `APP.idx` (current item), `APP.streak`, `APP.stars`. Other `APP` helpers: `L, ui, t, mt, icon, exclaim, alphabet, hands, items, item, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
 any `[data-t][data-id][data-play]` button opens that tile at that item (`openTile(id, play, quiet, itemId)`, one render); `APP.stop()` clears `.on` in the stage, the info list and every `fullHeight` view;
 `APP.links(item, el, brief)` fills `el` with the item's link chips (info, same concept in other tiles — the one with the nearest `at` when items carry one —, `related` as picture-only chips, learn ↔ play) and hides it when empty — every view uses it; `brief` (dial) and play view keep only info and learn ↔ play. On a backdrop the chips get the `--card` background (contrast).
 Space/Enter on a focused button presses that button; elsewhere they play (▶) or say the view's `line()`.
@@ -153,8 +153,10 @@ hint (👆 `icons.drag`, after 3 s, 3 times, static under reduced motion) shows 
 A learn card too tall for the screen first takes the `#learn.tight` tokens, then scales (`APP.fit`).
 
 **GAME** — hosted by the `play` view, which draws the question line the same way for every game (🔊 + text, tap repeats the spoken question):
-`{ needs (min. items, default 2), pool(items, streak) → candidates, show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
-The play view offers 2 choices, 3 from a streak of 3, 4 from a streak of 8, and draws missed targets more often (`RULES` in play.js, weights stored as `w`).
+`{ needs (min. items, default 2), pool(items, streak) → candidates, vary?(target) → round.look ({ vars } joins the question's fields; the rest is for show), caption? (bubbles show the item's name under the picture), show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
+`howmany` counts a random word of the language with a plural (no mass/unique words), or — with the tile's `game.fingers` concept, a quarter of the rounds — raised fingers (`APP.hands(n)`, shared with the count view).
+The play view offers 2 choices, 3 from a streak of 3, 4 from a streak of 8, and draws missed targets more often but at most 3× (`RULES` in play.js, weights stored as `w`);
+a target does not come back before half the pool was asked, a `subject` not before 8 others.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
 **config** — `name` (title, install text; checked against the head and the web manifest), `version` (x.y.z, shown with the build hash at the foot of every hub),

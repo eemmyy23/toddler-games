@@ -7,7 +7,7 @@ const TILES = Tiles.list();
 const TILE = Object.fromEntries(TILES.map(t => [t.id, t]));
 const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
-const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50, STEM = 4;
+const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50, STEM = 4, HAND = 5;
 let seqTok = 0;
 const canPlay = v => !!(v && v.play && (!v.playable || v.playable(APP.item())));
 
@@ -127,6 +127,10 @@ const APP = {
     if (compact) { el.classList.add(compact); [top, bot] = span(); if (top >= lim0 && bot <= lim1) return; }
     const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
+  },
+  hands(n) {
+    const one = (raised, right) => `<svg class="hand" viewBox="0 0 32 32" aria-label="${esc(APP.ui().aria[right ? 'rightHand' : 'leftHand'])}"><g${right ? ' transform="translate(32 0) scale(-1 1)"' : ''}>${ABC.art['hand-' + raised]}</g></svg>`;
+    return n <= HAND ? one(n, false) : one(HAND, false) + one(n - HAND, true);
   },
   addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.innerHTML = APP.icon('star') + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };

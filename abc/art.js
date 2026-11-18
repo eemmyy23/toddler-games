@@ -34,3 +34,4 @@ ART('midnight', '<circle cx="16" cy="16" r="14.5" fill="#2f3b85" stroke="#1d2150
     ART('hand-' + raised, `<g transform="scale(0.2667) translate(7 0)">${g}</g>`);
   }
 }
+ART('grass', '<ellipse cx="16" cy="27.5" rx="13.5" ry="2.5" fill="#5a3d24"/><path d="M4 28C4.5 21 3.5 15 1.5 10C5.5 14 7.5 20 8 28Z" fill="#3e9b3a"/><path d="M7 28C8 19 9 12 7.5 5C11 11 12 19 11.5 28Z" fill="#5cc24e"/><path d="M10.5 28C12 21 14.5 15 18 11C16 17 15 22 15 28Z" fill="#46a83f"/><path d="M14 28C14.5 19 15.5 10 15 2.5C18.5 9 19 19 18.5 28Z" fill="#6fd35b"/><path d="M17.5 28C18 21 20.5 14 24.5 9.5C22.5 16 21.5 22 22 28Z" fill="#3e9b3a"/><path d="M21 28C21.5 20 22.5 13 22 6C25.5 12 26 20 25.5 28Z" fill="#5cc24e"/><path d="M24.5 28C25.5 22 27.5 17 31 13.5C29 18.5 28.5 23 29 28Z" fill="#46a83f"/>');

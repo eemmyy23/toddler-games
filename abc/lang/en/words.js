@@ -190,6 +190,7 @@ w('eye', { w: 'eye', art: 'an', pl: 'eyes' });
 w('tooth', { w: 'tooth', art: 'a', pl: 'teeth' });
 w('tongue', { w: 'tongue', art: 'a', pl: 'tongues' });
 w('hand', { w: 'hand', art: 'a', pl: 'hands' });
+w('finger', { w: 'fin/ger', art: 'a', pl: 'fingers' });
 w('arm', { w: 'arm', art: 'an', pl: 'arms' });
 w('spring', { w: 'spring' });
 w('summer', { w: 'sum/mer' });

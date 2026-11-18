@@ -192,6 +192,7 @@ C('eye', '👁️');
 C('tooth', '🦷');
 C('tongue', '👅');
 C('hand', '✋');
+C('finger', '☝️');
 C('arm', '💪');
 C('spring', '🌷');
 C('summer', '🏖️');

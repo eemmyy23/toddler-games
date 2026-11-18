@@ -1,24 +1,27 @@
 (function () {
-  let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false;
+  let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false, seen = [], seenSub = [];
   const game = () => ABC.games[APP.tile().game.type];
   const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
-  const RULES = { levels: [[8, 4], [3, 3], [0, 2]], maxWeight: 5, cooldown: 700, bigEvery: 10, next: 1200, nextBig: 2400, settle: 350 };
+  const RULES = { levels: [[8, 4], [3, 3], [0, 2]], maxWeight: 2, recent: 0.5, recentSubjects: 8, cooldown: 700, bigEvery: 10, next: 1200, nextBig: 2400, settle: 350 };
   const nChoices = () => RULES.levels.find(([s]) => APP.streak >= s)[1];
   const look = it => it.bubbleArt || it.bubble || it.bubbleColor;
   const pool = () => game().pool(APP.gameItems(), APP.streak);
   const fits = (it, t, os) => (!t.among || it.among === t.among) && !os.some(o => o === it || (o.sound && o.sound === it.sound) || look(o) === look(it));
+  const remember = (list, id, n) => { list.push(id); while (list.length > n) list.shift(); };
+  const fresh = (xs, list) => { const f = xs.filter(x => !list.includes(x.id)); return f.length ? f : xs; };
   function pickTarget() {
-    const p = pool().filter(it => it !== target);
+    const all = pool(), p = fresh(all.filter(it => it !== target), seen);
     let r = Math.random() * p.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
-    for (const it of p) { r -= 1 + (weights[wk(it)] || 0); if (r <= 0) return it; }
-    return p[p.length - 1];
+    const it = p.find(it => (r -= 1 + (weights[wk(it)] || 0)) <= 0) || p[p.length - 1];
+    if (it) remember(seen, it.id, Math.floor(all.length * RULES.recent));
+    return it;
   }
-  const pickSubject = t => { const m = t.members || []; return m.length ? m[Math.random() * m.length | 0].id : null; };
+  const pickSubject = t => { const m = fresh(t.members || [], seenSub); if (!m.length) return null; const id = m[Math.random() * m.length | 0].id; remember(seenSub, id, RULES.recentSubjects); return id; };
   const subject = () => round.subject && target.members ? target.members.find(m => m.id === round.subject) || null : null;
   function askLine() {
     const key = Tiles.ask(APP.tile(), target, round), it = subject() || target;
-    return APP.mt('games.' + key, Object.assign({}, it, { the: it.the || it.name }));
+    return APP.mt('games.' + key, Object.assign({}, it, { the: it.the || it.name }, round.look && round.look.vars));
   }
   function newRound() {
     locked = false; target = pickTarget();
@@ -28,6 +31,7 @@
     opts = shuffle(opts);
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
     round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: pickSubject(target) };
+    round.look = game().vary ? game().vary(target) : null;
     draw();
   }
   function draw() {
@@ -40,10 +44,12 @@
     opts.forEach((it, i) => {
       const b = document.createElement('button');
       b.className = 'bub'; if (it.bubbleArt) { b.innerHTML = it.bubbleArt; b.classList.add('drawn'); } else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--len', Math.max(1, [...b.textContent].length)); }
+      if (game().caption) { const c = document.createElement('span'); c.className = 'bname'; c.textContent = it.name; b.appendChild(c); b.classList.add('named'); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
       b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.setProperty('--i', i);
       box.appendChild(b);
     });
+    box.querySelectorAll('.bname').forEach(c => APP.fitText(c));
     APP.links(target, $('plinks'));
     APP.fit($('play'));
     speak(askLine(), PAUSE.ask);
@@ -93,7 +99,7 @@
       if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = pickSubject(t);
       keep = true;
     },
-    reset() { target = null; },
+    reset() { target = null; seen = []; seenSub = []; },
     choices: () => opts,
     select(it) { choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); },
     state: () => ({ target, opts, round }), newRound, choose
