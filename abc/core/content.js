@@ -44,7 +44,7 @@ const CONTENT = (() => {
       if (abcCache[code]) return abcCache[code];
       const L = ABC.langs[code], units = I18N.units(L);
       const color = id => { const i = units.findIndex(u => u.id === id); return i < 0 ? null : C.palette(i); };
-      const name = u => L.spell ? L.spell(u.upper) : u.upper;
+      const name = u => (L.names && L.names[u.upper] && L.names[u.upper].say) || u.upper;
       return (abcCache[code] = { units, color, name, unit: id => units.find(u => u.id === id) || null });
     },
     thing: (x, extra) => seal({ id: x.id, label: x.w, name: x.w, say: x.say, big: pic(x.concept), word: x.w, nav: pic(x.concept), pic: x.pic,
