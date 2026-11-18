@@ -96,6 +96,15 @@ for (const c of langs) {
 
 console.log(`concepts: ${ABC.concepts.length}`);
 const used = new Set();
+const SRC = /^https:\/\/(commons\.wikimedia\.org|dexonline\.ro|(ro|en|de)\.wiktionary\.org)\/\S+$/, PRON = ['ipa', 'stress', 'src', 'of', 'ipaSrc', 'tts', 'voice'];
+const checkPron = (where, p, syl) => {
+  if (!p) return err(`${where}: no pron ({ stress, src } from dexonline / wiktionary)`);
+  for (const k of Object.keys(p)) if (!PRON.includes(k)) err(`${where}: pron.${k} is not a PRON field`);
+  if (!Number.isInteger(p.stress) || p.stress < 0 || p.stress >= syl) err(`${where}: pron.stress ${p.stress} outside its ${syl} syllable(s)`);
+  for (const k of ['src', 'ipaSrc']) if (k in p && !SRC.test(p[k])) err(`${where}: pron.${k} "${p[k]}" is not a source URL`);
+  if (!p.src) err(`${where}: pron without src`);
+  if (p.tts && !p.voice) err(`${where}: pron.tts without the voice it was heard wrong on`);
+};
 for (const x of ABC.concepts) {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(x.id)) err(`concept "${x.id}": id must be an ASCII slug`);
   if (!/\p{Extended_Pictographic}|\p{Regional_Indicator}|⃣/u.test(x.pic)) warn(`concept "${x.id}": picture "${x.pic}" is not an emoji`);
@@ -115,12 +124,18 @@ for (const c of langs) {
     if (!w.trim()) err(`${c}/words.js ${e.id}: empty word`);
     for (const [k, v] of Object.entries(e)) if (typeof v === 'string' && v !== v.normalize('NFC')) err(`${c}/words.js ${e.id}.${k}: not NFC-normalized`);
     if (L.checkWord) { const m = L.checkWord(e); if (m) err(`${c}/words.js ${e.id}: ${m}`); }
+    checkPron(`${c}/words.js ${e.id} "${w}"`, e.pron, (e.w || '').split(/[/ ]/).filter(Boolean).length);
     try { L.forms(e, w); } catch (x) { err(`${c}/words.js ${e.id}: forms → ${x.message}`); }
     if (L.checkForms) { const m = L.checkForms(e); if (m) warn(`${c}/words.js ${e.id}: ${m}`); }
     const key = w.toLocaleLowerCase(L.bcp47);
     if (seenW.has(key) && !(e.homonym && e.homonym === seenW.get(key))) err(`${c}/words.js: "${w}" is used for two concepts (${seenW.get(key)}, ${e.id}) — add a note or pick another word`);
     seenW.set(key, e.id);
   }
+  for (const u of L.letters.split(' ')) {
+    const n = (L.names || {})[u];
+    if (!n || !SRC.test(n.src || '') || !(n.say || n.name || n.ipa)) err(`${c}/grammar.js names.${u}: needs say, name or ipa and a source URL`);
+  }
+  for (const u of Object.keys(L.names || {})) if (!L.letters.split(' ').includes(u)) err(`${c}/grammar.js names.${u}: not a letter`);
   for (const id of Object.keys(L.info || {})) {
     const I = L.info[id];
     if (!ABC.conceptById[id]) err(`${c}/info.js: card "${id}" has no concept`);

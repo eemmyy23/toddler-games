@@ -52,15 +52,18 @@ const sfx = {
 };
 
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: null,
+  voice: null, noVoice: false, bcp47: null, respell: [],
   norm: v => v.lang.replace('_', '-').toLowerCase(),
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  pick(bcp47, prefer) {
+  pick(bcp47, prefer, words = []) {
+    const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     this.bcp47 = bcp47;
+    this.respell = words.flatMap(e => [e, ...(e.syn || [])]).filter(e => e.pron && e.pron.tts)
+      .map(e => [new RegExp(`(?<!${edge})${lit(e.w.split('/').join(''))}(?!${edge})`, 'giu'), e.pron.tts]);
     if (!('speechSynthesis' in window)) { this.noVoice = true; return; }
     const all = speechSynthesis.getVoices();
     if (!all.length) { this.voice = null; this.noVoice = false; return; }
@@ -75,7 +78,8 @@ const SPEECH = {
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 function makeUtt(text, rate, onDone) {
-  const u = new SpeechSynthesisUtterance(/[.!?…:]\s*$/u.test(text) ? text : text + '.');
+  const said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
+  const u = new SpeechSynthesisUtterance(/[.!?…:]\s*$/u.test(said) ? said : said + '.');
   u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = rate; u.pitch = 1.25;
