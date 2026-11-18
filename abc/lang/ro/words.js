@@ -234,7 +234,7 @@ w('watch', { w: 'ceas de mâ/nă', def: 'ceasul de mână', pl: 'ceasuri de mân
 w('up', { w: 'sus' });
 w('zero', { w: 'ze/ro', def: 'zeroul', pl: 'zerouri', g: 'n', plDef: 'zerourile' });
 w('ufo', { w: 'OZN', ex: false });
-w('hourglass', { w: 'ceas de ni/sip', def: 'ceasul de nisip', pl: 'ceasuri de nisip', g: 'n', plDef: 'ceasurile de nisip' });
+w('hourglass', { w: 'clep/si/dră', def: 'clepsidra', pl: 'clepsidre', g: 'f', plDef: 'clepsidrele', syn: [{ w: 'ceas de ni/sip', def: 'ceasul de nisip', pl: 'ceasuri de nisip', g: 'n', plDef: 'ceasurile de nisip' }] });
 w('sundial', { w: 'ceas so/lar', def: 'ceasul solar', pl: 'ceasuri solare', g: 'n', plDef: 'ceasurile solare' });
 w('clock-tower', { w: 'turn cu ceas', def: 'turnul cu ceas', pl: 'turnuri cu ceas', g: 'n', plDef: 'turnurile cu ceas' });
 w('noon', { w: 'a/mia/ză', def: 'amiaza', pl: 'amiezi', g: 'f', plDef: 'amiezile', unique: true, syn: [{ w: 'mie/zul zi/lei', def: 'miezul zilei', g: 'n', mass: true }] });
