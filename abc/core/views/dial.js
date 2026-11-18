@@ -2,8 +2,7 @@
   const GRIP = { tap: 16, near: 28, reach: 2, weight: 8, center: 1.5, outside: 17, half: 16 };
   let pos = 0, active = 0, grab = null, keep = false, bound = false;
   const release = () => { grab = null; if ($('dface')) $('dface').classList.remove('drag'); };
-  const cur = () => APP.items()[APP.idx];
-  const D = () => cur().dial;
+  const D = () => APP.item().dial;
   const mod = (a, n) => ((a % n) + n) % n;
   const turn = (a, b) => mod(b - a + 180, 360) - 180;
   const angle = (h, p) => mod(p / h.turn * 360, 360);
@@ -19,7 +18,7 @@
     document.querySelectorAll('#dface .dhand').forEach((g, i) => { g.style.transform = spin(d.hands[i]); g.classList.toggle('held', i === active); });
     const t = $('dtime'), html = esc(r.text);
     if (t.dataset.v !== html) { t.dataset.v = html; t.innerHTML = html; t.setAttribute('aria-label', r.name); APP.fitText(t); }
-    $('dface').setAttribute('aria-valuetext', r.name);
+    $('dface').setAttribute('aria-valuetext', r.name); $('dface').setAttribute('aria-valuenow', value());
     $('dsay').textContent = r.name;
     APP.backdrop(r.backdrop);
   }
@@ -57,7 +56,7 @@
     sfx.pop(); paint(); if (!cancel) say();
   }
   function nudge(dir, size) { if (grab) return; const t = D().step; APP.stop(); pos = Math.round(pos / t) * t + dir * (size || t); sfx.pop(); paint(); say(); }
-  function refresh() { APP.links(cur(), $('dlinks'), true); paint(); APP.fit($('dial')); APP.shown(); }
+  function refresh() { APP.links(APP.item(), $('dlinks'), true); paint(); APP.fit($('dial')); APP.shown(); }
   function bind() {
     if (bound) return; bound = true;
     const el = $('dial');
@@ -79,9 +78,9 @@
     el: 'dial', arrows: true,
     show(sayIt) {
       APP.stop(); bind(); release();
-      const it = cur(), d = it.dial;
+      const it = APP.item(), d = it.dial;
       if (!keep) pos = it.at; keep = false;
-      $('dial').innerHTML = `<div class="dial" id="dface" role="slider" tabindex="0"><svg viewBox="0 0 32 32" aria-hidden="true">${d.face}${d.hands.map((h, i) => `<g transform="translate(16 16)"><g class="dhand" data-i="${i}" style="transform:${spin(h)}"><g transform="translate(-16 -16)">${h.body}</g></g></g>`).join('')}${d.cap}</svg></div>` +
+      $('dial').innerHTML = `<div class="dial" id="dface" role="slider" tabindex="0" aria-label="${esc(d.aria.face)}" aria-valuemin="0" aria-valuemax="${d.cycle - d.step}"><svg viewBox="0 0 32 32" aria-hidden="true">${d.face}${d.hands.map((h, i) => `<g transform="translate(16 16)"><g class="dhand" data-i="${i}" style="transform:${spin(h)}"><g transform="translate(-16 -16)">${h.body}</g></g></g>`).join('')}${d.cap}</svg></div>` +
         `<div class="dinfo"><div class="dctl"><button class="rbtn dstep" id="dless" aria-label="${esc(d.aria.less)}">${APP.icon('less')}</button>` +
         `<button class="pill dtime" id="dtime"></button><button class="rbtn dstep" id="dmore" aria-label="${esc(d.aria.more)}">${APP.icon('more')}</button></div>` +
         `<div class="label dsay" id="dsay"></div><div id="dlinks" class="links"></div></div>`;
@@ -90,7 +89,7 @@
     },
     step(dir) {
       APP.stop(); release(); APP.step(dir); sfx.pop();
-      const it = cur(), d = it.dial; let diff = mod(it.at - value(), d.cycle); if (diff > d.cycle / 2) diff -= d.cycle;
+      const it = APP.item(), d = it.dial; let diff = mod(it.at - value(), d.cycle); if (diff > d.cycle / 2) diff -= d.cycle;
       pos += diff;
       refresh(); say();
     },

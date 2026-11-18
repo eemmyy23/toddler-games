@@ -11,21 +11,19 @@ const COLOR_DATA = [
 ].map(c => Object.assign({ hex: HEX[c.id] }, c));
 const RAINBOW_HEX = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'].map(k => HEX[k]);
 const RAINBOW_DOT = `conic-gradient(${[...RAINBOW_HEX, RAINBOW_HEX[0]].join(',')})`;
-function rainbowSVG() {
-  return `<svg class="rbsvg" viewBox="0 0 200 104">${RAINBOW_HEX.map((c, i) => { const r = 92 - i * 10;
+const rainbowSVG = () => `<svg class="rbsvg" viewBox="0 0 200 104">${RAINBOW_HEX.map((c, i) => { const r = 92 - i * 10;
     return `<path class="part rbb" data-part="${i}" d="M ${100 - r} 100 A ${r} ${r} 0 0 1 ${100 + r} 100" stroke="${c}"/>`; }).join('')}</svg>`;
-}
 MODULE('colors', {
   section: 'disc', ages: [2, 6],
   build(code) {
-    const s = this.strings[code], loc = ABC.langs[code].bcp47, words = CONTENT.byId(code);
+    const s = this.strings[code], words = CONTENT.byId(code);
     const colors = COLOR_DATA.filter(c => s.colors[c.id]).map(c => {
       const name = s.colors[c.id];
       const examples = c.things.split(' ').map(id => words.get(id)).filter(Boolean).map(x => CONTENT.example(x));
       const parts = c.bands && s.rainbow && s.rainbow.length === RAINBOW_HEX.length ? s.rainbow.map((b, i) => ({ say: b, color: RAINBOW_HEX[i] })) : null;
       if (c.bands && !parts) return null;
       return CONTENT.picture(code, { id: c.id, name, concept: c.concept || c.id, bubbleColor: c.hex,
-        big: parts ? rainbowSVG() : `<span class="dot sw" style="background:${c.hex}"></span>`, nav: `<span class="dot" style="background:${c.hex || RAINBOW_DOT}"></span>` },
+        big: parts ? rainbowSVG() : `<span class="dot sw" style="--c:${c.hex}"></span>`, nav: `<span class="dot" style="--c:${c.hex || RAINBOW_DOT}"></span>` },
         { say: parts ? CONTENT.listing(code, name, s.rainbow) : undefined, examples, parts, noPlay: !!c.noPlay });
     }).filter(Boolean);
     return { colors };

@@ -15,6 +15,6 @@ STRINGS('de', {
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
-  aria: { search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
+  aria: { ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
     objects: 'Dinge', fingers: 'Finger', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
 });

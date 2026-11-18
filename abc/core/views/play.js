@@ -39,9 +39,9 @@
     box.innerHTML = '';
     opts.forEach((it, i) => {
       const b = document.createElement('button');
-      b.className = 'bub'; if (it.bubbleArt) { b.innerHTML = it.bubbleArt; b.classList.add('drawn'); } else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--fit', (1.3 / Math.max(1, [...b.textContent].length)).toFixed(3)); }
+      b.className = 'bub'; if (it.bubbleArt) { b.innerHTML = it.bubbleArt; b.classList.add('drawn'); } else { b.textContent = round.lower && it.lower ? it.lower : it.bubble; b.style.setProperty('--len', Math.max(1, [...b.textContent].length)); }
       b.setAttribute('aria-label', it.name); b.dataset.id = it.id;
-      b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.animationDelay = (i * 0.4) + 's';
+      b.style.setProperty('--c', it.bubbleColor || CONTENT.palette(i * 2)); b.style.setProperty('--i', i);
       box.appendChild(b);
     });
     APP.links(target, $('plinks'));

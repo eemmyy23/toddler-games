@@ -21,7 +21,7 @@ function onScrub(root, sel, fn) {
   r.addEventListener('click', e => { e.stopPropagation(); const b = !e.detail && e.target.closest && e.target.closest(sel); if (b) fn(b, e); });
 }
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400 };
+const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, beat: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {
@@ -96,10 +96,6 @@ function speak(text, delay = 0) {
     speakDone = done;
     speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, 0.85, done)), delay);
   });
-}
-function sayNow(text) {
-  if (!('speechSynthesis' in window) || SPEECH.noVoice) return;
-  clearTimeout(speakTimer); if (speakDone) speakDone(); speechSynthesis.speak(makeUtt(text, 1, null));
 }
 const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); };
 

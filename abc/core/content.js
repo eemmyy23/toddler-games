@@ -38,7 +38,7 @@ const CONTENT = (() => {
     things: (code, ids) => { const by = byId(code); return ids.map(id => by.get(id)).filter(Boolean); },
     palette: i => INK[((Math.round(i) % INK.length) + INK.length) % INK.length],
     made: it => !!(it && it[ITEM] && Object.isFrozen(it)),
-    navText: (label, color) => `<b style="color:${color}">${esc(label)}</b>`,
+    navText: (label, color) => `<b class="ink" style="--c:${color}">${esc(label)}</b>`,
     alphabet(code) {
       if (abcCache[code]) return abcCache[code];
       const L = ABC.langs[code], units = I18N.units(L);

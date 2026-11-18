@@ -45,8 +45,9 @@ for (const m of markup.matchAll(/>([^<]*[^<\s][^<]*)</gu)) err(`abc.html: hard-c
   for (const m of body.matchAll(/@media[^{]*\{(?!:root)/g)) err(`abc.html CSS: "${m[0].trim()}" sets more than tokens — breakpoints only reassign :root tokens`);
   for (const m of body.matchAll(/[^{}]+\{[^}]*\}/g)) {
     const raw = [...m[0].matchAll(/(?<![\w.#-])-?(\d+(?:\.\d+)?)(px|vh|vw)\b/g)].filter(x => x[2] !== 'px' || +x[1] > 2).map(x => x[0]);
-    const col = m[0].match(/#[0-9a-fA-F]{3,8}\b|rgba?\(/g) || [];
-    if (raw.length || col.length) err(`abc.html CSS: raw ${[...raw, ...col].join(' ')} in "${m[0].trim().split('{')[0].slice(0, 50)}" — sizes and colours are :root tokens`);
+    const col = m[0].match(/#[0-9a-fA-F]{3,8}\b|rgba?\(|cubic-bezier\(/g) || [], dur = m[0].match(/(?<![\w.#-])\d*\.?\d+m?s\b/g) || [];
+    raw.push(...dur);
+    if (raw.length || col.length) err(`abc.html CSS: raw ${[...raw, ...col].join(' ')} in "${m[0].trim().split('{')[0].slice(0, 50)}" — sizes, colours and timings are :root tokens`);
   } }
 for (const m of css.matchAll(/content\s*:\s*(['"])(.+?)\1/g)) err(`abc.html CSS: hard-coded content "${m[2]}" — icons come from config.icons`);
 const appMan = JSON.parse(read('manifest-abc.json')), title = (html.match(/<title>([^<]*)<\/title>/) || [])[1], apple = (html.match(/apple-mobile-web-app-title" content="([^"]*)"/) || [])[1];

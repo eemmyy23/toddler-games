@@ -9,7 +9,7 @@ const PROFILES = Tiles.profiles();
 const PLAY_SECTION = CFG.sections.find(s => s.play).id;
 const GAP = 200, CELEBRATE = { spark: [18, 6], burst: [60, 10] }, SWIPE = 50, SEARCH_ROWS = 40, FOCUS_DELAY = 50, STEM = 4;
 let seqTok = 0;
-const canPlay = v => !!(v && v.play && (!v.playable || v.playable(APP.items()[APP.idx])));
+const canPlay = v => !!(v && v.play && (!v.playable || v.playable(APP.item())));
 
 for (const v of Object.values(ABC.views)) if (!$(v.el)) {
   const d = document.createElement('div'); d.id = v.el; d.hidden = true;
@@ -24,12 +24,13 @@ const sectionNow = () => atHub ? section : mode === 'play' ? PLAY_SECTION : tile
 let atHub = store.get('athub', true), tileId = store.get('tile', TILES[0].id), mode = store.get('mode', 'view');
 if (!TILE[tileId]) { tileId = TILES[0].id; atHub = true; }
 let started = false;
+const uiCache = {};
 
 const APP = {
   idx: 0, streak: 0, stars: store.get('stars', store.legacy('stars') || 0),
   L: () => ABC.langs[lang],
   alphabet: () => CONTENT.alphabet(lang),
-  ui: () => abcMerge(abcMerge({}, ABC.langs[CFG.baseLanguage].strings), ABC.langs[lang].strings),
+  ui: () => uiCache[lang] || (uiCache[lang] = abcMerge(abcMerge({}, ABC.langs[CFG.baseLanguage].strings), ABC.langs[lang].strings)),
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
   icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
   exclaim: name => APP.t(APP.ui().exclaim, { name }),
@@ -45,16 +46,17 @@ const APP = {
   },
   tile: () => tileOf(),
   items: () => itemsOf(tileOf()),
+  item: () => APP.items()[APP.idx],
   gameItems: () => gameItemsOf(tileOf()),
   screen: () => atHub ? 'hub' : mode === 'play' ? GAME_VIEW : tileOf().view,
   indexOf: id => APP.items().findIndex(it => it.id === id),
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
-  saveIdx() { const it = APP.items()[APP.idx]; if (it) store.set('pos_' + tileId, it.id); },
+  saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
   reveal(el) { if (el) el.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); },
   celebrate(el, big) { const r = el && el.getBoundingClientRect(); sfx[big ? 'right' : 'pop'](); confetti(r ? r.left + r.width / 2 : W / 2, r ? r.top + r.height / 2 : H / 3, ...CELEBRATE[big ? 'burst' : 'spark']); },
-  stop() { seqTok++; hush(); APP.playing(false); document.querySelectorAll('#stage .on, #count .on, #infolist .on').forEach(x => x.classList.remove('on')); },
+  stop() { seqTok++; hush(); APP.playing(false); document.querySelectorAll(['stage', 'infolist', ...VIEWS.filter(v => v.fullHeight).map(v => v.el)].map(id => `#${id} .on`).join()).forEach(x => x.classList.remove('on')); },
   async sequence(scope, steps, opts = {}) {
     const t = ++seqTok, alive = () => t === seqTok; hush();
     if (opts.button) APP.playing(true);
@@ -78,14 +80,13 @@ const APP = {
     if (!it.alts || !it.alts.length) return '';
     const home = id => TILES.find(t => usable(t, false) && itemsOf(t).some(y => y.id === id));
     return `<span class="label">${esc(APP.ui().also)}</span>` + it.alts.map(a => { const t = home(a.id);
-      return `<button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}${t ? `<i class="link" role="link" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</i>` : ''}</button>`; }).join('');
+      return `<button class="pill small syn" data-say="${esc(a.w)}">${esc(a.w)}</button>${t ? `<button class="pill link see" data-t="${t.id}" data-id="${esc(a.id)}" data-play="0" aria-label="${esc(label(t, 0))}">${APP.icon('link')}</button>` : ''}`; }).join('');
   },
   shown() {
     APP.saveIdx(); const v = view(); $('act').hidden = !canPlay(v); if (!v || !v.arrows) return;
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
     $('prev').innerHTML = APP.icon('prev') + face(pv); $('next').innerHTML = face(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
   },
-  firstTouch,
   set(o) { if ('profile' in o && CFG.profiles[o.profile]) profile = o.profile; if ('section' in o && SECTIONS[o.section]) section = o.section; if ('hub' in o) atHub = !!o.hub; },
   links(it, el, brief) {
     const t = tileOf(), play = mode === 'play', few = play || brief, out = [];
@@ -162,13 +163,14 @@ function renderHub() {
     : `<button class="card ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');
 }
-function openTile(id, play, quiet) {
+function openTile(id, play, quiet, itemId) {
   const t = TILE[id]; if (!usable(t, play)) return false;
   leaveView();
   if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
-  loadIdx(); if (!quiet) sfx.pop(); render();
+  loadIdx(); const at = itemId == null ? -1 : APP.indexOf(itemId); if (at >= 0) { APP.idx = at; APP.saveIdx(); }
+  if (!quiet) sfx.pop(); render();
   return true;
 }
 onTapIn('hub', '.hsearch', openSearch);
@@ -212,7 +214,7 @@ function render() {
 
 function setLang(code) {
   if (code === lang) { sfx.pop(); announce(); return; }
-  const v0 = !atHub && view(), cur = v0 && APP.items()[APP.idx];
+  const v0 = !atHub && view(), cur = v0 && APP.item();
   if (v0) leaveView();
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
   lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices); markVoices();
@@ -237,12 +239,9 @@ function openInfo(c) {
   $('info').hidden = false; sfx.pop(); speak(I.title, PAUSE.tap);
 }
 function closeInfo() { if (!$('info').hidden) APP.stop(); $('info').hidden = true; }
-onTapIn(document, '.link[data-t]', b => {
-  const play = b.dataset.play === '1'; if (!openTile(b.dataset.t, play)) return;
-  if (!play) { const i = APP.indexOf(b.dataset.id); if (i >= 0) { APP.idx = i; APP.saveIdx(); view().show(true); } }
-});
+onTapIn(document, '[data-t]', b => { const play = b.dataset.play === '1'; openTile(b.dataset.t, play, false, play ? null : b.dataset.id); });
 onTapIn(document, '.infobtn', b => openInfo(b.dataset.c));
-onTapIn(document, '.syn', (b, e) => { if (!e.target.closest('.link')) APP.sequence(b.parentNode, [{ light: b, say: b.dataset.say, pop: true }]); });
+onTapIn(document, '.syn', b => APP.sequence(b.parentNode, [{ light: b, say: b.dataset.say, pop: true }]));
 onTapIn('infolist', '.inf', b => APP.sequence('infolist', [{ light: b, say: infoFor(infoId).lines[+b.dataset.i][1] }]));
 function playInfo() {
   const I = infoFor(infoId);
@@ -261,7 +260,7 @@ function openIndex() {
   let html = '', az = '';
   const byGroup = !!(v.indexSort && hasGroups && ixMode === 'grp');
   $('ixmode').hidden = !(v.indexSort && hasGroups);
-  $('ixmode').querySelectorAll('.seg').forEach(b => { b.classList.toggle('on', (b.dataset.m === 'grp') === byGroup); b.textContent = U.index[b.dataset.m]; });
+  $('ixmode').querySelectorAll('.seg').forEach(b => { const on = (b.dataset.m === 'grp') === byGroup; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.textContent = U.index[b.dataset.m]; });
   if (v.indexSort) {
     const col = I18N.collator(L.bcp47), A = APP.alphabet(), by = byGroup ? CONTENT.byId(lang) : null, names = by && { get: id => (by.get(id) || {}).w };
     const first = s => { const p = I18N.splitUnits(s, A.units, L.bcp47).find(x => /[\p{L}\p{N}]/u.test(x.text)); return p && p.unit ? p.unit.id : OTHER; };
@@ -273,10 +272,10 @@ function openIndex() {
     for (const [u, xs] of groups) {
       if (!xs.length) continue;
       const h = head(u), n = APP.t(U.words, { n: xs.length });
-      html += `<div class="ixh" id="ixh-${esc(u)}"><b style="color:${h.color}">${esc(h.text)}</b><span class="label">${esc(h.name ? APP.t(U.headCount, { name: h.name, n }) : n)}</span></div>` + xs.map(btn).join('');
+      html += `<div class="ixh" id="ixh-${esc(u)}"><b class="ink" style="--c:${h.color}">${esc(h.text)}</b><span class="label">${esc(h.name ? APP.t(U.headCount, { name: h.name, n }) : n)}</span></div>` + xs.map(btn).join('');
     }
     az = [...groups.keys()].filter(u => u !== OTHER || groups.get(OTHER).length)
-      .map(u => `<span class="az${groups.get(u).length ? '' : ' dim'}" data-u="${esc(u)}">${esc(head(u).text)}</span>`).join('');
+      .map(u => `<button class="az${groups.get(u).length ? '' : ' dim'}" data-u="${esc(u)}" aria-label="${esc(head(u).name || head(u).text)}">${esc(head(u).text)}</button>`).join('');
   } else html = list.map(btn).join('');
   $('ixgrid').innerHTML = html; $('ixaz').innerHTML = az; $('ixaz').hidden = !az;
   $('ixsearch').querySelector('span').textContent = U.search.placeholder;
@@ -331,12 +330,12 @@ function runSearch() {
   for (const h of hits) { const k = h.x.it.concept || fold(h.x.it.name); if (groups.has(k)) groups.get(k).push(h.x); else groups.set(k, [h.x]); }
   const rows = [...groups.values()].slice(0, SEARCH_ROWS);
   $('smeta').textContent = rows.length ? APP.t(U.search.results, { n: rows.length }) : U.search.none;
-  const mark = n => { const f = fold(n), i = f.indexOf(q); return i < 0 || f.length !== n.replace(/\//g, '').length ? esc(n) : esc(n.slice(0, i)) + '<mark>' + esc(n.slice(i, i + q.length)) + '</mark>' + esc(n.slice(i + q.length)); };
+  const mark = n => I18N.highlight(n, q, fold, s => `<mark>${s}</mark>`);
   $('sres').innerHTML = rows.map(([x, ...more]) => {
     const cur = x.names.find(n => n[0] === lang), others = x.names.filter(n => n[0] !== lang);
-    const icons = [x, ...more].map(m => `<button class="link srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0">${tileIcon(m.t, 'ico-s')}</button>`).join('');
-    return `<div class="card sr" role="button" data-t="${x.t.id}" data-id="${esc(x.it.id)}"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
-      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `<span><i>${ABC.langs[c].flag}</i>${mark(n)}</span>`).join('')}</small></span>${icons}</div>`;
+    const icons = [x, ...more].map(m => `<button class="srk" data-t="${m.t.id}" data-id="${esc(m.it.id)}" data-play="0" aria-label="${esc(label(m.t, 0))}">${tileIcon(m.t, 'ico-s')}</button>`).join('');
+    return `<div class="card sr"><button class="srgo" data-t="${x.t.id}" data-id="${esc(x.it.id)}" data-play="0"><span class="srp">${x.it.concept && ABC.art[x.it.concept] ? CONTENT.pic(x.it.concept) : x.it.pic || x.it.nav || esc(x.it.label)}</span>` +
+      `<span class="srt"><b>${mark(cur ? cur[1] : x.it.name)}</b><small>${others.map(([c, n]) => `<span><i>${ABC.langs[c].flag}</i>${mark(n)}</span>`).join('')}</small></span></button>${icons}</div>`;
   }).join('');
 }
 function openSearch() {
@@ -345,11 +344,6 @@ function openSearch() {
 }
 const closeSearch = () => { $('search').hidden = true; $('sq').blur(); };
 $('sq').addEventListener('input', runSearch);
-onTapIn('sres', '.sr', b => {
-  closeSearch(); closeIndex();
-  openTile(b.dataset.t, false, true); const i = APP.indexOf(b.dataset.id);
-  if (i >= 0) { APP.idx = i; APP.saveIdx(); } view().show(true);
-});
 onTap('sqclear', () => { $('sq').value = ''; runSearch(); $('sq').focus(); });
 onTap('sclose', closeSearch);
 onTap('ixsearch', openSearch);
@@ -395,7 +389,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeSearch(); closeIndex(); closeInfo(); return; }
   if (!$('search').hidden || (e.target.closest && e.target.closest('input, textarea'))) return;
   const k = e.key.toLocaleLowerCase(APP.L().bcp47), v = view();
-  if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step(k === 'arrowright' ? 1 : -1); return; }
+  if ((k === 'arrowright' || k === 'arrowleft') && v && v.step) { v.step((k === 'arrowright') !== (APP.L().dir === 'rtl') ? 1 : -1); return; }
   if (e.repeat) return;
   if ((k === ' ' || k === 'enter') && v && !(e.target.closest && e.target.closest('button, [role=link], [role=slider]'))) { e.preventDefault(); if (canPlay(v)) $('act').classList.contains('on') ? APP.stop() : v.play(); else if (v.line && v.line()) speak(v.line()); return; }
   const pick = (vw, k) => { const it = (vw.choices ? vw.choices() : APP.items()).find(x => x.key === k); if (it && vw.select) vw.select(it); return !!it; };
@@ -425,7 +419,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { APP.stop(); if (!atHub && view().pause) view().pause(); quietAudio(); }
+  if (document.hidden) { APP.stop(); quietAudio(); }
 });
 (function () {
   const bar = $('install-bar'), btn = $('install-btn'), msg = $('install-msg'), dismiss = $('dismiss-btn');

@@ -15,6 +15,6 @@ STRINGS('ro', {
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },
   profile: { curious: 'Curios', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
   installBtn: 'Instalează',
-  aria: { search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
+  aria: { ages: 'Vârsta', search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
     objects: 'Obiecte', fingers: 'Degete', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
 });

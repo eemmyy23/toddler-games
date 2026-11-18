@@ -8,7 +8,7 @@ MSTRINGS('clock', 'en', {
   time: { m0: '{oclock}', m5: 'five past {h}', m10: 'ten past {h}', m15: 'quarter past {h}', m20: 'twenty past {h}', m25: 'twenty-five past {h}', m30: 'half past {h}',
           m35: 'twenty-five to {next}', m40: 'twenty to {next}', m45: 'quarter to {next}', m50: 'ten to {next}', m55: 'five to {next}' },
   parts: { night: 'at night', morning: 'in the morning', forenoon: 'in the morning', noon: 'at midday', lunch: 'in the afternoon', afternoon: 'in the afternoon', evening: 'in the evening' },
-  less: 'Five minutes back', more: 'Five minutes on',
+  face: 'Clock hands', less: 'Five minutes back', more: 'Five minutes on',
   when: '{time} {part}',
   say: '{when}. {what}',
   day: { h7: 'We wake up and stretch.', h8: 'We eat breakfast.', h9: 'We play at nursery.', h10: 'We eat some fruit.', h12: 'We have lunch.', h13: 'We have a rest.',

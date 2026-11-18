@@ -67,7 +67,7 @@
       const card = (v, what) => CONTENT.picture(code, { id: idOf(v), label: T.digital(v), name: T.name(v), big: still(v), nav: still(v), word: T.digital(v),
         bubbleArt: still(v), bubbleColor: tint(v), concept: conceptOf(v) },
         { say: what ? I18N.t(s.say, { when: I18N.capFirst(T.name(v), loc), what }, loc) : T.say(v), at: v, backdrop: sky(v), concepts: related(v, []), related: ['clock', ...related(v, LINKS.extra)] });
-      const dial = Object.freeze({ aria: { less: s.less, more: s.more }, face: FACE_SVG, cap: CAP, cycle: DAY, step: STEP, hands: HANDS.map(h => Object.freeze({ turn: h.turn, snap: h.snap, len: h.len, body: h.body + h.knob })),
+      const dial = Object.freeze({ aria: { less: s.less, more: s.more, face: s.face }, face: FACE_SVG, cap: CAP, cycle: DAY, step: STEP, hands: HANDS.map(h => Object.freeze({ turn: h.turn, snap: h.snap, len: h.len, body: h.body + h.knob })),
         read: v => ({ text: T.digital(v), name: T.name(v), say: T.say(v), backdrop: sky(v) }) });
       return {
         hours: CLOCK.map(v => card(v, s.day['h' + v / HOUR])),

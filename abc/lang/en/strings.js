@@ -16,5 +16,5 @@ STRINGS('en', {
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
   aria: { search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
-    objects: 'Objects', fingers: 'Fingers', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now' }
+    objects: 'Objects', fingers: 'Fingers', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now', ages: 'Age' }
 });

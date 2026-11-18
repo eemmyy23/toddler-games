@@ -26,7 +26,7 @@ abc/core/content.js         INK palette; CONTENT: builders thing/word/glyph/pict
 abc/core/tiles.js           the one rule set "what a tile shows and when" — used by the app AND tools/check.js
 abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no palm taps), onScrub (tap or drag a finger across a row/column of
                             targets: each target acts once as the finger enters it; keyboard clicks too; never swipes the stage), wait, shuffle, PAUSE/TALK timings,
-                            store (localStorage or session, `abc2.` keys), sound (sfx, tone), speech (SPEECH, speak, sayNow, hush),
+                            store (localStorage or session, `abc2.` keys; `store.legacy(k)` reads an old `abc.` key once, so stars and language survive the rename), sound (sfx, tone), speech (SPEECH, speak, hush),
                             audio (ensureAudio, quietAudio), confetti, calm (reduced motion)
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
@@ -73,10 +73,12 @@ tools/smoke.js              browser test: every language, every game, choice rul
   Every tappable card (hub tile, example, letter tile, form, count row, info line, index cell, search row, question) is a `.card`: one background,
   shadow, transition and pressed look. A variant is a modifier class (`.primary`, `.small`, `.link`, `.caps`, `.txt`, `.accent`, `.tight`, `.dim` …);
   it restyles only its own component.
-- **Tokens.** Colours, radii, type, spacing, sizes and shadows live in `:root`; `check.js` rejects any px/vh/vw (above 2px hairlines) or colour
-  outside `:root`. The breakpoints (width ≤ 440, width ≤ 350, height ≤ 700, landscape height ≤ 450, portrait) only reassign tokens (checked);
+- **Tokens.** Colours, radii, type, spacing, sizes, shadows, durations and easings live in `:root`; `check.js` rejects any px/vh/vw (above 2px hairlines), colour,
+  `cubic-bezier` or s/ms duration outside `:root`. A data colour (letter, number, swatch) is passed as `--c` and read by `.ink` (text), `.dot` or `.pt` (fill); a stagger as `--i`. The breakpoints (width ≤ 440, width ≤ 350, height ≤ 700, landscape height ≤ 450, portrait) only reassign tokens (checked);
   the reduced-motion block turns animation off.
-- **One selected look**: `.on` — the amber ring (`--ring` outline) and a small lift — for everything picked or being read aloud.
+- **One selected look**: `.on` — the amber ring (`--ring` outline) and a small lift — for everything picked or being read aloud. Keyboard focus is a different look
+  (`:focus-visible`, the dashed `--focus` outline). The dial's `.held` hand is grab state, not selection (`APP.stop()` clears `.on`, never the held hand).
+- **Every tap target is a `<button>`** with a name (text or `aria-label`), never nested in another button; `#glyph` (it holds part buttons) is the one tappable box, and Space/Enter speak its line.
 - **One visibility mechanism**: the `hidden` attribute (`[hidden]` wins over any display); breakpoints and compact classes may size a token to 0, never hide.
 - **One content column**: `--col` / `--gut` place the top bar, every screen, the ‹ › arrows, the sheets and the tab bar.
   Controls fixed above the tab bar carry `data-low`; a screen too tall for the space calls `APP.fit(el, compactClass)`
@@ -92,7 +94,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 
 **STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `wrong`, `index { az, grp, other }`,
 `search { placeholder, hint, none, results }`, `words`, `headCount`, `version`, `exclaim`, `listing`, `then`, `range`, `install`, `installBtn`, `profile { <id>, ages }`,
-`aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
+`also`, `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
 (orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.
@@ -126,13 +128,14 @@ games: `bubble`, `lower`, `bubbleColor`, `prompt`, `promptWord`, `the`, `noPlay`
 `plural`, `a` + `g`, `thats` ({ name, g } for "That's …", built). Two choices in one round never share a `sound` or a look.
 
 **VIEW** — required `el, show(sayIt)`; optional `line()` (what the language announcement and Space say), `select(item)` (a key picked this item; `choices()` limits which),
-`step(d), leave(), pause(), resize(), reset(), beforeLang() → state, afterLang(state)`, `state()` (tests), flags `arrows` (the shell draws ‹ › with `navFace(item)`, default `item.nav`),
+`step(d), leave(), resize(), reset(), beforeLang() → state, afterLang(state)`, `state()` (tests), flags `arrows` (the shell draws ‹ › with `navFace(item)`, default `item.nav`),
 `play()` (the shell shows ▶ and toggles it; with `playable(item)` only for the items it accepts — Space follows the same rule), `swipe, fullHeight, keepScroll, indexFace(item) → HTML, indexSort`.
 A single line is `speak(text, PAUSE.x)`. Anything multi-step goes through `APP.sequence(scope, steps, { button, finale, at })` with
 `steps = [{ light?, say?, pop?, delay?, pause? (default 200 ms) }]`: it speaks, lights (`.on`), reveals and celebrates step by step; a new sequence cancels the
 previous one; the shell calls `APP.stop()` on leave, language switch and background, and views call it when they step. One-off feedback is
 `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
-Other `APP` helpers: `L, ui, t, mt, icon, exclaim, items, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
+State: `APP.idx` (current item), `APP.streak`, `APP.stars`. Other `APP` helpers: `L, ui, t, mt, icon, exclaim, alphabet, items, item, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
+any `[data-t][data-id][data-play]` button opens that tile at that item (`openTile(id, play, quiet, itemId)`, one render); `APP.stop()` clears `.on` in the stage, the info list and every `fullHeight` view;
 `APP.links(item, el, brief)` fills `el` with the item's link chips (info, same concept in other tiles — the one with the nearest `at` when items carry one —, `related` as picture-only chips, learn ↔ play) and hides it when empty — every view uses it; `brief` (dial) and play view keep only info and learn ↔ play. On a backdrop the chips get the `--card` background (contrast).
 Space/Enter on a focused button presses that button; elsewhere they play (▶) or say the view's `line()`.
 **dial** — a face with hands the child turns: a drag that starts anywhere on the face moves the hand nearest the finger (within `GRIP.near`°, else the held hand) by the finger's angle change (no jump to the finger);

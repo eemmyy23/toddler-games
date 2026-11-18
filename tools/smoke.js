@@ -181,7 +181,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(bg.q0 === bg.q1 && bg.infoOpen, `back from the background: same question (${bg.q0} → ${bg.q1}), the open card stays open`);
   const keyGame = await ev(() => { openTile('letters', true, true); const s = APP.streak = 4; ['5', 'q', '7'].forEach(k => window.dispatchEvent(new KeyboardEvent('keydown', { key: k }))); return [APP.tile().id, APP.screen()]; });
   ok(keyGame[0] === 'letters' && keyGame[1] === 'play', `keys that are not a choice never leave the game (${keyGame.join('/')})`);
-  const sfold = await ev(() => { const q = (c, v) => { setLang(c); openSearch(); $('sq').value = v; runSearch(); const r = [...document.querySelectorAll('#sres .sr')].map(x => x.dataset.t + ':' + x.dataset.id); closeSearch(); return r; };
+  const sfold = await ev(() => { const q = (c, v) => { setLang(c); openSearch(); $('sq').value = v; runSearch(); const r = [...document.querySelectorAll('#sres .srgo')].map(x => x.dataset.t + ':' + x.dataset.id); closeSearch(); return r; };
     const r = { gruen: q('de', 'gruen').length, ice: q('en', 'ice-cream').length, ten: q('en', 'ten').filter(x => /^(digits|tens)/.test(x)).length, syn: q('ro', 'ghete').join() }; setLang('ro'); return r; });
   ok(sfold.gruen >= 1 && sfold.ice >= 1 && sfold.ten === 1 && sfold.syn === 'read:boots~1', `search: DE ue = ü, hyphen = space, one row per number, synonyms (ghete → the gheată page) (${JSON.stringify(sfold)})`);
   const syns = await ev(() => { setLang('ro'); openTile('read', false, true); APP.idx = APP.indexOf('boots'); view().show(false); return [...document.querySelectorAll('#rA .syn')].map(b => b.dataset.say).join(); });
@@ -270,15 +270,15 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   }
   await ev(() => closeIndex());
   const search = async q => { await ev(q => { openSearch(); $('sq').value = q; runSearch(); }, q);
-    return ev(() => [...document.querySelectorAll('.sr')].map(r => r.dataset.t + ':' + r.dataset.id)); };
+    return ev(() => [...document.querySelectorAll('.srgo')].map(r => r.dataset.t + ':' + r.dataset.id)); };
   ok((await search('goat')).includes('read:goat'), 'search "goat" (EN) → capră');
   ok((await search('ziege')).includes('read:goat'), 'search "Ziege" (DE, any case) → capră');
   ok((await search('zwei'))[0] === 'digits:n2', 'search "zwei" → 2');
   const rot = await search('rot');
   ok(rot[0].endsWith(':red') && rot.length === 1, `search "rot" → one result for roșu, no substring noise (${rot.join(' ')})`);
-  ok(await ev(() => [...document.querySelectorAll('.sr .link')].map(l => l.dataset.t).join()) === 'read,colors', 'roșu links to Citește and Culori');
+  ok(await ev(() => [...document.querySelectorAll('.sr .srk')].map(l => l.dataset.t).join()) === 'read,colors', 'roșu links to Citește and Culori');
   ok((await search('capra')).includes('read:goat'), 'search without diacritics: "capra" → capră');
-  await ev(() => { document.querySelector('.sr').click(); });
+  await ev(() => { document.querySelector('.srgo').click(); });
   ok(await ev(() => APP.screen() === 'read' && APP.items()[APP.idx].id === 'goat' && $('search').hidden), 'tapping a result opens it');
   await ev(() => { openSearch(); }); await until(() => document.activeElement === $('sq')); await p.keyboard.type('m');
   ok(await ev(() => !$('search').hidden && $('sq').value === 'm'), 'typing in search does not trigger letter shortcuts');
