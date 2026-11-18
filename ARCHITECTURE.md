@@ -104,7 +104,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 `stress` is the 0-based index of the stressed syllable in the `/`-and-space split of `w`; `src` the page it was read from — RO dexonline.ro (the accent mark,
 DOOM first), EN en.wiktionary.org (UK), DE de.wiktionary.org; `ipa` as that page writes it (RO: from ro.wiktionary.org, its URL in `ipaSrc`).
 `of` names the dictionary form the stress was read from when the source has no entry for this exact form (a plural: mănuși → mănușă; a phrase without its own
-entry: the stress of its first word, farm animals → farm; a spelling variant: wifi → Wi-Fi).
+entry: the stress of its first word, farm animals → farm).
 `tts` (a respelling) with `voice` (the voice and device it was heard wrong on) — only when that voice misplaces the stress; `speak` (services.js) substitutes every
 whole-word match of a base form by its `tts` in any utterance of the current language (`SPEECH.pick(bcp47, voices, words)` builds the table, no word in code).
 Recordings (not in the repo yet): `pron.audio` would name `audio/<lang>/<id>.mp3` (mono, 32 kbps, from a Commons native-speaker file — Lingua Libre

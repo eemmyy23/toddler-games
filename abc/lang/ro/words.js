@@ -49,7 +49,6 @@ w('cloud', { w: 'nor', def: 'norul', pl: 'nori', g: 'm', plDef: 'norii', pron: {
 w('teddy', { w: 'ur/su/leț', def: 'ursulețul', pl: 'ursuleți', g: 'm', plDef: 'ursuleții', pron: { ipa: '/ur.suˈleʦ/', stress: 2, src: 'https://dexonline.ro/definitie/ursuleț', ipaSrc: 'https://ro.wiktionary.org/wiki/ursuleț' } });
 w('koala', { w: 'ko/a/la', def: 'koala', pl: 'koala', g: 'm', plDef: 'koala', pron: { ipa: '/koˈa.la/', stress: 1, src: 'https://dexonline.ro/definitie/koala', ipaSrc: 'https://ro.wiktionary.org/wiki/koala' } });
 w('xylophone', { w: 'xi/lo/fon', def: 'xilofonul', pl: 'xilofoane', g: 'n', plDef: 'xilofoanele', pron: { ipa: '/ksi.loˈfon/', stress: 2, src: 'https://dexonline.ro/definitie/xilofon', ipaSrc: 'https://ro.wiktionary.org/wiki/xilofon' } });
-w('wifi', { w: 'wi-/fi', pron: { ipa: '/ˈwaɪ.faɪ/', stress: 0, src: 'https://en.wiktionary.org/wiki/Wi-Fi', of: 'Wi-Fi' } });
 w('question', { w: 'quiz', pron: { stress: 0, src: 'https://dexonline.ro/definitie/quiz' } });
 w('wheat-ear', { w: 'spic', def: 'spicul', pl: 'spice', g: 'n', plDef: 'spicele', pron: { ipa: '/spik/', stress: 0, src: 'https://dexonline.ro/definitie/spic', ipaSrc: 'https://ro.wiktionary.org/wiki/spic' } });
 w('bread', { w: 'pâi/ne', def: 'pâinea', pl: 'pâini', g: 'f', plDef: 'pâinile', pron: { ipa: '/ˈpɨj.ne/', stress: 0, src: 'https://dexonline.ro/definitie/pâine', ipaSrc: 'https://ro.wiktionary.org/wiki/pâine' } });
