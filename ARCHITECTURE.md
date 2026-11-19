@@ -184,6 +184,7 @@ A learn card too tall for the screen first takes the `#learn.tight` tokens, then
 `{ needs (min. items, default 2), pool(items, streak) → candidates, vary?(target) → round.look ({ vars } joins the question's fields; the rest is for show), caption? (bubbles show the item's name under the picture), show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
 Every picture or colour bubble shows its name under it (`.bname`) unless the question shows the name as text (`find` with a `glyph`/`word` prompt) or the tile sets `game.caption: false` (clocks: the name would give away the time).
 Numbers 1–10 carry `tally: n` instead of fixed pictures: card, count view and game draw n of a random countable word (`CONTENT.countable(code)`, `APP.countable()`, `APP.tally(item)`) each time.
+Those pictures are always one `.objs` box (card `#pics`, count rows, how-many question): at most `--row` (5) per line, so 6–10 read as 5 + the rest.
 `howmany` counts a random countable word (a plural, no mass/unique words), or — with the tile's `game.fingers` concept, a quarter of the rounds — raised fingers (`APP.hands(n)`, shared with the count view).
 The play view offers 2 choices, 3 from a streak of 3, 4 from a streak of 8, and draws missed targets more often but at most 3× (`RULES` in play.js, weights stored as `w`);
 a target does not come back before half the pool was asked, a `subject` not before 8 others.
