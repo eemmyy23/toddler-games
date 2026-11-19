@@ -5,14 +5,15 @@
     section: 'num', ages: [2, 6], needs: ['numbers', 'teens', 'tens'],
     build(code) {
       const L = ABC.langs[code], s = this.strings[code];
-      const numbers = L.numbers.map((w, i) => num(code, i + 1, w, i + 1, { key: i === 9 ? '0' : String(i + 1), tally: i + 1 }));
-      const teens = L.teens.map((w, i) => num(code, i + 11, w, i + 11, i < 9
+      const nm = (n, name, i, more, look) => num(code, n, name, i, Object.assign({ a: I18N.t(s.thatsNum, { name }, L.bcp47), g: s.thatsG }, more), look);
+      const numbers = L.numbers.map((w, i) => nm(i + 1, w, i + 1, { key: i === 9 ? '0' : String(i + 1), tally: i + 1 }));
+      const teens = L.teens.map((w, i) => nm(i + 11, w, i + 11, i < 9
         ? { say: I18N.t(s.teenSay, { name: w, ones: L.numbers[i] }, L.bcp47), pics: [TEN, ...Array(i + 1).fill(ONE)] }
         : { say: s.tensSay[1], pics: [TEN, TEN] }));
-      const tens = L.tens.map((w, i) => num(code, (i + 1) * 10, w, i + 1,
+      const tens = L.tens.map((w, i) => nm((i + 1) * 10, w, i + 1,
         { say: s.tensSay[i], pics: Array(i + 1).fill(TEN) }, { id: 't' + (i + 1) * 10 }));
       const big = BIG.map((n, i) => { const t = n === Infinity ? '∞' : n.toLocaleString(L.bcp47);
-        return s.bigNames && s.bigNames[i] && s.bigSay && s.bigSay[i] && num(code, n, s.bigNames[i], i + 5,
+        return s.bigNames && s.bigNames[i] && s.bigSay && s.bigSay[i] && nm(n, s.bigNames[i], i + 5,
           { noPlay: n === Infinity, say: s.bigSay[i], smallBubble: true }, { id: 'b' + (n === Infinity ? 'inf' : n), text: t, cls: 'grp' }); }).filter(Boolean);
       return { numbers, teens, tens, big };
     },

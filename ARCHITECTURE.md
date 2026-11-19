@@ -162,7 +162,7 @@ A single line is `speak(text, PAUSE.x)`. Anything multi-step goes through `APP.s
 `steps = [{ light?, say?, pop?, delay?, pause? (default 200 ms) }]`: it speaks, lights (`.on`), reveals and celebrates step by step; a new sequence cancels the
 previous one; the shell calls `APP.stop()` on leave, language switch and background, and views call it when they step. One-off feedback is
 `APP.celebrate(el, big)`; taps go through `onTap`/`onTapIn`.
-State: `APP.idx` (current item), `APP.streak`, `APP.stars`. Other `APP` helpers: `L, ui, t, mt, icon, exclaim, alphabet, hands, items, item, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
+State: `APP.idx` (current item), `APP.streak`, `APP.stars`. Other `APP` helpers: `L, ui, t, mt, icon, exclaim, alphabet, hands, tallyOf, items, item, gameItems, tile, screen, indexOf, step, neighbors, shown, saveIdx, light, reveal, playing, stop, celebrate, sequence, synonyms, addStar, fit, fitText, backdrop`;
 any `[data-t][data-id][data-play]` button opens that tile at that item (`openTile(id, play, quiet, itemId)`, one render); `APP.stop()` clears `.on` in the stage, the info list and every `fullHeight` view;
 `APP.links(item, el, brief)` fills `el` with the item's link chips (info, same concept in other tiles — the one with the nearest `at` when items carry one —, `related` as picture + word chips, learn ↔ play) and hides it when empty — every view uses it; `brief` (dial) and play view keep only info and learn ↔ play. On a backdrop the chips get the `--card` background (contrast).
 Space/Enter on a focused button presses that button; elsewhere they play (▶) or say the view's `line()`.
@@ -184,6 +184,7 @@ A learn card too tall for the screen first takes the `#learn.tight` tokens, then
 `{ needs (min. items, default 2), pool(items, streak) → candidates, vary?(target) → round.look ({ vars } joins the question's fields; the rest is for show), caption? (bubbles show the item's name under the picture), show(target, round, spokenQuestion, subject) → { text (never reveals the answer), picture: HTML } }`.
 Every picture or colour bubble shows its name under it (`.bname`) unless the question shows the name as text (`find` with a `glyph`/`word` prompt) or the tile sets `game.caption: false` (clocks: the name would give away the time).
 Numbers 1–10 carry `tally: n` instead of fixed pictures: card, count view and game draw n of a random countable word (`CONTENT.countable(code)`, `APP.countable()`, `APP.tally(item)`) each time.
+`APP.tallyOf(item)` → `{ pics, line }`: `line` says what is counted (n = 1: the word's `forms.sg[0]`, 2: `forms.pl[0]`, ≥ 3: `numbers[n-1]` + plural), and the card speaks `say` + `line` ("Zece! Zece bărci!").
 Those pictures are always one `.objs` box (card `#pics`, count rows, how-many question): at most `--row` (5) per line, so 6–10 read as 5 + the rest.
 `howmany` counts a random countable word (a plural, no mass/unique words), or — with the tile's `game.fingers` concept, a quarter of the rounds — raised fingers (`APP.hands(n)`, shared with the count view).
 The play view offers 2 choices, 3 from a streak of 3, 4 from a streak of 8, and draws missed targets more often but at most 3× (`RULES` in play.js, weights stored as `w`);

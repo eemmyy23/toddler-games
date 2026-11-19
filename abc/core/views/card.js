@@ -2,7 +2,7 @@
   const big = i => document.querySelector(`#glyph .part[data-part="${i}"]`);
   const cell = i => document.querySelector(`#parts .pt[data-part="${i}"]`);
   const both = i => [cell(i), big(i)];
-  let at = -1;
+  let at = -1, said = '';
   const calmHint = () => { $('parts').classList.remove('hint'); const tip = $('parts').querySelector('.tip'); if (tip) tip.remove(); };
   function part(i) {
     const it = APP.item(); if (!it.parts || !it.parts[i]) return;
@@ -34,7 +34,7 @@
       $('parts').innerHTML = strip ? P.map((x, i) => `<button class="card pt" data-part="${i}" aria-label="${esc(x.say)}" style="--i:${i};--c:${x.color}"></button>`).join('')
         + `<span class="tip">${APP.icon('drag')}</span>` : '';
       if (strip) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }
-      const pics = APP.tally(it); $('pics').hidden = !pics.length; $('word').hidden = !it.word;
+      const tl = APP.tallyOf(it), pics = tl.pics; said = tl.line ? `${it.say} ${tl.line}` : it.say; $('pics').hidden = !pics.length; $('word').hidden = !it.word;
       $('word').textContent = it.word || '';
       $('also').innerHTML = APP.synonyms(it); $('also').hidden = !$('also').innerHTML; if (!$('also').hidden) APP.fitText($('also'));
       $('pics').innerHTML = pics.map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
@@ -45,10 +45,10 @@
       APP.fitText(g);
       APP.fit($('learn'), 'tight');
       APP.shown();
-      if (sayIt) speak(it.say, PAUSE.line);
+      if (sayIt) speak(said, PAUSE.line);
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
-    line: () => APP.item().say,
+    line: () => said,
     play: () => playAll(),
     playable: it => !!(it && it.parts),
     resize() { APP.fitText($('glyph')); if (!$('also').hidden) APP.fitText($('also')); APP.fit($('learn'), 'tight'); },

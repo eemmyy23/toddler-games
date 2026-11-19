@@ -129,7 +129,13 @@ const APP = {
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
   countable() { const xs = CONTENT.countable(lang); return xs[Math.random() * xs.length | 0]; },
-  tally: it => it.tally ? Array(it.tally).fill(APP.countable().pic) : it.pics || [],
+  tallyOf(it) {
+    if (!it.tally) return { pics: it.pics || [], line: null };
+    const x = APP.countable(), n = it.tally, L = APP.L(), f = x.forms;
+    const what = n === 1 ? f.sg[0] : n === 2 ? f.pl[0] : L.numbers ? `${L.numbers[n - 1]} ${x.entry.pl}` : null;
+    return { pics: Array(n).fill(x.pic), line: what && APP.exclaim(I18N.capFirst(what, L.bcp47)) };
+  },
+  tally: it => APP.tallyOf(it).pics,
   hands(n) {
     const one = (raised, right) => `<svg class="hand" viewBox="0 0 32 32" aria-label="${esc(APP.ui().aria[right ? 'rightHand' : 'leftHand'])}"><g${right ? ' transform="translate(32 0) scale(-1 1)"' : ''}>${ABC.art['hand-' + raised]}</g></svg>`;
     return n <= HAND ? one(n, false) : one(HAND, false) + one(n - HAND, true);
