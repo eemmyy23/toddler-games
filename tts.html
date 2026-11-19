@@ -14,7 +14,7 @@ main{padding:8px 16px 40px;max-width:760px;margin:0 auto}
 select,button,textarea{font:inherit;color:inherit}
 select,button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:40px}
 button{cursor:pointer}
-.row{display:grid;grid-template-columns:1fr;gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.row{display:grid;grid-template-columns:minmax(0,1fr);gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
 .row.done .w{color:var(--ok)}
 .row.cur{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
 .w{font-size:20px}
@@ -22,7 +22,9 @@ button{cursor:pointer}
 .meta{grid-column:1/-1;color:var(--mut);font-size:13px;overflow-wrap:anywhere}
 .opt{grid-column:1/-1;display:flex;gap:6px;align-items:center}
 .opt .play{flex:1;text-align:left}
+.opt [data-own]{flex:none}
 .mark{min-width:48px;font-size:18px}
+.opt input{flex:1;min-width:0;min-height:40px;background:var(--card);color:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit}
 .mark.pass[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--bg)}
 .mark.fail[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--bg)}
 .info{color:var(--mut);font-size:13px;width:100%;overflow-wrap:anywhere}

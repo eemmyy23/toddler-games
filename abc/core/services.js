@@ -79,7 +79,7 @@ let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 function makeUtt(text, onDone) {
   const said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
-  const u = new SpeechSynthesisUtterance(/[.!?…:]\s*$/u.test(said) ? said : said + '.');
+  const u = new SpeechSynthesisUtterance(/^<speak>|[.!?…:]\s*$/u.test(said) ? said : said + '.');
   u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = SPEECH.rate; u.pitch = SPEECH.pitch;
