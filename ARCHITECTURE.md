@@ -94,7 +94,7 @@ tools/smoke.js              browser test: every language, every game, choice rul
 **LANG** (`grammar.js`) — required: `name, flag, bcp47, letters` (space-separated units, multi-character allowed),
 `forms(entry, word) → { sg: [a, the] | null, pl: [two, the] | null } | null` (a language without `forms` gets no flag).
 Optional: `dir` (`<html dir>`, swipe direction), `keepCase` (example words keep their case), `names` (the letter names, see **Letter names**), `fold(text)` (search),
-`voices` (RegExp of preferred voice names), `checkForms(entry)` / `checkWord(entry)` → message.
+`voices` (RegExp of preferred voice names), `ssml` (RegExp of `voiceURI`s measured on tts.html to honour SSML `<phoneme>`; RO: `moz-tts:android:ro_RO`, Firefox Android, 2026-11-19: hipopotam and meduză wrong as text, right with IPA), `checkForms(entry)` / `checkWord(entry)` → message.
 Module data, only when a module lists it in `needs`: `numbers` (1–10), `teens` (11–20), `tens` (10, 20 … 100) — 10 words each, `sayLetter(name, word, inside)`.
 Optional data the letters module uses when present: `groups` (letter groups, e.g. `'ch sch'`), `sayGroup(group, word)`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
 
@@ -111,6 +111,9 @@ DOOM first), EN en.wiktionary.org (UK), DE de.wiktionary.org; `ipa` as that page
 entry: the stress of its first word, farm animals → farm).
 `tts` (a respelling) with `voice` (the voice and device it was heard wrong on) — only when that voice misplaces the stress; `speak` (services.js) substitutes every
 whole-word match of a base form by its `tts` in any utterance of the current language (`SPEECH.pick(bcp47, voices, words)` builds the table, no word in code).
+On a voice matching `LANG.ssml`, `speak` wraps every utterance that contains a base form with `pron.ipa` (not `of`, not `tts`) in `<speak>` and that word in
+`<phoneme alphabet="ipa" ph="…">` (one pass, longest form first, text escaped); articulated and plural forms stay text (their IPA is not in the sources). Any other voice
+gets plain text — a voice that ignores SSML could read the tags aloud.
 How a `tts` is found: open `tts.html` on the device, pick language and voice, mark each variant ✓ or ✗: the original; IPA — `<speak><phoneme alphabet="ipa"
 ph="…">word</phoneme></speak>` from the sourced `pron.ipa` (`speak` passes text starting with `<speak>` unchanged; whether a voice honours it is what the test
 measures); the tester's own respelling. Accent marks and doubled vowels were measured as useless on Android's Google ro-RO voice (2026-11-19: accent read
