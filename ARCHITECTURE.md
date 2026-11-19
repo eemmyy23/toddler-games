@@ -37,7 +37,7 @@ sw.js                       precaches MANIFEST.files under cache 'toddler-<versi
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
 tts.html + tts.js           pronunciation test page (not part of the app, not precached): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); per word ▶ original, V1, V2
-                            and a select (original / V1 / V2 / all wrong), kept per language + voice in `store`; exports JSON or MD with app version, build hash,
+                            each with ✓ pass / ✗ fail (tap again clears), kept per language + voice in `store`; exports JSON or MD with app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
 tools/check.js              content, config, markup, CSS-token, engine-literal, PWA-scope and no-comment checks; manifest generator (CI)
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest
@@ -111,9 +111,9 @@ DOOM first), EN en.wiktionary.org (UK), DE de.wiktionary.org; `ipa` as that page
 entry: the stress of its first word, farm animals → farm).
 `tts` (a respelling) with `voice` (the voice and device it was heard wrong on) — only when that voice misplaces the stress; `speak` (services.js) substitutes every
 whole-word match of a base form by its `tts` in any utterance of the current language (`SPEECH.pick(bcp47, voices, words)` builds the table, no word in code).
-How a `tts` is found: open `tts.html` on the device, pick language and voice, judge each word; V1 puts an acute accent on the vowel of the stressed syllable
-(`stress`; RO glides oa, ea, eo, ia, ie, io, iu, ua, uă take it on their second letter), V2 doubles that vowel. An exported result where V1 or V2 won becomes
-`tts` (that text) + `voice` (name · lang from the export); `orig` changes nothing; `bad` is reported, never guessed.
+How a `tts` is found: open `tts.html` on the device, pick language and voice, mark each variant ✓ or ✗; V1 puts an acute accent on the vowel of the stressed syllable
+(`stress`; RO glides oa, ea, eo, ia, ie, io, iu, ua, uă take it on their second letter), V2 doubles that vowel. Where the original fails and V1 or V2 passes, that
+variant becomes `tts` (V1 first) + `voice` (name · lang from the export); an original that passes changes nothing; all failing is reported, never guessed.
 Recordings (not in the repo yet): `pron.audio` would name `audio/<lang>/<id>.mp3` (mono, 32 kbps, from a Commons native-speaker file — Lingua Libre
 `LL-Q7913 (ron)` / `LL-Q1860 (eng)` / `LL-Q188 (deu)` first — with `file`, `author`, a CC0/CC BY/CC BY-SA `license`), played when an utterance is exactly that
 base form, the voice otherwise or on any playback error; the files go into the manifest, `check.js --fix` reports their MB and the app lists their credits.

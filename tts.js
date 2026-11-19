@@ -1,6 +1,6 @@
 (function () {
   const M = self.MANIFEST, CFG = ABC.config, ACUTE = '́';
-  const CHOICES = [['', '—'], ['orig', '✓ original'], ['v1', '✓ V1'], ['v2', '✓ V2'], ['bad', '✗ toate greșite']];
+  const OPTS = [['orig', 'original'], ['v1', 'V1'], ['v2', 'V2']];
   const RO_GLIDE = ['oa', 'ea', 'eo', 'ia', 'ie', 'io', 'iu', 'ua', 'uă'];
   let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null;
 
@@ -39,28 +39,31 @@
     $('voice').innerHTML = all.length ? all.map((v, i) => `<option value="${i}"${v === SPEECH.voice ? ' selected' : ''}>${esc(v.name)} · ${esc(v.lang)}${v.localService ? ' · local' : ''}${v.default ? ' · default' : ''}</option>`).join('') : '<option>fără voce</option>';
     $('voice').onchange = () => { SPEECH.voice = all[+$('voice').value]; SPEECH.noVoice = !SPEECH.voice; load(); };
   }
+  const opts = r => OPTS.filter(([k]) => r[k === 'orig' ? 'base' : k]);
+  const text = (r, k) => r[k === 'orig' ? 'base' : k];
+  const judged = r => { const p = picks[r.e.key] || {}; return opts(r).every(([k]) => p[k]); };
   function load() {
-    picks = store.get(saveKey(), {});
+    const raw = store.get(saveKey(), {});
+    picks = Object.fromEntries(Object.entries(raw).filter(([, v]) => v && typeof v === 'object'));
     render();
   }
   function render() {
     const L = ABC.langs[code];
     rows = L.words.flatMap(e => [Object.assign({ key: e.id }, e), ...(e.syn || []).map((s, i) => Object.assign({ key: `${e.id}~${i + 1}` }, s))])
       .map(e => Object.assign({ e }, variants(e, code)));
-    $('list').innerHTML = rows.map((r, i) => `<div class="row${picks[r.e.key] ? ' done' : ''}" id="r${i}">
+    $('list').innerHTML = rows.map((r, i) => `<div class="row${judged(r) ? ' done' : ''}" id="r${i}">
       <div class="w">${r.bold}</div>
-      <select data-i="${i}" aria-label="Rezultat ${esc(r.base)}">${CHOICES.filter(([v]) => (v !== 'v1' && v !== 'v2') || r.v1).map(([v, t]) => `<option value="${v}"${(picks[r.e.key] || '') === v ? ' selected' : ''}>${t}</option>`).join('')}</select>
-      <div class="plays"><button data-say="${esc(r.base)}">▶ original</button>${r.v1 ? `<button data-say="${esc(r.v1)}">▶ V1 ${esc(r.v1)}</button><button data-say="${esc(r.v2)}">▶ V2 ${esc(r.v2)}</button>` : ''}</div>
+      ${opts(r).map(([k, t]) => `<div class="opt"><button class="play" data-say="${esc(text(r, k))}">▶ ${t}${k === 'orig' ? '' : ` ${esc(text(r, k))}`}</button>${['pass', 'fail'].map(v => `<button class="mark ${v}" data-i="${i}" data-k="${k}" data-v="${v}" aria-pressed="${(picks[r.e.key] || {})[k] === v}" aria-label="${t} ${v}">${v === 'pass' ? '✓' : '✗'}</button>`).join('')}</div>`).join('')}
       <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.ipa || '')} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
   }
   function info() {
-    const n = rows.filter(r => picks[r.e.key]).length, v = SPEECH.voice;
+    const n = rows.filter(judged).length, v = SPEECH.voice;
     $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · ${n}/${rows.length}`;
   }
   async function next() {
-    let i = rows.findIndex((r, k) => k > cur && !picks[r.e.key]);
-    if (i < 0) i = rows.findIndex(r => !picks[r.e.key]);
+    let i = rows.findIndex((r, k) => k > cur && !judged(r));
+    if (i < 0) i = rows.findIndex(r => !judged(r));
     if (i < 0) return;
     document.querySelectorAll('.row.cur').forEach(el => el.classList.remove('cur'));
     cur = i; const el = $('r' + i), r = rows[i];
@@ -68,17 +71,17 @@
     for (const t of [r.base, r.v1, r.v2].filter(Boolean)) { await speak(t); if (cur !== i) return; await wait(PAUSE.beat); }
   }
   function report() {
-    const v = SPEECH.voice, done = rows.filter(r => picks[r.e.key]), count = {};
-    done.forEach(r => { count[picks[r.e.key]] = (count[picks[r.e.key]] || 0) + 1; });
+    const v = SPEECH.voice, done = rows.filter(r => Object.keys(picks[r.e.key] || {}).length), count = {};
+    done.forEach(r => Object.entries(picks[r.e.key]).forEach(([k, x]) => { count[`${k} ${x}`] = (count[`${k} ${x}`] || 0) + 1; }));
     return {
       version: { app: CFG.version, build: M.version, deployed },
       tested: iso(new Date()), page: location.href, userAgent: navigator.userAgent,
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
       rate: SPEECH.rate, pitch: SPEECH.pitch,
-      total: rows.length, judged: done.length, count,
-      results: done.map(r => ({ key: r.e.key, w: r.base, stress: r.e.pron ? r.e.pron.stress : null, src: r.e.pron ? r.e.pron.src : null,
-        choice: picks[r.e.key], text: { orig: r.base, v1: r.v1, v2: r.v2 }[picks[r.e.key]] || null }))
+      total: rows.length, judged: rows.filter(judged).length, count,
+      results: done.map(r => Object.assign({ key: r.e.key, w: r.base, stress: r.e.pron ? r.e.pron.stress : null, src: r.e.pron ? r.e.pron.src : null },
+        ...opts(r).map(([k]) => ({ [k]: { text: text(r, k), result: picks[r.e.key][k] || null } }))))
     };
   }
   function md(o) {
@@ -89,8 +92,8 @@
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
       `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
       `- judged ${o.judged}/${o.total}: ${Object.entries(o.count).map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
-      '| key | word | stress | choice | text |', '|---|---|---|---|---|',
-      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.choice} | ${r.text || ''} |`)].join('\n');
+      '| key | word | stress | original | V1 | V2 |', '|---|---|---|---|---|---|',
+      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${['orig', 'v1', 'v2'].map(k => r[k] ? `${r[k].result || '—'} ${k === 'orig' ? '' : r[k].text}`.trim() : '').join(' | ')} |`)].join('\n');
   }
   function show(text) { $('out').hidden = false; $('text').value = text; $('out').scrollIntoView({ behavior: 'smooth' }); }
 
@@ -100,12 +103,15 @@
     fillVoices(); load();
   }
   $('lang').onchange = () => setLang($('lang').value);
-  $('list').addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) speak(b.dataset.say); });
-  $('list').addEventListener('change', e => {
-    const s = e.target.closest('select[data-i]'); if (!s) return;
-    const r = rows[+s.dataset.i];
-    if (s.value) picks[r.e.key] = s.value; else delete picks[r.e.key];
-    store.set(saveKey(), picks); s.closest('.row').classList.toggle('done', !!s.value); info();
+  $('list').addEventListener('click', e => {
+    const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
+    const b = e.target.closest('.mark'); if (!b) return;
+    const r = rows[+b.dataset.i], p = picks[r.e.key] = picks[r.e.key] || {}, k = b.dataset.k;
+    if (p[k] === b.dataset.v) delete p[k]; else p[k] = b.dataset.v;
+    if (!Object.keys(p).length) delete picks[r.e.key];
+    store.set(saveKey(), picks);
+    b.parentNode.querySelectorAll('.mark').forEach(m => m.setAttribute('aria-pressed', p[k] === m.dataset.v));
+    b.closest('.row').classList.toggle('done', judged(r)); info();
   });
   $('next').onclick = next;
   $('json').onclick = () => show(JSON.stringify(report(), null, 2));
