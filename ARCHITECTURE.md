@@ -26,7 +26,7 @@ abc/core/content.js         INK palette; CONTENT: builders thing/word/glyph/pict
 abc/core/tiles.js           the one rule set "what a tile shows and when" — used by the app AND tools/check.js
 abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no palm taps), onScrub (tap or drag a finger across a row/column of
                             targets: each target acts once as the finger enters it; keyboard clicks too; never swipes the stage), wait, shuffle, PAUSE/TALK timings,
-                            store (localStorage or session, `abc2.` keys; `store.legacy(k)` reads an old `abc.` key once, so stars and language survive the rename), sound (sfx, tone), speech (SPEECH, speak, hush),
+                            store (localStorage or session, `abc2.` keys; `store.legacy(k)` reads an old `abc.` key once, so stars and language survive the rename), sound (sfx, tone), speech (SPEECH with `rate`/`pitch`, speak, hush),
                             audio (ensureAudio, quietAudio), confetti, calm (reduced motion)
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
@@ -35,6 +35,10 @@ abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶
 sw.js                       precaches MANIFEST.files under cache 'toddler-<version>' and deletes older ones; scripts whose ?v= is the current
                             version are cache-first, the rest network-first (cache after 3 s or offline); an open app checks for an update on
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
+tts.html + tts.js           pronunciation test page (not part of the app, not precached): loads registry, i18n, services, config and every language's grammar +
+                            words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); per word ▶ original, V1, V2
+                            and a select (original / V1 / V2 / all wrong), kept per language + voice in `store`; exports JSON or MD with app version, build hash,
+                            deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
 tools/check.js              content, config, markup, CSS-token, engine-literal, PWA-scope and no-comment checks; manifest generator (CI)
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest
                             item; Read: 6 longest words), games × 7 sizes (phones, tablet portrait/landscape, desktop), oldest profile (CI)
@@ -107,6 +111,9 @@ DOOM first), EN en.wiktionary.org (UK), DE de.wiktionary.org; `ipa` as that page
 entry: the stress of its first word, farm animals → farm).
 `tts` (a respelling) with `voice` (the voice and device it was heard wrong on) — only when that voice misplaces the stress; `speak` (services.js) substitutes every
 whole-word match of a base form by its `tts` in any utterance of the current language (`SPEECH.pick(bcp47, voices, words)` builds the table, no word in code).
+How a `tts` is found: open `tts.html` on the device, pick language and voice, judge each word; V1 puts an acute accent on the vowel of the stressed syllable
+(`stress`; RO glides oa, ea, eo, ia, ie, io, iu, ua, uă take it on their second letter), V2 doubles that vowel. An exported result where V1 or V2 won becomes
+`tts` (that text) + `voice` (name · lang from the export); `orig` changes nothing; `bad` is reported, never guessed.
 Recordings (not in the repo yet): `pron.audio` would name `audio/<lang>/<id>.mp3` (mono, 32 kbps, from a Commons native-speaker file — Lingua Libre
 `LL-Q7913 (ron)` / `LL-Q1860 (eng)` / `LL-Q188 (deu)` first — with `file`, `author`, a CC0/CC BY/CC BY-SA `license`), played when an utterance is exactly that
 base form, the voice otherwise or on any playback error; the files go into the manifest, `check.js --fix` reports their MB and the app lists their credits.

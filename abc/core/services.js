@@ -52,7 +52,7 @@ const sfx = {
 };
 
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: null, respell: [],
+  voice: null, noVoice: false, bcp47: null, respell: [], rate: 0.85, pitch: 1.25,
   norm: v => v.lang.replace('_', '-').toLowerCase(),
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
@@ -77,12 +77,12 @@ const SPEECH = {
 };
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
-function makeUtt(text, rate, onDone) {
+function makeUtt(text, onDone) {
   const said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
   const u = new SpeechSynthesisUtterance(/[.!?…:]\s*$/u.test(said) ? said : said + '.');
   u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
-  u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = rate; u.pitch = 1.25;
+  u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = SPEECH.rate; u.pitch = SPEECH.pitch;
   liveUtts.add(u);
   let fallback;
   const fin = () => { clearTimeout(fallback); liveUtts.delete(u); onDone && onDone(); };
@@ -98,7 +98,7 @@ function speak(text, delay = 0) {
     let settled = false;
     const done = () => { if (!settled) { settled = true; if (speakDone === done) speakDone = null; res(); } };
     speakDone = done;
-    speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, 0.85, done)), delay);
+    speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, done)), delay);
   });
 }
 const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); };

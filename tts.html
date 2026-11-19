@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test TTS</title>
+<style>
+:root{--bg:#fff;--fg:#1b1b1f;--mut:#666;--line:#ddd;--acc:#c2410c;--ok:#15803d;--card:#f6f6f7}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--fg:#ececf0;--mut:#9a9aa3;--line:#333;--acc:#fb923c;--ok:#4ade80;--card:#1e1e22}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,sans-serif}
+header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;z-index:1}
+main{padding:8px 16px 40px;max-width:760px;margin:0 auto}
+select,button,textarea{font:inherit;color:inherit}
+select,button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:40px}
+button{cursor:pointer}
+.row{display:grid;grid-template-columns:1fr auto;gap:6px 10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.row.done .w{color:var(--ok)}
+.row.cur{outline:2px solid var(--acc);outline-offset:2px;border-radius:6px}
+.w{font-size:20px}
+.w b{color:var(--acc)}
+.meta{grid-column:1/-1;color:var(--mut);font-size:13px;overflow-wrap:anywhere}
+.plays{display:flex;gap:6px;flex-wrap:wrap}
+.info{color:var(--mut);font-size:13px;width:100%;overflow-wrap:anywhere}
+textarea{width:100%;min-height:220px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;font:13px/1.4 ui-monospace,monospace}
+#out{margin-top:16px}
+</style>
+</head>
+<body>
+<canvas id="fx" hidden></canvas>
+<header>
+  <select id="lang" aria-label="Limba"></select>
+  <select id="voice" aria-label="Voce"></select>
+  <button id="next">▶ Următorul</button>
+  <button id="json">Export JSON</button>
+  <button id="md">Export MD</button>
+  <div class="info" id="info"></div>
+</header>
+<main>
+  <div id="list"></div>
+  <div id="out" hidden><button id="copy">Copiază</button><textarea id="text" readonly></textarea></div>
+</main>
+<script src="abc/manifest.js"></script>
+<script>
+(function () {
+  var M = self.MANIFEST, want = /^abc\/(core\/(registry|i18n|services)|config|lang\/[^/]+\/(grammar|words))\.js$/;
+  M.scripts.filter(function (s) { return want.test(s); }).concat(['tts.js']).forEach(function (src) {
+    var e = document.createElement('script');
+    e.src = src + '?v=' + M.version; e.async = false;
+    document.body.appendChild(e);
+  });
+})();
+</script>
+</body>
+</html>
