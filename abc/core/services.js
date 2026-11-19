@@ -52,17 +52,19 @@ const sfx = {
 };
 
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: null, respell: [], rate: 0.85, pitch: 1.25,
+  voice: null, noVoice: false, bcp47: null, respell: [], phonemes: null, rate: 0.85, pitch: 1.25,
   norm: v => v.lang.replace('_', '-').toLowerCase(),
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  pick(bcp47, prefer, words = []) {
+  pick(bcp47, prefer, words = [], ssml = null) {
     const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     this.bcp47 = bcp47;
-    this.respell = words.flatMap(e => [e, ...(e.syn || [])]).filter(e => e.pron && e.pron.tts)
+    const all0 = words.flatMap(e => [e, ...(e.syn || [])]);
+    this.phonemes = null;
+    this.respell = all0.filter(e => e.pron && e.pron.tts)
       .map(e => [new RegExp(`(?<!${edge})${lit(e.w.split('/').join(''))}(?!${edge})`, 'giu'), e.pron.tts]);
     if (!('speechSynthesis' in window)) { this.noVoice = true; return; }
     const all = speechSynthesis.getVoices();
@@ -73,13 +75,24 @@ const SPEECH = {
     this.voice = same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
               || same.find(nice) || same[0] || lang[0] || null;
     this.noVoice = !this.voice;
+    const ipa = ssml && this.voice && ssml.test(this.voice.voiceURI) ? all0.filter(e => e.pron && e.pron.ipa && !e.pron.of && !e.pron.tts) : [];
+    if (!ipa.length) return;
+    const map = new Map(ipa.map(e => [e.w.split('/').join('').toLocaleLowerCase(bcp47), e.pron.ipa.replace(/^[/[]|[/\]]$/g, '')]));
+    this.phonemes = { map, re: new RegExp(`(?<!${edge})(${[...map.keys()].sort((a, b) => b.length - a.length).map(lit).join('|')})(?!${edge})`, 'giu') };
   }
 };
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 function makeUtt(text, onDone) {
-  const said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
-  const u = new SpeechSynthesisUtterance(/^<speak>|[.!?…:]\s*$/u.test(said) ? said : said + '.');
+  let said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
+  if (!/^<speak>|[.!?…:]\s*$/u.test(said)) said += '.';
+  const P = SPEECH.phonemes;
+  if (P && !/^<speak>/.test(said) && P.re.test(esc(said))) {
+    P.re.lastIndex = 0;
+    said = `<speak>${esc(said).replace(P.re, w => `<phoneme alphabet="ipa" ph="${esc(P.map.get(w.toLocaleLowerCase(SPEECH.bcp47)))}">${w}</phoneme>`)}</speak>`;
+  }
+  P && (P.re.lastIndex = 0);
+  const u = new SpeechSynthesisUtterance(said);
   u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = SPEECH.rate; u.pitch = SPEECH.pitch;
