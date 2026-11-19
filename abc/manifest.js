@@ -1,5 +1,5 @@
 self.MANIFEST = {
-  "version": "27562a8df2",
+  "version": "e4ffc1a116",
   "scripts": [
     "abc/core/registry.js",
     "abc/core/i18n.js",
@@ -190,6 +190,8 @@ self.MANIFEST = {
     "fonts/lexend-latin.woff2",
     "rocket.html",
     "paint.html",
+    "tts.html",
+    "tts.js",
     "manifest.json",
     "manifest-paint.json",
     "icon-192.png",

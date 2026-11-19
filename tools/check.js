@@ -25,8 +25,9 @@ for (const m of CFG.modules) {
 const VIEW_FILES = ls('abc/core/views', /\.js$/), GAME_FILES = ls('abc/core/games', /\.js$/);
 scripts.push('abc/core/services.js', ...VIEW_FILES, ...GAME_FILES, 'abc/core/shell.js');
 const files = ['abc.html', 'abc/manifest.js', ...scripts, 'manifest-abc.json', 'abc-icon-192.png', 'abc-icon-512.png',
-  ...ls('fonts', /\.woff2$/), 'rocket.html', 'paint.html', 'manifest.json', 'manifest-paint.json',
+  ...ls('fonts', /\.woff2$/), 'rocket.html', 'paint.html', 'tts.html', 'tts.js', 'manifest.json', 'manifest-paint.json',
   'icon-192.png', 'icon-512.png', 'paint-icon-192.png', 'paint-icon-512.png'].filter(exists);
+for (const f of ls('.', /\.(html|js)$/).map(f => f.slice(2))) if (f !== 'sw.js' && !files.includes(f)) err(`${f}: not in the manifest files — the version hash would miss its changes and sw.js would keep serving the old copy`);
 const hash = crypto.createHash('sha256'); files.filter(f => f !== 'abc/manifest.js').forEach(f => hash.update(f).update(fs.readFileSync(path.join(root, f))));
 const version = hash.digest('hex').slice(0, 10);
 const manifest = `self.MANIFEST = ${JSON.stringify({ version, scripts, files }, null, 2)};\n`;

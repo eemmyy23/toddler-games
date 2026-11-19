@@ -35,7 +35,7 @@ abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶
 sw.js                       precaches MANIFEST.files under cache 'toddler-<version>' and deletes older ones; scripts whose ?v= is the current
                             version are cache-first, the rest network-first (cache after 3 s or offline); an open app checks for an update on
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
-tts.html + tts.js           pronunciation test page (not part of the app, not precached): loads registry, i18n, services, config and every language's grammar +
+tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); per word ▶ original, V1, V2
                             each with ✓ pass / ✗ fail (tap again clears), kept per language + voice in `store`; exports JSON or MD with app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
