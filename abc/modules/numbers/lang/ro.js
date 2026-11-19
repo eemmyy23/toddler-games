@@ -7,5 +7,6 @@ MSTRINGS('numbers', 'ro', {
   teenSay: '{name}! Zece și {ones}.',
   tensSay: ['Zece! O grupă de zece.', 'Douăzeci! Două grupe de zece.', 'Treizeci! Trei grupe de zece.', 'Patruzeci! Patru grupe de zece.', 'Cincizeci! Cinci grupe de zece.',
             'Șaizeci! Șase grupe de zece.', 'Șaptezeci! Șapte grupe de zece.', 'Optzeci! Opt grupe de zece.', 'Nouăzeci! Nouă grupe de zece.', 'O sută! Zece grupe de zece.'],
+  thatsNum: 'numărul {name}', thatsG: 'n',
   games: { digits: 'Găsește numărul {name}!', count: 'Câte sunt?', countThing: { m: 'Câți {pl} sunt?', other: 'Câte {pl} sunt?' } }
 });

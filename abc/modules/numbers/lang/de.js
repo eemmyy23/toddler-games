@@ -7,5 +7,6 @@ MSTRINGS('numbers', 'de', {
   teenSay: '{name}! Zehn und {ones}.',
   tensSay: ['Zehn! Ein Zehner.', 'Zwanzig! Zwei Zehner.', 'Dreißig! Drei Zehner.', 'Vierzig! Vier Zehner.', 'Fünfzig! Fünf Zehner.', 'Sechzig! Sechs Zehner.',
             'Siebzig! Sieben Zehner.', 'Achtzig! Acht Zehner.', 'Neunzig! Neun Zehner.', 'Hundert! Zehn Zehner.'],
+  thatsNum: 'die {name}',
   games: { digits: 'Finde die Zahl {name}!', count: 'Wie viele?', countThing: 'Wie viele {pl}?' }
 });
