@@ -1,6 +1,7 @@
 LANG('en', {
   name: 'English', flag: '🇬🇧', bcp47: 'en-GB', dir: 'ltr',
   voices: /samantha|karen|kate|serena|female/i,
+  piper: 'en_GB-alba-medium',
   letters: 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z',
   names: {
     A: { name: 'a', src: 'https://en.wiktionary.org/wiki/A' },

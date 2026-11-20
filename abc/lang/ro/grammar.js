@@ -2,6 +2,8 @@ LANG('ro', {
   name: 'Română', flag: '🇷🇴', bcp47: 'ro-RO', dir: 'ltr',
   voices: /ioana|female/i,
   ssml: /^(moz-tts:android:ro_RO|Romanian Romania)$/,
+  g2p: [[/j/g, 'ʒ'], [/ce/g, 'ʧe'], [/ci$/g, 'ʧʲ'], [/ci/g, 'ʧi'], [/ge/g, 'ʤe'], [/gi$/g, 'ʤʲ'], [/gi/g, 'ʤi'], [/ch/g, 'k'], [/gh/g, 'g'], [/ii$/g, 'ij'],
+    [/([^aăâeiîou])i$/g, '$1ʲ'], [/ă/g, 'ə'], [/[âî]/g, 'ɨ'], [/c/g, 'k'], [/ș/g, 'ʃ'], [/ț/g, 'ʦ'], [/g/g, 'ɡ']],
   fixes: {
     'moz-tts:android:ro_RO': { tested: '2026-11-20T04:46:36+02:00', words: {
       hipopotam: '/hi.po.poˈtam/', hipopotamul: '/hi.po.poˈtamul/', hipopotami: 'hipopo tami', hipopotamii: 'hipopo tamii',
@@ -28,9 +30,10 @@ LANG('ro', {
       microbul: '/miˈkrobul/', microbi: 'mi crobi', microbii: 'mi crobii', săpunul: '/səˈpunul/', săpunuri: 'să punuri', săpunurile: 'să punurile',
       vaccinul: '/vakˈʧinul/', vaccinuri: 'vac cinuri', vaccinurile: 'vac cinurile'
     } },
-    'Romanian Romania': { tested: '2026-11-20T04:49:52+02:00', words: { ancoră: '/ˈan.ko.rə/', ancorele: 'an-corele' } }
+    'Romanian Romania': { tested: '2026-11-20T05:33:00+02:00', words: { ancoră: '/ˈan.ko.rə/', ancorele: 'an-corele', meduze: 'medu-ze' } }
   },
   checkWord: e => Object.values(e).some(v => typeof v === 'string' && /[şţŞŢ]/.test(v)) ? 'ş/ţ cu sedilă — folosește ș/ț cu virgulă' : null,
+  piper: 'ro_RO-mihai-medium',
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
   groups: 'ce ci che chi ge gi ghe ghi',
   alike: 'â=î',
