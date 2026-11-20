@@ -37,7 +37,8 @@ sw.js                       precaches MANIFEST.files under cache 'toddler-<versi
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
 tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every word of 2+ syllables ▶ original, ▶ IPA (SSML `<phoneme>` with `pron.ipa`) and the respellings
-                            built from `stress` (below), each with one ✓; a word heard with nothing ticked is bad; kept per language + voice in `store`; exports JSON or MD with app version, build hash,
+                            built from `stress` (below), each with one ✓ (only ✓ counts; no tick says nothing), kept per language + voice in `store`; the first ticked variant
+                            of each word is also stored as `ttsfix.<bcp47>.<voiceURI>`, which the app applies on that device at once; exports JSON or MD with app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
 tools/check.js              content, config, markup, CSS-token, engine-literal, PWA-scope and no-comment checks; manifest generator (CI)
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest
@@ -117,7 +118,9 @@ gets plain text — a voice that ignores SSML could read the tags aloud.
 How a `tts` is found: open `tts.html` on the device, pick language and voice, ▶ Următorul plays every variant of the next word, tick what sounds right:
 the original; IPA — `<speak><phoneme alphabet="ipa" ph="…">word</phoneme></speak>` from the sourced `pron.ipa`; a hyphen and a space at the stressed syllable's
 boundary (after it, or before it when it is the last: an-coră, hipopo-tam); the consonant after the stressed vowel doubled (anncoră, vaccă). Accent marks and doubled
-vowels were measured useless on Android ro-RO (2026-11-19) and are not offered. A ticked respelling becomes `tts` + `voice`; a word with nothing ticked is reported, never guessed.
+vowels were measured useless on Android ro-RO (2026-11-19) and are not offered. On that device the app applies the ticks at once: `SPEECH.pick(…, own = true)` reads `ttsfix.<bcp47>.<voiceURI>` from `store` —
+`orig` turns IPA off for that word, `ipa` sends its `<phoneme>`, a respelling replaces the word — over the data (`pron.tts`, `LANG.ssml`); the exported ✓ become `tts` + `voice`
+in the data for every device with that voice. A word without ✓ changes nothing.
 Recordings (not in the repo yet): `pron.audio` would name `audio/<lang>/<id>.mp3` (mono, 32 kbps, from a Commons native-speaker file — Lingua Libre
 `LL-Q7913 (ron)` / `LL-Q1860 (eng)` / `LL-Q188 (deu)` first — with `file`, `author`, a CC0/CC BY/CC BY-SA `license`), played when an utterance is exactly that
 base form, the voice otherwise or on any playback error; the files go into the manifest, `check.js --fix` reports their MB and the app lists their credits.

@@ -59,26 +59,32 @@ const SPEECH = {
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  pick(bcp47, prefer, words = [], ssml = null) {
-    const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    this.bcp47 = bcp47;
-    const all0 = words.flatMap(e => [e, ...(e.syn || [])]);
-    this.phonemes = null;
-    this.respell = all0.filter(e => e.pron && e.pron.tts)
-      .map(e => [new RegExp(`(?<!${edge})${lit(e.w.split('/').join(''))}(?!${edge})`, 'giu'), e.pron.tts]);
-    if (!('speechSynthesis' in window)) { this.noVoice = true; return; }
-    const all = speechSynthesis.getVoices();
-    if (!all.length) { this.voice = null; this.noVoice = false; return; }
-    const want = bcp47.toLowerCase(), base = want.split('-')[0];
-    const same = all.filter(v => this.norm(v) === want), lang = all.filter(v => this.norm(v).split('-')[0] === base);
-    const nice = v => !!prefer && prefer.test(v.name);
-    this.voice = same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
-              || same.find(nice) || same[0] || lang[0] || null;
-    this.noVoice = !this.voice;
-    const ipa = ssml && this.voice && ssml.test(this.voice.voiceURI) ? all0.filter(e => e.pron && e.pron.ipa && !e.pron.of && !e.pron.tts) : [];
-    if (!ipa.length) return;
-    const map = new Map(ipa.map(e => [e.w.split('/').join('').toLocaleLowerCase(bcp47), e.pron.ipa.replace(/^[/[]|[/\]]$/g, '')]));
-    this.phonemes = { map, re: new RegExp(`(?<!${edge})(${[...map.keys()].sort((a, b) => b.length - a.length).map(lit).join('|')})(?!${edge})`, 'giu') };
+  pick(bcp47, prefer, words = [], ssml = null, own = false) {
+    this.bcp47 = bcp47; this.voice = null; this.noVoice = !('speechSynthesis' in window);
+    const all = this.noVoice ? [] : speechSynthesis.getVoices();
+    if (all.length) {
+      const want = bcp47.toLowerCase(), base = want.split('-')[0];
+      const same = all.filter(v => this.norm(v) === want), lang = all.filter(v => this.norm(v).split('-')[0] === base);
+      const nice = v => !!prefer && prefer.test(v.name);
+      this.voice = same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
+                || same.find(nice) || same[0] || lang[0] || null;
+      this.noVoice = !this.voice;
+    }
+    this.tune(words, ssml, own);
+  },
+  fixKey: (bcp47, v) => `ttsfix.${bcp47}.${v ? v.voiceURI : '-'}`,
+  tune(words, ssml, own) {
+    const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), low = t => t.toLocaleLowerCase(this.bcp47);
+    const re = w => new RegExp(`(?<!${edge})${lit(w)}(?!${edge})`, 'giu'), base = e => e.w.split('/').join('');
+    const all = words.flatMap(e => [e, ...(e.syn || [])]), fix = own && this.voice ? store.get(this.fixKey(this.bcp47, this.voice), {}) : {};
+    const map = new Map(ssml && this.voice && ssml.test(this.voice.voiceURI)
+      ? all.filter(e => e.pron && e.pron.ipa && !e.pron.of && !e.pron.tts).map(e => [low(base(e)), e.pron.ipa.replace(/^[/[]|[/\]]$/g, '')]) : []);
+    this.respell = all.filter(e => e.pron && e.pron.tts && !fix[low(base(e))]).map(e => [re(base(e)), e.pron.tts]);
+    for (const [w, f] of Object.entries(fix)) {
+      map.delete(w);
+      if (f.k === 'ipa') map.set(w, f.text); else if (f.k !== 'orig') this.respell.push([re(w), f.text]);
+    }
+    this.phonemes = map.size ? { map, re: new RegExp(`(?<!${edge})(${[...map.keys()].sort((a, b) => b.length - a.length).map(lit).join('|')})(?!${edge})`, 'giu') } : null;
   }
 };
 let speakTimer = null, speakDone = null;

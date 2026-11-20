@@ -31,8 +31,8 @@
   const opts = r => OPTS.filter(([k]) => r[k === 'orig' ? 'base' : k]);
   const text = (r, k) => r[k === 'orig' ? 'base' : k];
   const label = (r, k, t) => k === 'orig' ? t : k === 'ipa' ? `IPA ${esc(r.ph)}` : esc(r[k]);
-  const pk = r => picks[r.e.key] || (picks[r.e.key] = { heard: false, ok: [] });
-  const heard = r => !!(picks[r.e.key] && picks[r.e.key].heard);
+  const ok = r => (picks[r.e.key] || { ok: [] }).ok;
+  const done = r => ok(r).length > 0;
 
   function fillLangs() {
     $('lang').innerHTML = CFG.languages.map(c => `<option value="${c}"${c === code ? ' selected' : ''}>${esc(ABC.langs[c].name)}</option>`).join('');
@@ -48,42 +48,44 @@
     picks = Object.fromEntries(Object.entries(raw).filter(([, v]) => v && Array.isArray(v.ok)));
     render();
   }
-  const save = () => store.set(saveKey(), picks);
+  function save() {
+    store.set(saveKey(), picks);
+    const L = ABC.langs[code], fix = {};
+    rows.filter(done).forEach(r => { const k = OPTS.map(([x]) => x).find(x => ok(r).includes(x)); fix[r.base.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
+    store.set(SPEECH.fixKey(L.bcp47, SPEECH.voice), fix);
+  }
   function render() {
     const L = ABC.langs[code];
     rows = L.words.flatMap(e => [Object.assign({ key: e.id }, e), ...(e.syn || []).map((s, i) => Object.assign({ key: `${e.id}~${i + 1}` }, s))])
       .map(e => Object.assign({ e }, variants(e))).filter(r => r.n > 1);
-    $('list').innerHTML = rows.map((r, i) => `<div class="row${heard(r) ? ' done' : ''}" id="r${i}">
+    $('list').innerHTML = rows.map((r, i) => `<div class="row${done(r) ? ' done' : ''}" id="r${i}">
       <div class="w">${r.bold}</div>
-      ${opts(r).map(([k, t]) => `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button><button class="mark pass" data-i="${i}" data-k="${k}" aria-pressed="${pk(r).ok.includes(k)}" aria-label="${t} ✓">✓</button></div>`).join('')}
+      ${opts(r).map(([k, t]) => `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button><button class="mark pass" data-i="${i}" data-k="${k}" aria-pressed="${ok(r).includes(k)}" aria-label="${t} ✓">✓</button></div>`).join('')}
       <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
   }
   function info() {
-    const n = rows.filter(heard).length, v = SPEECH.voice;
-    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · ascultate ${n}/${rows.length}`;
+    const n = rows.filter(done).length, v = SPEECH.voice;
+    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · bifate ${n}/${rows.length}`;
   }
-  function markHeard(i) { const r = rows[i]; if (heard(r)) return; pk(r).heard = true; save(); $('r' + i).classList.add('done'); info(); }
   async function next() {
-    let i = rows.findIndex((r, k) => k > cur && !heard(r));
-    if (i < 0) i = rows.findIndex(r => !heard(r));
-    if (i < 0) return;
+    const i = cur + 1 < rows.length ? cur + 1 : 0;
     document.querySelectorAll('.row.cur').forEach(el => el.classList.remove('cur'));
     cur = i; const el = $('r' + i), r = rows[i];
-    el.classList.add('cur'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); markHeard(i);
+    el.classList.add('cur'); el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     for (const [k] of opts(r)) { await speak(text(r, k)); if (cur !== i) return; await wait(PAUSE.beat); }
   }
   function report() {
-    const v = SPEECH.voice, done = rows.filter(heard), count = { heard: done.length, bad: 0 };
-    done.forEach(r => { const ok = picks[r.e.key].ok; if (!ok.length) count.bad++; ok.forEach(k => { count[k] = (count[k] || 0) + 1; }); });
+    const v = SPEECH.voice, ticked = rows.filter(done), count = { ticked: ticked.length };
+    ticked.forEach(r => ok(r).forEach(k => { count[k] = (count[k] || 0) + 1; }));
     return {
       version: { app: CFG.version, build: M.version, deployed },
       tested: iso(new Date()), page: location.href, userAgent: navigator.userAgent,
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
       rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
-      results: done.map(r => ({ key: r.e.key, w: r.base, stress: r.e.pron ? r.e.pron.stress : null,
-        ok: picks[r.e.key].ok.map(k => ({ k, text: k === 'ipa' ? r.ph : text(r, k) })) }))
+      results: ticked.map(r => ({ key: r.e.key, w: r.base, stress: r.e.pron ? r.e.pron.stress : null,
+        ok: ok(r).map(k => ({ k, text: k === 'ipa' ? r.ph : text(r, k) })) }))
     };
   }
   function md(o) {
@@ -93,24 +95,24 @@
       `- tested: ${o.tested}`, `- page: ${o.page}`,
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
       `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
-      `- heard ${o.count.heard}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'heard').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
+      `- ticked ${o.count.ticked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'ticked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
       '| key | word | stress | ✓ |', '|---|---|---|---|',
-      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.ok.length ? r.ok.map(x => `${x.k} ${x.text}`).join('; ') : 'bad'} |`)].join('\n');
+      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.ok.map(x => `${x.k} ${x.text}`).join('; ')} |`)].join('\n');
   }
   function show(t) { $('out').hidden = false; $('text').value = t; $('out').scrollIntoView({ behavior: 'smooth' }); }
 
   function setLang(c) {
     code = c; store.set('tts.lang', c); cur = -1;
-    const L = ABC.langs[c]; SPEECH.pick(L.bcp47, L.voices, L.words); document.documentElement.lang = L.bcp47;
+    const L = ABC.langs[c]; SPEECH.pick(L.bcp47, L.voices); document.documentElement.lang = L.bcp47;
     fillVoices(); load();
   }
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
-    const say = e.target.closest('[data-say]'); if (say) { markHeard(+say.dataset.i); return speak(say.dataset.say); }
+    const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
     const b = e.target.closest('.mark'); if (!b) return;
-    const r = rows[+b.dataset.i], p = pk(r), k = b.dataset.k;
-    p.ok = p.ok.includes(k) ? p.ok.filter(x => x !== k) : [...p.ok, k];
-    b.setAttribute('aria-pressed', p.ok.includes(k)); markHeard(+b.dataset.i); save();
+    const r = rows[+b.dataset.i], k = b.dataset.k, now = ok(r).includes(k) ? ok(r).filter(x => x !== k) : [...ok(r), k];
+    if (now.length) picks[r.e.key] = { ok: now }; else delete picks[r.e.key];
+    b.setAttribute('aria-pressed', now.includes(k)); b.closest('.row').classList.toggle('done', now.length > 0); save(); info();
   });
   $('next').onclick = next;
   $('json').onclick = () => show(JSON.stringify(report(), null, 2));
@@ -119,7 +121,7 @@
     const t = $('text'); t.select();
     (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).catch(() => document.execCommand('copy'));
   };
-  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { const L = ABC.langs[code]; SPEECH.pick(L.bcp47, L.voices, L.words); fillVoices(); load(); };
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { const L = ABC.langs[code]; SPEECH.pick(L.bcp47, L.voices); fillVoices(); load(); };
   fetch('abc/manifest.js', { cache: 'no-store' }).then(r => { const h = r.headers.get('last-modified'); deployed = h ? new Date(h).toISOString() : null; info(); }).catch(() => {});
   if (!CFG.languages.includes(code)) code = CFG.languages[0];
   fillLangs(); setLang(code);
