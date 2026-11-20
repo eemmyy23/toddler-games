@@ -33,7 +33,7 @@ abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
                             speech sequences, service-worker updates, install bar, APP
 sw.js                       precaches MANIFEST.files under cache 'toddler-<version>' and deletes older ones; scripts whose ?v= is the current
-                            version are cache-first, the rest network-first (cache after 3 s or offline); an open app checks for an update on
+                            version are cache-first, the rest network-first (after 3 s the cached copy of that exact URL; another `?v=` only when offline, so a slow network never mixes versions); an open app checks for an update on
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
 tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (SSML `<phoneme>`: `pron.ipa`, for other forms derived from it by swapping the differing ending through
