@@ -104,17 +104,20 @@ const PIPER = {
       uri: `piper:${id}`,
       say: async text => {
         const { data, rate } = await PIPER.render(text, SPEECH.phonemes);
-        ensureAudio();
-        if (!AC || !data.length) return;
-        const b = AC.createBuffer(1, data.length, rate);
-        b.copyToChannel(data, 0);
-        PIPER.stop();
-        const s = PIPER.src = AC.createBufferSource();
-        s.buffer = b; s.connect(AC.destination);
-        await new Promise(res => { s.onended = res; s.start(); });
+        await PIPER.play(data, rate);
       },
       stop: () => PIPER.stop()
     };
+  },
+  async play(data, rate) {
+    ensureAudio();
+    if (!AC || !data.length) return;
+    const b = AC.createBuffer(1, data.length, rate);
+    b.copyToChannel(data, 0);
+    this.stop();
+    const s = this.src = AC.createBufferSource();
+    s.buffer = b; s.connect(AC.destination);
+    await new Promise(res => { s.onended = res; s.start(); });
   },
   stop() { if (this.src) { try { this.src.stop(); } catch (e) {} this.src = null; } }
 };
