@@ -135,7 +135,7 @@ for (const c of langs) {
   const forms = new Set(L.words.flatMap(e => [e, ...(e.syn || [])]).flatMap(e => [e.w.split('/').join(''), e.def, e.pl, e.plDef]).filter(Boolean).map(t => t.toLocaleLowerCase(L.bcp47)));
   for (const [uri, v] of Object.entries(L.fixes || {})) {
     if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/.test(v.tested || '')) err(`${c}/grammar.js fixes["${uri}"]: needs tested (the tts.html export time)`);
-    for (const [w, t] of Object.entries(v.words || {})) {
+    for (const [w, t] of Object.entries(Object.assign({}, v.derived, v.words))) {
       if (!forms.has(w.toLocaleLowerCase(L.bcp47))) err(`${c}/grammar.js fixes["${uri}"].${w}: not a form of any word`);
       if (typeof t !== 'string' || !t.trim()) err(`${c}/grammar.js fixes["${uri}"].${w}: needs a respelling or /ipa/`);
     }

@@ -76,7 +76,7 @@ const SPEECH = {
   tune(words, ssml, own, fixes) {
     const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), low = t => t.toLocaleLowerCase(this.bcp47);
     const re = w => new RegExp(`(?<!${edge})${lit(w)}(?!${edge})`, 'giu'), base = e => e.w.split('/').join('');
-    const data = (fixes && this.voice && fixes[this.voice.voiceURI] || {}).words || {};
+    const v = fixes && this.voice && fixes[this.voice.voiceURI] || {}, data = Object.assign({}, v.derived, v.words);
     const fix = Object.assign(Object.fromEntries(Object.entries(data).map(([w, t]) => [low(w), /^\/.*\/$/.test(t) ? { k: 'ipa', text: t.slice(1, -1) } : { k: 'tts', text: t }])),
       own && this.voice ? store.get(this.fixKey(this.bcp47, this.voice), {}) : {});
     const all = words.flatMap(e => [e, ...(e.syn || [])]);
