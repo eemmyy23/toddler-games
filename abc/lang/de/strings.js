@@ -15,7 +15,9 @@ STRINGS('de', {
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
-  settings: { title: 'Einstellungen', voice: 'Stimme', pron: 'Aussprache', pronSub: 'Ein Wort finden und korrigieren',
+  session: { left: ['Jetzt die letzte!', 'Noch zwei!', 'Noch drei, dann sind wir fertig!'], almost: 'Gleich machen wir Pause!', done: 'Super gespielt! Jetzt ist Pause. Ab zum Spielen!', title: 'Super gespielt! Jetzt ist Pause.',
+    wait: { one: 'In einer Minute geht es weiter.', other: 'In {n} Minuten geht es weiter.' }, again: 'Nochmal spielen!', sum: 'Für Erwachsene: {a} + {b} = ?' },
+  settings: { time: 'Spielzeit', minutes: '{n} Min.', timeHint: 'Gegen Ende sagt die App „Noch drei, dann sind wir fertig!“ und macht dann mindestens {rest} Minuten Pause. Früher entsperren: 🔒 {hold} Sekunden gedrückt halten.', used: 'Gespielt: {used} von {limit}', title: 'Einstellungen', voice: 'Stimme', pron: 'Aussprache', pronSub: 'Ein Wort finden und korrigieren',
     search: 'Wort suchen…', searchHint: 'Suche das Wort, das falsch klingt.', showAll: 'Alle Wörter zeigen ({n})', noResult: 'Kein Wort gefunden.',
     forms: 'Formen des Wortes', fix: 'Korrigieren', which: 'Welche klingt richtig?', asNow: 'Wie bisher', version: 'Variante {n}', noneRight: 'Keine stimmt',
     write: 'Schreib es so, wie es klingen soll', use: 'Übernehmen', saved: 'Gespeichert. Dieses Handy sagt es jetzt so.', fixed: 'Korrigiert', restore: 'Original wiederherstellen',
@@ -26,6 +28,6 @@ STRINGS('de', {
     piper: 'Piper', piperTag: 'Funktioniert offline · auf jedem Handy gleich', download: 'Herunterladen · {mb} MB', progress: '{p}% · {got} von {total} MB',
     downloading: 'Wird geladen… {p}%', cancel: 'Abbrechen', retry: 'Erneut versuchen', failed: 'Kein Internet. Download gestoppt.', full: 'Nicht genug Speicher ({mb} MB nötig).',
     offline: 'Für den Download mit dem Internet verbinden.', del: 'Löschen', delAsk: 'Stimme löschen? Gibt 63 MB frei.', switched: 'Zur Handystimme gewechselt.', sample: 'Hallo! Ich bin deine Stimme.' },
-  aria: { settings: 'Einstellungen', ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
+  aria: { parent: 'Für Erwachsene', settings: 'Einstellungen', ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
     objects: 'Dinge', fingers: 'Finger', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
 });

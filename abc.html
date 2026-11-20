@@ -255,8 +255,8 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 
 #infotitle,#settitle{flex:1;font-size:var(--fs-l);font-weight:700}
 #setbody{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-3);padding:var(--ring-room);margin-inline:calc(-1 * var(--ring-room))}
-.setlang{display:flex;gap:var(--sp-2)}
-.card.setl{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-0);min-height:var(--set-row);padding:var(--sp-2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-weight:700}
+.setlang{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.card.setl{flex:1 0 calc((100% - 2 * var(--sp-2)) / 3);display:flex;flex-direction:column;align-items:center;gap:var(--sp-0);min-height:var(--set-row);padding:var(--sp-2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-weight:700}
 .card.setl span{font-size:var(--fs-l)}
 .card.setv,.card.setn{display:flex;align-items:center;gap:var(--sp-3);min-height:var(--set-row);padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);border-radius:var(--r-sm);text-align:left}
 .sett{flex:1;display:flex;flex-direction:column;gap:var(--sp-0);min-width:0;overflow-wrap:break-word}
@@ -271,6 +271,17 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 .sethow summary{min-height:var(--tap);display:flex;align-items:center;color:var(--amber);font-weight:700;cursor:pointer}
 .sethow p{margin:var(--sp-1) 0}
 #setmsg{min-height:var(--fs-m);text-align:center;color:var(--amber)}
+#rest{background:var(--bg1)}
+#rest .sheet-head{justify-content:flex-end}
+#restlock{position:relative;opacity:.6}
+#restlock::after{content:'';position:absolute;inset:calc(-1 * var(--ring-gap));border-radius:50%;border:var(--ring-w) solid var(--amber);clip-path:inset(0 100% 0 0)}
+#restlock.hold::after{clip-path:inset(0);transition:clip-path var(--hold) linear}
+#restbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-4);text-align:center}
+#restpic{font-size:calc(var(--fs-xl) * 3);line-height:1}
+#restmsg{font-size:var(--fs-l);font-weight:700;max-width:var(--col)}
+#restgate{display:flex;flex-direction:column;align-items:center;gap:var(--sp-3)}
+#restgate[hidden]{display:none}
+#restopts{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-3)}
 .setpic{flex:none;font-size:var(--fs-xl);line-height:1}
 .setpic svg{width:var(--icon-m);height:var(--icon-m)}
 .setword .sett b{font-size:var(--fs-xl)}
@@ -384,6 +395,17 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
   <div class="sheet-head"><button id="setback" class="rbtn" data-aria="back" data-icon="back" hidden></button><span id="settitle"></span><button id="setclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="setbody" class="scroll"></div>
   <div id="setmsg" class="label" role="status" aria-live="polite"></div>
+</div>
+<div id="rest" class="sheet" role="dialog" aria-modal="true" aria-labelledby="restmsg" hidden>
+  <div class="sheet-head"><button id="restlock" class="rbtn small" data-aria="parent" data-icon="lock"></button></div>
+  <div id="restbody">
+    <div id="restpic" data-icon="rest"></div>
+    <p id="restmsg"></p>
+    <p id="reststars" class="label"></p>
+    <p id="restwait" class="label"></p>
+    <button id="restgo" class="pill accent" hidden></button>
+    <div id="restgate" hidden><p id="restq" class="label"></p><div id="restopts"></div></div>
+  </div>
 </div>
 <nav id="tabs"></nav>
 <canvas id="fx"></canvas>

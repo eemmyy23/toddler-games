@@ -18,7 +18,14 @@
   }
   async function home() {
     const U = S();
-    return `${langs()}${nav('voice', U.voice, st.busy != null ? APP.t(U.downloading, { p: st.busy }) : curName())}${nav('pron', U.pron, U.pronSub)}<p class="label ver">${esc(APP.version())}</p>`;
+    return `${langs()}${nav('voice', U.voice, st.busy != null ? APP.t(U.downloading, { p: st.busy }) : curName())}${nav('pron', U.pron, U.pronSub)}${nav('time', U.time, APP.t(U.minutes, { n: store.get('limit', CFG.session.minutes) }))}<p class="label ver">${esc(APP.version())}</p>`;
+  }
+  const clock = ms => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
+  function time() {
+    const U = S(), C = CFG.session, cur = store.get('limit', C.minutes);
+    return `<div class="setlang">${C.choices.map(n => `<button class="card setl${n === cur ? ' on' : ''}" data-min="${n}" aria-pressed="${n === cur}"><span>${n}</span>min</button>`).join('')}</div>
+      <p class="label">${esc(APP.t(U.used, { used: clock(SESSION.used()), limit: clock(SESSION.limit()) }))}</p>
+      <p class="label">${esc(APP.t(U.timeHint, { rest: C.breakMin, hold: C.hold }))}</p>`;
   }
   async function voice() {
     const U = S(), L = APP.L(), id = L.piper, cur = SPEECH.voice && SPEECH.voice.voiceURI, list = voices();
@@ -104,11 +111,11 @@
   async function draw() {
     if ($('settings').hidden) return;
     const U = S(), v = st.view;
-    $('settitle').textContent = v === 'home' ? U.title : v === 'voice' ? U.voice : U.pron;
+    $('settitle').textContent = v === 'home' ? U.title : v === 'voice' ? U.voice : v === 'time' ? U.time : U.pron;
     $('setback').hidden = v === 'home';
     $('setclose').hidden = v !== 'home';
     const focus = document.activeElement && document.activeElement.id === 'setq';
-    $('setbody').innerHTML = v === 'home' ? await home() : v === 'voice' ? await voice() : v === 'word' ? word() : pron();
+    $('setbody').innerHTML = v === 'home' ? await home() : v === 'voice' ? await voice() : v === 'time' ? time() : v === 'word' ? word() : pron();
     if (v === 'pron' && (focus || st.focus)) { const q = $('setq'); q.focus(); q.setSelectionRange(q.value.length, q.value.length); st.focus = false; }
   }
   function go(v) { st.view = v; st.ask = false; st.open = -1; if (v === 'pron') st.focus = true; note(''); draw(); }
@@ -138,7 +145,8 @@
   function close() { $('settings').hidden = true; }
   onTap('setbtn', open); onTap('setclose', close);
   onTap('setback', () => go(st.view === 'word' ? 'pron' : 'home'));
-  onTapIn('setbody', '.setl', b => { setLang(b.dataset.l); st.sizeOf = null; draw(); });
+  onTapIn('setbody', '[data-min]', b => { store.set('limit', +b.dataset.min); draw(); });
+  onTapIn('setbody', '.setl[data-l]', b => { setLang(b.dataset.l); st.sizeOf = null; draw(); });
   onTapIn('setbody', '.setn', b => go(b.dataset.go));
   onTapIn('setbody', '[data-play]', b => {
     const p = b.dataset.play;

@@ -26,13 +26,16 @@ async function audit() {
     if (gameOk(t)) screens.push([`${t.id}:play`, () => openTile(t.id, true, true)]);
   }
   const wait = f => new Promise(res => { const t0 = performance.now(), go = () => f() || performance.now() - t0 > 2000 ? res() : setTimeout(go, 20); go(); });
-  for (const [v, mark] of [['home', '.setl'], ['voice', '.setv'], ['pron', '#setq']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); APP.settings.open(); await wait(() => document.querySelector('#setbody .setl'));
+  for (const [v, mark] of [['home', '.setn'], ['voice', '.setv'], ['pron', '#setq'], ['time', '[data-min]']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); APP.settings.open(); await wait(() => document.querySelector('#setbody .setn'));
     if (v !== 'home') { document.querySelector(`.setn[data-go=${v}]`).click(); await wait(() => document.querySelector(`#setbody ${mark}`)); } }]);
+  screens.push(['rest', () => { SESSION.rest(true); }], ['rest:gate', () => { SESSION.rest(true); $('restlock').dispatchEvent(new PointerEvent('pointerdown')); $('restgate').hidden = false; }]);
   for (const [name, go] of screens) {
     if (!document.getElementById('settings').hidden) APP.settings.close();
+    if (!document.getElementById('rest').hidden) SESSION.wake();
     await go();
+    if (name.startsWith('rest')) { const box = R(document.getElementById('restbody')); for (const e of document.querySelectorAll('#rest button, #rest p, #restpic')) { if (!vis(e)) continue; const r = R(e); if (r.left < box.left - 1 || r.right > box.right + 1 || r.bottom > innerHeight + 1 || r.top < 0) bad.push(`${name}: ${e.id || e.tagName} outside the screen`); } }
     for (const e of document.querySelectorAll('.on')) { const c = vis(e) && ringCut(e); if (c) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} ring cut by ${c}`); }
-    if (name.startsWith('settings:')) continue;
+    if (/^(settings|rest)/.test(name)) continue;
     if (document.documentElement.scrollWidth > innerWidth + 1) bad.push(`${name}: horizontal scroll`);
     const col = R(document.getElementById('stage')), cs = getComputedStyle(document.getElementById('stage'));
     const L = col.left + parseFloat(cs.paddingLeft), Rr = col.right - parseFloat(cs.paddingRight);
@@ -59,6 +62,7 @@ async function audit() {
     }
   }
   if (!document.getElementById('settings').hidden) APP.settings.close();
+  if (!document.getElementById('rest').hidden) SESSION.wake();
   return [...new Set(bad)];
 }
 
