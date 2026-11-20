@@ -70,20 +70,21 @@
     $('voice').onchange = () => { const v = all[+$('voice').value]; piper = v && v.id ? v : null; if (!piper) { SPEECH.voice = v; SPEECH.noVoice = !v; } gen = null; load(); probe(); };
   }
   const voiceNow = () => piper || SPEECH.voice;
-  let lib = null, ipaRun = null, audio = null;
+  let lib = null, ipaRun = null, audio = null; const got = new Set();
   const status = t => { gen = t; info(); };
-  async function piperLib() {
-    if (!lib) { lib = await import(PIPER.lib); status('Piper: descarc modelul…'); await lib.download(piper.id, p => p.total && status(`Piper: descarc ${Math.round(p.loaded * 100 / p.total)}%`)); }
+  async function piperLib(P) {
+    if (!lib) lib = await import(PIPER.lib);
+    if (!got.has(P.id)) { status('Piper: descarc modelul…'); await lib.download(P.id, p => p.total && status(`Piper: descarc ${Math.round(p.loaded * 100 / p.total)}%`)); got.add(P.id); }
     return lib;
   }
-  async function piperIpa(ph) {
-    if (!ipaRun || ipaRun.id !== piper.id) {
+  async function piperIpa(ph, P) {
+    if (!ipaRun || ipaRun.id !== P.id) {
       const ortm = await import(PIPER.ort), ort = ortm.default || ortm; ort.env.wasm.wasmPaths = PIPER.wasm;
-      const path = `${piper.id.split('_')[0]}/${piper.id.split('-')[0]}/${piper.id.split('-')[1]}/${piper.id.split('-')[2]}/${piper.id}.onnx`;
+      const path = `${P.id.split('_')[0]}/${P.id.split('-')[0]}/${P.id.split('-')[1]}/${P.id.split('-')[2]}/${P.id}.onnx`;
       const get = async u => { const c = await caches.open('piper'); let r = await c.match(u); if (!r) { r = await fetch(u); await c.put(u, r.clone()); } return r; };
       status('Piper: încarc modelul pentru IPA…');
       const cfg = await (await get(`${PIPER.hf}/${path}.json`)).json(), sess = await ort.InferenceSession.create(await (await get(`${PIPER.hf}/${path}`)).arrayBuffer(), { executionProviders: ['wasm'] });
-      ipaRun = { id: piper.id, ort, cfg, sess };
+      ipaRun = { id: P.id, ort, cfg, sess };
     }
     const { ort, cfg, sess } = ipaRun, map = cfg.phoneme_id_map, one = c => map[c] ? map[c][0] : null;
     const chars = [...ph.replace(/[/[\].]/g, '').replace(/\u0361/g, '').replace(/ʧ/g, 'tʃ').replace(/ʤ/g, 'dʒ').replace(/ʦ/g, 'ts').normalize('NFD')];
@@ -98,11 +99,11 @@
     pcm.forEach((x, i) => b.setInt16(44 + i * 2, Math.max(-1, Math.min(1, x)) * 0x7fff, true));
     return new Blob([b.buffer], { type: 'audio/wav' });
   }
-  async function say(t) {
-    if (!piper) return speak(t);
+  async function say(t, P = piper) {
+    if (!P) return speak(t);
     const t0 = performance.now(), m = /^<speak>.*ph="([^"]*)"/.exec(t), plain = t.replace(/<[^>]*>/g, '');
     let wav;
-    try { wav = m ? await piperIpa(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')) : await (await piperLib()).predict({ text: plain, voiceId: piper.id }); }
+    try { wav = m ? await piperIpa(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&'), P) : await (await piperLib(P)).predict({ text: plain, voiceId: P.id }); }
     catch (x) { return status(`Piper: eroare ${x.message || x}`); }
     status(`Piper: generat în ${Math.round(performance.now() - t0)} ms${m ? ' (IPA)' : ''}`);
     if (audio) audio.pause();
@@ -132,8 +133,8 @@
     $('list').innerHTML = rows.map((r, i) => `<div class="row${done(r) ? ' done' : ''}" id="r${i}">
       <div class="w">${r.bold}${r.form !== r.of ? ` <small>· ${esc(r.of)}</small>` : ''}</div>
       ${opts(r).map(([k, t]) => k === 'own'
-        ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t} sau IPA" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${marks(r, i, k, t)}</div>`
-        : `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button>${marks(r, i, k, t)}</div>`).join('')}
+        ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t} sau IPA" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${!piper && pv() ? `<button class="pp" data-ppown="${i}" aria-label="▶ Piper">▶ P</button>` : ''}${marks(r, i, k, t)}</div>`
+        : `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button>${!piper && pv() ? `<button class="pp" data-pp="${esc(text(r, k))}" aria-label="▶ Piper">▶ P</button>` : ''}${marks(r, i, k, t)}</div>`).join('')}
       <button class="none" data-none="${i}" aria-pressed="${!!P(r).none}">✗ toate greșite</button>
       <div class="meta">în aplicație: <b>${esc(applied(r))}</b> · ${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
@@ -161,7 +162,7 @@
   const printText = () => print ? `amprentă ${print.ms == null ? '?' : print.ms} ms · ${print.words} cuvinte${print.error ? ` · ${print.error}` : ''}` : 'amprentă …';
   function info() {
     const n = rows.filter(done).length, v = voiceNow();
-    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · ${piper ? gen || 'Piper' : printText()} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
+    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · ${piper ? gen || 'Piper' : printText() + (gen ? ` · ${gen}` : '')} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
   }
   async function next() {
     const i = cur + 1 < rows.length ? cur + 1 : 0;
@@ -205,6 +206,8 @@
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
     const sb = e.target.closest('[data-say]'); if (sb) return say(sb.dataset.say);
+    const pb = e.target.closest('[data-pp]'); if (pb) return say(pb.dataset.pp, pv());
+    const po = e.target.closest('[data-ppown]'); if (po) { const t = po.parentNode.querySelector('input').value.trim(); return t && say(IPA.test(t) ? ssml(t, rows[+po.dataset.ppown].form) : t, pv()); }
     const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && say(IPA.test(t) ? ssml(t, rows[+own.dataset.own].form) : t); }
     const none = e.target.closest('[data-none]');
     if (none) { const r = rows[+none.dataset.none]; edit(r, p => { if (p.none) delete p.none; else p.none = true; }); none.setAttribute('aria-pressed', !!P(r).none); none.closest('.row').classList.toggle('done', done(r)); save(); return info(); }
