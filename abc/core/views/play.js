@@ -103,6 +103,6 @@
     reset() { target = null; seen = []; seenSub = []; },
     choices: () => opts,
     select(it) { choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); },
-    state: () => ({ target, opts, round, ask: target ? askLine() : null }), newRound, choose
+    state: () => ({ target, opts, round }), newRound, choose
   });
 })();

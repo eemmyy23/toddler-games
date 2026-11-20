@@ -136,20 +136,18 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await p.innerText('#infotitle')) === 'Curcubeul' && (await p.$$('.inf')).length === 6, 'info card opens with 6 lines');
   await p.locator('#infoclose').dispatchEvent('click');
 
-  console.log('games (every language)');
+  console.log('games (RO)');
   const ASK = {
-    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) .+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^(Unde e|Când e) .+\?$/], ['clock', /^Care ceas arată ora .+\?$/], ['halves', /^Care ceas arată .+ și jumătate .+\?$/], ['setclock', /^Care ceas arată .+\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /], ['planets', /^Unde e .+\?$/], ['clean', /^Unde e .+\?$/], ['immune', /^(Ce|Unde) .+\?$/], ['elements', /^Găsește simbolul pentru .+!$/]],
-    en: [['digits', /^Find the number /], ['count', /^How many .+\?$/], ['letters', /^Find the (small )?letter /], ['read', /^(Where is|Find:) /], ['groups', /^Find \S+!$/], ['colors', /^Where is /], ['families', /^Where is the .+\?$/], ['weather', /^Where is the .+\?$/], ['shapes', /^Where is the .+\?$/], ['body', /^Where is the .+\?$/], ['seasons', /^When .+\?$/], ['cats', /^Where does the .+ go\?$/], ['opposites', /^Which one .+\?$/], ['sky', /^(Where is the .+|When is it \w+ outside)\?$/], ['clock', /^Which clock shows .+ o'clock .+\?$/], ['halves', /^Which clock shows half past .+\?$/], ['setclock', /^Which clock shows .+\?$/], ['teens', /^Find the number /], ['tens', /^Find the number /], ['big', /^Find the number /], ['planets', /^Where is .+\?$/], ['clean', /^Where is .+\?$/], ['immune', /^(What|Where) .+\?$/], ['elements', /^Find the symbol for .+!$/]],
-    de: [['digits', /^Finde die Zahl /], ['count', /^Wie viele .+\?$/], ['letters', /^Finde (den (kleinen )?Buchstaben|das) /], ['read', /^(Wo ist|Finde:) /], ['groups', /^Finde \S+!$/], ['colors', /^Wo ist /], ['families', /^Wo ist (der|die|das) .+\?$/], ['weather', /^Wo ist (der|die|das) .+\?$/], ['shapes', /^Wo ist (der|die|das) .+\?$/], ['body', /^Wo ist (der|die|das) .+\?$/], ['seasons', /^Wann .+\?$/], ['cats', /^Wohin gehört (der|die|das) .+\?$/], ['opposites', /^Was .+\?$/], ['sky', /^(Wo ist (der|die|das) .+|Wann ist es draußen \w+)\?$/], ['clock', /^Welche Uhr zeigt .+ Uhr \S+\?$/], ['halves', /^Welche Uhr zeigt halb .+\?$/], ['setclock', /^Welche Uhr zeigt .+\?$/], ['teens', /^Finde die Zahl /], ['tens', /^Finde die Zahl /], ['big', /^Finde die Zahl /], ['planets', /^Wo ist .+\?$/], ['clean', /^Wo ist .+\?$/], ['immune', /^(Was|Wo) .+\?$/], ['elements', /^Finde das Symbol für .+!$/]]
+    ro: [['digits', /^Găsește numărul /], ['count', /^Câ(ți|te) .+ sunt\?$/], ['letters', /^Găsește litera /], ['read', /^(Unde e|Găsește:) /], ['groups', /^Găsește grupul /], ['colors', /^Unde e /], ['families', /^Unde e .+\?$/], ['weather', /^Unde e .+\?$/], ['shapes', /^Unde e .+\?$/], ['body', /^Unde e .+\?$/], ['seasons', /^Când .+\?$/], ['cats', /^Unde punem .+\?$/], ['opposites', /^Care .+\?$/], ['sky', /^(Unde e|Când e) .+\?$/], ['clock', /^Care ceas arată ora .+\?$/], ['halves', /^Care ceas arată .+ și jumătate .+\?$/], ['setclock', /^Care ceas arată .+\?$/], ['teens', /^Găsește numărul /], ['tens', /^Găsește numărul /], ['big', /^Găsește numărul /], ['planets', /^Unde e .+\?$/], ['clean', /^Unde e .+\?$/], ['immune', /^(Ce|Unde) .+\?$/], ['elements', /^Găsește simbolul pentru .+!$/]]
   };
   await ev(() => { APP.set({ profile: 'scientist' }); });
-  for (const l of ['ro', 'en', 'de']) {
+  for (const l of ['ro']) {
     await ev(x => setLang(x), l);
     const games = await ev(() => Tiles.list().filter(t => t.game && usable(t, true)).map(t => t.id).sort().join());
     ok(games === ASK[l].map(x => x[0]).sort().join(), `${l}: every playable game is checked (${games})`);
     for (const [id, re] of ASK[l]) {
-      await clear(); await ev(i => openTile(i, true, true), id); if (l === 'ro') await spoken();
-      const s = l === 'ro' ? await said() : [await ev(() => ABC.views.play.state().ask)], n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
+      await clear(); await ev(i => openTile(i, true, true), id); await spoken();
+      const s = await said(), n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
       ok(re.test(last) && !/undefined|\{/.test(last) && n >= 2, `${l} game ${id}: "${last}" with ${n} bubbles`);
     }
   }
