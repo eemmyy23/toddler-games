@@ -39,7 +39,8 @@ tts.html + tts.js           pronunciation test page (not linked from the app; pr
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (SSML `<phoneme>`: `pron.ipa`, for other forms derived from it by swapping the differing ending through a
                             RO letter→IPA table) and the respellings, plus the tester's own text (text with IPA marks such as ˈ ə ʃ, or in /…/, is sent as `<phoneme>` and stored as `ipa`)
                             built from `stress` (below), each with ✓ / ✗ and a row-level "✗ toate greșite" (only ✓ is applied; ✗ and none are reported), kept per language + voice in `store`; the first ticked variant
-                            of each word is also stored as `ttsfix.<bcp47>.<voiceURI>`, which the app applies on that device at once; exports JSON or MD with app version, build hash,
+                            of each word is also stored as `ttsfix.<bcp47>.<voiceURI>`, which the app applies on that device at once; on load and on a voice change speaks the language's numbers 1–5 at volume 0 and shows a fingerprint (ms from start to end, word-boundary events) — browsers give no engine name and report the same voice URI for different Android engines;
+                            exports JSON or MD with that fingerprint, app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
 tools/check.js              content, config, markup, CSS-token, engine-literal, PWA-scope and no-comment checks; manifest generator (CI)
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest

@@ -20,7 +20,7 @@
     return j ? null : ph.slice(0, from.length ? i : ph.length) + to;
   };
   const CONS = /^[^aăâeiîouyäöüáéíóú]$/i;
-  let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null;
+  let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null, print = null;
 
   const iso = d => {
     const o = -d.getTimezoneOffset(), p = n => String(Math.floor(Math.abs(n))).padStart(2, '0');
@@ -66,7 +66,7 @@
     const L = ABC.langs[code], base = L.bcp47.toLowerCase().split('-')[0];
     const all = 'speechSynthesis' in window ? speechSynthesis.getVoices().filter(v => SPEECH.norm(v).split('-')[0] === base) : [];
     $('voice').innerHTML = all.length ? all.map((v, i) => `<option value="${i}"${v === SPEECH.voice ? ' selected' : ''}>${esc(v.name)} · ${esc(v.lang)}${v.localService ? ' · local' : ''}${v.default ? ' · default' : ''}</option>`).join('') : '<option>fără voce</option>';
-    $('voice').onchange = () => { SPEECH.voice = all[+$('voice').value]; SPEECH.noVoice = !SPEECH.voice; load(); };
+    $('voice').onchange = () => { SPEECH.voice = all[+$('voice').value]; SPEECH.noVoice = !SPEECH.voice; load(); probe(); };
   }
   function load() {
     const raw = store.get(saveKey(), {});
@@ -105,9 +105,22 @@
     if (v && L.ssml && L.ssml.test(v.voiceURI) && r.form === r.of && r.e.pron && r.e.pron.ipa && !r.e.pron.of) return `IPA ${r.ph}`;
     return 'original';
   }
+  function probe() {
+    const L = ABC.langs[code], v = SPEECH.voice;
+    if (!v || !('speechSynthesis' in window)) return;
+    print = null; info();
+    const u = new SpeechSynthesisUtterance((L.numbers || []).slice(0, 5).join(' ') + '.');
+    u.voice = v; u.lang = v.lang; u.rate = 1; u.pitch = 1; u.volume = 0;
+    let t0 = 0, words = 0;
+    u.onstart = () => { t0 = performance.now(); };
+    u.onboundary = e => { if (e.name !== 'sentence') words++; };
+    u.onend = u.onerror = e => { print = { ms: t0 ? Math.round(performance.now() - t0) : null, words, error: e.error || null }; info(); };
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }
+  const printText = () => print ? `amprentă ${print.ms == null ? '?' : print.ms} ms · ${print.words} cuvinte${print.error ? ` · ${print.error}` : ''}` : 'amprentă …';
   function info() {
     const n = rows.filter(done).length, v = SPEECH.voice;
-    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
+    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · ${printText()} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
   }
   async function next() {
     const i = cur + 1 < rows.length ? cur + 1 : 0;
@@ -124,7 +137,7 @@
       tested: iso(new Date()), page: location.href, userAgent: navigator.userAgent,
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
-      rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
+      fingerprint: print, rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
       results: ticked.map(r => ({ key: r.e.key, w: r.form, of: r.of, stress: r.e.pron ? r.e.pron.stress : null, none: !!P(r).none,
         marks: Object.entries(M_(r)).map(([k, x]) => ({ k, mark: x, text: k === 'ipa' ? r.ph : text(r, k) })) }))
     };
@@ -135,7 +148,7 @@
       `- app: ${o.version.app} · build ${o.version.build} · deployed ${o.version.deployed || '?'}`,
       `- tested: ${o.tested}`, `- page: ${o.page}`,
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
-      `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
+      `- ${printText()}`, `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
       `- marked ${o.count.marked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'marked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
       '| key | word | stress | ✓ | ✗ | toate greșite |', '|---|---|---|---|---|---|',
       ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.marks.filter(x => x.mark === 'ok').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.marks.filter(x => x.mark === 'no').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.none ? 'da' : ''} |`)].join('\n');
@@ -145,7 +158,7 @@
   function setLang(c) {
     code = c; store.set('tts.lang', c); cur = -1;
     const L = ABC.langs[c]; SPEECH.pick(L.bcp47, L.voices); document.documentElement.lang = L.bcp47;
-    fillVoices(); load();
+    fillVoices(); load(); probe();
   }
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
