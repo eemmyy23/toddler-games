@@ -7,7 +7,8 @@ LANG('ro', {
       hipopotam: '/hi.po.poˈtam/', hipopotamul: '/hi.po.poˈtamul/', hipopotami: 'hipopo tami', hipopotamii: 'hipopo tamii',
       meduză: '/meˈdu.zə/', ananasul: '/a.naˈnasul/', ananași: '/a.naˈnaʃʲ/', ananașii: 'ana nașii',
       ancoră: 'an-coră', ancorele: '/ˈan.ko.rele/'
-    } }
+    } },
+    'Romanian Romania': { tested: '2026-11-20T04:49:52+02:00', words: { ancoră: '/ˈan.ko.rə/', ancorele: 'an-corele' } }
   },
   checkWord: e => Object.values(e).some(v => typeof v === 'string' && /[şţŞŢ]/.test(v)) ? 'ş/ţ cu sedilă — folosește ș/ț cu virgulă' : null,
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
