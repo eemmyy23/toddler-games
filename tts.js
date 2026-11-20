@@ -1,6 +1,21 @@
 (function () {
   const M = self.MANIFEST, CFG = ABC.config;
-  const OPTS = [['orig', 'original'], ['ipa', 'IPA'], ['dash', 'cratimă'], ['gap', 'spațiu'], ['dbl', 'consoană dublă']];
+  const OPTS = [['orig', 'original'], ['ipa', 'IPA'], ['dash', 'cratimă'], ['gap', 'spațiu'], ['dbl', 'consoană dublă'], ['own', 'textul tău']];
+  const G2P = { ro: [[/j/g, 'ʒ'], [/ce/g, 'ʧe'], [/ci$/g, 'ʧʲ'], [/ci/g, 'ʧi'], [/ge/g, 'ʤe'], [/gi$/g, 'ʤʲ'], [/gi/g, 'ʤi'], [/ch/g, 'k'], [/gh/g, 'g'], [/ii$/g, 'ij'],
+    [/([^aăâeiîou])i$/g, '$1ʲ'], [/ă/g, 'ə'], [/[âî]/g, 'ɨ'], [/c/g, 'k'], [/ș/g, 'ʃ'], [/ț/g, 'ʦ'], [/g/g, 'ɡ']] };
+  const g2p = (t, lang) => G2P[lang] ? G2P[lang].reduce((x, [re, to]) => x.replace(re, to), t) : null;
+  const formIpa = (ph0, base, form, lang) => {
+    const ph = ph0.replace(/t͡ʃ/g, 'ʧ').replace(/d͡ʒ/g, 'ʤ').replace(/t͡s/g, 'ʦ');
+    const lo = t => t.toLocaleLowerCase(), b = lo(base), f = lo(form);
+    let p = 0; while (p < b.length && b[p] === f[p]) p++;
+    if (p > 0) p--;
+    while (p > 0 && /[cgh]/.test(b[p - 1])) p--;
+    const from = g2p(b.slice(p), lang), to = g2p(f.slice(p), lang);
+    if (from == null || to == null) return null;
+    let i = ph.length, j = from.length;
+    while (j > 0 && i > 0) { i--; if (ph[i] === '.') continue; if (ph[i] !== from[j - 1]) return null; j--; }
+    return j ? null : ph.slice(0, from.length ? i : ph.length) + to;
+  };
   const CONS = /^[^aăâeiîouyäöüáéíóú]$/i;
   let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null;
 
@@ -25,17 +40,21 @@
     const low = t => t.toLocaleLowerCase(ABC.langs[code].bcp47);
     return [...new Set([base, e.def, e.pl, e.plDef].filter(Boolean))].map((form, n) => {
       const r = n ? { form, of: base, bold: esc(form) } : head;
+      if (n && ph) { const fp = formIpa(ph, base, form, code); if (fp) { r.ph = fp; r.ipa = `<speak><phoneme alphabet="ipa" ph="${esc(fp)}">${esc(form)}</phoneme></speak>`; } }
       for (const [k, pos, ins] of cuts) if (pos < form.length && low(form.slice(0, pos)) === low(base.slice(0, pos))) r[k] = form.slice(0, pos) + ins + form.slice(pos);
       return r;
-    }).filter(r => r.ipa || r.dash || r.gap || r.dbl);
+    });
   };
   const saveKey = () => `tts3.${code}.${SPEECH.voice ? SPEECH.voice.name : '-'}`;
-  const opts = r => OPTS.filter(([k]) => r[k === 'orig' ? 'form' : k]);
-  const text = (r, k) => r[k === 'orig' ? 'form' : k];
+  const opts = r => OPTS.filter(([k]) => k === 'own' || r[k === 'orig' ? 'form' : k]);
+  const text = (r, k) => k === 'own' ? (picks[id(r)] || {}).own || '' : r[k === 'orig' ? 'form' : k];
   const label = (r, k, t) => k === 'orig' ? t : k === 'ipa' ? `IPA ${esc(r.ph)}` : esc(r[k]);
   const id = r => `${r.e.key}|${r.form}`;
-  const ok = r => (picks[id(r)] || { ok: [] }).ok;
-  const done = r => ok(r).length > 0;
+  const P = r => picks[id(r)] || {}, M_ = r => P(r).m || {};
+  const ok = r => OPTS.map(([k]) => k).filter(k => M_(r)[k] === 'ok' && (k !== 'own' || P(r).own));
+  const done = r => Object.keys(M_(r)).length > 0 || !!P(r).none;
+  const edit = (r, f) => { const p = picks[id(r)] = Object.assign({ m: {} }, picks[id(r)]); f(p); if (!Object.keys(p.m).length && !p.none && !p.own) delete picks[id(r)]; };
+  const marks = (r, i, k, t) => ['ok', 'no'].map(v => `<button class="mark ${v === 'ok' ? 'pass' : 'fail'}" data-i="${i}" data-k="${k}" data-v="${v}" aria-pressed="${M_(r)[k] === v}" aria-label="${t} ${v === 'ok' ? '✓' : '✗'}">${v === 'ok' ? '✓' : '✗'}</button>`).join('');
 
   function fillLangs() {
     $('lang').innerHTML = CFG.languages.map(c => `<option value="${c}"${c === code ? ' selected' : ''}>${esc(ABC.langs[c].name)}</option>`).join('');
@@ -48,13 +67,14 @@
   }
   function load() {
     const raw = store.get(saveKey(), {});
-    picks = Object.fromEntries(Object.entries(raw).filter(([, v]) => v && Array.isArray(v.ok)));
+    picks = Object.fromEntries(Object.entries(raw).filter(([, v]) => v && typeof v === 'object')
+      .map(([k, v]) => [k, Array.isArray(v.ok) ? { m: Object.fromEntries(v.ok.map(x => [x, 'ok'])) } : v]));
     render();
   }
   function save() {
     store.set(saveKey(), picks);
     const L = ABC.langs[code], fix = {};
-    rows.filter(done).forEach(r => { const k = OPTS.map(([x]) => x).find(x => ok(r).includes(x)); fix[r.form.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
+    rows.forEach(r => { const k = ok(r)[0]; if (k) fix[r.form.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
     store.set(SPEECH.fixKey(L.bcp47, SPEECH.voice), fix);
   }
   function render() {
@@ -63,32 +83,35 @@
       .flatMap(e => rowsOf(e).map(r => Object.assign({ e }, r)));
     $('list').innerHTML = rows.map((r, i) => `<div class="row${done(r) ? ' done' : ''}" id="r${i}">
       <div class="w">${r.bold}${r.form !== r.of ? ` <small>· ${esc(r.of)}</small>` : ''}</div>
-      ${opts(r).map(([k, t]) => `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button><button class="mark pass" data-i="${i}" data-k="${k}" aria-pressed="${ok(r).includes(k)}" aria-label="${t} ✓">✓</button></div>`).join('')}
+      ${opts(r).map(([k, t]) => k === 'own'
+        ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t}" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${marks(r, i, k, t)}</div>`
+        : `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button>${marks(r, i, k, t)}</div>`).join('')}
+      <button class="none" data-none="${i}" aria-pressed="${!!P(r).none}">✗ toate greșite</button>
       <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
   }
   function info() {
     const n = rows.filter(done).length, v = SPEECH.voice;
-    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · bifate ${n}/${rows.length}`;
+    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
   }
   async function next() {
     const i = cur + 1 < rows.length ? cur + 1 : 0;
     document.querySelectorAll('.row.cur').forEach(el => el.classList.remove('cur'));
     cur = i; const el = $('r' + i), r = rows[i];
     el.classList.add('cur'); el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    for (const [k] of opts(r)) { await speak(text(r, k)); if (cur !== i) return; await wait(PAUSE.beat); }
+    for (const [k] of opts(r)) { if (!text(r, k)) continue; await speak(text(r, k)); if (cur !== i) return; await wait(PAUSE.beat); }
   }
   function report() {
-    const v = SPEECH.voice, ticked = rows.filter(done), count = { ticked: ticked.length };
-    ticked.forEach(r => ok(r).forEach(k => { count[k] = (count[k] || 0) + 1; }));
+    const v = SPEECH.voice, ticked = rows.filter(done), count = { marked: ticked.length, none: ticked.filter(r => P(r).none).length };
+    ticked.forEach(r => Object.entries(M_(r)).forEach(([k, x]) => { count[`${k} ${x}`] = (count[`${k} ${x}`] || 0) + 1; }));
     return {
       version: { app: CFG.version, build: M.version, deployed },
       tested: iso(new Date()), page: location.href, userAgent: navigator.userAgent,
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
       rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
-      results: ticked.map(r => ({ key: r.e.key, w: r.form, of: r.of, stress: r.e.pron ? r.e.pron.stress : null,
-        ok: ok(r).map(k => ({ k, text: k === 'ipa' ? r.ph : text(r, k) })) }))
+      results: ticked.map(r => ({ key: r.e.key, w: r.form, of: r.of, stress: r.e.pron ? r.e.pron.stress : null, none: !!P(r).none,
+        marks: Object.entries(M_(r)).map(([k, x]) => ({ k, mark: x, text: k === 'ipa' ? r.ph : text(r, k) })) }))
     };
   }
   function md(o) {
@@ -98,9 +121,9 @@
       `- tested: ${o.tested}`, `- page: ${o.page}`,
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
       `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
-      `- ticked ${o.count.ticked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'ticked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
-      '| key | word | stress | ✓ |', '|---|---|---|---|',
-      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.ok.map(x => `${x.k} ${x.text}`).join('; ')} |`)].join('\n');
+      `- marked ${o.count.marked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'marked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
+      '| key | word | stress | ✓ | ✗ | toate greșite |', '|---|---|---|---|---|---|',
+      ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.marks.filter(x => x.mark === 'ok').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.marks.filter(x => x.mark === 'no').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.none ? 'da' : ''} |`)].join('\n');
   }
   function show(t) { $('out').hidden = false; $('text').value = t; $('out').scrollIntoView({ behavior: 'smooth' }); }
 
@@ -112,10 +135,19 @@
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
     const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
+    const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && speak(t); }
+    const none = e.target.closest('[data-none]');
+    if (none) { const r = rows[+none.dataset.none]; edit(r, p => { if (p.none) delete p.none; else p.none = true; }); none.setAttribute('aria-pressed', !!P(r).none); none.closest('.row').classList.toggle('done', done(r)); save(); return info(); }
     const b = e.target.closest('.mark'); if (!b) return;
-    const r = rows[+b.dataset.i], k = b.dataset.k, now = ok(r).includes(k) ? ok(r).filter(x => x !== k) : [...ok(r), k];
-    if (now.length) picks[id(r)] = { ok: now }; else delete picks[id(r)];
-    b.setAttribute('aria-pressed', now.includes(k)); b.closest('.row').classList.toggle('done', now.length > 0); save(); info();
+    const r = rows[+b.dataset.i], k = b.dataset.k, v = b.dataset.v;
+    edit(r, p => { if (p.m[k] === v) delete p.m[k]; else p.m[k] = v; });
+    b.parentNode.querySelectorAll('.mark').forEach(x => x.setAttribute('aria-pressed', M_(r)[k] === x.dataset.v));
+    b.closest('.row').classList.toggle('done', done(r)); save(); info();
+  });
+  $('list').addEventListener('input', e => {
+    const t = e.target.closest('input[data-i]'); if (!t) return;
+    const r = rows[+t.dataset.i];
+    edit(r, p => { if (t.value.trim()) p.own = t.value.trim(); else delete p.own; }); save();
   });
   $('next').onclick = next;
   $('json').onclick = () => show(JSON.stringify(report(), null, 2));
