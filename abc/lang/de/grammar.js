@@ -2,6 +2,7 @@ LANG('de', {
   name: 'Deutsch', flag: '🇩🇪', bcp47: 'de-DE', dir: 'ltr',
   voices: /anna|female/i,
   fold: s => s.replace(/ß/g, 'ss').replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u'),
+  piper: 'de_DE-thorsten-medium',
   letters: 'A Ä B C D E F G H I J K L M N O Ö P Q R S ß T U Ü V W X Y Z',
   names: {
     A: { ipa: 'aː', src: 'https://de.wiktionary.org/wiki/A' },

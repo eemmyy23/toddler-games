@@ -33,6 +33,7 @@ LANG('ro', {
     'Romanian Romania': { tested: '2026-11-20T05:33:00+02:00', words: { ancoră: '/ˈan.ko.rə/', ancorele: 'an-corele', meduze: 'medu-ze' } }
   },
   checkWord: e => Object.values(e).some(v => typeof v === 'string' && /[şţŞŢ]/.test(v)) ? 'ş/ţ cu sedilă — folosește ș/ț cu virgulă' : null,
+  piper: 'ro_RO-mihai-medium',
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
   groups: 'ce ci che chi ge gi ghe ghi',
   alike: 'â=î',

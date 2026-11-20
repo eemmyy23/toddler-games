@@ -18,7 +18,7 @@
     return j ? null : ph.slice(0, from.length ? i : ph.length) + to;
   };
   const CONS = /^[^aăâeiîouyäöüáéíóú]$/i;
-  let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null, print = null;
+  let code = store.get('tts.lang', CFG.languages[0]), rows = [], picks = {}, cur = -1, deployed = null, print = null, piper = null, gen = null;
 
   const iso = d => {
     const o = -d.getTimezoneOffset(), p = n => String(Math.floor(Math.abs(n))).padStart(2, '0');
@@ -46,7 +46,7 @@
       return r;
     });
   };
-  const saveKey = () => `tts3.${code}.${SPEECH.voice ? SPEECH.voice.name : '-'}`;
+  const saveKey = () => `tts3.${code}.${voiceNow() ? voiceNow().name : '-'}`;
   const opts = r => OPTS.filter(([k]) => k === 'own' || r[k === 'orig' ? 'form' : k]);
   const text = (r, k) => k === 'own' ? (picks[id(r)] || {}).own || '' : r[k === 'orig' ? 'form' : k];
   const label = (r, k, t) => k === 'orig' ? t : k === 'ipa' ? `IPA ${esc(r.ph)}` : esc(r[k]);
@@ -60,11 +60,54 @@
   function fillLangs() {
     $('lang').innerHTML = CFG.languages.map(c => `<option value="${c}"${c === code ? ' selected' : ''}>${esc(ABC.langs[c].name)}</option>`).join('');
   }
+  const PIPER = { lib: 'https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?deps=onnxruntime-web@1.18.0', ort: 'https://esm.sh/onnxruntime-web@1.18.0',
+    wasm: 'https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.18.0/', hf: 'https://huggingface.co/diffusionstudio/piper-voices/resolve/main' };
+  const pv = () => { const id = ABC.langs[code].piper; return id ? { name: `Piper ${id}`, lang: ABC.langs[code].bcp47, voiceURI: `piper:${id}`, localService: true, default: false, id } : null; };
   function fillVoices() {
-    const L = ABC.langs[code], base = L.bcp47.toLowerCase().split('-')[0];
-    const all = 'speechSynthesis' in window ? speechSynthesis.getVoices().filter(v => SPEECH.norm(v).split('-')[0] === base) : [];
-    $('voice').innerHTML = all.length ? all.map((v, i) => `<option value="${i}"${v === SPEECH.voice ? ' selected' : ''}>${esc(v.name)} · ${esc(v.lang)}${v.localService ? ' · local' : ''}${v.default ? ' · default' : ''}</option>`).join('') : '<option>fără voce</option>';
-    $('voice').onchange = () => { SPEECH.voice = all[+$('voice').value]; SPEECH.noVoice = !SPEECH.voice; load(); probe(); };
+    const L = ABC.langs[code], base = L.bcp47.toLowerCase().split('-')[0], P = pv();
+    const all = ('speechSynthesis' in window ? speechSynthesis.getVoices().filter(v => SPEECH.norm(v).split('-')[0] === base) : []).concat(P ? [P] : []);
+    $('voice').innerHTML = all.length ? all.map((v, i) => `<option value="${i}"${(piper ? v === P || (v.voiceURI === piper.voiceURI) : v === SPEECH.voice) ? ' selected' : ''}>${esc(v.name)} · ${esc(v.lang)}${v.id ? ' · ~60 MB, offline după prima folosire' : `${v.localService ? ' · local' : ''}${v.default ? ' · default' : ''}`}</option>`).join('') : '<option>fără voce</option>';
+    $('voice').onchange = () => { const v = all[+$('voice').value]; piper = v && v.id ? v : null; if (!piper) { SPEECH.voice = v; SPEECH.noVoice = !v; } gen = null; load(); probe(); };
+  }
+  const voiceNow = () => piper || SPEECH.voice;
+  let lib = null, ipaRun = null, audio = null;
+  const status = t => { gen = t; info(); };
+  async function piperLib() {
+    if (!lib) { lib = await import(PIPER.lib); status('Piper: descarc modelul…'); await lib.download(piper.id, p => p.total && status(`Piper: descarc ${Math.round(p.loaded * 100 / p.total)}%`)); }
+    return lib;
+  }
+  async function piperIpa(ph) {
+    if (!ipaRun || ipaRun.id !== piper.id) {
+      const ortm = await import(PIPER.ort), ort = ortm.default || ortm; ort.env.wasm.wasmPaths = PIPER.wasm;
+      const path = `${piper.id.split('_')[0]}/${piper.id.split('-')[0]}/${piper.id.split('-')[1]}/${piper.id.split('-')[2]}/${piper.id}.onnx`;
+      const get = async u => { const c = await caches.open('piper'); let r = await c.match(u); if (!r) { r = await fetch(u); await c.put(u, r.clone()); } return r; };
+      status('Piper: încarc modelul pentru IPA…');
+      const cfg = await (await get(`${PIPER.hf}/${path}.json`)).json(), sess = await ort.InferenceSession.create(await (await get(`${PIPER.hf}/${path}`)).arrayBuffer(), { executionProviders: ['wasm'] });
+      ipaRun = { id: piper.id, ort, cfg, sess };
+    }
+    const { ort, cfg, sess } = ipaRun, map = cfg.phoneme_id_map, one = c => map[c] ? map[c][0] : null;
+    const chars = [...ph.replace(/[/[\].]/g, '').replace(/\u0361/g, '').replace(/ʧ/g, 'tʃ').replace(/ʤ/g, 'dʒ').replace(/ʦ/g, 'ts').normalize('NFD')];
+    const ids = [one('^'), one('_'), ...chars.flatMap(c => one(c) == null ? [] : [one(c), one('_')]), one('$')];
+    const { noise_scale, length_scale, noise_w } = cfg.inference;
+    const feeds = { input: new ort.Tensor('int64', BigInt64Array.from(ids.map(BigInt)), [1, ids.length]), input_lengths: new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)])),
+      scales: new ort.Tensor('float32', Float32Array.from([noise_scale, length_scale, noise_w])) };
+    const out = await sess.run(feeds), pcm = out.output.data, rate = cfg.audio.sample_rate, b = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+    [[0, 'RIFF'], [8, 'WAVE'], [12, 'fmt '], [36, 'data']].forEach(([o, t]) => [...t].forEach((ch, i) => b.setUint8(o + i, ch.charCodeAt(0))));
+    b.setUint32(4, 36 + pcm.length * 2, true); b.setUint32(16, 16, true); b.setUint16(20, 1, true); b.setUint16(22, 1, true); b.setUint32(24, rate, true);
+    b.setUint32(28, rate * 2, true); b.setUint16(32, 2, true); b.setUint16(34, 16, true); b.setUint32(40, pcm.length * 2, true);
+    pcm.forEach((x, i) => b.setInt16(44 + i * 2, Math.max(-1, Math.min(1, x)) * 0x7fff, true));
+    return new Blob([b.buffer], { type: 'audio/wav' });
+  }
+  async function say(t) {
+    if (!piper) return speak(t);
+    const t0 = performance.now(), m = /^<speak>.*ph="([^"]*)"/.exec(t), plain = t.replace(/<[^>]*>/g, '');
+    let wav;
+    try { wav = m ? await piperIpa(m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')) : await (await piperLib()).predict({ text: plain, voiceId: piper.id }); }
+    catch (x) { return status(`Piper: eroare ${x.message || x}`); }
+    status(`Piper: generat în ${Math.round(performance.now() - t0)} ms${m ? ' (IPA)' : ''}`);
+    if (audio) audio.pause();
+    audio = new Audio(URL.createObjectURL(wav));
+    return new Promise(res => { audio.onended = audio.onerror = res; audio.play().catch(res); });
   }
   function load() {
     const raw = store.get(saveKey(), {});
@@ -80,7 +123,7 @@
       const t = k === 'ipa' ? r.ph : text(r, k), ipa = k === 'own' && IPA.test(t);
       fix[r.form.toLocaleLowerCase(L.bcp47)] = ipa ? { k: 'ipa', text: bare(t) } : { k, text: t };
     });
-    store.set(SPEECH.fixKey(L.bcp47, SPEECH.voice), fix);
+    store.set(SPEECH.fixKey(L.bcp47, voiceNow()), fix);
   }
   function render() {
     const L = ABC.langs[code];
@@ -96,16 +139,16 @@
     info();
   }
   function applied(r) {
-    const L = ABC.langs[code], v = SPEECH.voice, w = r.form.toLocaleLowerCase(L.bcp47), local = v ? store.get(SPEECH.fixKey(L.bcp47, v), {}) : {};
+    const L = ABC.langs[code], v = voiceNow(), w = r.form.toLocaleLowerCase(L.bcp47), local = v ? store.get(SPEECH.fixKey(L.bcp47, v), {}) : {};
     const d = v && L.fixes && L.fixes[v.voiceURI] || {}, fromData = Object.assign({}, d.derived, d.words)[r.form];
     if (local[w]) return `${local[w].k === 'ipa' ? 'IPA ' : ''}${local[w].text} (bifa ta)`;
     if (fromData) return /^\/.*\/$/.test(fromData) ? `IPA ${fromData.slice(1, -1)}` : fromData;
-    if (v && L.ssml && L.ssml.test(v.voiceURI) && r.form === r.of && r.e.pron && r.e.pron.ipa && !r.e.pron.of) return `IPA ${r.ph}`;
+    if (v && (piper || L.ssml && L.ssml.test(v.voiceURI)) && r.form === r.of && r.e.pron && r.e.pron.ipa && !r.e.pron.of) return `IPA ${r.ph}`;
     return 'original';
   }
   function probe() {
     const L = ABC.langs[code], v = SPEECH.voice;
-    if (!v || !('speechSynthesis' in window)) return;
+    if (piper || !v || !('speechSynthesis' in window)) return;
     print = null; info();
     const u = new SpeechSynthesisUtterance((L.numbers || []).slice(0, 5).join(' ') + '.');
     u.voice = v; u.lang = v.lang; u.rate = 1; u.pitch = 1; u.volume = 0;
@@ -117,18 +160,18 @@
   }
   const printText = () => print ? `amprentă ${print.ms == null ? '?' : print.ms} ms · ${print.words} cuvinte${print.error ? ` · ${print.error}` : ''}` : 'amprentă …';
   function info() {
-    const n = rows.filter(done).length, v = SPEECH.voice;
-    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · ${printText()} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
+    const n = rows.filter(done).length, v = voiceNow();
+    $('info').textContent = `${CFG.version} · build ${M.version} · deployed ${deployed || '?'} · ${v ? `${v.name} (${v.lang})` : 'fără voce'} · ${piper ? gen || 'Piper' : printText()} · rate ${SPEECH.rate} · pitch ${SPEECH.pitch} · marcate ${n}/${rows.length}`;
   }
   async function next() {
     const i = cur + 1 < rows.length ? cur + 1 : 0;
     document.querySelectorAll('.row.cur').forEach(el => el.classList.remove('cur'));
     cur = i; const el = $('r' + i), r = rows[i];
     el.classList.add('cur'); el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    for (const [k] of opts(r)) { const t = text(r, k); if (!t) continue; await speak(k === 'own' && IPA.test(t) ? ssml(t, r.form) : t); if (cur !== i) return; await wait(PAUSE.beat); }
+    for (const [k] of opts(r)) { const t = text(r, k); if (!t) continue; await say(k === 'own' && IPA.test(t) ? ssml(t, r.form) : t); if (cur !== i) return; await wait(PAUSE.beat); }
   }
   function report() {
-    const v = SPEECH.voice, ticked = rows.filter(done), count = { marked: ticked.length, none: ticked.filter(r => P(r).none).length };
+    const v = voiceNow(), ticked = rows.filter(done), count = { marked: ticked.length, none: ticked.filter(r => P(r).none).length };
     ticked.forEach(r => Object.entries(M_(r)).forEach(([k, x]) => { count[`${k} ${x}`] = (count[`${k} ${x}`] || 0) + 1; }));
     return {
       version: { app: CFG.version, build: M.version, deployed },
@@ -161,8 +204,8 @@
   }
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
-    const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
-    const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && speak(IPA.test(t) ? ssml(t, rows[+own.dataset.own].form) : t); }
+    const sb = e.target.closest('[data-say]'); if (sb) return say(sb.dataset.say);
+    const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && say(IPA.test(t) ? ssml(t, rows[+own.dataset.own].form) : t); }
     const none = e.target.closest('[data-none]');
     if (none) { const r = rows[+none.dataset.none]; edit(r, p => { if (p.none) delete p.none; else p.none = true; }); none.setAttribute('aria-pressed', !!P(r).none); none.closest('.row').classList.toggle('done', done(r)); save(); return info(); }
     const b = e.target.closest('.mark'); if (!b) return;
