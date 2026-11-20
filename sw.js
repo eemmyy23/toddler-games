@@ -15,7 +15,7 @@ self.addEventListener('activate', e => {
 const keep = (req, r) => { if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return r; };
 function fresh(req) {
   const net = fetch(req, { cache: 'no-cache' }).then(r => keep(req, r));
-  const late = new Promise(res => setTimeout(res, SLOW)).then(() => caches.match(req, { ignoreSearch: true })).then(r => r || net);
+  const late = new Promise(res => setTimeout(res, SLOW)).then(() => caches.match(req)).then(r => r || net);
   return Promise.race([net, late]).catch(() => caches.match(req, { ignoreSearch: true }));
 }
 self.addEventListener('fetch', e => {
