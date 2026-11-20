@@ -48,7 +48,7 @@ function audit() {
 }
 
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {});
   const p = await b.newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.addInitScript(() => { localStorage.clear(); speechSynthesis.speak = () => {}; });

@@ -18,12 +18,12 @@ const PIPER = {
     const needRun = (await Promise.all(run.map(x => c.match(x)))).some(r => !r);
     return own.reduce((a, b) => a + b, 0) + (needRun ? ABC.config.piper.runtime : 0);
   },
-  async download(id, progress) {
+  async download(id, progress, signal) {
     const c = await caches.open(this.store), total = await this.size(id) || 1;
     let got = 0;
     for (const u of Object.values(this.urls(id))) {
       if (await c.match(u)) continue;
-      const r = await fetch(u);
+      const r = await fetch(u, { signal });
       if (!r.ok) throw new Error(`${r.status}`);
       const rd = r.body.getReader(), parts = [];
       for (;;) {

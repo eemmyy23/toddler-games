@@ -31,9 +31,16 @@ abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no p
 abc/core/piper.js           PIPER: optional Piper neural voice — downloads `config.piper` runtime (onnxruntime-web, piper_phonemize) + the language's `LANG.piper` model
                             into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
                             PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
-abc/core/settings.js        Settings sheet (⚙ on the hubs) → Voice: the phone's voices of the current language (where to change them: phone settings), Piper with its size,
-                            download progress, use and delete, and the pronunciation test: `config.testPage` embedded (`?embed=1&lang=<code>`, same origin, so its ticks apply
-                            at once; leaving it re-picks the voice); the choice is stored per language (`voice.<code>`)
+abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation, sub-screens with ‹ back.
+                            Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
+                            "additional voices": Piper as the same card, greyed with "Download · N MB" until downloaded → progress with Cancel, failed/offline/storage
+                            messages → selectable, 🗑 with confirm (falls back to the phone voice); the choice is stored per language (`voice.<code>`).
+                            Pronunciation (search first, nothing listed until a word is typed — accents ignored, any form matches — or "show all"):
+                            a word → its forms (▶ = as the app says it now, "Fix" → "As now" / "Version 2…" (PRON variants; IPA only on a voice that takes it) /
+                            "None sounds right" + own text or IPA / "Restore original"; variants' spelling only under "Advanced"); a choice is stored with
+                            `PRON.setFix` and applied at once (`APP.pickVoice`); "Send my fixes (n)" shares or copies them
+abc/core/pron.js            PRON: per-word variants for the pronunciation screens (forms, stressed-syllable respellings, sourced/derived IPA via `LANG.g2p`) and the
+                            per-voice fix store — shared by Settings and tts.html
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
@@ -110,7 +117,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 
 **STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `wrong`, `index { az, grp, other }`,
 `search { placeholder, hint, none, results }`, `words`, `headCount`, `version`, `exclaim`, `listing`, `then`, `range`, `install`, `installBtn`, `profile { <id>, ages }`,
-`also`, `settings { title, voice, phone, phoneHint, piper, piperName, piperHint, download, downloading, failed, remove, test, sample }`, `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
+`also`, `settings { … }` (every label of the settings sheet), `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
 (orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.
@@ -208,7 +215,7 @@ a target does not come back before half the pool was asked, a `subject` not befo
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
 **config** — `name` (title, install text; checked against the head and the web manifest), `version` (x.y.z, shown with the build hash at the foot of every hub),
-`icons { key: text }` (every UI icon; `data-icon` in abc.html), `testPage`, `piper { ort, phonemize, models, runtime }` (download URLs; runtime = measured bytes of the shared files), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
+`icons { key: text }` (every UI icon; `data-icon` in abc.html), `piper { ort, phonemize, models, runtime }` (download URLs; runtime = measured bytes of the shared files), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
 `profiles { id: { ages, art? } }` (ascending), `defaultProfile`, `baseLanguage`.
 
 ## Recipes
@@ -246,5 +253,5 @@ node tools/check.js --fix        # after every change: all static checks, rewrit
 node tools/fast.js [sizes] [dir] # ~13 s, no server: every language × hubs, learn tiles, games × 7 sizes — after any CSS/markup/view edit
 node tools/smoke.js [url] [WxH]  # ~40 s per size, repo's parent folder served on :8765 — CI runs it; locally when a change touches what it covers
 ```
-CI: `check.yml` runs `check` (~10 s) on every PR and push to main that changes more than `*.md` / `docs/**`; `browser.yml` runs fast and smoke
-(360×640 and 320×568, ~3–9 min) only when the app changes (`abc/**` except `abc/manifest.js`, `abc.html`, `sw.js`, `manifest-abc.json`, `fonts/**`, fast/smoke) — not for tts.*, paint, rocket.
+CI: `check.yml` runs `check` (~10 s) on every PR and push to main that changes more than `*.md` / `docs/**`; `browser.yml` runs fast, smoke 360×640 and smoke 320×568
+as 3 parallel jobs on the runner's preinstalled Chrome (`PW_CHANNEL=chrome`, no browser download) only when the app changes (`abc/**` except `abc/manifest.js`, `abc.html`, `sw.js`, `manifest-abc.json`, `fonts/**`, fast/smoke) — not for tts.*, paint, rocket.

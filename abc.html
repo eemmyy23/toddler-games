@@ -17,14 +17,14 @@
 :root{
     --bg0:#090c1f; --bg1:#11163a; --bg-glow:#1b2156; --card:#1a2050; --card2:#232a63;
   --line:rgba(255,255,255,.07); --line-strong:rgba(255,255,255,.25);
-  --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16); --ink:#14183a;
+  --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16); --danger:#b3261e; --ink:#14183a;
   --scrim:var(--bg0); --tabbar:color-mix(in srgb,var(--bg0) 94%,transparent);
   --shade:rgba(0,0,0,.35); --star-1:rgba(255,240,200,.55); --star-2:rgba(255,240,200,.45); --star-3:rgba(255,240,200,.4); --star-4:rgba(255,240,200,.35); --star-5:rgba(255,240,200,.3); --shine:#fff; --deep:#000; --shadow:0 6px 18px var(--shade); --shadow-lg:0 8px 22px rgba(0,0,0,.45);
   --ring:3px solid var(--amber); --ring-gap:3px; --lift:-3px; --focus:3px dashed var(--text);
   --t-fast:.15s; --t-med:.2s; --t-pop:.45s; --t-shake:.5s; --t-wig:.7s; --t-bob:2.4s; --t-float:4s; --t-hint:9s; --t-hint-wait:3s; --t-stagger:.12s; --t-bub-stagger:.4s; --ease-pop:cubic-bezier(.34,1.56,.64,1);
   --hair:1px; --rb-w:10.6; --hand-ring:.9; --len-fit:1.3;
   --font:'Lexend',ui-rounded,'Segoe UI',system-ui,sans-serif;
-    --r-sm:16px; --test-h:70vh; --r:22px; --r-lg:26px; --r-pill:999px;
+    --r-sm:16px; --set-row:64px; --dash-line:2px dashed var(--muted); --r:22px; --r-lg:26px; --r-pill:999px;
   --fs-xxs:10px; --fs-xs:13px; --fs-s:15px; --fs-m:19px; --fs-l:24px; --fs-xl:34px; --fs-hero:48px; --fs-xxl:40px;
   --sp-0:2px; --line-w:2px; --sp-1:4px; --sp-2:6px; --sp-3:10px; --sp-4:16px; --sp-5:20px; --sp-6:28px;
     --col:640px; --gut:max(12px, calc((100% - var(--col)) / 2));
@@ -255,9 +255,32 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 
 #infotitle,#settitle{flex:1;font-size:var(--fs-l);font-weight:700}
 #setbody{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-3);width:100%}
-.card.setv{min-height:var(--tap);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-sm);text-align:left;font-size:var(--fs-m)}
+.setlang{display:flex;gap:var(--sp-2)}
+.card.setl{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-0);min-height:var(--set-row);padding:var(--sp-2);border-radius:var(--r-sm);font-size:var(--fs-xs);font-weight:700}
+.card.setl span{font-size:var(--fs-l)}
+.card.setv,.card.setn{display:flex;align-items:center;gap:var(--sp-3);min-height:var(--set-row);padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);border-radius:var(--r-sm);text-align:left}
+.sett{flex:1;display:flex;flex-direction:column;gap:var(--sp-0);min-width:0;overflow-wrap:break-word}
+.sett b{font-size:var(--fs-m)}
+.sett small{font-size:var(--fs-xs);color:var(--muted)}
+.sett progress{width:100%;accent-color:var(--amber)}
+.card.setv.off .sett{opacity:.5}
+.chip{flex:none;padding:var(--sp-0) var(--sp-2);border-radius:var(--r-pill);background:var(--amber-soft);color:var(--amber);font-size:var(--fs-xs);font-weight:700}
+.go{flex:none;color:var(--muted)}
+.pill.danger{background:var(--danger);color:var(--text)}
+.sethow{color:var(--muted);font-size:var(--fs-s)}
+.sethow summary{min-height:var(--tap);display:flex;align-items:center;color:var(--amber);font-weight:700;cursor:pointer}
+.sethow p{margin:var(--sp-1) 0}
+#setmsg{min-height:var(--fs-m);text-align:center;color:var(--amber)}
+.setpic{flex:none;font-size:var(--fs-xl);line-height:1}
+.setpic svg{width:var(--icon-m);height:var(--icon-m)}
+.setword .sett b{font-size:var(--fs-xl)}
+.setq{width:100%;min-height:var(--tap);padding:0 var(--sp-4);border:0;border-radius:var(--r-sm);font:inherit;font-size:var(--fs-m);color:var(--text)}
+.setown .setq{background:var(--card2);margin-top:var(--sp-1)}
+.setopts{display:flex;flex-direction:column;gap:var(--sp-2);padding-left:var(--sp-4)}
+.card.setown{border:var(--dash-line);flex-wrap:wrap;justify-content:flex-end}
+.card.setown .sett{flex-basis:100%}
+.pill.setsend{position:sticky;bottom:0;margin-top:auto}
 .label.sethint{margin:0}
-.settest{flex:1;width:100%;min-height:var(--test-h);border:0;border-radius:var(--r-sm);background:var(--card)}
 #infolist{flex:1;display:flex;flex-direction:column;gap:var(--sp-3);width:100%}
 .inf{display:flex;align-items:center;gap:var(--sp-4);text-align:left;padding:var(--inf-pad);border-radius:var(--r);
   font-size:var(--inf-fs);font-weight:500;line-height:1.3;}
@@ -357,8 +380,9 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
   <div id="sres" class="scroll"></div>
 </div>
 <div id="settings" class="sheet" role="dialog" aria-modal="true" aria-labelledby="settitle" hidden>
-  <div class="sheet-head"><span id="settitle"></span><button id="setclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
+  <div class="sheet-head"><button id="setback" class="rbtn" data-aria="back" data-icon="back" hidden></button><span id="settitle"></span><button id="setclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="setbody" class="scroll"></div>
+  <div id="setmsg" class="label" role="status" aria-live="polite"></div>
 </div>
 <nav id="tabs"></nav>
 <canvas id="fx"></canvas>
