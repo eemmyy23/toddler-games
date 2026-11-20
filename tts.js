@@ -94,8 +94,16 @@
         ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t} sau IPA" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${marks(r, i, k, t)}</div>`
         : `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button>${marks(r, i, k, t)}</div>`).join('')}
       <button class="none" data-none="${i}" aria-pressed="${!!P(r).none}">✗ toate greșite</button>
-      <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
+      <div class="meta">în aplicație: <b>${esc(applied(r))}</b> · ${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
+  }
+  function applied(r) {
+    const L = ABC.langs[code], v = SPEECH.voice, w = r.form.toLocaleLowerCase(L.bcp47), local = v ? store.get(SPEECH.fixKey(L.bcp47, v), {}) : {};
+    const d = v && L.fixes && L.fixes[v.voiceURI] || {}, fromData = Object.assign({}, d.derived, d.words)[r.form];
+    if (local[w]) return `${local[w].k === 'ipa' ? 'IPA ' : ''}${local[w].text} (bifa ta)`;
+    if (fromData) return /^\/.*\/$/.test(fromData) ? `IPA ${fromData.slice(1, -1)}` : fromData;
+    if (v && L.ssml && L.ssml.test(v.voiceURI) && r.form === r.of && r.e.pron && r.e.pron.ipa && !r.e.pron.of) return `IPA ${r.ph}`;
+    return 'original';
   }
   function info() {
     const n = rows.filter(done).length, v = SPEECH.voice;
@@ -150,6 +158,7 @@
     edit(r, p => { if (p.m[k] === v) delete p.m[k]; else p.m[k] = v; });
     b.parentNode.querySelectorAll('.mark').forEach(x => x.setAttribute('aria-pressed', M_(r)[k] === x.dataset.v));
     b.closest('.row').classList.toggle('done', done(r)); save(); info();
+    b.closest('.row').querySelector('.meta b').textContent = applied(r);
   });
   $('list').addEventListener('input', e => {
     const t = e.target.closest('input[data-i]'); if (!t) return;
