@@ -137,7 +137,7 @@
       tested: iso(new Date()), page: location.href, userAgent: navigator.userAgent,
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
-      fingerprint: print, rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
+      fingerprint: print, voices: ('speechSynthesis' in window ? speechSynthesis.getVoices() : []).map(x => `${x.name} | ${x.lang} | ${x.voiceURI}${x.localService ? '' : ' | network'}`), rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
       results: ticked.map(r => ({ key: r.e.key, w: r.form, of: r.of, stress: r.e.pron ? r.e.pron.stress : null, none: !!P(r).none,
         marks: Object.entries(M_(r)).map(([k, x]) => ({ k, mark: x, text: k === 'ipa' ? r.ph : text(r, k) })) }))
     };
@@ -149,6 +149,7 @@
       `- tested: ${o.tested}`, `- page: ${o.page}`,
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
       `- ${printText()}`, `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
+      `- voices (${o.voices.length}): ${o.voices.filter(x => /\b(ro|en|de)[-_]/i.test(x)).join(' ; ')}`,
       `- marked ${o.count.marked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'marked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
       '| key | word | stress | ✓ | ✗ | toate greșite |', '|---|---|---|---|---|---|',
       ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.marks.filter(x => x.mark === 'ok').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.marks.filter(x => x.mark === 'no').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.none ? 'da' : ''} |`)].join('\n');
