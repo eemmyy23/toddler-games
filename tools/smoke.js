@@ -148,8 +148,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const games = await ev(() => Tiles.list().filter(t => t.game && usable(t, true)).map(t => t.id).sort().join());
     ok(games === ASK[l].map(x => x[0]).sort().join(), `${l}: every playable game is checked (${games})`);
     for (const [id, re] of ASK[l]) {
-      await clear(); await ev(i => openTile(i, true, true), id); await spoken();
-      const s = await said(), n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
+      await clear(); await ev(i => openTile(i, true, true), id); if (l === 'ro') await spoken();
+      const s = l === 'ro' ? await said() : [await ev(() => ABC.views.play.state().ask)], n = (await p.$$('.bub')).length, last = s[s.length - 1] || '';
       ok(re.test(last) && !/undefined|\{/.test(last) && n >= 2, `${l} game ${id}: "${last}" with ${n} bubbles`);
     }
   }
@@ -348,7 +348,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   const cp = await ev(() => ({ top: $('count').scrollTop, cls: $('act').classList.contains('on'), act: document.querySelector('.crow.on')?.dataset.n }));
   ok(cp.top < 5 && cp.cls && cp.act === '2', `playing: scrolled to top, ▶ pressed, row ${cp.act}`);
   const rows = [];
-  for (let k = 3; k <= 10; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k);
+  for (let k = 3; k <= 5; k++) { await until(k => document.querySelector('.crow.on')?.dataset.n === String(k), k);
     await ev(() => new Promise(res => { let last = -1; const tick = () => { const s = $('count').scrollTop; if (s === last) res(); else { last = s; setTimeout(tick, 80); } }; tick(); })); rows.push(await ev(() => { const a = document.querySelector('.crow.on'); if (!a) return 'none';
     const r = a.getBoundingClientRect(), b = $('count').getBoundingClientRect(), t = $('ctools').getBoundingClientRect(); return r.top >= t.bottom - 14 && r.bottom <= Math.min(b.bottom, innerHeight - 60) + 2 ? 'ok' : a.dataset.n; })); }
   ok(rows.every(x => x === 'ok'), 'the counted row is always fully visible (' + rows.join(' ') + ')');

@@ -253,5 +253,5 @@ node tools/check.js --fix        # after every change: all static checks, rewrit
 node tools/fast.js [sizes] [dir] # ~13 s, no server: every language × hubs, learn tiles, games × 7 sizes — after any CSS/markup/view edit
 node tools/smoke.js [url] [WxH]  # ~40 s per size, repo's parent folder served on :8765 — CI runs it; locally when a change touches what it covers
 ```
-CI: `check.yml` runs `check` (~10 s) on every PR and push to main that changes more than `*.md` / `docs/**`; `browser.yml` runs fast, smoke 360×640 and smoke 320×568
-as 3 parallel jobs on the runner's preinstalled Chrome (`PW_CHANNEL=chrome`, no browser download) only when the app changes (`abc/**` except `abc/manifest.js`, `abc.html`, `sw.js`, `manifest-abc.json`, `fonts/**`, fast/smoke) — not for tts.*, paint, rocket.
+CI runs on PRs only (main gets exactly what the PR tested): `check.yml` runs `check` (~10 s) when a PR changes more than `*.md` / `docs/**`; `browser.yml` runs fast and smoke 320×568
+(the strictest size; fast.js covers the other sizes; game questions are spoken in RO, read from the screen in EN/DE) as 2 parallel jobs with the runner's own Node on the runner's preinstalled Chrome (`PW_CHANNEL=chrome`, no browser download) only when the app changes (`abc/**` except `abc/manifest.js`, `abc.html`, `sw.js`, `manifest-abc.json`, `fonts/**`, fast/smoke) — not for tts.*, paint, rocket.
