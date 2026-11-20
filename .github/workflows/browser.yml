@@ -1,0 +1,40 @@
+name: browser
+on:
+  pull_request:
+    paths:
+      - 'abc/**'
+      - '!abc/manifest.js'
+      - 'abc.html'
+      - 'sw.js'
+      - 'manifest-abc.json'
+      - 'fonts/**'
+      - 'tools/fast.js'
+      - 'tools/smoke.js'
+      - '.github/workflows/browser.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'abc/**'
+      - '!abc/manifest.js'
+      - 'abc.html'
+      - 'sw.js'
+      - 'manifest-abc.json'
+      - 'fonts/**'
+      - 'tools/fast.js'
+      - 'tools/smoke.js'
+      - '.github/workflows/browser.yml'
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: toddler-games
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: python3 -m http.server 8765 &
+      - run: node toddler-games/tools/fast.js
+      - run: curl -s -o /dev/null --retry 20 --retry-connrefused --retry-delay 1 http://localhost:8765/ && node toddler-games/tools/smoke.js http://localhost:8765/toddler-games/abc.html 360x640
+      - run: node toddler-games/tools/smoke.js http://localhost:8765/toddler-games/abc.html 320x568
