@@ -68,7 +68,7 @@
       if (big) {
         APP.celebrate(el, true); sfx.fanfare();
         said = speak(APP.t(U.wow, { n: APP.stars }), PAUSE.praise);
-      } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], name: target.name }), PAUSE.answer); }
+      } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], thats: APP.t(U.thats, target.thats) }), PAUSE.answer); }
       const tok = ++roundTok;
       Promise.all([said, wait(big ? RULES.nextBig : RULES.next)]).then(() => wait(RULES.settle)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
     } else {

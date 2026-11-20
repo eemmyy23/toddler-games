@@ -11,7 +11,7 @@ STRINGS('de', {
   words: { one: '1 Wort', other: '{n} Wörter' },
   also: 'Auch:',
   version: 'v{version} · {build} · {date}',
-  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
+  exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{thats} {cheer}', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
