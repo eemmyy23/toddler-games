@@ -34,6 +34,8 @@ const APP = {
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
   icon: k => `<i class="ic" aria-hidden="true">${CFG.icons[k] != null ? esc(CFG.icons[k]) : ABC.art[k] ? `<svg class="art" viewBox="0 0 32 32">${ABC.art[k]}</svg>` : ''}</i>`,
   exclaim: name => APP.t(APP.ui().exclaim, { name }),
+  version: () => APP.t(APP.ui().version, { version: CFG.version, build: self.MANIFEST.version,
+    date: new Intl.DateTimeFormat(APP.L().bcp47, { dateStyle: 'short', timeStyle: 'short' }).format(new Date(self.MANIFEST.built)) }),
   fitText(el, inner) {
     const ratio = e => e.scrollWidth > e.clientWidth + 1 ? e.clientWidth / e.scrollWidth : 1;
     const worst = () => Math.min(ratio(el), ...(inner ? [...el.querySelectorAll(inner)].map(ratio) : []));
@@ -171,7 +173,7 @@ function hubTiles() {
 }
 function renderHub() {
   const U = APP.ui();
-  $('hub').innerHTML = `<div id="ver" class="label" aria-hidden="true">${esc(APP.t(U.version, { version: CFG.version, build: self.MANIFEST.version }))}</div>` + `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
+  $('hub').innerHTML = `<div id="ver" class="label ver" aria-hidden="true">${esc(APP.version())}</div>` + `<button class="pill sbox hsearch" id="hsearch">${APP.icon('search')}<span>${esc(U.search.placeholder)}</span></button>` + hubTiles().map(x => x.header
     ? `<div class="label caps hh">${iconHTML(x.header.icon, 'hi')} ${esc(U.sections[x.header.id])}</div>`
     : `<button class="card ht" data-id="${x.t.id}" data-play="${x.play ? 1 : 0}">${ageBadge(x.t)}` +
       `${tileIcon(x.t, 'hp')}<span class="hl">${esc(x.lbl)}</span></button>`).join('');

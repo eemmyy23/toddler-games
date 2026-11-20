@@ -3,7 +3,7 @@ const path = require('path'), os = require('os'), t0 = Date.now();
 const SIZES = (process.argv[2] || '320x480,360x640,390x844,768x1024,1024x768,1280x800,1920x1080').split(',').map(s => s.split('x').map(Number));
 const out = process.argv[3] || os.tmpdir();
 
-function audit() {
+async function audit() {
   const bad = [], R = e => e.getBoundingClientRect(), vis = e => { const r = R(e); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
   const hit = (a, b) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
   const chrome = () => ['bar', 'tabs', 'prev', 'next', 'act'].map(id => document.getElementById(id)).filter(e => e && vis(e))
@@ -11,6 +11,13 @@ function audit() {
   const stretched = t => { const cs = getComputedStyle(t), kids = [...t.children].filter(k => getComputedStyle(k).position !== 'absolute').map(R);
     const content = kids.length ? Math.max(...kids.map(k => k.bottom)) - Math.min(...kids.map(k => k.top)) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0;
     return R(t).height > Math.max(parseFloat(cs.minHeight) || 0, content) + 2; };
+  const ringCut = e => { const r = R(e), cs = getComputedStyle(e), m = cs.outlineStyle === 'none' ? 0 : parseFloat(cs.outlineWidth) + parseFloat(cs.outlineOffset);
+    for (let a = e.parentElement; m && a && a !== document.body; a = a.parentElement) {
+      const o = getComputedStyle(a); if (o.overflowX === 'visible' && o.overflowY === 'visible') continue;
+      const b = R(a), x = r.left - b.left - a.clientLeft + a.scrollLeft, y = r.top - b.top - a.clientTop + a.scrollTop;
+      if (x - m < -0.5 || x + r.width + m > Math.max(a.clientWidth, a.scrollWidth) + 0.5 || y - m < -0.5 || y + r.height + m > Math.max(a.clientHeight, a.scrollHeight) + 0.5) return a.id || a.className.split(' ')[0];
+    }
+    return null; };
   const screens = [];
   for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { APP.set({ section: s.id }); APP.set({ hub: true }); render(); }]);
   for (const t of TILES) {
@@ -18,13 +25,20 @@ function audit() {
       for (const i of picks) screens.push([`${t.id}#${i}`, () => { openTile(t.id, false, true); APP.idx = i; view().show(false); }]); }
     if (gameOk(t)) screens.push([`${t.id}:play`, () => openTile(t.id, true, true)]);
   }
+  const wait = f => new Promise(res => { const t0 = performance.now(), go = () => f() || performance.now() - t0 > 2000 ? res() : setTimeout(go, 20); go(); });
+  for (const [v, mark] of [['home', '.setl'], ['voice', '.setv'], ['pron', '#setq']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); APP.settings.open(); await wait(() => document.querySelector('#setbody .setl'));
+    if (v !== 'home') { document.querySelector(`.setn[data-go=${v}]`).click(); await wait(() => document.querySelector(`#setbody ${mark}`)); } }]);
   for (const [name, go] of screens) {
-    go();
+    if (!document.getElementById('settings').hidden) APP.settings.close();
+    await go();
+    for (const e of document.querySelectorAll('.on')) { const c = vis(e) && ringCut(e); if (c) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} ring cut by ${c}`); }
+    if (name.startsWith('settings:')) continue;
     if (document.documentElement.scrollWidth > innerWidth + 1) bad.push(`${name}: horizontal scroll`);
     const col = R(document.getElementById('stage')), cs = getComputedStyle(document.getElementById('stage'));
     const L = col.left + parseFloat(cs.paddingLeft), Rr = col.right - parseFloat(cs.paddingRight);
     const items = [...document.getElementById('bar').children].filter(vis).map(R);
     if (items.length && Math.abs(items[0].left - L) > 2) bar(`bar starts at ${items[0].left | 0}, content at ${L | 0}`);
+    if (items.length && Math.max(...items.map(r => r.right)) > Rr + 2) bar(`bar ends at ${Math.max(...items.map(r => r.right)) | 0}, content at ${Rr | 0}`);
     const tabs = [...document.querySelectorAll('.tab')].map(R);
     if (tabs.length && (tabs[0].left < L - 2 || tabs[tabs.length - 1].right > Rr + 2)) bar('tabs outside the content column');
     function bar(m) { bad.push(`${name}: ${m}`); }
@@ -44,6 +58,7 @@ function audit() {
       if (stretched(t)) bad.push(`${name}/${t.dataset.id}: stretched`);
     }
   }
+  if (!document.getElementById('settings').hidden) APP.settings.close();
   return [...new Set(bad)];
 }
 

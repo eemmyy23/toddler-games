@@ -18,7 +18,7 @@
   }
   async function home() {
     const U = S();
-    return `${langs()}${nav('voice', U.voice, st.busy != null ? APP.t(U.downloading, { p: st.busy }) : curName())}${nav('pron', U.pron, U.pronSub)}`;
+    return `${langs()}${nav('voice', U.voice, st.busy != null ? APP.t(U.downloading, { p: st.busy }) : curName())}${nav('pron', U.pron, U.pronSub)}<p class="label ver">${esc(APP.version())}</p>`;
   }
   async function voice() {
     const U = S(), L = APP.L(), id = L.piper, cur = SPEECH.voice && SPEECH.voice.voiceURI, list = voices();
