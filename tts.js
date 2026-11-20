@@ -8,30 +8,33 @@
     const o = -d.getTimezoneOffset(), p = n => String(Math.floor(Math.abs(n))).padStart(2, '0');
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}${o >= 0 ? '+' : '-'}${p(o / 60)}:${p(o % 60)}`;
   };
-  const variants = e => {
+  const rowsOf = e => {
     const parts = e.w.split(/([/ ])/), syl = parts.map((p, i) => i).filter(i => !/^[/ ]$/.test(parts[i]));
     const at = e.pron ? syl[e.pron.stress] : -1, join = ps => ps.filter(p => p !== '/').join('');
-    const base = join(parts), v = { base, n: syl.length };
-    v.bold = parts.map((p, i) => i === at && syl.length > 1 ? `<b>${esc(p)}</b>` : esc(p)).filter(p => p !== '/').join('');
+    const base = join(parts), cuts = [];
+    const head = { form: base, of: base, bold: parts.map((p, i) => i === at && syl.length > 1 ? `<b>${esc(p)}</b>` : esc(p)).filter(p => p !== '/').join('') };
     const ph = e.pron && e.pron.ipa && !e.pron.of ? e.pron.ipa.replace(/^[/[]|[/\]]$/g, '') : null;
-    if (ph) { v.ph = ph; v.ipa = `<speak><phoneme alphabet="ipa" ph="${esc(ph)}">${esc(base)}</phoneme></speak>`; }
-    if (at < 0 || syl.length < 2) return v;
-    const cut = at === syl[syl.length - 1] ? at - 1 : at + 1, sep = cut > at ? at + 1 : at - 1;
-    if (parts[sep] === '/') {
-      v.dash = join(parts.map((p, i) => i === sep ? '-' : p));
-      v.gap = join(parts.map((p, i) => i === sep ? ' ' : p));
+    if (ph) { head.ph = ph; head.ipa = `<speak><phoneme alphabet="ipa" ph="${esc(ph)}">${esc(base)}</phoneme></speak>`; }
+    if (at >= 0 && syl.length > 1) {
+      const sep = at === syl[syl.length - 1] ? at - 1 : at + 1;
+      if (parts[sep] === '/') cuts.push(['dash', join(parts.slice(0, sep)).length, '-'], ['gap', join(parts.slice(0, sep)).length, ' ']);
+      const s = parts[at], nx = parts[at + 2], whole = parts[at - 1] !== '/' && parts[at + 1] !== '/';
+      if (!whole && CONS.test(s.slice(-1))) cuts.push(['dbl', join(parts.slice(0, at + 1)).length, s.slice(-1)]);
+      else if (!whole && parts[at + 1] === '/' && nx && CONS.test(nx[0])) cuts.push(['dbl', join(parts.slice(0, at + 1)).length, nx[0]]);
     }
-    const s = parts[at], nx = parts[at + 2];
-    if (parts[at - 1] !== '/' && parts[at + 1] !== '/') return v;
-    if (CONS.test(s.slice(-1))) v.dbl = join(parts.map((p, i) => i === at ? p + p.slice(-1) : p));
-    else if (parts[at + 1] === '/' && nx && CONS.test(nx[0])) v.dbl = join(parts.map((p, i) => i === at + 2 ? p[0] + p : p));
-    return v;
+    const low = t => t.toLocaleLowerCase(ABC.langs[code].bcp47);
+    return [...new Set([base, e.def, e.pl, e.plDef].filter(Boolean))].map((form, n) => {
+      const r = n ? { form, of: base, bold: esc(form) } : head;
+      for (const [k, pos, ins] of cuts) if (pos < form.length && low(form.slice(0, pos)) === low(base.slice(0, pos))) r[k] = form.slice(0, pos) + ins + form.slice(pos);
+      return r;
+    }).filter(r => r.ipa || r.dash || r.gap || r.dbl);
   };
-  const saveKey = () => `tts2.${code}.${SPEECH.voice ? SPEECH.voice.name : '-'}`;
-  const opts = r => OPTS.filter(([k]) => r[k === 'orig' ? 'base' : k]);
-  const text = (r, k) => r[k === 'orig' ? 'base' : k];
+  const saveKey = () => `tts3.${code}.${SPEECH.voice ? SPEECH.voice.name : '-'}`;
+  const opts = r => OPTS.filter(([k]) => r[k === 'orig' ? 'form' : k]);
+  const text = (r, k) => r[k === 'orig' ? 'form' : k];
   const label = (r, k, t) => k === 'orig' ? t : k === 'ipa' ? `IPA ${esc(r.ph)}` : esc(r[k]);
-  const ok = r => (picks[r.e.key] || { ok: [] }).ok;
+  const id = r => `${r.e.key}|${r.form}`;
+  const ok = r => (picks[id(r)] || { ok: [] }).ok;
   const done = r => ok(r).length > 0;
 
   function fillLangs() {
@@ -51,15 +54,15 @@
   function save() {
     store.set(saveKey(), picks);
     const L = ABC.langs[code], fix = {};
-    rows.filter(done).forEach(r => { const k = OPTS.map(([x]) => x).find(x => ok(r).includes(x)); fix[r.base.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
+    rows.filter(done).forEach(r => { const k = OPTS.map(([x]) => x).find(x => ok(r).includes(x)); fix[r.form.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
     store.set(SPEECH.fixKey(L.bcp47, SPEECH.voice), fix);
   }
   function render() {
     const L = ABC.langs[code];
     rows = L.words.flatMap(e => [Object.assign({ key: e.id }, e), ...(e.syn || []).map((s, i) => Object.assign({ key: `${e.id}~${i + 1}` }, s))])
-      .map(e => Object.assign({ e }, variants(e))).filter(r => r.n > 1);
+      .flatMap(e => rowsOf(e).map(r => Object.assign({ e }, r)));
     $('list').innerHTML = rows.map((r, i) => `<div class="row${done(r) ? ' done' : ''}" id="r${i}">
-      <div class="w">${r.bold}</div>
+      <div class="w">${r.bold}${r.form !== r.of ? ` <small>· ${esc(r.of)}</small>` : ''}</div>
       ${opts(r).map(([k, t]) => `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button><button class="mark pass" data-i="${i}" data-k="${k}" aria-pressed="${ok(r).includes(k)}" aria-label="${t} ✓">✓</button></div>`).join('')}
       <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
     info();
@@ -84,7 +87,7 @@
       lang: code, bcp47: ABC.langs[code].bcp47,
       voice: v ? { name: v.name, lang: v.lang, local: v.localService, default: v.default, uri: v.voiceURI } : null,
       rate: SPEECH.rate, pitch: SPEECH.pitch, total: rows.length, count,
-      results: ticked.map(r => ({ key: r.e.key, w: r.base, stress: r.e.pron ? r.e.pron.stress : null,
+      results: ticked.map(r => ({ key: r.e.key, w: r.form, of: r.of, stress: r.e.pron ? r.e.pron.stress : null,
         ok: ok(r).map(k => ({ k, text: k === 'ipa' ? r.ph : text(r, k) })) }))
     };
   }
@@ -111,7 +114,7 @@
     const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
     const b = e.target.closest('.mark'); if (!b) return;
     const r = rows[+b.dataset.i], k = b.dataset.k, now = ok(r).includes(k) ? ok(r).filter(x => x !== k) : [...ok(r), k];
-    if (now.length) picks[r.e.key] = { ok: now }; else delete picks[r.e.key];
+    if (now.length) picks[id(r)] = { ok: now }; else delete picks[id(r)];
     b.setAttribute('aria-pressed', now.includes(k)); b.closest('.row').classList.toggle('done', now.length > 0); save(); info();
   });
   $('next').onclick = next;
