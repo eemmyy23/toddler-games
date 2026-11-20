@@ -32,7 +32,8 @@ abc/core/piper.js           PIPER: optional Piper neural voice — downloads `co
                             into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
                             PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
 abc/core/settings.js        Settings sheet (⚙ on the hubs) → Voice: the phone's voices of the current language (where to change them: phone settings), Piper with its size,
-                            download progress, use and delete, link to the pronunciation test (`config.testPage`); the choice is stored per language (`voice.<code>`)
+                            download progress, use and delete, and the pronunciation test: `config.testPage` embedded (`?embed=1&lang=<code>`, same origin, so its ticks apply
+                            at once; leaving it re-picks the voice); the choice is stored per language (`voice.<code>`)
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
@@ -40,7 +41,8 @@ abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶
 sw.js                       precaches MANIFEST.files under cache 'toddler-<version>' and deletes older ones; scripts whose ?v= is the current
                             version are cache-first, the rest network-first (after 3 s the cached copy of that exact URL; another `?v=` only when offline, so a slow network never mixes versions); an open app checks for an update on
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
-tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
+tts.html + tts.js           pronunciation test page (search box first — nothing listed until a word is typed or "arată tot" is ticked; "Trimite feedback" shares or copies the MD export;
+                            `?embed=1&lang=` = inside Settings: the app's language and chosen voice, selectors hidden; Piper through `abc/core/piper.js`) (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (SSML `<phoneme>`: `pron.ipa`, for other forms derived from it by swapping the differing ending through
                             the language's `LANG.g2p` letter→IPA rules) and the respellings, plus the tester's own text (text with IPA marks such as ˈ ə ʃ, or in /…/, is sent as `<phoneme>` and stored as `ipa`)
                             built from `stress` (below), each with ✓ / ✗ and a row-level "✗ toate greșite" (only ✓ is applied; ✗ and none are reported), kept per language + voice in `store`; the first ticked variant

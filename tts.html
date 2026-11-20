@@ -36,6 +36,9 @@ select{max-width:100%;min-width:0}
 .info{color:var(--mut);font-size:13px;width:100%;overflow-wrap:anywhere}
 textarea{width:100%;min-height:220px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;font:13px/1.4 ui-monospace,monospace}
 #out{margin-top:16px}
+#q{flex:1 1 100%;min-height:44px;background:var(--card);color:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:inherit}
+.all{display:flex;align-items:center;gap:6px;color:var(--mut)}
+.embed #lang,.embed #voice,.embed #json,.embed #md{display:none}
 </style>
 </head>
 <body>
@@ -46,6 +49,9 @@ textarea{width:100%;min-height:220px;background:var(--card);border:1px solid var
   <button id="next">▶ Următorul</button>
   <button id="json">Export JSON</button>
   <button id="md">Export MD</button>
+  <button id="share">Trimite feedback</button>
+  <input id="q" type="search" placeholder="Caută un cuvânt…" autocomplete="off" spellcheck="false">
+  <label class="all"><input id="all" type="checkbox"> arată tot</label>
   <div class="info" id="info"></div>
 </header>
 <main>
@@ -55,7 +61,7 @@ textarea{width:100%;min-height:220px;background:var(--card);border:1px solid var
 <script src="abc/manifest.js"></script>
 <script>
 (function () {
-  var M = self.MANIFEST, want = /^abc\/(core\/(registry|i18n|services)|config|lang\/[^/]+\/(grammar|words))\.js$/;
+  var M = self.MANIFEST, want = /^abc\/(core\/(registry|i18n|services|piper)|config|lang\/[^/]+\/(grammar|words))\.js$/;
   M.scripts.filter(function (s) { return want.test(s); }).concat(['tts.js']).forEach(function (src) {
     var e = document.createElement('script');
     e.src = src + '?v=' + M.version; e.async = false;
