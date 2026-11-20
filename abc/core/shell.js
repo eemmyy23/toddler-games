@@ -214,7 +214,7 @@ function render() {
   document.body.dataset.mode = sc;
   document.body.classList.toggle('lownav', !!(v && (v.arrows || v.play)));
   $('ages').hidden = !atHub; $('barback').hidden = atHub;
-  $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW;
+  $('gridbtn').hidden = atHub || mode === 'play' || !tileOf().index; $('stars').hidden = sc !== GAME_VIEW; $('setbtn').hidden = !atHub;
   $('barback').innerHTML = APP.icon('back') + iconHTML(SECTIONS[sec].icon, 'bi');
   $('stars').innerHTML = APP.icon('star') + APP.stars;
   $('hub').hidden = sc !== 'hub';
@@ -230,7 +230,7 @@ function setLang(code) {
   const v0 = !atHub && view(), cur = v0 && APP.item();
   if (v0) leaveView();
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
-  lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true, APP.L().fixes); markVoices();
+  lang = code; store.set('lang', code); pickVoice();
   if (v0) {
     const i = cur ? APP.indexOf(cur.id) : -1;
     if (i >= 0) APP.idx = i; else loadIdx();
@@ -374,8 +374,16 @@ $('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">
 function markVoices() {
   document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); f.querySelector('.nv').hidden = has !== false; });
 }
-SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true, APP.L().fixes);
-if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true, APP.L().fixes); markVoices(); };
+function pickVoice() {
+  const L = APP.L(), want = store.get(`voice.${L.code}`, null), mine = L.piper && want === `piper:${L.piper}`;
+  const E = mine && PIPER.live === L.piper ? PIPER.engine(L.piper) : null;
+  SPEECH.pick(L.bcp47, L.voices, L.words, L.ssml, true, L.fixes, want, E);
+  markVoices();
+  if (mine && !E) PIPER.has(L.piper).then(ok => ok && PIPER.load(L.piper).then(() => { PIPER.live = L.piper; if (APP.L() === L) pickVoice(); }, () => {}));
+}
+APP.pickVoice = pickVoice;
+pickVoice();
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => pickVoice();
 markVoices();
 
 function firstTouch() { started = true; ensureAudio(); }

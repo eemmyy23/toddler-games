@@ -15,6 +15,9 @@ STRINGS('de', {
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
-  aria: { ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
+  settings: { title: 'Einstellungen', voice: 'Stimme', phone: 'Stimmen auf diesem Handy', phoneHint: 'Diese Stimmen kommen vom Handy. Hinzufügen oder ändern: Handy-Einstellungen → Bedienungshilfen → Text-in-Sprache.',
+    piper: 'Piper-Stimme (KI, auf jedem Handy gleich)', piperName: 'Piper · {id}', piperHint: 'Lädt einmal etwa {mb} MB, danach ohne Internet.',
+    download: 'Herunterladen', downloading: 'Lädt… {p}%', failed: 'Download fehlgeschlagen — nochmal versuchen', remove: 'Piper löschen', test: 'Aussprache-Test', sample: 'Hallo! So klinge ich.' },
+  aria: { settings: 'Einstellungen', ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
     objects: 'Dinge', fingers: 'Finger', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
 });

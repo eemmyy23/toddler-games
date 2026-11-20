@@ -52,24 +52,25 @@ const sfx = {
 };
 
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: null, respell: [], phonemes: null, rate: 0.85, pitch: 1.25,
+  voice: null, noVoice: false, bcp47: null, respell: [], phonemes: null, engine: null, rate: 0.85, pitch: 1.25,
   norm: v => v.lang.replace('_', '-').toLowerCase(),
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  pick(bcp47, prefer, words = [], ssml = null, own = false, fixes = null) {
-    this.bcp47 = bcp47; this.voice = null; this.noVoice = !('speechSynthesis' in window);
-    const all = this.noVoice ? [] : speechSynthesis.getVoices();
+  pick(bcp47, prefer, words = [], ssml = null, own = false, fixes = null, choice = null, engine = null) {
+    this.bcp47 = bcp47; this.voice = null; this.engine = engine; this.noVoice = !('speechSynthesis' in window) && !engine;
+    const all = 'speechSynthesis' in window ? speechSynthesis.getVoices() : [];
     if (all.length) {
       const want = bcp47.toLowerCase(), base = want.split('-')[0];
       const same = all.filter(v => this.norm(v) === want), lang = all.filter(v => this.norm(v).split('-')[0] === base);
       const nice = v => !!prefer && prefer.test(v.name);
-      this.voice = same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
+      this.voice = lang.find(v => choice && v.voiceURI === choice) || same.find(v => v.localService && nice(v)) || same.find(v => v.localService) || lang.find(v => v.localService)
                 || same.find(nice) || same[0] || lang[0] || null;
-      this.noVoice = !this.voice;
+      this.noVoice = !this.voice && !engine;
     }
+    if (engine) this.voice = { voiceURI: engine.uri, lang: bcp47, name: engine.uri, localService: true };
     this.tune(words, ssml, own, fixes);
   },
   fixKey: (bcp47, v) => `ttsfix.${bcp47}.${v ? v.voiceURI : '-'}`,
@@ -113,17 +114,22 @@ function makeUtt(text, onDone) {
   return u;
 }
 function speak(text, delay = 0) {
-  if (!('speechSynthesis' in window) || SPEECH.noVoice) return wait(TALK.silent + delay);
-  speechSynthesis.cancel(); clearTimeout(speakTimer);
+  const E = SPEECH.engine;
+  if (!E && (!('speechSynthesis' in window) || SPEECH.noVoice)) return wait(TALK.silent + delay);
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (E) E.stop();
+  clearTimeout(speakTimer);
   if (speakDone) speakDone();
   return new Promise(res => {
     let settled = false;
     const done = () => { if (!settled) { settled = true; if (speakDone === done) speakDone = null; res(); } };
     speakDone = done;
-    speakTimer = setTimeout(() => speechSynthesis.speak(makeUtt(text, done)), delay);
+    speakTimer = setTimeout(() => E
+      ? E.say(SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text)).then(done, done)
+      : speechSynthesis.speak(makeUtt(text, done)), delay);
   });
 }
-const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); };
+const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
 
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;

@@ -26,8 +26,13 @@ abc/core/content.js         INK palette; CONTENT: builders thing/word/glyph/pict
 abc/core/tiles.js           the one rule set "what a tile shows and when" — used by the app AND tools/check.js
 abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no palm taps), onScrub (tap or drag a finger across a row/column of
                             targets: each target acts once as the finger enters it; keyboard clicks too; never swipes the stage), wait, shuffle, PAUSE/TALK timings,
-                            store (localStorage or session, `abc2.` keys; `store.legacy(k)` reads an old `abc.` key once, so stars and language survive the rename), sound (sfx, tone), speech (SPEECH with `rate`/`pitch`, speak, hush),
+                            store (localStorage or session, `abc2.` keys; `store.legacy(k)` reads an old `abc.` key once, so stars and language survive the rename), sound (sfx, tone), speech (SPEECH with `rate`/`pitch`, `pick(…, choice, engine)` — a stored voice URI, or an engine that replaces speechSynthesis —, speak, hush),
                             audio (ensureAudio, quietAudio), confetti, calm (reduced motion)
+abc/core/piper.js           PIPER: optional Piper neural voice — downloads `config.piper` runtime (onnxruntime-web, piper_phonemize) + the language's `LANG.piper` model
+                            into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
+                            PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
+abc/core/settings.js        Settings sheet (⚙ on the hubs) → Voice: the phone's voices of the current language (where to change them: phone settings), Piper with its size,
+                            download progress, use and delete, link to the pronunciation test (`config.testPage`); the choice is stored per language (`voice.<code>`)
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
@@ -103,7 +108,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 
 **STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `wrong`, `index { az, grp, other }`,
 `search { placeholder, hint, none, results }`, `words`, `headCount`, `version`, `exclaim`, `listing`, `then`, `range`, `install`, `installBtn`, `profile { <id>, ages }`,
-`also`, `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
+`also`, `settings { title, voice, phone, phoneHint, piper, piperName, piperHint, download, downloading, failed, remove, test, sample }`, `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
 (orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.
@@ -201,7 +206,7 @@ a target does not come back before half the pool was asked, a `subject` not befo
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
 **config** — `name` (title, install text; checked against the head and the web manifest), `version` (x.y.z, shown with the build hash at the foot of every hub),
-`icons { key: text }` (every UI icon; `data-icon` in abc.html), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
+`icons { key: text }` (every UI icon; `data-icon` in abc.html), `testPage`, `piper { ort, phonemize, models, runtime }` (download URLs; runtime = measured bytes of the shared files), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
 `profiles { id: { ages, art? } }` (ascending), `defaultProfile`, `baseLanguage`.
 
 ## Recipes

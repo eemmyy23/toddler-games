@@ -253,7 +253,10 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 .label.dsay{font-size:var(--dsay-fs);min-height:2lh;color:var(--text);text-align:center;text-wrap:balance}
 #act{position:fixed;left:var(--act-l);right:var(--act-r);margin:0 auto;bottom:calc(var(--bot) + var(--nav-gap));z-index:var(--z-float)}
 
-#infotitle{flex:1;font-size:var(--fs-l);font-weight:700}
+#infotitle,#settitle{flex:1;font-size:var(--fs-l);font-weight:700}
+#setbody{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-3);width:100%}
+.card.setv{min-height:var(--tap);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-sm);text-align:left;font-size:var(--fs-m)}
+.label.sethint{margin:0}
 #infolist{flex:1;display:flex;flex-direction:column;gap:var(--sp-3);width:100%}
 .inf{display:flex;align-items:center;gap:var(--sp-4);text-align:left;padding:var(--inf-pad);border-radius:var(--r);
   font-size:var(--inf-fs);font-weight:500;line-height:1.3;}
@@ -306,6 +309,7 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
   <button id="barback" class="pill accent" data-aria="back" hidden></button>
   <button id="gridbtn" class="rbtn accent" data-aria="index" data-icon="grid" hidden></button>
   <div id="stars" class="pill" hidden></div>
+  <button id="setbtn" class="rbtn" data-aria="settings" data-icon="settings" hidden></button>
 </div>
 
 <div id="backdrop" hidden></div>
@@ -350,6 +354,10 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
   <div class="sheet-head"><div class="pill sbox"><i data-icon="search"></i><input id="sq" type="search" data-aria="search" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search"><button id="sqclear" class="rbtn small" data-aria="clear" data-icon="close" hidden></button></div><button id="sclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
   <div id="smeta" class="label"></div>
   <div id="sres" class="scroll"></div>
+</div>
+<div id="settings" class="sheet" role="dialog" aria-modal="true" aria-labelledby="settitle" hidden>
+  <div class="sheet-head"><span id="settitle"></span><button id="setclose" class="rbtn" data-aria="close" data-icon="close"></button></div>
+  <div id="setbody" class="scroll"></div>
 </div>
 <nav id="tabs"></nav>
 <canvas id="fx"></canvas>
