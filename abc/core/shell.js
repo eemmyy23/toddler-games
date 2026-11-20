@@ -230,7 +230,7 @@ function setLang(code) {
   const v0 = !atHub && view(), cur = v0 && APP.item();
   if (v0) leaveView();
   const state = v0 && v0.beforeLang ? v0.beforeLang() : null, scroll = v0 && v0.keepScroll ? $(v0.el).scrollTop : 0;
-  lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml); markVoices();
+  lang = code; store.set('lang', code); SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true); markVoices();
   if (v0) {
     const i = cur ? APP.indexOf(cur.id) : -1;
     if (i >= 0) APP.idx = i; else loadIdx();
@@ -374,8 +374,8 @@ $('tabs').innerHTML = CFG.sections.map(s => `<button class="tab" id="t-${s.id}">
 function markVoices() {
   document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); f.querySelector('.nv').hidden = has !== false; });
 }
-SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml);
-if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml); markVoices(); };
+SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true);
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { SPEECH.pick(APP.L().bcp47, APP.L().voices, APP.L().words, APP.L().ssml, true); markVoices(); };
 markVoices();
 
 function firstTouch() { started = true; ensureAudio(); }
