@@ -173,12 +173,12 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
           if (!(ok1 && ok2 && ok3 && ok4)) { bad.push(`${c}/${t.id}`); break; } } } }
     setLang('ro'); return bad; });
   ok(!rules.length, 'one right answer, no two choices look or sound alike, pairs stay pairs' + (rules.length ? ': ' + rules.join(' ') : ''));
-  const variety = await ev(() => { const bad = [];
-    for (const t of Tiles.list().filter(t => t.game && usable(t, true))) { openTile(t.id, true, true); APP.streak = 0; const n = Math.floor(ABC.games[t.game.type].pool(gameItemsOf(t), 0).length / 2), ids = [];
+  const variety = await ev(() => { const bad = [], P = ABC.config.play;
+    for (const t of Tiles.list().filter(t => t.game && usable(t, true))) { openTile(t.id, true, true); APP.streak = 0; const len = ABC.games[t.game.type].pool(gameItemsOf(t), 0).length, n = Math.min(len - 1, Math.max(P.window, Math.floor(len * P.recent))), ids = [];
       for (let k = 0; k < 60; k++) { ABC.views.play.newRound(); ids.push(ABC.views.play.state().target.id); }
       const rep = ids.findIndex((id, i) => ids.slice(Math.max(0, i - n), i).includes(id)); if (rep >= 0) bad.push(`${t.id}@${rep}`); }
     return bad; });
-  ok(!variety.length, `no question comes back before half the others were asked (${variety.join(' ') || 'every game'})`);
+  ok(!variety.length, `no question comes back within 5 rounds or before half the others were asked (${variety.join(' ') || 'every game'})`);
   const counted = await ev(() => { setLang('ro'); openTile('count', true, true); const things = new Set(); let hands = 0, lines = new Set();
     for (let k = 0; k < 80; k++) { ABC.views.play.newRound(); const { round, target } = ABC.views.play.state(); things.add(round.look.thing); if (round.look.hands) hands += document.querySelectorAll('#ask .hand').length >= 1 && $('ask').textContent.includes('degete');
       else if (document.querySelectorAll('#ask .objs > span').length !== target.n) return 'wrong count'; lines.add($('ask').textContent); }
@@ -371,6 +371,28 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
              [...document.querySelectorAll('#read .rt,#rC .rc')].some(t => t.scrollWidth > t.clientWidth + 1); }, i)) bad.push(`${l}:R${i}`);
   }
   ok(bad.length === 0, 'no overlap / clipping' + (bad.length ? ': ' + bad.slice(0, 10).join(' ') : ''));
+
+  console.log('play time (wind-down, break, parent gate)');
+  await ev(() => { closeInfo && !$('info').hidden && closeInfo(); setLang('ro'); store.set('limit', 2); store.set('session', { used: 2 * 60000, at: Date.now(), rest: 0 }); });
+  await p.reload(); await p.waitForFunction(() => typeof APP === 'object');
+  await ev(() => { openTile('colors', true, true); }); await clear();
+  const leads = [];
+  await ev(() => ABC.views.play.newRound());
+  for (let k = 0; k < 3; k++) {
+    const lead = await ev(() => ABC.views.play.state().round.lead); leads.push(lead);
+    await ev(() => ABC.views.play.select(ABC.views.play.state().target));
+    await until(l => !$('rest').hidden || ABC.views.play.state().round.lead !== l, lead);
+  }
+  ok(leads.join('|') === 'Încă trei și gata!|Încă două!|Ultima!', `wind-down counts questions: ${leads.join(' | ')}`);
+  ok(await ev(() => !$('rest').hidden && __said.some(x => /^Bravo! Acum facem pauză/.test(x))), 'after the last one: break screen, spoken once');
+  await p.reload(); await p.waitForFunction(() => typeof APP === 'object');
+  ok(await ev(() => !$('rest').hidden && $('restgo').hidden), 'a reload keeps the break (no "play again" before the minimum break)');
+  await p.goBack().catch(() => {}); ok(await ev(() => !$('rest').hidden), 'the back button does not leave the break');
+  await p.dispatchEvent('#restlock', 'pointerdown'); await p.waitForTimeout(300); await p.dispatchEvent('#restlock', 'pointerup');
+  ok(await ev(() => $('restgate').hidden), 'a short tap on the lock does nothing');
+  await p.dispatchEvent('#restlock', 'pointerdown'); await until(() => !$('restgate').hidden);
+  await ev(() => { const m = $('restq').textContent.match(/(\d+) \+ (\d+)/); document.querySelector(`#restopts [data-n="${+m[1] + +m[2]}"]`).click(); });
+  ok(await ev(() => $('rest').hidden && SESSION.used() === 0), 'a grown-up unlocks: hold 3 s + the sum, the timer starts over');
 
   console.log('offline (service worker precache from manifest)');
   const cached = await ev(async () => { await navigator.serviceWorker.ready; await new Promise(r => setTimeout(r, 1500));

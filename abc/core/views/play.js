@@ -1,10 +1,12 @@
 (function () {
-  let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false, seen = [], seenSub = [];
+  let target = null, opts = [], locked = false, round = {}, roundTok = 0, keep = false, seen = [], seenSub = [], spots = [], tier = null, run = 0, miss = 0;
   const game = () => ABC.games[APP.tile().game.type];
   const wk = it => `${APP.tile().id}:${it.id}`;
   const weights = store.get('w', {});
-  const RULES = { levels: [[8, 4], [3, 3], [0, 2]], maxWeight: 2, recent: 0.5, recentSubjects: 8, cooldown: 700, bigEvery: 10, next: 1200, nextBig: 2400, settle: 350 };
-  const nChoices = () => RULES.levels.find(([s]) => APP.streak >= s)[1];
+  const RULES = ABC.config.play;
+  const level = () => tier == null ? (tier = ABC.config.profiles[APP.profile()].tier || 0) : tier;
+  const nChoices = () => RULES.choices[Math.min(level(), RULES.choices.length - 1)];
+  const climb = d => { tier = Math.max(0, Math.min(RULES.choices.length - 1, level() + d)); run = 0; miss = 0; };
   const look = it => it.bubbleArt || it.bubble || it.bubbleColor;
   const named = it => (it.pictureBubble || (!!it.bubbleColor && !it.bubble)) && APP.tile().game.caption !== false && !!(typeof game().caption === 'function' ? game().caption(round) : game().caption);
   const pool = () => game().pool(APP.gameItems(), APP.streak);
@@ -15,7 +17,7 @@
     const all = pool(), p = fresh(all.filter(it => it !== target), seen);
     let r = Math.random() * p.reduce((s, it) => s + 1 + (weights[wk(it)] || 0), 0);
     const it = p.find(it => (r -= 1 + (weights[wk(it)] || 0)) <= 0) || p[p.length - 1];
-    if (it) remember(seen, it.id, Math.floor(all.length * RULES.recent));
+    if (it) remember(seen, it.id, Math.min(all.length - 1, Math.max(RULES.window, Math.floor(all.length * RULES.recent))));
     return it;
   }
   const pickSubject = t => { const m = fresh(t.members || [], seenSub); if (!m.length) return null; const id = m[Math.random() * m.length | 0].id; remember(seenSub, id, RULES.recentSubjects); return id; };
@@ -30,8 +32,12 @@
     opts = [target];
     for (const it of shuffle(pool())) if (opts.length < nChoices() && fits(it, target, opts)) opts.push(it);
     opts = shuffle(opts);
+    const at = opts.indexOf(target);
+    if (opts.length > 1 && spots.length >= RULES.sameSpot && spots.slice(-RULES.sameSpot).every(i => i === at)) opts.push(opts.shift());
+    remember(spots, opts.indexOf(target), RULES.sameSpot);
+    const lead = SESSION.lead(), t0 = Date.now();
     const g = APP.tile().game, prompts = g.prompts || ['glyph'];
-    round = { lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: pickSubject(target) };
+    round = { lead, t0, lower: !!(g.lower && target.lower && Math.random() < 0.5), prompt: prompts[Math.random() * prompts.length | 0], subject: pickSubject(target) };
     round.look = game().vary ? game().vary(target) : null;
     draw();
   }
@@ -53,14 +59,15 @@
     box.querySelectorAll('.bname').forEach(c => APP.fitText(c));
     APP.links(target, $('plinks'));
     APP.fit($('play'));
-    speak(askLine(), PAUSE.ask);
+    speak(round.lead ? APP.t(APP.ui().then, { a: round.lead, b: askLine() }) : askLine(), PAUSE.ask);
   }
   function choose(it, el) {
     if (locked) return;
     if (it !== target && el) { const now = Date.now(); if (+(el.dataset.cool || 0) > now) return; el.dataset.cool = now + RULES.cooldown; }
     const U = APP.ui();
     if (it === target) {
-      locked = true; APP.streak++; APP.addStar();
+      locked = true; APP.streak++; APP.addStar(); SESSION.round(Date.now() - round.t0);
+      if (!round.missed && ++run >= RULES.up) climb(1);
       weights[wk(it)] = Math.max(0, (weights[wk(it)] || 0) - 1); store.set('w', weights);
       if (el) el.classList.add('right');
       const big = APP.stars % RULES.bigEvery === 0;
@@ -70,10 +77,10 @@
         said = speak(APP.t(U.wow, { n: APP.stars }), PAUSE.praise);
       } else { APP.celebrate(el, true); said = speak(APP.t(U.cheer, { cheer: U.cheers[Math.random() * U.cheers.length | 0], thats: APP.t(U.thats, target.thats) }), PAUSE.answer); }
       const tok = ++roundTok;
-      Promise.all([said, wait(big ? RULES.nextBig : RULES.next)]).then(() => wait(RULES.settle)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked) newRound(); });
+      Promise.all([said, wait(big ? RULES.nextBig : RULES.next)]).then(() => wait(RULES.settle)).then(() => { if (tok === roundTok && APP.screen() === 'play' && locked && !SESSION.done(round.lead)) newRound(); });
     } else {
       APP.streak = 0;
-      if (!round.missed) { round.missed = true; weights[wk(target)] = Math.min(RULES.maxWeight, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
+      if (!round.missed) { run = 0; if (++miss >= RULES.down) climb(-1); round.missed = true; weights[wk(target)] = Math.min(RULES.maxWeight, (weights[wk(target)] || 0) + 1); store.set('w', weights); }
       sfx.wrong();
       if (el) { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); }
       speak(APP.t(U.wrong, { thats: APP.t(U.thats, it.thats), ask: askLine() }), PAUSE.answer);
@@ -100,7 +107,7 @@
       if (round.subject && !(t.members || []).some(m => m.id === round.subject)) round.subject = pickSubject(t);
       keep = true;
     },
-    reset() { target = null; seen = []; seenSub = []; },
+    reset() { target = null; seen = []; seenSub = []; spots = []; tier = null; run = 0; miss = 0; },
     choices: () => opts,
     select(it) { choose(it, document.querySelector(`.bub[data-id="${CSS.escape(it.id)}"]`)); },
     state: () => ({ target, opts, round }), newRound, choose

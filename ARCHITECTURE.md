@@ -32,7 +32,8 @@ abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no p
 abc/core/piper.js           PIPER: optional Piper neural voice — downloads `config.piper` runtime (onnxruntime-web, piper_phonemize) + the language's `LANG.piper` model
                             into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
                             PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
-abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation, sub-screens with ‹ back.
+abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
+abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation / Play time, sub-screens with ‹ back.
                             Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
                             "additional voices": Piper as the same card, greyed with "Download · N MB" until downloaded → progress with Cancel, failed/offline/storage
                             messages → selectable, 🗑 with confirm (falls back to the phone voice); the choice is stored per language (`voice.<code>`).
@@ -118,7 +119,7 @@ Optional: `dir` (`<html dir>`, swipe direction), `keepCase` (example words keep 
 Module data, only when a module lists it in `needs`: `numbers` (1–10), `teens` (11–20), `tens` (10, 20 … 100) — 10 words each, `sayLetter(name, word, inside)`.
 Optional data the letters module uses when present: `groups` (letter groups, e.g. `'ch sch'`), `sayGroup(group, word)`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
 
-**STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `wrong`, `index { az, grp, other }`,
+**STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `session`, `wrong`, `index { az, grp, other }`,
 `search { placeholder, hint, none, results }`, `words`, `headCount`, `version`, `exclaim`, `listing`, `then`, `range`, `install`, `installBtn`, `profile { <id>, ages }`,
 `also`, `settings { … }` (every label of the settings sheet), `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
@@ -213,8 +214,15 @@ Numbers 1–10 carry `tally: n` instead of fixed pictures: card, count view and 
 `APP.tallyOf(item)` → `{ pics, line }`: `line` says what is counted (n = 1: the word's `forms.sg[0]`, 2: `forms.pl[0]`, ≥ 3: `numbers[n-1]` + plural), and the card speaks `say` + `line` ("Zece! Zece bărci!").
 Those pictures are always one `.objs` box (card `#pics`, count rows, how-many question): at most `--row` (5) per line, so 6–10 read as 5 + the rest.
 `howmany` counts a random countable word (a plural, no mass/unique words), or — with the tile's `game.fingers` concept, a quarter of the rounds — raised fingers (`APP.hands(n)`, shared with the count view).
-The play view offers 2 choices, 3 from a streak of 3, 4 from a streak of 8, and draws missed targets more often but at most 3× (`RULES` in play.js, weights stored as `w`);
-a target does not come back before half the pool was asked, a `subject` not before 8 others.
+The play view (rules in `config.play`) starts at the profile's `tier` (2/3/4 choices for 2–4/4–7/7–12), goes up a tier after `up` first-try right answers in a row
+and down after `down` first-try misses in a row, draws missed targets more often but at most 3× (weights stored as `w`), never puts the answer in the same spot
+3 times running; a target does not come back within `window` rounds (pool − 1 for small pools) nor before half the pool was asked, a `subject` not before 8 others.
+Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds while the page is visible, Settings and the break are closed and the child touched
+the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
+when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
+the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
+(`#rest`) says `session.done` once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
 **config** — `name` (title, install text; checked against the head and the web manifest), `version` (x.y.z, shown with the build hash at the foot of every hub),

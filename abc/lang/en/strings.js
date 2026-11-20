@@ -15,7 +15,9 @@ STRINGS('en', {
   install: 'Install {app} on your device',
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
-  settings: { title: 'Settings', voice: 'Voice', pron: 'Pronunciation', pronSub: 'Find and fix a word',
+  session: { left: ['Last one!', 'Two more!', "Three more and we're done!"], almost: 'Almost time for a break!', done: "Great playing! Time for a break. Let's go play!", title: 'Great playing! Time for a break.',
+    wait: { one: 'You can play again in a minute.', other: 'You can play again in {n} minutes.' }, again: 'Play again!', sum: 'For grown-ups: {a} + {b} = ?' },
+  settings: { time: 'Play time', minutes: '{n} min', timeHint: 'Near the end the app says "Three more and we\'re done!", then takes a break of at least {rest} minutes. To unlock sooner: hold 🔒 for {hold} seconds.', used: 'Used: {used} of {limit}', title: 'Settings', voice: 'Voice', pron: 'Pronunciation', pronSub: 'Find and fix a word',
     search: 'Search a word…', searchHint: 'Search for the word that sounds wrong.', showAll: 'Show all words ({n})', noResult: 'No word found.',
     forms: 'Forms of this word', fix: 'Fix', which: 'Which one sounds right?', asNow: 'As now', version: 'Version {n}', noneRight: 'None sounds right',
     write: 'Write it the way it should sound', use: 'Use this', saved: 'Saved. This phone now says it like this.', fixed: 'Fixed', restore: 'Restore original',
@@ -26,6 +28,6 @@ STRINGS('en', {
     piper: 'Piper', piperTag: 'Works offline · same on every phone', download: 'Download · {mb} MB', progress: '{p}% · {got} of {total} MB',
     downloading: 'Downloading… {p}%', cancel: 'Cancel', retry: 'Try again', failed: 'No internet. Download stopped.', full: 'Not enough storage ({mb} MB needed).',
     offline: 'Connect to the internet to download.', del: 'Delete', delAsk: 'Delete voice? Frees 63 MB.', switched: 'Switched to the phone voice.', sample: "Hi! I'm your voice." },
-  aria: { settings: 'Settings', search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
+  aria: { parent: 'For grown-ups', settings: 'Settings', search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
     objects: 'Objects', fingers: 'Fingers', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now', ages: 'Age' }
 });

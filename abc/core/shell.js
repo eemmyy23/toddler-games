@@ -29,6 +29,7 @@ const uiCache = {};
 const APP = {
   idx: 0, streak: 0, stars: store.get('stars', store.legacy('stars') || 0),
   L: () => ABC.langs[lang],
+  profile: () => profile,
   alphabet: () => CONTENT.alphabet(lang),
   ui: () => uiCache[lang] || (uiCache[lang] = abcMerge(abcMerge({}, ABC.langs[CFG.baseLanguage].strings), ABC.langs[lang].strings)),
   t: (tpl, vars) => I18N.t(tpl, vars, ABC.langs[lang].bcp47),
@@ -430,6 +431,7 @@ addEventListener('contextmenu', e => e.preventDefault());
 
 loadIdx();
 render();
+SESSION.start();
 if (document.fonts) document.fonts.ready.then(() => { if (!atHub && view().resize) view().resize(); });
 
 if ('serviceWorker' in navigator) {

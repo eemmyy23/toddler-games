@@ -23,7 +23,7 @@ for (const m of CFG.modules) {
   for (const c of CFG.languages) { const p = `abc/modules/${m}/lang/${c}.js`; if (exists(p)) scripts.push(p); }
 }
 const VIEW_FILES = ls('abc/core/views', /\.js$/), GAME_FILES = ls('abc/core/games', /\.js$/);
-scripts.push('abc/core/services.js', 'abc/core/piper.js', 'abc/core/pron.js', ...VIEW_FILES, ...GAME_FILES, 'abc/core/shell.js', 'abc/core/settings.js');
+scripts.push('abc/core/services.js', 'abc/core/piper.js', 'abc/core/pron.js', 'abc/core/session.js', ...VIEW_FILES, ...GAME_FILES, 'abc/core/shell.js', 'abc/core/settings.js');
 const files = ['abc.html', 'abc/manifest.js', ...scripts, 'manifest-abc.json', 'abc-icon-192.png', 'abc-icon-512.png',
   ...ls('fonts', /\.woff2$/), 'rocket.html', 'paint.html', 'tts.html', 'tts.js', 'manifest.json', 'manifest-paint.json',
   'icon-192.png', 'icon-512.png', 'paint-icon-192.png', 'paint-icon-512.png'].filter(exists);
@@ -36,7 +36,7 @@ const manifest = `self.MANIFEST = ${JSON.stringify({ version, built, scripts, fi
 if (FIX) { fs.writeFileSync(path.join(root, 'abc/manifest.js'), manifest); console.log(`manifest written: ${scripts.length} scripts, ${files.length} files, version ${version}`); }
 else if (!exists('abc/manifest.js') || read('abc/manifest.js') !== manifest) err('abc/manifest.js is out of date — run `node tools/check.js --fix`');
 
-for (const f of scripts.slice(3)) { if (/^abc\/core\/(services|shell|settings|views\/)/.test(f)) continue; run(f); }
+for (const f of scripts.slice(3)) { if (/^abc\/core\/(services|shell|session|settings|views\/)/.test(f)) continue; run(f); }
 const ABC = ctx.ABC, Tiles = vm.runInContext('Tiles', ctx), CONTENT = vm.runInContext('CONTENT', ctx), langs = CFG.languages, base = CFG.baseLanguage;
 for (const f of VIEW_FILES) ABC.views[path.basename(f, '.js')] = {};
 const keysOf = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => v && typeof v === 'object' && !Array.isArray(v) && !('other' in v) ? keysOf(v, p + k + '.') : [p + k]);
