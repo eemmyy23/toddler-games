@@ -2,6 +2,8 @@ LANG('ro', {
   name: 'Română', flag: '🇷🇴', bcp47: 'ro-RO', dir: 'ltr',
   voices: /ioana|female/i,
   ssml: /^(moz-tts:android:ro_RO|Romanian Romania)$/,
+  g2p: [[/j/g, 'ʒ'], [/ce/g, 'ʧe'], [/ci$/g, 'ʧʲ'], [/ci/g, 'ʧi'], [/ge/g, 'ʤe'], [/gi$/g, 'ʤʲ'], [/gi/g, 'ʤi'], [/ch/g, 'k'], [/gh/g, 'g'], [/ii$/g, 'ij'],
+    [/([^aăâeiîou])i$/g, '$1ʲ'], [/ă/g, 'ə'], [/[âî]/g, 'ɨ'], [/c/g, 'k'], [/ș/g, 'ʃ'], [/ț/g, 'ʦ'], [/g/g, 'ɡ']],
   fixes: {
     'moz-tts:android:ro_RO': { tested: '2026-11-20T04:46:36+02:00', words: {
       hipopotam: '/hi.po.poˈtam/', hipopotamul: '/hi.po.poˈtamul/', hipopotami: 'hipopo tami', hipopotamii: 'hipopo tamii',

@@ -1,12 +1,10 @@
 (function () {
   const M = self.MANIFEST, CFG = ABC.config;
   const OPTS = [['orig', 'original'], ['ipa', 'IPA'], ['dash', 'cratimă'], ['gap', 'spațiu'], ['dbl', 'consoană dublă'], ['own', 'textul tău']];
-  const G2P = { ro: [[/j/g, 'ʒ'], [/ce/g, 'ʧe'], [/ci$/g, 'ʧʲ'], [/ci/g, 'ʧi'], [/ge/g, 'ʤe'], [/gi$/g, 'ʤʲ'], [/gi/g, 'ʤi'], [/ch/g, 'k'], [/gh/g, 'g'], [/ii$/g, 'ij'],
-    [/([^aăâeiîou])i$/g, '$1ʲ'], [/ă/g, 'ə'], [/[âî]/g, 'ɨ'], [/c/g, 'k'], [/ș/g, 'ʃ'], [/ț/g, 'ʦ'], [/g/g, 'ɡ']] };
   const IPA = /^[/[].*[/\]]$|[ˈˌəɨʃʒʧʤʦɡʲːθðŋɲ]/;
   const bare = t => t.replace(/^[/[]|[/\]]$/g, '');
   const ssml = (ph, form) => `<speak><phoneme alphabet="ipa" ph="${esc(bare(ph))}">${esc(form)}</phoneme></speak>`;
-  const g2p = (t, lang) => G2P[lang] ? G2P[lang].reduce((x, [re, to]) => x.replace(re, to), t) : null;
+  const g2p = (t, lang) => { const G = ABC.langs[lang].g2p; return G ? G.reduce((x, [re, to]) => x.replace(re, to), t) : null; };
   const formIpa = (ph0, base, form, lang) => {
     const ph = ph0.replace(/t͡ʃ/g, 'ʧ').replace(/d͡ʒ/g, 'ʤ').replace(/t͡s/g, 'ʦ');
     const lo = t => t.toLocaleLowerCase(), b = lo(base), f = lo(form);
@@ -149,7 +147,7 @@
       `- tested: ${o.tested}`, `- page: ${o.page}`,
       `- voice: ${v ? `${v.name} · ${v.lang}${v.local ? ' · local' : ''}${v.default ? ' · default' : ''} · ${v.uri}` : '—'}`,
       `- ${printText()}`, `- rate ${o.rate} · pitch ${o.pitch}`, `- userAgent: ${o.userAgent}`,
-      `- voices (${o.voices.length}): ${o.voices.filter(x => /\b(ro|en|de)[-_]/i.test(x)).join(' ; ')}`,
+      `- voices (${o.voices.length}): ${o.voices.filter(x => CFG.languages.some(c => x.toLowerCase().includes(` | ${ABC.langs[c].bcp47.split('-')[0].toLowerCase()}`))).join(' ; ')}`,
       `- marked ${o.count.marked}/${o.total}: ${Object.entries(o.count).filter(([k]) => k !== 'marked').map(([k, n]) => `${k} ${n}`).join(', ')}`, '',
       '| key | word | stress | ✓ | ✗ | toate greșite |', '|---|---|---|---|---|---|',
       ...o.results.map(r => `| ${r.key} | ${r.w} | ${r.stress == null ? '' : r.stress + 1} | ${r.marks.filter(x => x.mark === 'ok').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.marks.filter(x => x.mark === 'no').map(x => `${x.k} ${x.text}`).join('; ')} | ${r.none ? 'da' : ''} |`)].join('\n');
