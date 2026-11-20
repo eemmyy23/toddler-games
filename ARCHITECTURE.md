@@ -35,7 +35,12 @@ abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (f
                             Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
                             "additional voices": Piper as the same card, greyed with "Download · N MB" until downloaded → progress with Cancel, failed/offline/storage
                             messages → selectable, 🗑 with confirm (falls back to the phone voice); the choice is stored per language (`voice.<code>`).
-                            Pronunciation: `config.testPage` embedded (`?embed=1&lang=<code>`); leaving it re-picks the voice so new ticks apply
+                            Pronunciation (search first, nothing listed until a word is typed — accents ignored, any form matches — or "show all"):
+                            a word → its forms (▶ = as the app says it now, "Fix" → "As now" / "Version 2…" (PRON variants; IPA only on a voice that takes it) /
+                            "None sounds right" + own text or IPA / "Restore original"; variants' spelling only under "Advanced"); a choice is stored with
+                            `PRON.setFix` and applied at once (`APP.pickVoice`); "Send my fixes (n)" shares or copies them
+abc/core/pron.js            PRON: per-word variants for the pronunciation screens (forms, stressed-syllable respellings, sourced/derived IPA via `LANG.g2p`) and the
+                            per-voice fix store — shared by Settings and tts.html
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
@@ -210,7 +215,7 @@ a target does not come back before half the pool was asked, a `subject` not befo
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
 **config** — `name` (title, install text; checked against the head and the web manifest), `version` (x.y.z, shown with the build hash at the foot of every hub),
-`icons { key: text }` (every UI icon; `data-icon` in abc.html), `testPage`, `piper { ort, phonemize, models, runtime }` (download URLs; runtime = measured bytes of the shared files), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
+`icons { key: text }` (every UI icon; `data-icon` in abc.html), `piper { ort, phonemize, models, runtime }` (download URLs; runtime = measured bytes of the shared files), `languages` (flag order), `modules`, `sections [{ id, icon, play? }]` (tab order, exactly one `play`),
 `profiles { id: { ages, art? } }` (ascending), `defaultProfile`, `baseLanguage`.
 
 ## Recipes

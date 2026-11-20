@@ -23,7 +23,7 @@ for (const m of CFG.modules) {
   for (const c of CFG.languages) { const p = `abc/modules/${m}/lang/${c}.js`; if (exists(p)) scripts.push(p); }
 }
 const VIEW_FILES = ls('abc/core/views', /\.js$/), GAME_FILES = ls('abc/core/games', /\.js$/);
-scripts.push('abc/core/services.js', 'abc/core/piper.js', ...VIEW_FILES, ...GAME_FILES, 'abc/core/shell.js', 'abc/core/settings.js');
+scripts.push('abc/core/services.js', 'abc/core/piper.js', 'abc/core/pron.js', ...VIEW_FILES, ...GAME_FILES, 'abc/core/shell.js', 'abc/core/settings.js');
 const files = ['abc.html', 'abc/manifest.js', ...scripts, 'manifest-abc.json', 'abc-icon-192.png', 'abc-icon-512.png',
   ...ls('fonts', /\.woff2$/), 'rocket.html', 'paint.html', 'tts.html', 'tts.js', 'manifest.json', 'manifest-paint.json',
   'icon-192.png', 'icon-512.png', 'paint-icon-192.png', 'paint-icon-512.png'].filter(exists);

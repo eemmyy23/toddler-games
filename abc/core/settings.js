@@ -1,5 +1,5 @@
 (function () {
-  const st = { view: 'home', size: null, sizeOf: null, busy: null, got: 0, err: null, ctl: null, ask: false };
+  const st = { view: 'home', size: null, sizeOf: null, busy: null, got: 0, err: null, ctl: null, ask: false, q: '', all: false, word: null, open: -1 };
   const S = () => APP.ui().settings, key = () => `voice.${APP.L().code}`, mb = n => Math.round(n / 1e6);
   const voices = () => {
     const base = APP.L().bcp47.toLowerCase().split('-')[0];
@@ -43,18 +43,75 @@
     return `${langs()}<div class="label caps">${esc(U.phone)}</div><p class="label sethint">${esc(U.phoneHint)}</p>${how}${phone}
       ${piper ? `<div class="label caps">${esc(U.more)}</div>${piper}` : ''}`;
   }
-  function pron() {
-    return `<iframe class="settest" title="${esc(S().pron)}" src="${esc(CFG.testPage)}?embed=1&amp;lang=${encodeURIComponent(APP.L().code)}"></iframe>`;
+  const code = () => APP.L().code;
+  const fold = t => t.toLocaleLowerCase(APP.L().bcp47).normalize('NFD').replace(/\p{M}/gu, '');
+  const fixes = () => PRON.fixes(code(), SPEECH.voice);
+  const low = t => t.toLocaleLowerCase(APP.L().bcp47);
+  const ipaOk = () => !!SPEECH.engine || !!(APP.L().ssml && SPEECH.voice && APP.L().ssml.test(SPEECH.voice.voiceURI));
+  const entry = k => PRON.entries(code()).find(e => e.key === k);
+  const formsOf = e => PRON.rowsOf(e, code());
+  const nFixed = e => { const f = fixes(); return formsOf(e).filter(r => f[low(r.form)]).length; };
+  function opts(r) {
+    const U = S(), out = [{ k: 'now', label: U.asNow }];
+    PRON.KINDS.forEach(k => { if (r[k] && (k !== 'ipa' || ipaOk())) out.push({ k, label: APP.t(U.version, { n: out.length + 1 }), text: k === 'ipa' ? r.ph : r[k] }); });
+    return out;
   }
+  async function raw(text, ph) {
+    hush();
+    if (SPEECH.engine) {
+      const id = APP.L().piper; await PIPER.load(id);
+      const { data, rate } = ph ? { data: await PIPER.pcm(await PIPER.ipaIds(ph)), rate: (await PIPER.ready).cfg.audio.sample_rate } : await PIPER.render(text, null);
+      return PIPER.play(data, rate);
+    }
+    if (!SPEECH.voice || !('speechSynthesis' in window)) return;
+    const u = new SpeechSynthesisUtterance(ph ? PRON.ssml(ph, text) : text);
+    u.voice = SPEECH.voice; u.lang = SPEECH.voice.lang; u.rate = SPEECH.rate; u.pitch = SPEECH.pitch;
+    speechSynthesis.speak(u);
+  }
+  function pron() {
+    const U = S(), q = fold(st.q.trim()), all = PRON.entries(code());
+    const hits = st.all ? all : q ? all.filter(e => formsOf(e).some(r => fold(r.form).includes(q))) : [];
+    const rows = hits.map(e => { const w = e.w.split('/').join(''), n = nFixed(e);
+      return `<div class="card setv" data-word="${esc(e.key)}" role="button" tabindex="0"><span class="setpic">${CONTENT.pic(e.id)}</span><span class="sett"><b>${esc(w)}</b></span>${n ? `<span class="chip">${esc(U.fixed)}</span>` : ''}${play(`say:${w}`)}<span class="go">${APP.icon('next')}</span></div>`; }).join('');
+    return `<input id="setq" class="card setq" type="search" placeholder="${esc(U.search)}" value="${esc(st.q)}" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      ${!q && !st.all ? `<p class="label sethint">${esc(U.searchHint)}</p><button id="setall" class="pill link">${esc(APP.t(U.showAll, { n: all.length }))}</button>`
+        : rows || `<p class="label sethint">${esc(U.noResult)}</p>`}${send()}`;
+  }
+  function word() {
+    const U = S(), e = entry(st.word), w = e.w.split('/').join(''), f = fixes();
+    const forms = formsOf(e).map((r, i) => {
+      const cur = f[low(r.form)], sel = !cur ? 'now' : cur.k === 'own' || (cur.k === 'ipa' && cur.text !== r.ph) ? 'own' : cur.k;
+      const head = `<div class="card setv"><span class="sett"><b>${esc(r.form)}</b></span>${cur ? `<span class="chip">${esc(U.fixed)}</span>` : ''}${play(`say:${r.form}`)}<button class="pill small" data-fix="${i}">${esc(U.fix)}</button></div>`;
+      if (st.open !== i) return head;
+      return `${head}<div class="setopts"><div class="label">${esc(U.which)}</div>
+        ${opts(r).map(o => `<div class="card setv${sel === o.k ? ' on' : ''}" data-opt="${i}:${o.k}" role="button" tabindex="0"><span class="sett"><b>${esc(o.label)}</b></span>${sel === o.k ? `<span class="chip">${esc(U.inUse)}</span>` : ''}${play(`opt:${i}:${o.k}`)}</div>`).join('')}
+        <div class="card setv setown${sel === 'own' ? ' on' : ''}"><span class="sett"><b>${esc(U.noneRight)}</b><input id="setown" class="setq" placeholder="${esc(U.write)}" value="${esc(sel === 'own' ? cur.text : '')}" autocomplete="off" spellcheck="false"></span>
+          ${play(`own:${i}`)}<button class="pill small primary" data-use="${i}">${esc(U.use)}</button></div>
+        <button class="pill link" data-restore="${i}">${esc(U.restore)}</button>
+        <details class="sethow"><summary>${esc(U.advanced)}</summary>${opts(r).filter(o => o.text).map(o => `<p><b>${esc(o.label)}:</b> ${esc(o.k === 'ipa' ? `/${o.text}/` : o.text)}</p>`).join('')}</details></div>`;
+    }).join('');
+    return `<div class="card setv setword"><span class="setpic">${CONTENT.pic(e.id)}</span><span class="sett"><b>${esc(w)}</b></span>${play(`say:${w}`)}</div>
+      <div class="label caps">${esc(U.forms)}</div>${forms}${send()}`;
+  }
+  const mine = () => Object.entries(fixes());
+  const send = () => { const n = mine().length; return n ? `<button id="setsend" class="pill primary setsend">${esc(APP.t(S().send, { n }))}</button>` : ''; };
+  function report() {
+    const v = SPEECH.voice, L = APP.L();
+    return [`ABC 123! · ${CFG.version} · ${self.MANIFEST.version}`, `${L.name} (${L.bcp47}) · ${v ? `${v.name} · ${v.voiceURI}` : '—'}`, navigator.userAgent, '',
+      ...mine().map(([w, x]) => `- ${w} → ${x.k === 'ipa' ? `/${x.text}/` : x.text} (${x.k})`), '', S().shareNote].join('\n');
+  }
+  function apply(form, fix) { PRON.setFix(code(), SPEECH.voice, form, fix); APP.pickVoice(); note(S().saved); draw(); }
   async function draw() {
     if ($('settings').hidden) return;
     const U = S(), v = st.view;
     $('settitle').textContent = v === 'home' ? U.title : v === 'voice' ? U.voice : U.pron;
     $('setback').hidden = v === 'home';
     $('setclose').hidden = v !== 'home';
-    $('setbody').innerHTML = v === 'home' ? await home() : v === 'voice' ? await voice() : pron();
+    const focus = document.activeElement && document.activeElement.id === 'setq';
+    $('setbody').innerHTML = v === 'home' ? await home() : v === 'voice' ? await voice() : v === 'word' ? word() : pron();
+    if (v === 'pron' && (focus || st.focus)) { const q = $('setq'); q.focus(); q.setSelectionRange(q.value.length, q.value.length); st.focus = false; }
   }
-  function go(v) { if (st.view === 'pron') APP.pickVoice(); st.view = v; st.ask = false; note(''); draw(); }
+  function go(v) { st.view = v; st.ask = false; st.open = -1; if (v === 'pron') st.focus = true; note(''); draw(); }
   async function choose(uri) {
     store.set(key(), uri);
     const id = APP.L().piper;
@@ -78,14 +135,39 @@
         x => { st.busy = null; st.err = x && x.name === 'AbortError' ? null : x && x.name === 'QuotaExceededError' ? APP.t(S().full, { mb: mb(st.size || 0) }) : S().failed; draw(); });
   }
   function open() { APP.stop(); st.view = 'home'; $('settings').hidden = false; sfx.pop(); note(''); draw(); }
-  function close() { if (st.view === 'pron') APP.pickVoice(); $('settings').hidden = true; }
+  function close() { $('settings').hidden = true; }
   onTap('setbtn', open); onTap('setclose', close);
-  onTap('setback', () => go('home'));
+  onTap('setback', () => go(st.view === 'word' ? 'pron' : 'home'));
   onTapIn('setbody', '.setl', b => { setLang(b.dataset.l); st.sizeOf = null; draw(); });
   onTapIn('setbody', '.setn', b => go(b.dataset.go));
-  onTapIn('setbody', '[data-play]', b => listen(b.dataset.play));
+  onTapIn('setbody', '[data-play]', b => {
+    const p = b.dataset.play;
+    if (p.startsWith('say:')) return speak(p.slice(4));
+    if (p.startsWith('own:')) { const t = (($('setown') || {}).value || '').trim(), r = formsOf(entry(st.word))[+p.split(':')[1]]; return t && (PRON.IPA.test(t) ? raw(r.form, PRON.bare(t)) : raw(t)); }
+    if (p.startsWith('opt:')) {
+      const [, i, k] = p.split(':'), r = formsOf(entry(st.word))[+i];
+      return k === 'now' ? speak(r.form) : k === 'ipa' ? raw(r.form, r.ph) : raw(r[k]);
+    }
+    return listen(p);
+  });
+  onTapIn('setbody', '.setv[data-word]', (b, e) => { if (!e.target.closest('button')) { st.word = b.dataset.word; st.open = -1; st.view = 'word'; note(''); draw(); } });
+  onTapIn('setbody', '[data-fix]', b => { st.open = st.open === +b.dataset.fix ? -1 : +b.dataset.fix; draw(); });
+  onTapIn('setbody', '.setv[data-opt]', (b, e) => {
+    if (e.target.closest('button')) return;
+    const [i, k] = b.dataset.opt.split(':'), r = formsOf(entry(st.word))[+i];
+    apply(r.form, k === 'now' ? null : { k, text: k === 'ipa' ? r.ph : r[k] });
+    if (k === 'now') speak(r.form); else if (k === 'ipa') raw(r.form, r.ph); else raw(r[k]);
+  });
+  onTapIn('setbody', '[data-use]', b => {
+    const t = (($('setown') || {}).value || '').trim(), r = formsOf(entry(st.word))[+b.dataset.use];
+    if (t) apply(r.form, PRON.IPA.test(t) ? { k: 'ipa', text: PRON.bare(t) } : { k: 'own', text: t });
+  });
+  onTapIn('setbody', '[data-restore]', b => { const r = formsOf(entry(st.word))[+b.dataset.restore]; apply(r.form, { k: 'orig', text: r.form }); speak(r.form); });
+  onTapIn('setbody', '#setall', () => { st.all = true; draw(); });
+  onTapIn('setbody', '#setsend', () => { const t = report(); (navigator.share ? navigator.share({ title: S().pron, text: t }) : Promise.reject()).catch(() => navigator.clipboard && navigator.clipboard.writeText(t).then(() => note(S().copied))); });
+  $('setbody').addEventListener('input', e => { if (e.target.id === 'setq') { st.q = e.target.value; st.all = false; draw(); } });
   onTapIn('setbody', '.setv[data-v]', (b, e) => { if (!e.target.closest('button')) choose(b.dataset.v); });
-  $('setbody').addEventListener('keydown', e => { const b = e.target.closest('.setv[data-v]'); if (b && e.target === b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); choose(b.dataset.v); } });
+  $('setbody').addEventListener('keydown', e => { if (e.target.matches && e.target.matches('.setv[role=button]') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.target.click(); } });
   onTapIn('setbody', '#setdl', download);
   onTapIn('setbody', '#setstop', () => { if (st.ctl) st.ctl.abort(); });
   onTapIn('setbody', '#setrm', () => { st.ask = true; draw(); });

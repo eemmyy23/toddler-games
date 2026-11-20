@@ -61,7 +61,7 @@ textarea{width:100%;min-height:220px;background:var(--card);border:1px solid var
 <script src="abc/manifest.js"></script>
 <script>
 (function () {
-  var M = self.MANIFEST, want = /^abc\/(core\/(registry|i18n|services|piper)|config|lang\/[^/]+\/(grammar|words))\.js$/;
+  var M = self.MANIFEST, want = /^abc\/(core\/(registry|i18n|services|piper|pron)|config|lang\/[^/]+\/(grammar|words))\.js$/;
   M.scripts.filter(function (s) { return want.test(s); }).concat(['tts.js']).forEach(function (src) {
     var e = document.createElement('script');
     e.src = src + '?v=' + M.version; e.async = false;
