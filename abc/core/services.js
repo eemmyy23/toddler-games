@@ -59,7 +59,7 @@ const SPEECH = {
     const all = speechSynthesis.getVoices(), base = bcp47.toLowerCase().split('-')[0];
     return all.length ? all.some(v => this.norm(v).split('-')[0] === base) : null;
   },
-  pick(bcp47, prefer, words = [], ssml = null, own = false) {
+  pick(bcp47, prefer, words = [], ssml = null, own = false, fixes = null) {
     this.bcp47 = bcp47; this.voice = null; this.noVoice = !('speechSynthesis' in window);
     const all = this.noVoice ? [] : speechSynthesis.getVoices();
     if (all.length) {
@@ -70,13 +70,16 @@ const SPEECH = {
                 || same.find(nice) || same[0] || lang[0] || null;
       this.noVoice = !this.voice;
     }
-    this.tune(words, ssml, own);
+    this.tune(words, ssml, own, fixes);
   },
   fixKey: (bcp47, v) => `ttsfix.${bcp47}.${v ? v.voiceURI : '-'}`,
-  tune(words, ssml, own) {
+  tune(words, ssml, own, fixes) {
     const edge = '[\\p{L}\\p{M}]', lit = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), low = t => t.toLocaleLowerCase(this.bcp47);
     const re = w => new RegExp(`(?<!${edge})${lit(w)}(?!${edge})`, 'giu'), base = e => e.w.split('/').join('');
-    const all = words.flatMap(e => [e, ...(e.syn || [])]), fix = own && this.voice ? store.get(this.fixKey(this.bcp47, this.voice), {}) : {};
+    const data = (fixes && this.voice && fixes[this.voice.voiceURI] || {}).words || {};
+    const fix = Object.assign(Object.fromEntries(Object.entries(data).map(([w, t]) => [low(w), /^\/.*\/$/.test(t) ? { k: 'ipa', text: t.slice(1, -1) } : { k: 'tts', text: t }])),
+      own && this.voice ? store.get(this.fixKey(this.bcp47, this.voice), {}) : {});
+    const all = words.flatMap(e => [e, ...(e.syn || [])]);
     const map = new Map(ssml && this.voice && ssml.test(this.voice.voiceURI)
       ? all.filter(e => e.pron && e.pron.ipa && !e.pron.of && !e.pron.tts).map(e => [low(base(e)), e.pron.ipa.replace(/^[/[]|[/\]]$/g, '')]) : []);
     this.respell = all.filter(e => e.pron && e.pron.tts && !fix[low(base(e))]).map(e => [re(base(e)), e.pron.tts]);

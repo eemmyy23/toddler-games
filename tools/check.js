@@ -132,6 +132,14 @@ for (const c of langs) {
     if (seenW.has(key) && !(e.homonym && e.homonym === seenW.get(key))) err(`${c}/words.js: "${w}" is used for two concepts (${seenW.get(key)}, ${e.id}) — add a note or pick another word`);
     seenW.set(key, e.id);
   }
+  const forms = new Set(L.words.flatMap(e => [e, ...(e.syn || [])]).flatMap(e => [e.w.split('/').join(''), e.def, e.pl, e.plDef]).filter(Boolean).map(t => t.toLocaleLowerCase(L.bcp47)));
+  for (const [uri, v] of Object.entries(L.fixes || {})) {
+    if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d$/.test(v.tested || '')) err(`${c}/grammar.js fixes["${uri}"]: needs tested (the tts.html export time)`);
+    for (const [w, t] of Object.entries(v.words || {})) {
+      if (!forms.has(w.toLocaleLowerCase(L.bcp47))) err(`${c}/grammar.js fixes["${uri}"].${w}: not a form of any word`);
+      if (typeof t !== 'string' || !t.trim()) err(`${c}/grammar.js fixes["${uri}"].${w}: needs a respelling or /ipa/`);
+    }
+  }
   for (const u of L.letters.split(' ')) {
     const n = (L.names || {})[u];
     if (!n || !SRC.test(n.src || '') || !(n.say || n.name || n.ipa)) err(`${c}/grammar.js names.${u}: needs say, name or ipa and a source URL`);

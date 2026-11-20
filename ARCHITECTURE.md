@@ -96,7 +96,7 @@ tools/smoke.js              browser test: every language, every game, choice rul
 **LANG** (`grammar.js`) — required: `name, flag, bcp47, letters` (space-separated units, multi-character allowed),
 `forms(entry, word) → { sg: [a, the] | null, pl: [two, the] | null } | null` (a language without `forms` gets no flag).
 Optional: `dir` (`<html dir>`, swipe direction), `keepCase` (example words keep their case), `names` (the letter names, see **Letter names**), `fold(text)` (search),
-`voices` (RegExp of preferred voice names), `ssml` (RegExp of `voiceURI`s measured on tts.html to honour SSML `<phoneme>`; RO: `moz-tts:android:ro_RO`, Firefox Android, 2026-11-19: hipopotam and meduză wrong as text, right with IPA), `checkForms(entry)` / `checkWord(entry)` → message.
+`voices` (RegExp of preferred voice names), `fixes` (`{ <voiceURI>: { tested, words: { <form>: 'respelling' | '/ipa/' } } }`: the ✓ of a tts.html export for that voice, `tested` = its export time; every form is checked to be a form of a word; a device's own ticks override it), `ssml` (RegExp of `voiceURI`s measured on tts.html to honour SSML `<phoneme>`; RO: `moz-tts:android:ro_RO`, Firefox Android, 2026-11-19: hipopotam and meduză wrong as text, right with IPA), `checkForms(entry)` / `checkWord(entry)` → message.
 Module data, only when a module lists it in `needs`: `numbers` (1–10), `teens` (11–20), `tens` (10, 20 … 100) — 10 words each, `sayLetter(name, word, inside)`.
 Optional data the letters module uses when present: `groups` (letter groups, e.g. `'ch sch'`), `sayGroup(group, word)`, `alike` (letters that sound the same, e.g. `'â=î'`; never offered together in a game).
 

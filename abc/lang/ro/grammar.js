@@ -2,6 +2,13 @@ LANG('ro', {
   name: 'Română', flag: '🇷🇴', bcp47: 'ro-RO', dir: 'ltr',
   voices: /ioana|female/i,
   ssml: /^moz-tts:android:ro_RO$/,
+  fixes: {
+    'moz-tts:android:ro_RO': { tested: '2026-11-20T04:46:36+02:00', words: {
+      hipopotam: '/hi.po.poˈtam/', hipopotamul: '/hi.po.poˈtamul/', hipopotami: 'hipopo tami', hipopotamii: 'hipopo tamii',
+      meduză: '/meˈdu.zə/', ananasul: '/a.naˈnasul/', ananași: '/a.naˈnaʃʲ/', ananașii: 'ana nașii',
+      ancoră: 'an-coră', ancorele: '/ˈan.ko.rele/'
+    } }
+  },
   checkWord: e => Object.values(e).some(v => typeof v === 'string' && /[şţŞŢ]/.test(v)) ? 'ş/ţ cu sedilă — folosește ș/ț cu virgulă' : null,
   letters: 'A Ă Â B C D E F G H I Î J K L M N O P Q R S Ș T Ț U V W X Y Z',
   groups: 'ce ci che chi ge gi ghe ghi',
