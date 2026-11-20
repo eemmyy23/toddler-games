@@ -5,7 +5,7 @@ let fails = 0;
 const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); if (!cond) fails++; };
 
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {});
   const errs = [];
   const p = await b.newPage({ viewport: { width: VW, height: VH } });
   p.on('pageerror', e => errs.push(e.message));
