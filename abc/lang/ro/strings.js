@@ -6,7 +6,7 @@ STRINGS('ro', {
   cheers: ['Bravo!', 'Super!', 'Foarte bine!', 'Ura!', 'Ai reușit!'],
   wow: { one: 'Bravo! Ai o steluță!', few: 'Bravo! Ai {n} steluțe!', other: 'Bravo! Ai {n} de steluțe!' },
   also: 'Se mai spune:',
-  version: 'v{version} · {build}',
+  version: 'v{version} · {build} · {date}',
   exclaim: '{name}!', listing: '{name}: {list}!', then: '{a}. {b}', cheer: '{cheer} {name}!', wrong: '{thats} {ask}', range: '{a}–{b}', headCount: '{name} · {n}', noneLine: '— {none}',
   install: 'Instalează {app} pe dispozitiv',
   index: { az: 'A–Z', other: 'Altele', grp: 'Grupe' },
