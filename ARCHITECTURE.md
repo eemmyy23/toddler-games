@@ -31,9 +31,11 @@ abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no p
 abc/core/piper.js           PIPER: optional Piper neural voice — downloads `config.piper` runtime (onnxruntime-web, piper_phonemize) + the language's `LANG.piper` model
                             into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
                             PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
-abc/core/settings.js        Settings sheet (⚙ on the hubs) → Voice: the phone's voices of the current language (where to change them: phone settings), Piper with its size,
-                            download progress, use and delete, and the pronunciation test: `config.testPage` embedded (`?embed=1&lang=<code>`, same origin, so its ticks apply
-                            at once; leaving it re-picks the voice); the choice is stored per language (`voice.<code>`)
+abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation, sub-screens with ‹ back.
+                            Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
+                            "additional voices": Piper as the same card, greyed with "Download · N MB" until downloaded → progress with Cancel, failed/offline/storage
+                            messages → selectable, 🗑 with confirm (falls back to the phone voice); the choice is stored per language (`voice.<code>`).
+                            Pronunciation: `config.testPage` embedded (`?embed=1&lang=<code>`); leaving it re-picks the voice so new ticks apply
 abc/core/views/*.js         VIEW(): card, read, count, play, dial (a view's id is its file name)
 abc/core/games/*.js         GAME(): find, howmany, sort
 abc/core/shell.js           hubs, tabs, flags, profiles, navigation, ‹ › ▶ controls, language switch, index, search, info cards, input,
@@ -110,7 +112,7 @@ Optional data the letters module uses when present: `groups` (letter groups, e.g
 
 **STRINGS** — the engine reads `sections`, `find`, `info`, `noVoice`, `sgpl`, `none`, `noneLine`, `thats`, `cheers`, `cheer`, `wow`, `wrong`, `index { az, grp, other }`,
 `search { placeholder, hint, none, results }`, `words`, `headCount`, `version`, `exclaim`, `listing`, `then`, `range`, `install`, `installBtn`, `profile { <id>, ages }`,
-`also`, `settings { title, voice, phone, phoneHint, piper, piperName, piperHint, download, downloading, failed, remove, test, sample }`, `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
+`also`, `settings { … }` (every label of the settings sheet), `aria { … }` (every `data-aria` key of abc.html, plus `leftHand`, `rightHand`). `APP.ui()` is the merged table, cached per language. Templates use `{name}`-style slots; an object template is chosen by `g`, then by plural category.
 
 **WORDS** — `const w = WORDS(code); w(id, { w: 'va/că', … })`; `/` and spaces mark syllables; `homonym: 'orange'` allows the same spelling as that concept
 (orange the colour / the fruit); `syn: [{ w: 'ghea/tă', def: 'gheata', pl: 'ghete', g: 'f', plDef: 'ghetele' }, …]` lists synonyms as full words (own syllables and forms, checked like any word): each is its own dictionary item (`<concept>~<n>`, same picture and concept), every name shows the others under "also called" (tap to hear, 🔗 to its Read page), the "What is it?" card lists all names, and search finds any name or form.

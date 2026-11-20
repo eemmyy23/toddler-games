@@ -15,9 +15,13 @@ STRINGS('en', {
   install: 'Install {app} on your device',
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
-  settings: { title: 'Settings', voice: 'Voice', phone: 'Voices on this phone', phoneHint: 'These voices come from the phone. To add or change them: phone Settings → Accessibility → Text-to-speech.',
-    piper: 'Piper voice (AI, the same on every phone)', piperName: 'Piper · {id}', piperHint: 'Downloads about {mb} MB once, then works without internet.',
-    download: 'Download', downloading: 'Downloading… {p}%', failed: 'Download failed — try again', remove: 'Delete Piper', test: 'Pronunciation test', sample: 'Hello! This is how I sound.' },
+  settings: { title: 'Settings', voice: 'Voice', pron: 'Pronunciation', pronSub: 'Find and fix a word',
+    phone: 'Voices on this phone', phoneHint: 'These voices come from your phone and sound different on each device.', how: 'How do I add voices?',
+    howAndroid: 'Settings → Accessibility → Text-to-speech', howIos: 'Settings → Accessibility → Spoken Content → Voices', phoneTag: 'phone',
+    inUse: 'In use', listen: 'Listen', none: 'No voice', noPhone: 'Your phone has no {lang} voice.', more: 'Additional voices',
+    piper: 'Piper', piperTag: 'Works offline · same on every phone', download: 'Download · {mb} MB', progress: '{p}% · {got} of {total} MB',
+    downloading: 'Downloading… {p}%', cancel: 'Cancel', retry: 'Try again', failed: 'No internet. Download stopped.', full: 'Not enough storage ({mb} MB needed).',
+    offline: 'Connect to the internet to download.', del: 'Delete', delAsk: 'Delete voice? Frees 63 MB.', switched: 'Switched to the phone voice.', sample: "Hi! I'm your voice." },
   aria: { settings: 'Settings', search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
     objects: 'Objects', fingers: 'Fingers', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now', ages: 'Age' }
 });
