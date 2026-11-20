@@ -25,6 +25,10 @@ select{max-width:100%;min-width:0}
 .opt .play{flex:1;text-align:left}
 .opt [data-own]{flex:none}
 .mark{min-width:48px;font-size:18px}
+.opt .own{flex:none}
+.opt input{flex:1;min-width:0;min-height:40px;background:var(--card);color:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit}
+.none{justify-self:start}
+.none[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--bg)}
 .opt input{flex:1;min-width:0;min-height:40px;background:var(--card);color:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit}
 .mark.pass[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--bg)}
 .mark.fail[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--bg)}

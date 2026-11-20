@@ -36,8 +36,9 @@ sw.js                       precaches MANIFEST.files under cache 'toddler-<versi
                             version are cache-first, the rest network-first (cache after 3 s or offline); an open app checks for an update on
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
 tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
-                            words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (base only, SSML `<phoneme>` with `pron.ipa`) and the respellings
-                            built from `stress` (below), each with one ✓ (only ✓ counts; no tick says nothing), kept per language + voice in `store`; the first ticked variant
+                            words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (SSML `<phoneme>`: `pron.ipa`, for other forms derived from it by swapping the differing ending through a
+                            RO letter→IPA table) and the respellings, plus the tester's own text
+                            built from `stress` (below), each with ✓ / ✗ and a row-level "✗ toate greșite" (only ✓ is applied; ✗ and none are reported), kept per language + voice in `store`; the first ticked variant
                             of each word is also stored as `ttsfix.<bcp47>.<voiceURI>`, which the app applies on that device at once; exports JSON or MD with app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
 tools/check.js              content, config, markup, CSS-token, engine-literal, PWA-scope and no-comment checks; manifest generator (CI)
