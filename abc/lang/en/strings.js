@@ -15,6 +15,9 @@ STRINGS('en', {
   install: 'Install {app} on your device',
   profile: { curious: 'Curious', explorer: 'Explorer', scientist: 'Scientist', ages: '{name}, ages {a} to {b}' },
   installBtn: 'Install',
-  aria: { search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
+  settings: { title: 'Settings', voice: 'Voice', phone: 'Voices on this phone', phoneHint: 'These voices come from the phone. To add or change them: phone Settings → Accessibility → Text-to-speech.',
+    piper: 'Piper voice (AI, the same on every phone)', piperName: 'Piper · {id}', piperHint: 'Downloads about {mb} MB once, then works without internet.',
+    download: 'Download', downloading: 'Downloading… {p}%', failed: 'Download failed — try again', remove: 'Delete Piper', test: 'Pronunciation test', sample: 'Hello! This is how I sound.' },
+  aria: { settings: 'Settings', search: 'Search', back: 'Back', index: 'All items', prev: 'Previous', next: 'Next', play: 'Play', close: 'Close', clear: 'Clear',
     objects: 'Objects', fingers: 'Fingers', leftHand: 'left hand', rightHand: 'right hand', dismiss: 'Not now', ages: 'Age' }
 });

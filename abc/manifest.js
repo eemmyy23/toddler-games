@@ -1,5 +1,5 @@
 self.MANIFEST = {
-  "version": "6353b9bd21",
+  "version": "fe4e6c0747",
   "scripts": [
     "abc/core/registry.js",
     "abc/core/i18n.js",
@@ -81,6 +81,7 @@ self.MANIFEST = {
     "abc/modules/elements/lang/ro.js",
     "abc/modules/elements/lang/de.js",
     "abc/core/services.js",
+    "abc/core/piper.js",
     "abc/core/views/card.js",
     "abc/core/views/count.js",
     "abc/core/views/dial.js",
@@ -89,7 +90,8 @@ self.MANIFEST = {
     "abc/core/games/find.js",
     "abc/core/games/howmany.js",
     "abc/core/games/sort.js",
-    "abc/core/shell.js"
+    "abc/core/shell.js",
+    "abc/core/settings.js"
   ],
   "files": [
     "abc.html",
@@ -174,6 +176,7 @@ self.MANIFEST = {
     "abc/modules/elements/lang/ro.js",
     "abc/modules/elements/lang/de.js",
     "abc/core/services.js",
+    "abc/core/piper.js",
     "abc/core/views/card.js",
     "abc/core/views/count.js",
     "abc/core/views/dial.js",
@@ -183,6 +186,7 @@ self.MANIFEST = {
     "abc/core/games/howmany.js",
     "abc/core/games/sort.js",
     "abc/core/shell.js",
+    "abc/core/settings.js",
     "manifest-abc.json",
     "abc-icon-192.png",
     "abc-icon-512.png",

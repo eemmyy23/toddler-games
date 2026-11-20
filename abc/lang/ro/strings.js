@@ -15,6 +15,9 @@ STRINGS('ro', {
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },
   profile: { curious: 'Curios', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
   installBtn: 'Instalează',
-  aria: { ages: 'Vârsta', search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
+  settings: { title: 'Setări', voice: 'Voce', phone: 'Voci din telefon', phoneHint: 'Vocile vin din telefon. Le adaugi sau le schimbi din Setări telefon → Accesibilitate → Text-to-speech.',
+    piper: 'Vocea Piper (AI, aceeași pe orice telefon)', piperName: 'Piper · {id}', piperHint: 'Se descarcă o singură dată, cam {mb} MB, apoi merge fără internet.',
+    download: 'Descarcă', downloading: 'Se descarcă… {p}%', failed: 'Descărcarea a eșuat — încearcă din nou', remove: 'Șterge Piper', test: 'Test pronunție', sample: 'Bună! Așa sună vocea mea.' },
+  aria: { settings: 'Setări', ages: 'Vârsta', search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
     objects: 'Obiecte', fingers: 'Degete', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
 });
