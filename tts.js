@@ -3,6 +3,9 @@
   const OPTS = [['orig', 'original'], ['ipa', 'IPA'], ['dash', 'cratimă'], ['gap', 'spațiu'], ['dbl', 'consoană dublă'], ['own', 'textul tău']];
   const G2P = { ro: [[/j/g, 'ʒ'], [/ce/g, 'ʧe'], [/ci$/g, 'ʧʲ'], [/ci/g, 'ʧi'], [/ge/g, 'ʤe'], [/gi$/g, 'ʤʲ'], [/gi/g, 'ʤi'], [/ch/g, 'k'], [/gh/g, 'g'], [/ii$/g, 'ij'],
     [/([^aăâeiîou])i$/g, '$1ʲ'], [/ă/g, 'ə'], [/[âî]/g, 'ɨ'], [/c/g, 'k'], [/ș/g, 'ʃ'], [/ț/g, 'ʦ'], [/g/g, 'ɡ']] };
+  const IPA = /^[/[].*[/\]]$|[ˈˌəɨʃʒʧʤʦɡʲːθðŋɲ]/;
+  const bare = t => t.replace(/^[/[]|[/\]]$/g, '');
+  const ssml = (ph, form) => `<speak><phoneme alphabet="ipa" ph="${esc(bare(ph))}">${esc(form)}</phoneme></speak>`;
   const g2p = (t, lang) => G2P[lang] ? G2P[lang].reduce((x, [re, to]) => x.replace(re, to), t) : null;
   const formIpa = (ph0, base, form, lang) => {
     const ph = ph0.replace(/t͡ʃ/g, 'ʧ').replace(/d͡ʒ/g, 'ʤ').replace(/t͡s/g, 'ʦ');
@@ -74,7 +77,11 @@
   function save() {
     store.set(saveKey(), picks);
     const L = ABC.langs[code], fix = {};
-    rows.forEach(r => { const k = ok(r)[0]; if (k) fix[r.form.toLocaleLowerCase(L.bcp47)] = { k, text: k === 'ipa' ? r.ph : text(r, k) }; });
+    rows.forEach(r => {
+      const k = ok(r)[0]; if (!k) return;
+      const t = k === 'ipa' ? r.ph : text(r, k), ipa = k === 'own' && IPA.test(t);
+      fix[r.form.toLocaleLowerCase(L.bcp47)] = ipa ? { k: 'ipa', text: bare(t) } : { k, text: t };
+    });
     store.set(SPEECH.fixKey(L.bcp47, SPEECH.voice), fix);
   }
   function render() {
@@ -84,7 +91,7 @@
     $('list').innerHTML = rows.map((r, i) => `<div class="row${done(r) ? ' done' : ''}" id="r${i}">
       <div class="w">${r.bold}${r.form !== r.of ? ` <small>· ${esc(r.of)}</small>` : ''}</div>
       ${opts(r).map(([k, t]) => k === 'own'
-        ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t}" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${marks(r, i, k, t)}</div>`
+        ? `<div class="opt"><button class="play own" data-own="${i}" aria-label="▶ ${t}">▶</button><input data-i="${i}" placeholder="${t} sau IPA" value="${esc(text(r, k))}" autocapitalize="off" autocomplete="off" spellcheck="false">${marks(r, i, k, t)}</div>`
         : `<div class="opt"><button class="play" data-i="${i}" data-say="${esc(text(r, k))}">▶ ${label(r, k, t)}</button>${marks(r, i, k, t)}</div>`).join('')}
       <button class="none" data-none="${i}" aria-pressed="${!!P(r).none}">✗ toate greșite</button>
       <div class="meta">${esc(r.e.key)}${r.e.pron ? ` · silaba ${r.e.pron.stress + 1} · ${esc(r.e.pron.src)}` : ''}</div></div>`).join('');
@@ -99,7 +106,7 @@
     document.querySelectorAll('.row.cur').forEach(el => el.classList.remove('cur'));
     cur = i; const el = $('r' + i), r = rows[i];
     el.classList.add('cur'); el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    for (const [k] of opts(r)) { if (!text(r, k)) continue; await speak(text(r, k)); if (cur !== i) return; await wait(PAUSE.beat); }
+    for (const [k] of opts(r)) { const t = text(r, k); if (!t) continue; await speak(k === 'own' && IPA.test(t) ? ssml(t, r.form) : t); if (cur !== i) return; await wait(PAUSE.beat); }
   }
   function report() {
     const v = SPEECH.voice, ticked = rows.filter(done), count = { marked: ticked.length, none: ticked.filter(r => P(r).none).length };
@@ -135,7 +142,7 @@
   $('lang').onchange = () => setLang($('lang').value);
   $('list').addEventListener('click', e => {
     const say = e.target.closest('[data-say]'); if (say) return speak(say.dataset.say);
-    const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && speak(t); }
+    const own = e.target.closest('[data-own]'); if (own) { const t = own.parentNode.querySelector('input').value.trim(); return t && speak(IPA.test(t) ? ssml(t, rows[+own.dataset.own].form) : t); }
     const none = e.target.closest('[data-none]');
     if (none) { const r = rows[+none.dataset.none]; edit(r, p => { if (p.none) delete p.none; else p.none = true; }); none.setAttribute('aria-pressed', !!P(r).none); none.closest('.row').classList.toggle('done', done(r)); save(); return info(); }
     const b = e.target.closest('.mark'); if (!b) return;

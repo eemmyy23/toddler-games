@@ -37,7 +37,7 @@ sw.js                       precaches MANIFEST.files under cache 'toddler-<versi
                             every return to the foreground and reloads the next time it goes to the background once a new version took over
 tts.html + tts.js           pronunciation test page (not linked from the app; precached and in the version hash like every root .html/.js — checked): loads registry, i18n, services, config and every language's grammar +
                             words from the manifest and speaks through the app's own `speak`/`SPEECH` (same voice pick, rate, pitch); for every form the app speaks (base, `def`, `pl`, `plDef`) ▶ original, ▶ IPA (SSML `<phoneme>`: `pron.ipa`, for other forms derived from it by swapping the differing ending through a
-                            RO letter→IPA table) and the respellings, plus the tester's own text
+                            RO letter→IPA table) and the respellings, plus the tester's own text (text with IPA marks such as ˈ ə ʃ, or in /…/, is sent as `<phoneme>` and stored as `ipa`)
                             built from `stress` (below), each with ✓ / ✗ and a row-level "✗ toate greșite" (only ✓ is applied; ✗ and none are reported), kept per language + voice in `store`; the first ticked variant
                             of each word is also stored as `ttsfix.<bcp47>.<voiceURI>`, which the app applies on that device at once; exports JSON or MD with app version, build hash,
                             deploy time (Last-Modified of abc/manifest.js), test time with UTC offset, voice, rate, pitch, user agent
