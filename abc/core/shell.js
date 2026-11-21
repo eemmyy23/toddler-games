@@ -131,10 +131,16 @@ const APP = {
     const k = Math.min(1, (lim1 - lim0) / (bot - top)), r = el.getBoundingClientRect();
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
-  countable() { const xs = CONTENT.countable(lang); return xs[Math.random() * xs.length | 0]; },
+  countable(key) {
+    const xs = CONTENT.countable(lang), k = key && `${lang}:${key}`, kept = k && countPick[k] && xs.find(x => x.concept === countPick[k]);
+    if (kept) return kept;
+    const x = xs[Math.random() * xs.length | 0];
+    if (k) countPick[k] = x.concept;
+    return x;
+  },
   tallyOf(it) {
     if (!it.tally) return { pics: it.pics || [], line: null };
-    const x = APP.countable(), n = it.tally, L = APP.L(), f = x.forms;
+    const x = APP.countable(`${tileId}:${it.id}`), n = it.tally, L = APP.L(), f = x.forms;
     const what = n === 1 ? f.sg[0] : n === 2 ? f.pl[0] : L.numbers ? `${L.numbers[n - 1]} ${x.entry.pl}` : null;
     return { pics: Array(n).fill(x.pic), words: what, line: what && APP.exclaim(I18N.capFirst(what, L.bcp47)) };
   },
@@ -145,7 +151,7 @@ const APP = {
   },
   addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.innerHTML = APP.icon('star') + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
-const tileOf = () => TILE[tileId];
+const tileOf = () => TILE[tileId], countPick = {};
 const itemsOf = t => Tiles.items(t, lang);
 const gameItemsOf = t => Tiles.gameItems(t, lang);
 const learnOk = t => Tiles.learnOk(t, lang);

@@ -67,6 +67,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const card = KARAOKE.find(ABC.views.card.line()); openTile('letters', false, true); KARAOKE.prime(null, APP.item().say);
     const cap = !$('sub').hidden && $('sub').textContent === APP.item().say && KARAOKE.marks.filter(Boolean).length >= 2; KARAOKE.stop(); KARAOKE.hide();
     return [tab && tab.classList.contains('tl'), card && card.id, cap]; });
+  const again = await ev(() => { openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const w0 = $('word').textContent; __said.length = 0;
+    $('glyph').click(); $('word').click(); const w1 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, $('word').textContent]; });
+  await spoken();
+  ok(again[0] === again[1] && again[1] === again[2], `tapping the card says it again and keeps it; back shows the same "${again.join(' / ')}"`);
   ok(kar[0] === true && kar[1] === 'word' && kar[2] === true, `on-screen text lights up; a line not on screen shows as a caption that also lights the letter and the word (${kar})`);
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
@@ -198,9 +202,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     return { bad, seen: Object.keys(seen).length }; });
   ok(!named.bad.length && named.seen >= 8, `every picture/colour bubble is named unless the question shows the word or the name is the answer (${named.seen} games named; ${named.bad.slice(0, 4).join(' ') || 'no misses'})`);
   const tallies = await ev(() => { openTile('count', false, true); const rows = [...document.querySelectorAll('.crow')].map(r => [+r.dataset.n, r.querySelectorAll('.objs > span').length, r.querySelector('.objs > span').innerHTML]);
-    openTile('digits', false, true); const pics = new Set(); for (let k = 0; k < 12; k++) { APP.idx = 2; view().show(false); pics.add($('pics').firstElementChild.innerHTML); }
+    openTile('digits', false, true); const pics = new Set(); for (let k = 0; k < 10; k++) { APP.idx = k; view().show(false); pics.add($('pics').firstElementChild.innerHTML); }
     return { right: rows.every(([n, c]) => n === c), kinds: new Set(rows.map(r => r[2])).size, cardKinds: pics.size }; });
-  ok(tallies.right && tallies.kinds >= 4 && tallies.cardKinds >= 4, `numbers draw n things of varying kinds in Count and on the cards (${JSON.stringify(tallies)})`);
+  ok(tallies.right && tallies.kinds >= 4 && tallies.cardKinds >= 4, `numbers draw n things of varying kinds in Count and across the cards (${JSON.stringify(tallies)})`);
   await ev(() => openTile('colors', true, true));
   const tapRes = await ev(async () => { const { target } = ABC.views.play.state(), s0 = APP.stars, b = document.querySelector(`.bub[data-id="${CSS.escape(target.id)}"]`);
     b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); const s1 = APP.stars; b.click(); return [s0, s1, APP.stars]; });

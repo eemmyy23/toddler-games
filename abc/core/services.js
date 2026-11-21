@@ -135,6 +135,7 @@ const KARAOKE = {
     this.stop(); this.id++;
     if (el) this.hide(); else if (this.norm(text)) el = this.caption(text);
     const words = el && el.isConnected ? this.wrap(el) : [];
+    if (el) el.dataset.said = text;
     this.marks = el && el.id === 'sub' ? words.map(k => { const t = this.find(k.textContent); return t ? t.closest('button') || t : null; }) : [];
     if (!words.length) return;
     const cut = ws => { const lens = ws.map(w => I18N.graphemes(w, SPEECH.bcp47).length), tot = lens.reduce((a, b) => a + b, 0); let c = 0; return lens.map(l => (c += l) / tot); };
@@ -205,6 +206,10 @@ function speak(text, delay = 0, el = KARAOKE.find(text), how = {}) {
       : speechSynthesis.speak(makeUtt(text, done, how)), delay);
   });
 }
+document.addEventListener('click', e => {
+  const k = e.target.closest && e.target.closest('[data-said]');
+  if (k && !e.target.closest('button, a, input, [role=button], [role=link]')) speak(k.dataset.said, 0, k);
+});
 const hush = () => { KARAOKE.stop(); KARAOKE.hide(); clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
 
 const fx = $('fx'), fctx = fx.getContext('2d');
