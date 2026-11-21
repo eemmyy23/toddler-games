@@ -58,22 +58,15 @@ const APP = {
   screen: () => atHub ? 'hub' : mode === 'play' ? GAME_VIEW : tileOf().view,
   indexOf: id => APP.items().findIndex(it => it.id === id),
   step(d) {
-    const n = APP.items().length, to = trail.at + d;
-    if (to >= 0 && to < trail.list.length) { trail.at = to; trail.how = 'hist'; const e = trail.list[to]; APP.idx = e.idx; if (e.pick) countPick[pickKey(e.idx)] = e.pick; return APP.item(); }
-    APP.idx = (APP.idx + d + n) % n; trail.how = d < 0 ? 'back' : 'fwd'; if (d > 0) APP.fresh();
+    const n = APP.items().length, h = tallySeen[pickKey(APP.idx)];
+    if (h && h.at + d >= 0 && h.at + d < h.list.length && APP.item().tally) { h.at += d; return APP.item(); }
+    APP.idx = (APP.idx + d + n) % n;
     return APP.items()[APP.idx];
   },
-  fresh() { const k = pickKey(APP.idx); if (countPick[k]) countPick['was:' + k] = countPick[k]; delete countPick[k]; trail.how = 'fwd'; },
+  fresh() { const h = tallySeen[pickKey(APP.idx)]; if (h) h.next = true; },
   neighbors() {
-    const L = APP.items(), n = L.length, at = (k, d) => (k >= 0 && k < trail.list.length && L[trail.list[k].idx]) || L[(APP.idx + d + n) % n];
-    return [at(trail.at - 1, -1), at(trail.at + 1, 1)];
-  },
-  visit() {
-    const e = { idx: APP.idx, pick: countPick[pickKey(APP.idx)] }, cur = trail.list[trail.at];
-    if (trail.how === 'hist' || (cur && cur.idx === e.idx && cur.pick === e.pick)) { trail.how = null; return; }
-    if (trail.how === 'back') { trail.list.splice(trail.at, 0, e); trail.list.splice(0, trail.at); trail.at = 0; }
-    else { trail.list.splice(trail.at + 1); trail.list.push(e); trail.at = trail.list.length - 1; }
-    trail.how = null;
+    const L = APP.items(), n = L.length, h = APP.item() && APP.item().tally && tallySeen[pickKey(APP.idx)];
+    return [h && h.at > 0 ? APP.item() : L[(APP.idx - 1 + n) % n], h && h.at < h.list.length - 1 ? APP.item() : L[(APP.idx + 1) % n]];
   },
   saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
@@ -107,7 +100,6 @@ const APP = {
   },
   shown() {
     APP.saveIdx(); const v = view(); $('act').hidden = !canPlay(v); if (!v || !v.arrows) return;
-    APP.visit();
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
     $('prev').innerHTML = APP.icon('prev') + face(pv); $('next').innerHTML = face(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
   },
@@ -153,11 +145,11 @@ const APP = {
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
   countable(key) {
-    const xs = CONTENT.countable(lang), k = key && `${lang}:${key}`, kept = k && countPick[k] && xs.find(x => x.concept === countPick[k]);
-    if (kept) return kept;
-    const ys = k ? xs.filter(x => x.concept !== countPick['was:' + k]) : xs, x = ys[Math.random() * ys.length | 0];
-    if (k) countPick[k] = x.concept;
-    return x;
+    const xs = CONTENT.countable(lang), k = key && `${lang}:${key}`, h = k && (tallySeen[k] = tallySeen[k] || { list: [], at: -1, next: true });
+    if (h && !h.next && xs[h.list[h.at]]) return xs[h.list[h.at]];
+    const cur = h ? h.list[h.at] : -1, pick = (() => { let i; do i = Math.random() * xs.length | 0; while (xs.length > 1 && i === cur); return i; })();
+    if (h) { h.list.splice(h.at + 1); h.list.push(pick); h.at = h.list.length - 1; h.next = false; }
+    return xs[pick];
   },
   tallyOf(it) {
     if (!it.tally) return { pics: it.pics || [], line: null };
@@ -172,7 +164,7 @@ const APP = {
   },
   addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.innerHTML = APP.icon('star') + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
-const tileOf = () => TILE[tileId], countPick = {}, trail = { list: [], at: -1, how: null }, pickKey = i => `${lang}:${tileId}:${(APP.items()[i] || {}).id}`;
+const tileOf = () => TILE[tileId], tallySeen = {}, pickKey = i => `${lang}:${tileId}:${(APP.items()[i] || {}).id}`;
 const itemsOf = t => Tiles.items(t, lang);
 const gameItemsOf = t => Tiles.gameItems(t, lang);
 const learnOk = t => Tiles.learnOk(t, lang);
@@ -209,7 +201,7 @@ function renderHub() {
 function openTile(id, play, quiet, itemId) {
   const t = TILE[id]; if (!usable(t, play)) return false;
   leaveView();
-  if (id !== tileId || (play ? 'play' : 'view') !== mode) { Object.values(ABC.views).forEach(v => v.reset && v.reset()); Object.keys(countPick).forEach(k => delete countPick[k]); trail.list = []; trail.at = -1; trail.how = null; }
+  if (id !== tileId || (play ? 'play' : 'view') !== mode) { Object.values(ABC.views).forEach(v => v.reset && v.reset()); Object.keys(tallySeen).forEach(k => delete tallySeen[k]); }
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); const at = itemId == null ? -1 : APP.indexOf(itemId); if (at >= 0) { APP.idx = at; APP.saveIdx(); }
@@ -255,7 +247,7 @@ function render() {
   if (sc === 'hub') renderHub(); else v.show(started);
 }
 
-function setLang(code) { trail.list = []; trail.at = -1; trail.how = null;
+function setLang(code) {
   if (code === lang) { sfx.pop(); announce(); return; }
   const v0 = !atHub && view(), cur = v0 && APP.item();
   if (v0) leaveView();
