@@ -15,7 +15,7 @@ STRINGS('ro', {
   words: { one: 'un cuvânt', few: '{n} cuvinte', other: '{n} de cuvinte' },
   profile: { curious: 'Curios', explorer: 'Explorator', scientist: 'Om de știință', ages: '{name}, de la {a} la {b} ani' },
   installBtn: 'Instalează',
-  session: { left: ['Ultima!', 'Încă două!', 'Încă trei și gata!'], almost: 'Aproape e timpul de pauză!', done: 'Bravo! Acum facem pauză. Hai la joacă!',
+  session: { left: ['Ultima!', 'Încă două!', 'Încă trei și gata!'], almost: 'Aproape e timpul de pauză!', done: 'Bravo! Acum facem pauză. {idea}', ideas: [['🖍️', 'Hai să desenăm ceva!'], ['🧸', 'Ia o jucărie și joacă-te cu ea!'], ['💧', 'Bea un pahar cu apă!'], ['🐸', 'Sari de cinci ori ca o broscuță!'], ['🧱', 'Construiește un turn din cuburi!'], ['📚', 'Alege o carte și citiți împreună!'], ['🌳', 'Hai afară să vedem ce mai e nou!'], ['🎵', 'Cântă un cântecel!']],
     wait: { one: 'Se poate juca din nou peste un minut.', few: 'Se poate juca din nou peste {n} minute.', other: 'Se poate juca din nou peste {n} de minute.' }, again: 'Hai din nou!', sum: 'Pentru părinți: {a} + {b} = ?' },
   settings: { speed: 'Viteza vocii', speeds: ['Încet', 'Normal', 'Repede'], time: 'Timp de joc', minutes: '{n} min', timeHint: 'Spre final aplicația spune „Încă trei și gata!”, apoi face pauză cel puțin {rest} minute. Ca să deblochezi mai devreme: ține apăsat 🔒 {hold} secunde.', used: 'Folosit: {used} din {limit}', title: 'Setări', voice: 'Voce', pron: 'Pronunție', pronSub: 'Găsește și corectează un cuvânt',
     search: 'Caută un cuvânt…', searchHint: 'Caută cuvântul care sună greșit.', showAll: 'Arată toate cuvintele ({n})', noResult: 'Niciun cuvânt găsit.',

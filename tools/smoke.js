@@ -65,7 +65,7 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   console.log('karaoke: every spoken line that is on screen lights up, without wiring');
   const kar = await ev(() => { setLang('ro'); const tab = KARAOKE.find(APP.exclaim(APP.ui().sections.abc)); openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false);
     const card = KARAOKE.find(ABC.views.card.line()); openTile('letters', false, true); KARAOKE.prime(null, APP.item().say);
-    const cap = !$('sub').hidden && $('sub').textContent === APP.item().say && KARAOKE.marks.filter(Boolean).length >= 2; KARAOKE.stop(); KARAOKE.hide();
+    const slot = KARAOKE.slot(), cap = slot.classList.contains('sub') && slot.id !== 'sub' && slot.textContent === APP.item().say && KARAOKE.marks.filter(Boolean).length >= 2; KARAOKE.stop(); KARAOKE.hide();
     return [tab && tab.classList.contains('tl'), card && card.id, cap]; });
   const again = await ev(() => { openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const w0 = $('word').textContent; __said.length = 0;
     $('glyph').click(); $('word').click(); const w1 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, $('word').textContent]; });

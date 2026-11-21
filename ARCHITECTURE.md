@@ -41,7 +41,8 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             while the hidden word is said. All speech goes through speak(): its 4th argument `how` = { voice, engine, plain, ph }
                             covers voice samples and pronunciation variants in Settings — no other code builds an utterance.
                             A line that is not on screen (praise, "a, de la albină!", the clock's words) is written in the screen's infobox (`.sub`,
-                            a slot under the content, above the links, in Card, Game and Read; its space is reserved so nothing jumps), or in the
+                            a slot under the content, above the links, in Card, Game and Read; its space is reserved so nothing jumps; `--sub-slot`
+                            turns it off on short landscape), or in the
                             floating `#sub` where a screen has no slot (hub, Settings) — never over the content
                             with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
                             it is spoken; the infobox keeps the last line until the next one, the floating one leaves `TALK.linger` ms after. Nothing is said without being written.
@@ -239,7 +240,8 @@ Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds whil
 the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
 when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
 the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
-(`#rest`) says `session.done` once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+(`#rest`) shows and says `session.done` with one of `session.ideas` (an offline activity: draw, a toy, water, jump, blocks, a book,
+ outside, a song; kept across reloads) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
 🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 
