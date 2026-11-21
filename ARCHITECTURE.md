@@ -49,6 +49,9 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             Hear it again: every element that was spoken carries `data-said`; tapping it (outside buttons/links) says it again with
                             karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
                             (`APP.countable(key)`), so ‹ back shows exactly what was heard.
+                            Words split over several elements (a coloured first letter: <b>z</b>ebră) light up as one word. A line may say a
+                            part differently than it is written: `I18N.sayAs(shown, said)` (letter names: written "z", said "zî"); captions
+                            and karaoke use `I18N.shown`, the voice `I18N.said`.
                             So a view only has to SHOW what it SAYS (a tally card shows and says "cinci uși").
                             Voice speed: `config.speech` (rate 0.85 default; Slow/Normal/Fast 0.7/0.85/1 in Settings → Voice, stored as `rate`; Piper scales length by config rate ÷ it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
@@ -82,7 +85,8 @@ tools/fast.js               layout check, no server (needs playwright): every la
                             item; Read: 6 longest words), games, Settings (home, voice, pronunciation) × 7 sizes (phones, tablet portrait/landscape,
                             desktop), oldest profile; fails when a bar item leaves the content column or a `.on` ring is cut by a clipping ancestor
                             (scrollers give it `--ring-room`); on phone widths it also opens every index and fails when a tile's face is
-                            wider than the tile (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
+                            wider than the tile; on every screen, any component box (button, card, pill, bubble, chip, infobox, tile) whose
+                            content spills out of it or whose text is clipped fails the run — one rule instead of per-screen checks (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
 tools/smoke.js              browser test: every language, every game, choice rules, speech, keys, background, search, offline, clock (hour cycle per
                             language, spoken times, dragging and tapping the dial, day/night backdrop and its contrast) (CI)
 ```
@@ -241,8 +245,8 @@ Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds whil
 the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
 when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
 the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
-(`#rest`) shows 📵 and says `session.done` (why: a long time on a phone or tablet tires eyes and mind; put the screen away), then
- `session.wait` (the app can be used again to learn and play in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+(`#rest`) shows the screens (phone, laptop, computer, TV) crossed out and says `session.done` (too much screen time tires eyes
+ and mind; put away phone, tablet, computer and TV), then `session.wait` (the app can be used again in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
 🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 

@@ -38,7 +38,11 @@ const APP = {
   version: () => APP.t(APP.ui().version, { version: CFG.version, build: self.MANIFEST.version,
     date: new Intl.DateTimeFormat(APP.L().bcp47, { dateStyle: 'short', timeStyle: 'short' }).format(new Date(self.MANIFEST.built)) }),
   fitText(el, inner) {
-    const ratio = e => e.scrollWidth > e.clientWidth + 1 ? e.clientWidth / e.scrollWidth : 1;
+    const ratio = e => {
+      const cs = getComputedStyle(e), pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight), rs = [...e.children].map(k => k.getBoundingClientRect()).filter(r => r.width);
+      const need = Math.max(e.scrollWidth, rs.length ? Math.max(...rs.map(r => r.right)) - Math.min(...rs.map(r => r.left)) + pad : 0);
+      return need > e.clientWidth + 1 ? e.clientWidth / need * 0.97 : 1;
+    };
     const worst = () => Math.min(ratio(el), ...(inner ? [...el.querySelectorAll(inner)].map(ratio) : []));
     let k = 1; el.style.setProperty('--fit', k);
     for (let i = 0; i < 6; i++) { const r = worst(); if (r >= 1) break; k *= r; el.style.setProperty('--fit', k.toFixed(3)); }

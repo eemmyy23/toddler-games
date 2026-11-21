@@ -18,6 +18,21 @@ async function audit() {
       if (x - m < -0.5 || x + r.width + m > Math.max(a.clientWidth, a.scrollWidth) + 0.5 || y - m < -0.5 || y + r.height + m > Math.max(a.clientHeight, a.scrollHeight) + 0.5) return a.id || a.className.split(' ')[0];
     }
     return null; };
+  const BOX = 'button, .card, .pill, .bub, .rbtn, .seg, .chip, .sub, .ix, .rt, .rc';
+  const escapes = root => {
+    const out = [];
+    for (const box of root.querySelectorAll(BOX)) {
+      if (!vis(box) || box.closest('[hidden]')) continue;
+      const b = R(box);
+      for (const k of box.querySelectorAll('*')) {
+        if (!vis(k) || getComputedStyle(k).position === 'absolute' || k.closest('.bname,.agebadge,.nv,.tip')) continue;
+        const r = R(k);
+        if (r.width && (r.left < b.left - 1 || r.right > b.right + 1 || r.top < b.top - 1 || r.bottom > b.bottom + 1)) { out.push(`${(box.id || box.className.split(' ').slice(0, 2).join('.'))} «${box.textContent.trim().slice(0, 14)}» ${k.tagName.toLowerCase()} spills ${Math.round(Math.max(b.left - r.left, r.right - b.right, b.top - r.top, r.bottom - b.bottom))}px`); break; }
+      }
+      if (box.scrollWidth > box.clientWidth + 1 && getComputedStyle(box).overflowX !== 'visible') out.push(`${box.id || box.className.split(' ')[0]} «${box.textContent.trim().slice(0, 14)}» clips its text`);
+    }
+    return out;
+  };
   const screens = [];
   for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { APP.set({ section: s.id }); APP.set({ hub: true }); render(); }]);
   for (const t of TILES) {
@@ -27,7 +42,7 @@ async function audit() {
     if (learnOk(t) && t.index && innerWidth <= 360) screens.push([`${t.id}:index`, () => { openTile(t.id, false, true); openIndex(); }]);
   }
   const wait = f => new Promise(res => { const t0 = performance.now(), go = () => f() || performance.now() - t0 > 2000 ? res() : setTimeout(go, 20); go(); });
-  for (const [v, mark] of [['home', '.setn'], ['voice', '.setv'], ['pron', '#setq'], ['time', '[data-min]']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); APP.settings.open(); await wait(() => document.querySelector('#setbody .setn'));
+  for (const [v, mark] of [['home', '.setn'], ['voice', '.setv'], ['pron', '#setq'], ['time', '[data-min]']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); $('setbody').innerHTML = ''; APP.settings.open(); await wait(() => document.querySelector('#setbody .setn'));
     if (v !== 'home') { document.querySelector(`.setn[data-go=${v}]`).click(); await wait(() => document.querySelector(`#setbody ${mark}`)); } }]);
   screens.push(['rest', () => { SESSION.rest(true); }], ['rest:gate', () => { SESSION.rest(true); $('restlock').dispatchEvent(new PointerEvent('pointerdown')); $('restgate').hidden = false; }]);
   for (const [name, go] of screens) {
@@ -35,6 +50,7 @@ async function audit() {
     if (!document.getElementById('rest').hidden) SESSION.wake();
     await go();
     if (name.startsWith('rest')) { const box = R(document.getElementById('restbody')); for (const e of document.querySelectorAll('#rest button, #rest p, #restpic')) { if (!vis(e)) continue; const r = R(e); if (r.left < box.left - 1 || r.right > box.right + 1 || r.bottom > innerHeight + 1 || r.top < 0) bad.push(`${name}: ${e.id || e.tagName} outside the screen`); } }
+    for (const m of escapes(document.body)) bad.push(`${name}: ${m}`);
     for (const e of document.querySelectorAll('.on')) { const c = vis(e) && ringCut(e); if (c) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} ring cut by ${c}`); }
     if (name.endsWith(':index')) { for (const b of document.querySelectorAll('#ixgrid .ix')) if (b.scrollWidth > b.clientWidth + 1) { bad.push(`${name}: ${b.textContent.trim()} wider than its tile`); break; } closeIndex(); continue; }
     if (/^(settings|rest)/.test(name)) continue;

@@ -1,5 +1,8 @@
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const I18N = {
+  sayAs: (shown, said) => shown === said ? shown : `\u2060${shown}\u2061${said}\u2062`,
+  shown: t => t.replace(/\u2060([^\u2061]*)\u2061[^\u2062]*\u2062/g, '$1'),
+  said: t => t.replace(/\u2060[^\u2061]*\u2061([^\u2062]*)\u2062/g, '$1'),
   t(tpl, vars, locale) {
     if (tpl == null) return '';
     if (typeof tpl === 'function') return tpl(vars || {});
