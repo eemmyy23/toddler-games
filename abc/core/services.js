@@ -95,6 +95,14 @@ let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 const KARAOKE = {
   el: null, cuts: [], raf: 0, t0: 0, est: 0, real: false, id: 0,
+  norm: t => (t || '').toLocaleLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim(),
+  find(text) {
+    const want = this.norm(text);
+    if (!want) return null;
+    const shown = e => !e.closest('[hidden]') && e.getClientRects().length > 0;
+    const hits = [...document.body.querySelectorAll('*')].filter(e => !/^(SCRIPT|STYLE|SVG|CANVAS)$/i.test(e.tagName) && this.norm(e.textContent) === want && shown(e));
+    return hits.find(e => !hits.some(o => o !== e && e.contains(o))) || null;
+  },
   wrap(el) {
     if (!el.querySelector('.kw')) {
       const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
@@ -150,7 +158,7 @@ function makeUtt(text, onDone) {
   fallback = setTimeout(fin, TALK.base + I18N.graphemes(text, SPEECH.bcp47).length * TALK.perChar);
   return u;
 }
-function speak(text, delay = 0, el = null) {
+function speak(text, delay = 0, el = KARAOKE.find(text)) {
   const E = SPEECH.engine;
   KARAOKE.prime(el, text);
   const kid = KARAOKE.id;

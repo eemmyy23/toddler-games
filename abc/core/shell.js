@@ -68,7 +68,7 @@ const APP = {
         if (!alive()) return false;
         if ('light' in s) { APP.light(scope, s.light); APP.reveal([].concat(s.light)[0]); }
         if (s.pop) sfx.pop();
-        if (s.say) await speak(s.say, s.delay || 0, s.light instanceof Element ? s.light : null);
+        if (s.say) await speak(s.say, s.delay || 0);
         if (!alive()) return false;
         await wait(s.pause ?? GAP);
       }

@@ -45,7 +45,7 @@
       APP.fitText(g);
       APP.fit($('learn'), 'tight');
       APP.shown();
-      if (sayIt) speak(said, PAUSE.line, $('word'));
+      if (sayIt) speak(said, PAUSE.line);
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     line: () => said,

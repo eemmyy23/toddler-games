@@ -62,6 +62,10 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok((await hub('abc')).some(x => /group/i.test(x)), 'EN has letter groups too');
   await ev(() => setLang('ro'));
 
+  console.log('karaoke: every spoken line that is on screen lights up, without wiring');
+  const kar = await ev(() => { setLang('ro'); const tab = KARAOKE.find(APP.exclaim(APP.ui().sections.abc)); openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false);
+    const card = KARAOKE.find(ABC.views.card.line()); return [tab && tab.classList.contains('tl'), card && card.id]; });
+  ok(kar[0] === true && kar[1] === 'word', `tab label and card text are found from the spoken line (${kar})`);
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
   ok((await p.$$eval('.ex .ew', e => e.map(x => x.textContent).join())) === 'albină,arici,ananas,avion', 'A examples');

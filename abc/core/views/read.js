@@ -24,7 +24,7 @@
     APP.links(e, $('rlinks'));
     refit();
     APP.shown();
-    if (sayIt) speak(word, PAUSE.line, $('rW'));
+    if (sayIt) speak(word, PAUSE.line);
   }
   function refit() { ['rU', 'rL', 'rS', 'rW', 'rC', 'rA'].forEach(id => $(id) && APP.fitText($(id), '.rt, .rc')); APP.fit($('read'), 'tight'); }
   onTapIn('read', '[data-say]', el => APP.sequence('read', [{ light: el.classList.contains('rt') || el.classList.contains('rc') ? el : null, say: el.dataset.say, pop: true }]));
