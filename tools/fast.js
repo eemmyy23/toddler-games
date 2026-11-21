@@ -24,6 +24,7 @@ async function audit() {
     if (learnOk(t)) { const n = itemsOf(t).length, picks = t.view === 'read' ? itemsOf(t).map((x, i) => [x.w.length + (x.forms ? 20 : 0), i]).sort((a, b) => b[0] - a[0]).slice(0, 6).map(x => x[1]) : [...new Set([0, n >> 1, n - 1, itemsOf(t).reduce((b, x, i, a) => String(x.label).length > String(a[b].label).length ? i : b, 0)])];
       for (const i of picks) screens.push([`${t.id}#${i}`, () => { openTile(t.id, false, true); APP.idx = i; view().show(false); }]); }
     if (gameOk(t)) screens.push([`${t.id}:play`, () => openTile(t.id, true, true)]);
+    if (learnOk(t) && t.index && innerWidth <= 360) screens.push([`${t.id}:index`, () => { openTile(t.id, false, true); openIndex(); }]);
   }
   const wait = f => new Promise(res => { const t0 = performance.now(), go = () => f() || performance.now() - t0 > 2000 ? res() : setTimeout(go, 20); go(); });
   for (const [v, mark] of [['home', '.setn'], ['voice', '.setv'], ['pron', '#setq'], ['time', '[data-min]']]) screens.push([`settings:${v}`, async () => { APP.set({ hub: true }); render(); APP.settings.open(); await wait(() => document.querySelector('#setbody .setn'));
@@ -35,6 +36,7 @@ async function audit() {
     await go();
     if (name.startsWith('rest')) { const box = R(document.getElementById('restbody')); for (const e of document.querySelectorAll('#rest button, #rest p, #restpic')) { if (!vis(e)) continue; const r = R(e); if (r.left < box.left - 1 || r.right > box.right + 1 || r.bottom > innerHeight + 1 || r.top < 0) bad.push(`${name}: ${e.id || e.tagName} outside the screen`); } }
     for (const e of document.querySelectorAll('.on')) { const c = vis(e) && ringCut(e); if (c) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} ring cut by ${c}`); }
+    if (name.endsWith(':index')) { for (const b of document.querySelectorAll('#ixgrid .ix')) if (b.scrollWidth > b.clientWidth + 1) { bad.push(`${name}: ${b.textContent.trim()} wider than its tile`); break; } closeIndex(); continue; }
     if (/^(settings|rest)/.test(name)) continue;
     if (document.documentElement.scrollWidth > innerWidth + 1) bad.push(`${name}: horizontal scroll`);
     const col = R(document.getElementById('stage')), cs = getComputedStyle(document.getElementById('stage'));

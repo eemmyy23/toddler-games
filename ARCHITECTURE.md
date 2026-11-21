@@ -40,11 +40,17 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             rendered with the target's fields replaced by the prompt (👂 / glyph / word), so karaoke maps word to word and lights 👂
                             while the hidden word is said. All speech goes through speak(): its 4th argument `how` = { voice, engine, plain, ph }
                             covers voice samples and pronunciation variants in Settings — no other code builds an utterance.
-                            A line that is not on screen (praise, "a, de la albină!", the clock's words) is shown as a caption (`#sub`, one `.sub`)
+                            A line that is not on screen (praise, "a, de la albină!", the clock's words) is written in the screen's infobox (`.sub`,
+                            a slot under the content, above the links, in Card, Game and Read; its space is reserved so nothing jumps; `--sub-slot`
+                            turns it off on short landscape), or in the
+                            floating `#sub` where a screen has no slot (hub, Settings) — never over the content
                             with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
-                            it is spoken; the caption leaves `TALK.linger` ms after the line ends. Nothing is said without being written.
+                            it is spoken; the infobox keeps the last line until the next one, the floating one leaves `TALK.linger` ms after. Nothing is said without being written.
+                            Hear it again: every element that was spoken carries `data-said`; tapping it (outside buttons/links) says it again with
+                            karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
+                            (`APP.countable(key)`), so ‹ back shows exactly what was heard.
                             So a view only has to SHOW what it SAYS (a tally card shows and says "cinci uși").
-                            Voice speed: `config.speech` (rate 0.75 default; Slow/Normal/Fast in Settings → Voice, stored as `rate`; Piper scales length by it).
+                            Voice speed: `config.speech` (rate 0.85 default; Slow/Normal/Fast 0.7/0.85/1 in Settings → Voice, stored as `rate`; Piper scales length by config rate ÷ it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
 abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation / Play time, sub-screens with ‹ back.
                             Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
@@ -75,7 +81,8 @@ tools/check.js              content, config, markup, CSS-token, engine-literal, 
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest
                             item; Read: 6 longest words), games, Settings (home, voice, pronunciation) × 7 sizes (phones, tablet portrait/landscape,
                             desktop), oldest profile; fails when a bar item leaves the content column or a `.on` ring is cut by a clipping ancestor
-                            (scrollers give it `--ring-room`) (CI)
+                            (scrollers give it `--ring-room`); on phone widths it also opens every index and fails when a tile's face is
+                            wider than the tile (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
 tools/smoke.js              browser test: every language, every game, choice rules, speech, keys, background, search, offline, clock (hour cycle per
                             language, spoken times, dragging and tapping the dial, day/night backdrop and its contrast) (CI)
 ```
@@ -234,7 +241,8 @@ Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds whil
 the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
 when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
 the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
-(`#rest`) says `session.done` once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+(`#rest`) shows 📵 and says `session.done` (why: a long time on a phone or tablet tires eyes and mind; put the screen away), then
+ `session.wait` (the app can be used again to learn and play in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
 🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 

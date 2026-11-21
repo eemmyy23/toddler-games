@@ -31,7 +31,7 @@ const SESSION = (function () {
     if (!st.rest) { st.rest = Date.now(); save(); }
     gate(false); draw(); $('rest').hidden = false;
     history.pushState({ rest: 1 }, '');
-    if (!quiet) speak(S().done);
+    if (!quiet) speak(S().done).then(() => { if (resting() && $('restwait').textContent) speak($('restwait').textContent); });
   }
   function draw() {
     const U = S(), wait = Math.max(0, Math.ceil((st.rest + C.breakMin * min - Date.now()) / min));

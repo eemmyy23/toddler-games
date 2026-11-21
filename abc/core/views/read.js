@@ -20,7 +20,7 @@
         [0, 1].map(r => [['sg', 1], ['pl', 2]].map(([k, n], c) => forms[k]
           ? `<button class="card rc" data-say="${esc(forms[k][r])}"><span class="rce">${pic.repeat(n)}</span><span>${esc(forms[k][r])}</span></button>`
           : `<div class="rc none">${r === 0 ? esc(APP.t(U.noneLine, { none: U.none[c] })) : ''}</div>`).join('')).join('') + `</div>` : '') +
-      `<div class="links" id="rlinks"></div></div>`;
+      `<div class="sub" aria-hidden="true"></div><div class="links" id="rlinks"></div></div>`;
     APP.links(e, $('rlinks'));
     refit();
     APP.shown();

@@ -15,9 +15,10 @@
     const it = APP.item(), p = e.target.closest && e.target.closest('.part');
     if (p && it.parts) { APP.celebrate(p); part(+p.dataset.part); }
     else if (it.parts) { part((at + 1) % it.parts.length); APP.celebrate(big(at)); }
-    else { APP.celebrate(e.target); VIEW_CARD.show(true); }
+    else { APP.celebrate(e.target); speak(said); }
   }
   onTap('glyph', tapBig);
+  onTap('pics', () => { if (APP.screen() === 'card') speak(said); });
   onTap('word', e => { if (APP.screen() === 'card' && APP.item().parts) tapBig(e); });
   onScrub('parts', '.pt', b => part(+b.dataset.part));
   onTapIn('examples', '.ex', b => APP.sequence('examples', [{ light: b, say: APP.item().examples[+b.dataset.i][0], pop: true }]));

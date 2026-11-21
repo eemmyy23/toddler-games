@@ -31,7 +31,7 @@
   --bar-pad:max(10px, env(safe-area-inset-top));
   --pill-h:54px; --pill-fs:22px; --link-h:40px; --cap-fs:.2em; --part-min:72px; --sbox-min:min(100%, 220px); --az-fs:var(--fs-xs); --link-fs:var(--fs-xs); --link-gap:var(--sp-4); --seg-w:52px; --seg-h:44px; --seg-fs:26px;
   --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --tabbar-h:70px; --tab-h:62px; --tl-fs:var(--fs-xs); --bot:calc(var(--tabbar-h) + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --nav-w:112px; --nav-y:calc(var(--bot) + var(--nav-gap)); --low-h:calc(var(--nav-gap) * 2 + var(--nav-h)); --act-l:0; --act-r:0; --side:var(--gut); --hero-h:72px;
-  --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-sub:10; --z-toast:11;
+  --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-sub:10; --z-toast:11; --sub-slot:block;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
   --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw); --pset:.62em;
   --ex-dir:column; --ex-min:96px; --ex-pad:10px 12px 8px; --ex-pic:40px; --ex-fs:var(--fs-m);
@@ -52,7 +52,7 @@
   --part-h:54px;--part-fs:30px;--ex-dir:row;--ex-min:0px;--ex-pad:6px 12px 6px 8px;--ex-pic:26px;--ex-fs:16px;--inf-fs:17px;--inf-pad:9px 12px;--inf-pic:28px;--hero-h:60px;
   --dial:min(40vh,76vw);--dial-gap:var(--sp-2);--dstep:min(72px,20vw);--dtime-h:min(72px,20vw);--dtime-fs:var(--fs-l);--dsay-fs:var(--fs-s)}}
 @media (max-width:350px){:root{--seg-w:33px;--seg-fs:19px;--pill-h:46px;--pill-fs:19px;--fs-xs:12px}}
-@media (max-height:450px) and (orientation:landscape){:root{--read-dir:row;--read-split:2;--part-h:44px;--part-fs:26px;--az-fs:9px;--tabbar-h:50px;--tab-h:46px;--tl-fs:var(--fs-xxs);--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-w:44px;--seg-fs:22px;
+@media (max-height:450px) and (orientation:landscape){:root{--sub-slot:none;--read-dir:row;--read-split:2;--part-h:44px;--part-fs:26px;--az-fs:9px;--tabbar-h:50px;--tab-h:46px;--tl-fs:var(--fs-xxs);--nav-h:48px;--nav-gap:6px;--hero-h:48px;--pill-h:44px;--pill-fs:18px;--seg-w:44px;--seg-fs:22px;
   --nav-w:56px;--nav-y:calc(var(--bot) + (100% - var(--bot) - var(--top)) / 2 - var(--nav-h) / 2);--low-h:0px;--act-l:auto;--act-r:var(--gut);--side:calc(var(--gut) + 64px);--glyph:min(30vh,22vw);--rt-h:40px;--rt-fs:22px;--rc-h:40px;--rc-fs:16px;--rpic:20vh;--read-gap:4px;--tile-min:96px;--hub-gap:8px;
   --dial-dir:row;--dial:min(64vh,40vw);--dstep:56px;--dtime-h:56px}}
 
@@ -166,7 +166,10 @@ body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 #learn.tight{--learn-gap:var(--sp-1);--link-gap:var(--sp-1);--ex-pad:var(--sp-1) var(--sp-2);--ex-pic:var(--fs-l);--ex-fs:var(--fs-s)}
 #word{font-size:var(--word-fs);font-weight:600;text-align:center;min-height:1.2em}
 .kw{transition:color var(--t-fast)}
-.sub{position:fixed;left:var(--gut);right:var(--gut);top:var(--top);z-index:var(--z-sub);margin:0 auto;width:fit-content;max-width:calc(100% - 2 * var(--gut));padding:var(--sp-2) var(--sp-4);border-radius:var(--r-pill);background:var(--card2);box-shadow:var(--shadow);font-size:var(--fs-l);font-weight:700;text-align:center;pointer-events:none}
+.sub{margin:0 auto;width:fit-content;max-width:100%;min-height:calc(var(--fs-s) * 1.3 + 2 * var(--sp-0));padding:var(--sp-0) var(--sp-3);border-radius:var(--r-sm);background:var(--card);box-shadow:var(--shadow);font-size:var(--fs-s);line-height:1.3;font-weight:600;text-align:center;cursor:pointer}
+.sub:empty{visibility:hidden}
+.sub:not(#sub){display:var(--sub-slot)}
+#sub{position:fixed;left:var(--gut);right:var(--gut);top:var(--top);z-index:var(--z-sub);max-width:calc(100% - 2 * var(--gut))}
 .said{outline:var(--ring);outline-offset:var(--ring-gap);border-radius:var(--r-sm)}
 .kw.now{color:var(--amber);text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.15em}
 #pics{font-size:var(--pics-fs);line-height:1.2;min-height:1.2em}
@@ -302,12 +305,12 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 .ie{font-size:var(--inf-pic);flex:0 0 auto}
 #infofoot{display:flex;justify-content:center;padding-top:var(--sp-3)}
 #ixbody{flex:1;min-height:0;display:flex;gap:var(--sp-2)}
-#ixgrid{position:relative;flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--ix-w),1fr));gap:var(--sp-3);align-content:start;padding-bottom:var(--sp-5)}
+#ixgrid{position:relative;flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--ix-w),1fr));gap:var(--sp-3);align-content:start;padding:var(--ring-room) var(--ring-room) var(--sp-5)}
 .ixh{grid-column:1/-1;display:flex;align-items:baseline;gap:var(--sp-3);padding:var(--sp-3) var(--sp-1) 0}
 .ixh b{font-size:var(--fs-xl);line-height:1}
-.ix{height:var(--ix-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);padding-top:var(--sp-0);border-radius:var(--r-sm);
-  font-size:var(--fs-xxl);font-weight:700;line-height:1.15;}
-.ix small{font-size:var(--fs-xs);font-weight:500;color:var(--muted)}
+.ix{--swatch:1em;--rainbow:1.9em;height:var(--ix-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-2);padding-top:var(--sp-0);border-radius:var(--r-sm);
+  font-size:calc(var(--fs-xxl) * var(--fit, 1));font-weight:700;line-height:1.15;overflow:hidden}
+.ix small{max-width:100%;font-size:var(--fs-xs);font-weight:500;line-height:1.1;color:var(--muted);text-align:center;overflow-wrap:anywhere;hyphens:auto}
 #ixaz{flex:0 0 var(--badge);display:flex;flex-direction:column;justify-content:stretch;align-items:center;padding:var(--sp-2) 0;border-radius:var(--r-pill);background:var(--card);
   touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
 .az{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;width:calc(var(--badge) - var(--sp-1));padding:0;border-radius:var(--r-pill);font-size:var(--az-fs);font-weight:700;line-height:1;text-align:center;color:var(--muted);transition:transform var(--t-fast)}
@@ -362,11 +365,13 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
     <div id="word"></div>
     <div id="also" class="also" hidden></div>
     <div id="examples"></div>
+    <div class="sub" aria-hidden="true"></div>
     <div id="links" class="links"></div>
   </div>
   <div id="play" hidden>
     <button id="ask" class="card"></button>
     <div id="choices"></div>
+    <div class="sub" aria-hidden="true"></div>
     <div id="plinks" class="links"></div>
   </div>
   <div id="read" hidden></div>
@@ -403,7 +408,7 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 <div id="rest" class="sheet" role="dialog" aria-modal="true" aria-labelledby="restmsg" hidden>
   <div class="sheet-head"><button id="restlock" class="rbtn small" data-aria="parent" data-icon="lock"></button></div>
   <div id="restbody">
-    <div id="restpic" data-icon="rest"></div>
+    <div id="restpic" data-icon="noscreen"></div>
     <p id="restmsg"></p>
     <p id="reststars" class="label"></p>
     <p id="restwait" class="label"></p>
