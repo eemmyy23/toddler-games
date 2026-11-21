@@ -74,7 +74,7 @@ const PIPER = {
     const { cfg, sess } = await this.ready, I = cfg.inference;
     const out = await sess.run({ input: new ort.Tensor('int64', BigInt64Array.from(ids.map(BigInt)), [1, ids.length]),
       input_lengths: new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)])),
-      scales: new ort.Tensor('float32', Float32Array.from([I.noise_scale, I.length_scale / SPEECH.rate, I.noise_w])) });
+      scales: new ort.Tensor('float32', Float32Array.from([I.noise_scale, I.length_scale * ABC.config.speech.rate / SPEECH.rate, I.noise_w])) });
     return out.output.data;
   },
   async render(text, phonemes) {
@@ -90,13 +90,14 @@ const PIPER = {
       phonemes.re.lastIndex = 0;
       if (at < text.length) parts.push({ t: text.slice(at) });
     } else parts.push({ t: text });
-    const pcms = [];
+    const { cfg } = await this.ready, id = c => cfg.phoneme_id_map[c][0], edge = [id('^'), id('$')], ids = [];
     for (const p of parts) {
       if (p.t != null && !/[\p{L}\p{N}]/u.test(p.t)) continue;
-      pcms.push(await this.pcm(p.ipa ? await this.ipaIds(p.ipa) : await this.textIds(p.t)));
+      const one = (p.ipa ? await this.ipaIds(p.ipa) : await this.textIds(p.t)).filter(x => !edge.includes(x));
+      if (ids.length) ids.push(id(' '), id('_'));
+      ids.push(...one);
     }
-    const all = new Float32Array(pcms.reduce((n, x) => n + x.length, 0));
-    pcms.reduce((at, x) => { all.set(x, at); return at + x.length; }, 0);
+    const all = ids.length ? await this.pcm([edge[0], ...ids, edge[1]]) : new Float32Array(0);
     return { data: all, rate: (await this.ready).cfg.audio.sample_rate };
   },
   engine(id) {

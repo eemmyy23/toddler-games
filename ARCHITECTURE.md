@@ -47,7 +47,7 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
                             (`APP.countable(key)`), so ‹ back shows exactly what was heard.
                             So a view only has to SHOW what it SAYS (a tally card shows and says "cinci uși").
-                            Voice speed: `config.speech` (rate 0.75 default; Slow/Normal/Fast in Settings → Voice, stored as `rate`; Piper scales length by it).
+                            Voice speed: `config.speech` (rate 0.85 default; Slow/Normal/Fast 0.7/0.85/1 in Settings → Voice, stored as `rate`; Piper scales length by config rate ÷ it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
 abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation / Play time, sub-screens with ‹ back.
                             Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),
