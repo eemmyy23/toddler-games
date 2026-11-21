@@ -7,5 +7,5 @@
    - Start from the file map and contracts in ARCHITECTURE.md; open only the files a change needs, with targeted grep/reads.
    - After a change: `node tools/check.js --fix`, then `node tools/fast.js` (~13 s) for any CSS/markup/view change. The full `tools/smoke.js` runs in CI; run it locally only when a change touches behaviour it covers.
    - One commit and push per finished change; let CI run, don't poll.
-   - Ship silently: open the PR, merge it (squash) the moment CI is green, wait for the public site to serve the new `abc/manifest.js` version, then report ONCE: what changed and that it is live. Never report CI progress, intermediate notifications or "still running". A PR that only changes `*.md`/`docs/**` runs no CI and is merged directly.
+   - Ship silently: open the PR and enable auto-merge (squash) on it — GitHub merges it when CI is green (merge it yourself only if auto-merge is unavailable), wait for the public site to serve the new `abc/manifest.js` version, then report ONCE: what changed and that it is live. Never report CI progress, intermediate notifications or "still running". A PR that only changes `*.md`/`docs/**` runs no CI and is merged directly.
 5. **Report only measured results** — never claim a test passed, a deploy finished or a number before seeing it.
