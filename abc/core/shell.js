@@ -57,7 +57,7 @@ const APP = {
   gameItems: () => gameItemsOf(tileOf()),
   screen: () => atHub ? 'hub' : mode === 'play' ? GAME_VIEW : tileOf().view,
   indexOf: id => APP.items().findIndex(it => it.id === id),
-  step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
+  step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; if (d > 0) delete countPick[`${lang}:${tileId}:${APP.items()[APP.idx].id}`]; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
@@ -192,7 +192,7 @@ function renderHub() {
 function openTile(id, play, quiet, itemId) {
   const t = TILE[id]; if (!usable(t, play)) return false;
   leaveView();
-  if (id !== tileId || (play ? 'play' : 'view') !== mode) Object.values(ABC.views).forEach(v => v.reset && v.reset());
+  if (id !== tileId || (play ? 'play' : 'view') !== mode) { Object.values(ABC.views).forEach(v => v.reset && v.reset()); Object.keys(countPick).forEach(k => delete countPick[k]); }
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); const at = itemId == null ? -1 : APP.indexOf(itemId); if (at >= 0) { APP.idx = at; APP.saveIdx(); }

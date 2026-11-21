@@ -47,8 +47,10 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
                             it is spoken; the infobox keeps the last line until the next one, the floating one leaves `TALK.linger` ms after. Nothing is said without being written.
                             Hear it again: every element that was spoken carries `data-said`; tapping it (outside buttons/links) says it again with
-                            karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
-                            (`APP.countable(key)`), so ‹ back shows exactly what was heard.
+                            karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is picked fresh when
+                            you go forward (› or a new visit) and kept when you go back (`APP.countable(key)`), so ‹ back shows exactly what was
+                            heard. Karaoke timing: Piper starts it when its audio starts (with the audio's real length); voice boundary events are
+                            used only for words.
                             Words split over several elements (a coloured first letter: <b>z</b>ebră) light up as one word. A line may say a
                             part differently than it is written: `I18N.sayAs(shown, said)` (letter names: written "z", said "zî"); captions
                             and karaoke use `I18N.shown`, the voice `I18N.said`.

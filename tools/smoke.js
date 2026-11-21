@@ -71,6 +71,11 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     $('glyph').click(); $('word').click(); const w1 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, $('word').textContent]; });
   await spoken();
   ok(again[0] === again[1] && again[1] === again[2], `tapping the card says it again and keeps it; back shows the same "${again.join(' / ')}"`);
+  const fresh = await ev(() => { openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false); const seen = new Set();
+    for (let k = 0; k < 12; k++) { ABC.views.card.step(1); seen.add($('word').textContent); ABC.views.card.step(-1); }
+    ABC.views.card.step(1); KARAOKE.prime($('word'), ABC.views.card.line()); KARAOKE.start(KARAOKE.id, 1000); KARAOKE.at(0.1); const lit = $('word').querySelectorAll('.kw.now').length; KARAOKE.stop();
+    return [seen.size, lit]; });
+  ok(fresh[0] >= 3 && fresh[1] >= 1, `forward picks a new thing each time (${fresh[0]} kinds over 12 visits), the spoken word on the card lights up (${fresh[1]})`);
   ok(kar[0] === true && kar[1] === 'word' && kar[2] === true, `on-screen text lights up; a line not on screen shows as a caption that also lights the letter and the word (${kar})`);
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
