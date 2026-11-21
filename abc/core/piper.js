@@ -102,8 +102,9 @@ const PIPER = {
   engine(id) {
     return {
       uri: `piper:${id}`,
-      say: async text => {
-        const { data, rate } = await PIPER.render(text, SPEECH.phonemes);
+      say: async (text, how = {}) => {
+        await PIPER.load(id);
+        const { data, rate } = how.ph ? { data: await PIPER.pcm(await PIPER.ipaIds(how.ph)), rate: (await PIPER.ready).cfg.audio.sample_rate } : await PIPER.render(text, how.plain ? null : SPEECH.phonemes);
         await PIPER.play(data, rate);
       },
       stop: () => PIPER.stop()

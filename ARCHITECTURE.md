@@ -36,7 +36,10 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             `speak(text, delay, el = KARAOKE.find(text))`: find() takes the innermost visible element whose text equals the spoken
                             line (case and punctuation ignored); its words are wrapped in `.kw` and the one being said gets `.now`, from the voice's
                             word boundaries, else by estimated time (`TALK.karaoke` ms/char ÷ rate) — so it also works muted, without a voice and
-                            with Piper. Pass `el` only when the screen shows a different text than is said (the game question hides its word).
+                            with Piper. Pass `el` only when the screen shows the line with the answer hidden: the game question is the spoken sentence
+                            rendered with the target's fields replaced by the prompt (👂 / glyph / word), so karaoke maps word to word and lights 👂
+                            while the hidden word is said. All speech goes through speak(): its 4th argument `how` = { voice, engine, plain, ph }
+                            covers voice samples and pronunciation variants in Settings — no other code builds an utterance.
                             A line that is not on screen (praise, "a, de la albină!", the clock's words) is shown as a caption (`#sub`, one `.sub`)
                             with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
                             it is spoken; the caption leaves `TALK.linger` ms after the line ends. Nothing is said without being written.

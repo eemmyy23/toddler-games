@@ -22,9 +22,12 @@
   }
   const pickSubject = t => { const m = fresh(t.members || [], seenSub); if (!m.length) return null; const id = m[Math.random() * m.length | 0].id; remember(seenSub, id, RULES.recentSubjects); return id; };
   const subject = () => round.subject && target.members ? target.members.find(m => m.id === round.subject) || null : null;
-  function askLine() {
+  const HIDE = '\u2063';
+  function askLine(hide) {
     const key = Tiles.ask(APP.tile(), target, round), it = subject() || target;
-    return APP.mt('games.' + key, Object.assign({}, it, { the: it.the || it.name }, round.look && round.look.vars));
+    const v = Object.assign({}, it, { the: it.the || it.name }, round.look && round.look.vars);
+    if (hide) ['the', 'name', 'say'].forEach(k => { v[k] = HIDE; });
+    return APP.mt('games.' + key, v);
   }
   function newRound() {
     locked = false; target = pickTarget();
@@ -44,8 +47,8 @@
   const line = () => round.lead ? APP.t(APP.ui().then, { a: round.lead, b: askLine() }) : askLine();
   function draw() {
     locked = false;
-    const q = game().show(target, round, askLine(), subject());
-    $('ask').innerHTML = `<span class="q">${APP.icon('speak')}${round.lead ? `${esc(round.lead)} ` : ''}${esc(q.text)}</span>${q.picture || ''}`;
+    const q = game().show(target, round, askLine(), subject(), askLine(true)), [a, b] = q.text.split(HIDE);
+    $('ask').innerHTML = `<span class="q">${APP.icon('speak')}${round.lead ? `${esc(round.lead)} ` : ''}${esc(a)}${b == null ? '' : `${q.picture || ''}${esc(b.split(HIDE).join(''))}`}</span>${b == null ? q.picture || '' : ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');
     box.innerHTML = '';

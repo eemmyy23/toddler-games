@@ -31,7 +31,7 @@
   --bar-pad:max(10px, env(safe-area-inset-top));
   --pill-h:54px; --pill-fs:22px; --link-h:40px; --cap-fs:.2em; --part-min:72px; --sbox-min:min(100%, 220px); --az-fs:var(--fs-xs); --link-fs:var(--fs-xs); --link-gap:var(--sp-4); --seg-w:52px; --seg-h:44px; --seg-fs:26px;
   --top:calc(var(--bar-pad) + var(--pill-h) + 6px);             --tabbar-h:70px; --tab-h:62px; --tl-fs:var(--fs-xs); --bot:calc(var(--tabbar-h) + min(env(safe-area-inset-bottom), 8px));      --nav-h:72px; --nav-gap:12px; --nav-w:112px; --nav-y:calc(var(--bot) + var(--nav-gap)); --low-h:calc(var(--nav-gap) * 2 + var(--nav-h)); --act-l:0; --act-r:0; --side:var(--gut); --hero-h:72px;
-  --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-toast:11;
+  --z-sticky:2; --z-float:4; --z-bar:5; --z-tabs:6; --z-fx:8; --z-sheet:9; --z-sub:10; --z-toast:11;
     --tile-min:clamp(132px,22vh,160px); --tile-icon:var(--fs-hero); --tile-fs:var(--fs-m); --tile-gap:6px; --hub-gap:12px;
   --glyph:min(28vh,46vw); --glyph-grp:min(22vh,26vw); --pset:.62em;
   --ex-dir:column; --ex-min:96px; --ex-pad:10px 12px 8px; --ex-pic:40px; --ex-fs:var(--fs-m);
@@ -166,7 +166,7 @@ body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 #learn.tight{--learn-gap:var(--sp-1);--link-gap:var(--sp-1);--ex-pad:var(--sp-1) var(--sp-2);--ex-pic:var(--fs-l);--ex-fs:var(--fs-s)}
 #word{font-size:var(--word-fs);font-weight:600;text-align:center;min-height:1.2em}
 .kw{transition:color var(--t-fast)}
-.sub{position:fixed;left:var(--gut);right:var(--gut);top:var(--top);z-index:var(--z-fx);margin:0 auto;width:fit-content;max-width:calc(100% - 2 * var(--gut));padding:var(--sp-2) var(--sp-4);border-radius:var(--r-pill);background:var(--card2);box-shadow:var(--shadow);font-size:var(--fs-l);font-weight:700;text-align:center;pointer-events:none}
+.sub{position:fixed;left:var(--gut);right:var(--gut);top:var(--top);z-index:var(--z-sub);margin:0 auto;width:fit-content;max-width:calc(100% - 2 * var(--gut));padding:var(--sp-2) var(--sp-4);border-radius:var(--r-pill);background:var(--card2);box-shadow:var(--shadow);font-size:var(--fs-l);font-weight:700;text-align:center;pointer-events:none}
 .said{outline:var(--ring);outline-offset:var(--ring-gap);border-radius:var(--r-sm)}
 .kw.now{color:var(--amber);text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.15em}
 #pics{font-size:var(--pics-fs);line-height:1.2;min-height:1.2em}
