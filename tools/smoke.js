@@ -71,8 +71,14 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     $('word').click(); const w1 = $('word').textContent; const others = new Set(); for (let k = 0; k < 8; k++) { $('glyph').click(); others.add($('word').textContent); } ABC.views.card.step(1); ABC.views.card.step(-1); const back = $('word').textContent; $('pics').click(); const w2 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, others.size, back === w2]; });
   await spoken();
   ok(again[0] === again[1] && again[2] >= 3 && again[3], `tapping the text says it again; tapping the number shows other things (${again[2]} kinds); back keeps the last one; tapping the things says it again (${again.join(' / ')})`);
-  const fresh = await ev(() => { openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false); const seen = new Set();
-    for (let k = 0; k < 12; k++) { ABC.views.card.step(1); seen.add($('word').textContent); ABC.views.card.step(-1); }
+  const hist = await ev(() => { openTile('read', false, true); openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const seen = [$('word').textContent];
+    for (let k = 0; k < 2; k++) { $('glyph').click(); seen.push($('word').textContent); }
+    const label = $('prev').textContent, back = []; for (let k = 0; k < 3; k++) { ABC.views.card.step(-1); back.push($('word').textContent); }
+    ABC.views.card.step(1); const fwd = $('word').textContent; return { ok: back[0] === seen[1] && back[1] === seen[0] && /^patru /.test(back[2]) && fwd === seen[0] && /5/.test(label), seen, back, label, fwd }; });
+  ok(hist.ok, `‹ goes back through what was seen on the same number, then to the previous number (${hist.seen.join(' → ')} ‹ ${hist.back.join(' ‹ ')}; label "${hist.label}")`);
+  const fresh = await ev(() => { const seen = new Set();
+    for (let k = 0; k < 12; k++) { openTile('read', false, true); openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false); ABC.views.card.step(1); seen.add($('word').textContent); }
+    openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false);
     ABC.views.card.step(1); KARAOKE.prime($('word'), ABC.views.card.line()); KARAOKE.start(KARAOKE.id, 1000); KARAOKE.at(0.1); const lit = $('word').querySelectorAll('.kw.now').length; KARAOKE.stop();
     return [seen.size, lit]; });
   ok(fresh[0] >= 3 && fresh[1] >= 1, `forward picks a new thing each time (${fresh[0]} kinds over 12 visits), the spoken word on the card lights up (${fresh[1]})`);
