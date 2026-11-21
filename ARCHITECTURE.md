@@ -241,8 +241,8 @@ Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds whil
 the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
 when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
 the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
-(`#rest`) shows 📵 and says `session.done` (why: a long time on a phone or tablet tires eyes and mind; put the screen away), then
- `session.wait` (the app can be used again to learn and play in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+(`#rest`) shows the screens (phone, laptop, computer, TV) crossed out and says `session.done` (too much screen time tires eyes
+ and mind; put away phone, tablet, computer and TV), then `session.wait` (the app can be used again in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
 🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 

@@ -17,7 +17,7 @@
 :root{
     --bg0:#090c1f; --bg1:#11163a; --bg-glow:#1b2156; --card:#1a2050; --card2:#232a63;
   --line:rgba(255,255,255,.07); --line-strong:rgba(255,255,255,.25);
-  --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16); --danger:#b3261e; --ink:#14183a;
+  --text:#efe6d6; --muted:#9e98bf; --amber:#f0b24a; --amber-ink:#2b1d02; --amber-soft:rgba(240,178,74,.16); --danger:#b3261e; --ban-w:6px; --ink:#14183a;
   --scrim:var(--bg0); --tabbar:color-mix(in srgb,var(--bg0) 94%,transparent);
   --shade:rgba(0,0,0,.35); --star-1:rgba(255,240,200,.55); --star-2:rgba(255,240,200,.45); --star-3:rgba(255,240,200,.4); --star-4:rgba(255,240,200,.35); --star-5:rgba(255,240,200,.3); --shine:#fff; --deep:#000; --shadow:0 6px 18px var(--shade); --shadow-lg:0 8px 22px rgba(0,0,0,.45);
   --ring-w:3px; --ring:var(--ring-w) solid var(--amber); --ring-gap:3px; --lift:-3px; --ring-room:calc(var(--ring-w) + var(--ring-gap) - var(--lift)); --focus:3px dashed var(--text);
@@ -284,8 +284,10 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 #restlock::after{content:'';position:absolute;inset:calc(-1 * var(--ring-gap));border-radius:50%;border:var(--ring-w) solid var(--amber);clip-path:inset(0 100% 0 0)}
 #restlock.hold::after{clip-path:inset(0);transition:clip-path var(--hold) linear}
 #restbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-4);text-align:center}
-#restpic{font-size:calc(var(--fs-xl) * 3);line-height:1}
+#restpic{position:relative;font-size:var(--fs-xxl);line-height:1;padding:var(--sp-3) var(--sp-4)}
+#restpic::after{content:'';position:absolute;inset:0;border:var(--ban-w) solid var(--danger);border-radius:var(--r-pill);background:linear-gradient(to top right,transparent calc(50% - var(--ban-w) / 2),var(--danger) calc(50% - var(--ban-w) / 2),var(--danger) calc(50% + var(--ban-w) / 2),transparent calc(50% + var(--ban-w) / 2))}
 #restmsg{font-size:var(--fs-l);font-weight:700;max-width:var(--col)}
+#restwait{font-size:var(--fs-m);font-weight:700;color:var(--text)}
 #restgate{display:flex;flex-direction:column;align-items:center;gap:var(--sp-3)}
 #restgate[hidden]{display:none}
 #restopts{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-3)}
@@ -408,7 +410,7 @@ body:has(#backdrop:not([hidden])) .pill.link{background:var(--card)}
 <div id="rest" class="sheet" role="dialog" aria-modal="true" aria-labelledby="restmsg" hidden>
   <div class="sheet-head"><button id="restlock" class="rbtn small" data-aria="parent" data-icon="lock"></button></div>
   <div id="restbody">
-    <div id="restpic" data-icon="noscreen"></div>
+    <div id="restpic" data-icon="screens"></div>
     <p id="restmsg"></p>
     <p id="reststars" class="label"></p>
     <p id="restwait" class="label"></p>
