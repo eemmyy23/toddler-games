@@ -35,7 +35,7 @@ const SESSION = (function () {
   }
   function draw() {
     const U = S(), wait = Math.max(0, Math.ceil((st.rest + C.breakMin * min - Date.now()) / min));
-    $('restmsg').textContent = U.title;
+    $('restmsg').textContent = U.done;
     $('reststars').innerHTML = APP.stars ? `${APP.icon('star')} ${APP.stars}` : '';
     $('restwait').textContent = wait ? APP.t(U.wait, { n: wait }) : '';
     $('restgo').hidden = !!wait; $('restgo').textContent = U.again;

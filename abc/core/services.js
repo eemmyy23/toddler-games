@@ -21,7 +21,7 @@ function onScrub(root, sel, fn) {
   r.addEventListener('click', e => { e.stopPropagation(); const b = !e.detail && e.target.closest && e.target.closest(sel); if (b) fn(b, e); });
 }
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, beat: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400, karaoke: 75 };
+const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, beat: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400, karaoke: 75, linger: 1500 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {
@@ -94,15 +94,31 @@ const SPEECH = {
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 const KARAOKE = {
-  el: null, cuts: [], raf: 0, t0: 0, est: 0, real: false, id: 0,
+  el: null, cuts: [], marks: [], raf: 0, t0: 0, est: 0, real: false, id: 0, sub: null, hideT: 0,
   norm: t => (t || '').toLocaleLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim(),
   find(text) {
     const want = this.norm(text);
     if (!want) return null;
-    const shown = e => !e.closest('[hidden]') && e.getClientRects().length > 0;
-    const hits = [...document.body.querySelectorAll('*')].filter(e => !/^(SCRIPT|STYLE|SVG|CANVAS)$/i.test(e.tagName) && this.norm(e.textContent) === want && shown(e));
-    return hits.find(e => !hits.some(o => o !== e && e.contains(o))) || null;
+    const shown = e => !e.closest('[hidden], #sub') && e.getClientRects().length > 0, seen = new Set();
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (w.nextNode()) {
+      const t = this.norm(w.currentNode.data);
+      if (!t || !want.includes(t)) continue;
+      for (let e = w.currentNode.parentElement; e && e !== document.body && !seen.has(e); e = e.parentElement) {
+        seen.add(e);
+        const all = this.norm(e.textContent);
+        if (all.length > want.length) break;
+        if (all === want && shown(e)) return e;
+      }
+    }
+    return null;
   },
+  caption(text) {
+    const s = $('sub'); clearTimeout(this.hideT);
+    s.textContent = text; s.hidden = false;
+    return s;
+  },
+  hide() { clearTimeout(this.hideT); $('sub').hidden = true; },
   wrap(el) {
     if (!el.querySelector('.kw')) {
       const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
@@ -117,7 +133,9 @@ const KARAOKE = {
   },
   prime(el, text) {
     this.stop(); this.id++;
+    if (el) this.hide(); else if (this.norm(text)) el = this.caption(text);
     const words = el && el.isConnected ? this.wrap(el) : [];
+    this.marks = el && el.id === 'sub' ? words.map(k => { const t = this.find(k.textContent); return t ? t.closest('button') || t : null; }) : [];
     if (!words.length) return;
     const lens = words.map(k => I18N.graphemes(k.textContent, SPEECH.bcp47).length), tot = lens.reduce((a, b) => a + b, 0);
     let c = 0; this.cuts = lens.map(l => (c += l) / tot);
@@ -133,8 +151,16 @@ const KARAOKE = {
   at(p) {
     const ks = this.el.querySelectorAll('.kw'), n = this.cuts.findIndex(c => p < c);
     ks.forEach((k, i) => k.classList.toggle('now', i === n));
+    this.marks.forEach((m, i) => m && m.classList.toggle('said', i === n || (m === this.marks[n])));
   },
-  stop(id) { if (id != null && id !== this.id) return; cancelAnimationFrame(this.raf); if (this.el) this.el.querySelectorAll('.kw.now').forEach(k => k.classList.remove('now')); this.el = null; }
+  stop(id) {
+    if (id != null && id !== this.id) return;
+    cancelAnimationFrame(this.raf);
+    if (this.el) this.el.querySelectorAll('.kw.now').forEach(k => k.classList.remove('now'));
+    this.marks.forEach(m => m && m.classList.remove('said'));
+    if (this.el && this.el.id === 'sub') this.hideT = setTimeout(() => this.hide(), TALK.linger);
+    this.el = null; this.marks = [];
+  }
 };
 function makeUtt(text, onDone) {
   let said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
@@ -176,7 +202,7 @@ function speak(text, delay = 0, el = KARAOKE.find(text)) {
       : speechSynthesis.speak(makeUtt(text, done)), delay);
   });
 }
-const hush = () => { KARAOKE.stop(); clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
+const hush = () => { KARAOKE.stop(); KARAOKE.hide(); clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
 
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;

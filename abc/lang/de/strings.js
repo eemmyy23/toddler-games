@@ -15,7 +15,7 @@ STRINGS('de', {
   install: '{app} auf dem Gerät installieren',
   profile: { curious: 'Neugierig', explorer: 'Entdecker', scientist: 'Forscher', ages: '{name}, {a} bis {b} Jahre' },
   installBtn: 'Installieren',
-  session: { left: ['Jetzt die letzte!', 'Noch zwei!', 'Noch drei, dann sind wir fertig!'], almost: 'Gleich machen wir Pause!', done: 'Super gespielt! Jetzt ist Pause. Ab zum Spielen!', title: 'Super gespielt! Jetzt ist Pause.',
+  session: { left: ['Jetzt die letzte!', 'Noch zwei!', 'Noch drei, dann sind wir fertig!'], almost: 'Gleich machen wir Pause!', done: 'Super gespielt! Jetzt ist Pause. Ab zum Spielen!',
     wait: { one: 'In einer Minute geht es weiter.', other: 'In {n} Minuten geht es weiter.' }, again: 'Nochmal spielen!', sum: 'Für Erwachsene: {a} + {b} = ?' },
   settings: { speed: 'Sprechtempo', speeds: ['Langsam', 'Normal', 'Schnell'], time: 'Spielzeit', minutes: '{n} Min.', timeHint: 'Gegen Ende sagt die App „Noch drei, dann sind wir fertig!“ und macht dann mindestens {rest} Minuten Pause. Früher entsperren: 🔒 {hold} Sekunden gedrückt halten.', used: 'Gespielt: {used} von {limit}', title: 'Einstellungen', voice: 'Stimme', pron: 'Aussprache', pronSub: 'Ein Wort finden und korrigieren',
     search: 'Wort suchen…', searchHint: 'Suche das Wort, das falsch klingt.', showAll: 'Alle Wörter zeigen ({n})', noResult: 'Kein Wort gefunden.',

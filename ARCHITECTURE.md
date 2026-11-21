@@ -37,6 +37,9 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             line (case and punctuation ignored); its words are wrapped in `.kw` and the one being said gets `.now`, from the voice's
                             word boundaries, else by estimated time (`TALK.karaoke` ms/char ÷ rate) — so it also works muted, without a voice and
                             with Piper. Pass `el` only when the screen shows a different text than is said (the game question hides its word).
+                            A line that is not on screen (praise, "a, de la albină!", the clock's words) is shown as a caption (`#sub`, one `.sub`)
+                            with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
+                            it is spoken; the caption leaves `TALK.linger` ms after the line ends. Nothing is said without being written.
                             So a view only has to SHOW what it SAYS (a tally card shows and says "cinci uși").
                             Voice speed: `config.speech` (rate 0.75 default; Slow/Normal/Fast in Settings → Voice, stored as `rate`; Piper scales length by it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
