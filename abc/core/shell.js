@@ -300,6 +300,8 @@ function openIndex() {
       .map(u => `<button class="az${groups.get(u).length ? '' : ' dim'}" data-u="${esc(u)}" aria-label="${esc(head(u).name || head(u).text)}">${esc(head(u).text)}</button>`).join('');
   } else html = list.map(btn).join('');
   $('ixgrid').innerHTML = html; $('ixaz').innerHTML = az; $('ixaz').hidden = !az;
+  $('index').hidden = false;
+  [...$('ixgrid').querySelectorAll('.ix')].filter(b => b.scrollWidth > b.clientWidth + 1).forEach(b => APP.fitText(b));
   $('ixsearch').querySelector('span').textContent = U.search.placeholder;
   $('index').hidden = false;
   const on = $('ixgrid').querySelector('.on'); if (on) on.scrollIntoView({ block: 'center' });

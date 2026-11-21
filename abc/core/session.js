@@ -1,6 +1,6 @@
 const SESSION = (function () {
   const C = ABC.config.session, S = () => APP.ui().session, sec = 1000, min = 60 * sec;
-  const st = Object.assign({ used: 0, at: 0, rest: 0, idea: 0 }, store.get('session', {}));
+  const st = Object.assign({ used: 0, at: 0, rest: 0 }, store.get('session', {}));
   let last = 0, left = null, said = false, avg = C.round * sec, held = null, sum = null;
   const save = () => { st.at = Date.now(); store.set('session', st); };
   const limit = () => store.get('limit', C.minutes) * min;
@@ -28,17 +28,14 @@ const SESSION = (function () {
   }
   function rest(quiet) {
     APP.stop(); if (APP.settings) APP.settings.close();
-    if (!st.rest) { st.rest = Date.now(); st.idea = Math.random() * S().ideas.length | 0; save(); }
+    if (!st.rest) { st.rest = Date.now(); save(); }
     gate(false); draw(); $('rest').hidden = false;
     history.pushState({ rest: 1 }, '');
-    if (!quiet) speak(line());
+    if (!quiet) speak(S().done).then(() => { if (resting() && $('restwait').textContent) speak($('restwait').textContent); });
   }
-  const idea = () => { const I = S().ideas; return I[st.idea % I.length]; };
-  const line = () => APP.t(S().done, { idea: idea()[1] });
   function draw() {
     const U = S(), wait = Math.max(0, Math.ceil((st.rest + C.breakMin * min - Date.now()) / min));
-    $('restpic').textContent = idea()[0];
-    $('restmsg').textContent = line();
+    $('restmsg').textContent = U.done;
     $('reststars').innerHTML = APP.stars ? `${APP.icon('star')} ${APP.stars}` : '';
     $('restwait').textContent = wait ? APP.t(U.wait, { n: wait }) : '';
     $('restgo').hidden = !!wait; $('restgo').textContent = U.again;

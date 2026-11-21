@@ -81,7 +81,8 @@ tools/check.js              content, config, markup, CSS-token, engine-literal, 
 tools/fast.js               layout check, no server (needs playwright): every language × hubs, learn tiles (first, middle, last, longest
                             item; Read: 6 longest words), games, Settings (home, voice, pronunciation) × 7 sizes (phones, tablet portrait/landscape,
                             desktop), oldest profile; fails when a bar item leaves the content column or a `.on` ring is cut by a clipping ancestor
-                            (scrollers give it `--ring-room`) (CI)
+                            (scrollers give it `--ring-room`); on phone widths it also opens every index and fails when a tile's face is
+                            wider than the tile (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
 tools/smoke.js              browser test: every language, every game, choice rules, speech, keys, background, search, offline, clock (hour cycle per
                             language, spoken times, dragging and tapping the dial, day/night backdrop and its contrast) (CI)
 ```
@@ -240,8 +241,8 @@ Play time (`config.session`, `abc/core/session.js`): SESSION counts seconds whil
 the screen in the last `idle` s (stored as `session`, so a reload does not reset it; limit `limit`, default 3 min, 2–15 in Settings → Play time). In a game,
 when less than `windDown` average rounds remain, the next rounds open with `session.left` ("Three more and we're done!" → "Two more!" → "Last one!") and
 the break starts after the last one's praise; elsewhere `session.almost` at `warn` s, the break when time is up and nothing is speaking. The break screen
-(`#rest`) shows and says `session.done` with one of `session.ideas` (an offline activity: draw, a toy, water, jump, blocks, a book,
- outside, a song; kept across reloads) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
+(`#rest`) shows 📵 and says `session.done` (why: a long time on a phone or tablet tires eyes and mind; put the screen away), then
+ `session.wait` (the app can be used again to learn and play in n minutes) once, survives reloads and the back button, offers "play again" after `breakMin` minutes; a grown-up unlocks earlier by holding
 🔒 `hold` s and answering a sum.
 An item with `members` asks about one member per round (`subject`, kept across a language switch); the question's `{name}`/`{the}` come from it.
 

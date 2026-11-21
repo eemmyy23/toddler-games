@@ -383,7 +383,8 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
   ok(bad.length === 0, 'no overlap / clipping' + (bad.length ? ': ' + bad.slice(0, 10).join(' ') : ''));
 
   console.log('play time (wind-down, break)');
-  await ev(() => { setLang('ro'); store.set('limit', 2); store.set('session', { used: 2 * 60000, at: Date.now(), rest: 0 }); });
+  await ev(() => setLang('ro'));
+  await p.addInitScript(s => { if (!sessionStorage.pt) { sessionStorage.pt = 1; localStorage.setItem('abc2.limit', '2'); localStorage.setItem('abc2.session', s); } }, JSON.stringify({ used: 2 * 60000, at: Date.now(), rest: 0 }));
   await p.reload(); await p.waitForFunction(() => typeof APP === 'object');
   const wd = await ev(() => { openTile('colors', true, true); const leads = [];
     for (let k = 0; k < 3; k++) { ABC.views.play.newRound(); const l = ABC.views.play.state().round.lead; leads.push(l); SESSION.done(l); }
