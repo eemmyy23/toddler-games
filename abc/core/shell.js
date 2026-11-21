@@ -136,7 +136,7 @@ const APP = {
     if (!it.tally) return { pics: it.pics || [], line: null };
     const x = APP.countable(), n = it.tally, L = APP.L(), f = x.forms;
     const what = n === 1 ? f.sg[0] : n === 2 ? f.pl[0] : L.numbers ? `${L.numbers[n - 1]} ${x.entry.pl}` : null;
-    return { pics: Array(n).fill(x.pic), line: what && APP.exclaim(I18N.capFirst(what, L.bcp47)) };
+    return { pics: Array(n).fill(x.pic), words: what, line: what && APP.exclaim(I18N.capFirst(what, L.bcp47)) };
   },
   tally: it => APP.tallyOf(it).pics,
   hands(n) {
@@ -378,6 +378,7 @@ function markVoices() {
   document.querySelectorAll('.flag').forEach(f => { const has = SPEECH.hasVoice(ABC.langs[f.dataset.lang].bcp47); f.classList.toggle('novoice', has === false); f.querySelector('.nv').hidden = has !== false; });
 }
 function pickVoice() {
+  SPEECH.rate = store.get('rate', CFG.speech.rate);
   const L = APP.L(), want = store.get(`voice.${L.code}`, null), mine = L.piper && want === `piper:${L.piper}`;
   const E = mine && PIPER.live === L.piper ? PIPER.engine(L.piper) : null;
   SPEECH.pick(L.bcp47, L.voices, L.words, L.ssml, true, L.fixes, want, E);
