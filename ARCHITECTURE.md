@@ -32,6 +32,11 @@ abc/core/services.js        $, onTap/onTapIn (act on click: keyboard works, no p
 abc/core/piper.js           PIPER: optional Piper neural voice — downloads `config.piper` runtime (onnxruntime-web, piper_phonemize) + the language's `LANG.piper` model
                             into the Cache API ('piper-v1') only when the user asks, then runs offline: text → espeak phoneme ids, IPA (`SPEECH.phonemes`) → model ids,
                             PCM played through WebAudio; `PIPER.engine(id)` is the `{ uri, say, stop }` plugged into `SPEECH.engine`
+abc/core/services.js has KARAOKE: `speak(text, delay, el)` wraps the words of `el` in `.kw` spans and marks the one being said (`.now`) from
+                            the voice's word boundaries, else by estimated time (`TALK.karaoke` ms/char ÷ rate); works without sound and with Piper.
+                            Card, Read, the game question and every `APP.sequence` step with `light` pass the element that shows the spoken text —
+                            what is said is what is on screen (a tally card shows and says "cinci uși").
+                            Voice speed: `config.speech` (rate 0.75 default; Slow/Normal/Fast in Settings → Voice, stored as `rate`; Piper scales length by it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
 abc/core/settings.js        Settings sheet (⚙ on the hubs): home = language (flags; switches the app in place) + rows Voice / Pronunciation / Play time, sub-screens with ‹ back.
                             Voice: the language again, "voices on this phone" (card = select + sample, ▶ = sample only, where to add voices for Android/iOS),

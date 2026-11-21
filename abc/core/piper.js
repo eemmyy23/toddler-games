@@ -74,7 +74,7 @@ const PIPER = {
     const { cfg, sess } = await this.ready, I = cfg.inference;
     const out = await sess.run({ input: new ort.Tensor('int64', BigInt64Array.from(ids.map(BigInt)), [1, ids.length]),
       input_lengths: new ort.Tensor('int64', BigInt64Array.from([BigInt(ids.length)])),
-      scales: new ort.Tensor('float32', Float32Array.from([I.noise_scale, I.length_scale, I.noise_w])) });
+      scales: new ort.Tensor('float32', Float32Array.from([I.noise_scale, I.length_scale / SPEECH.rate, I.noise_w])) });
     return out.output.data;
   },
   async render(text, phonemes) {

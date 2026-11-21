@@ -21,7 +21,7 @@ function onScrub(root, sel, fn) {
   r.addEventListener('click', e => { e.stopPropagation(); const b = !e.detail && e.target.closest && e.target.closest(sel); if (b) fn(b, e); });
 }
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, beat: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400 };
+const PAUSE = { tap: 80, line: 120, ask: 250, answer: 350, praise: 700, beat: 700, hold: 1500 }, TALK = { base: 2000, perChar: 160, silent: 400, karaoke: 75 };
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 const store = {
@@ -52,7 +52,7 @@ const sfx = {
 };
 
 const SPEECH = {
-  voice: null, noVoice: false, bcp47: null, respell: [], phonemes: null, engine: null, rate: 0.85, pitch: 1.25,
+  voice: null, noVoice: false, bcp47: null, respell: [], phonemes: null, engine: null, rate: ABC.config.speech.rate, pitch: ABC.config.speech.pitch,
   norm: v => v.lang.replace('_', '-').toLowerCase(),
   hasVoice(bcp47) {
     if (!('speechSynthesis' in window)) return false;
@@ -93,6 +93,41 @@ const SPEECH = {
 };
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
+const KARAOKE = {
+  el: null, cuts: [], raf: 0, t0: 0, est: 0, real: false, id: 0,
+  wrap(el) {
+    if (!el.querySelector('.kw')) {
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
+      while (w.nextNode()) if (/\S/.test(w.currentNode.data)) nodes.push(w.currentNode);
+      for (const n of nodes) {
+        const f = document.createDocumentFragment();
+        for (const part of n.data.split(/(\s+)/)) if (part) { if (/^\s+$/.test(part)) f.append(part); else { const k = document.createElement('span'); k.className = 'kw'; k.textContent = part; f.append(k); } }
+        n.replaceWith(f);
+      }
+    }
+    return [...el.querySelectorAll('.kw')];
+  },
+  prime(el, text) {
+    this.stop(); this.id++;
+    const words = el && el.isConnected ? this.wrap(el) : [];
+    if (!words.length) return;
+    const lens = words.map(k => I18N.graphemes(k.textContent, SPEECH.bcp47).length), tot = lens.reduce((a, b) => a + b, 0);
+    let c = 0; this.cuts = lens.map(l => (c += l) / tot);
+    this.el = el; this.real = false; this.est = I18N.graphemes(text, SPEECH.bcp47).length * TALK.karaoke / SPEECH.rate;
+  },
+  start(id) {
+    if (!this.el || id !== this.id) return;
+    this.t0 = performance.now();
+    const step = () => { if (!this.el) return; if (!this.real) this.at(Math.min(0.999, (performance.now() - this.t0) / this.est)); this.raf = requestAnimationFrame(step); };
+    step();
+  },
+  boundary(id, i, len) { if (!this.el || !len || id !== this.id) return; this.real = true; this.at(Math.min(0.999, (i + 1) / len)); },
+  at(p) {
+    const ks = this.el.querySelectorAll('.kw'), n = this.cuts.findIndex(c => p < c);
+    ks.forEach((k, i) => k.classList.toggle('now', i === n));
+  },
+  stop(id) { if (id != null && id !== this.id) return; cancelAnimationFrame(this.raf); if (this.el) this.el.querySelectorAll('.kw.now').forEach(k => k.classList.remove('now')); this.el = null; }
+};
 function makeUtt(text, onDone) {
   let said = SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text);
   if (!/^<speak>|[.!?…:]\s*$/u.test(said)) said += '.';
@@ -102,20 +137,24 @@ function makeUtt(text, onDone) {
     said = `<speak>${esc(said).replace(P.re, w => `<phoneme alphabet="ipa" ph="${esc(P.map.get(w.toLocaleLowerCase(SPEECH.bcp47)))}">${w}</phoneme>`)}</speak>`;
   }
   P && (P.re.lastIndex = 0);
-  const u = new SpeechSynthesisUtterance(said);
+  const u = new SpeechSynthesisUtterance(said), kid = KARAOKE.id;
   u.said = text;
   if (SPEECH.voice) u.voice = SPEECH.voice;
   u.lang = SPEECH.voice ? SPEECH.voice.lang : SPEECH.bcp47; u.rate = SPEECH.rate; u.pitch = SPEECH.pitch;
   liveUtts.add(u);
   let fallback;
-  const fin = () => { clearTimeout(fallback); liveUtts.delete(u); onDone && onDone(); };
+  const fin = () => { clearTimeout(fallback); liveUtts.delete(u); KARAOKE.stop(kid); onDone && onDone(); };
   u.onend = u.onerror = fin;
+  u.onstart = () => KARAOKE.start(kid);
+  u.onboundary = e => KARAOKE.boundary(kid, e.charIndex, said.length);
   fallback = setTimeout(fin, TALK.base + I18N.graphemes(text, SPEECH.bcp47).length * TALK.perChar);
   return u;
 }
-function speak(text, delay = 0) {
+function speak(text, delay = 0, el = null) {
   const E = SPEECH.engine;
-  if (!E && (!('speechSynthesis' in window) || SPEECH.noVoice)) return wait(TALK.silent + delay);
+  KARAOKE.prime(el, text);
+  const kid = KARAOKE.id;
+  if (!E && (!('speechSynthesis' in window) || SPEECH.noVoice)) { setTimeout(() => KARAOKE.start(kid), delay); setTimeout(() => KARAOKE.stop(kid), delay + KARAOKE.est); return wait(TALK.silent + delay); }
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   if (E) E.stop();
   clearTimeout(speakTimer);
@@ -125,11 +164,11 @@ function speak(text, delay = 0) {
     const done = () => { if (!settled) { settled = true; if (speakDone === done) speakDone = null; res(); } };
     speakDone = done;
     speakTimer = setTimeout(() => E
-      ? E.say(SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text)).then(done, done)
+      ? (KARAOKE.start(kid), E.say(SPEECH.respell.reduce((t, [re, to]) => t.replace(re, to), text)).then(() => { KARAOKE.stop(kid); done(); }, () => { KARAOKE.stop(kid); done(); }))
       : speechSynthesis.speak(makeUtt(text, done)), delay);
   });
 }
-const hush = () => { clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
+const hush = () => { KARAOKE.stop(); clearTimeout(speakTimer); if (speakDone) speakDone(); if ('speechSynthesis' in window) speechSynthesis.cancel(); if (SPEECH.engine) SPEECH.engine.stop(); };
 
 const fx = $('fx'), fctx = fx.getContext('2d');
 let W, H;

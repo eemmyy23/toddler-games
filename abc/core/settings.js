@@ -47,7 +47,9 @@
       else piper = `<div class="card setv off">${name}<button id="setdl" class="pill small primary"${PIPER.ok() && navigator.onLine !== false ? '' : ' disabled'}>${esc(st.err ? U.retry : APP.t(U.download, { mb: total }))}</button></div>
           ${st.err ? `<p class="label sethint">${esc(st.err)}</p>` : ''}${navigator.onLine === false ? `<p class="label sethint">${esc(U.offline)}</p>` : ''}`;
     }
-    return `${langs()}<div class="label caps">${esc(U.phone)}</div><p class="label sethint">${esc(U.phoneHint)}</p>${how}${phone}
+    const R = CFG.speech, rate = store.get('rate', R.rate);
+    const speed = `<div class="label caps">${esc(U.speed)}</div><div class="setlang">${R.rates.map((r, i) => `<button class="card setl${r === rate ? ' on' : ''}" data-rate="${r}" aria-pressed="${r === rate}"><span>${APP.icon(R.icons[i])}</span>${esc(U.speeds[i])}</button>`).join('')}</div>`;
+    return `${langs()}${speed}<div class="label caps">${esc(U.phone)}</div><p class="label sethint">${esc(U.phoneHint)}</p>${how}${phone}
       ${piper ? `<div class="label caps">${esc(U.more)}</div>${piper}` : ''}`;
   }
   const code = () => APP.L().code;
@@ -145,6 +147,7 @@
   function close() { $('settings').hidden = true; }
   onTap('setbtn', open); onTap('setclose', close);
   onTap('setback', () => go(st.view === 'word' ? 'pron' : 'home'));
+  onTapIn('setbody', '[data-rate]', b => { store.set('rate', +b.dataset.rate); SPEECH.rate = +b.dataset.rate; say(); draw(); });
   onTapIn('setbody', '[data-min]', b => { store.set('limit', +b.dataset.min); draw(); });
   onTapIn('setbody', '.setl[data-l]', b => { setLang(b.dataset.l); st.sizeOf = null; draw(); });
   onTapIn('setbody', '.setn', b => go(b.dataset.go));

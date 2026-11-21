@@ -41,10 +41,11 @@
     round.look = game().vary ? game().vary(target) : null;
     draw();
   }
+  const line = () => round.lead ? APP.t(APP.ui().then, { a: round.lead, b: askLine() }) : askLine();
   function draw() {
     locked = false;
     const q = game().show(target, round, askLine(), subject());
-    $('ask').innerHTML = `<span class="q">${APP.icon('speak')}${esc(q.text)}</span>${q.picture || ''}`;
+    $('ask').innerHTML = `<span class="q">${APP.icon('speak')}${round.lead ? `${esc(round.lead)} ` : ''}${esc(q.text)}</span>${q.picture || ''}`;
     const box = $('choices');
     box.className = 'n' + opts.length + (target.smallBubble ? ' grp' : '') + (target.pictureBubble ? ' wrd' : '');
     box.innerHTML = '';
@@ -59,7 +60,7 @@
     box.querySelectorAll('.bname').forEach(c => APP.fitText(c));
     APP.links(target, $('plinks'));
     APP.fit($('play'));
-    speak(round.lead ? APP.t(APP.ui().then, { a: round.lead, b: askLine() }) : askLine(), PAUSE.ask);
+    speak(line(), PAUSE.ask, $('ask').querySelector('.q'));
   }
   function choose(it, el) {
     if (locked) return;
@@ -86,7 +87,7 @@
       speak(APP.t(U.wrong, { thats: APP.t(U.thats, it.thats), ask: askLine() }), PAUSE.answer);
     }
   }
-  onTap('ask', () => { if (target) speak(askLine()); });
+  onTap('ask', () => { if (target) speak(line(), 0, $('ask').querySelector('.q')); });
   onTapIn('choices', '.bub', b => { const it = opts.find(o => o.id === b.dataset.id); if (it) choose(it, b); });
   VIEW('play', {
     el: 'play',

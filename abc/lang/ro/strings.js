@@ -17,7 +17,7 @@ STRINGS('ro', {
   installBtn: 'Instalează',
   session: { left: ['Ultima!', 'Încă două!', 'Încă trei și gata!'], almost: 'Aproape e timpul de pauză!', done: 'Bravo! Acum facem pauză. Hai la joacă!', title: 'Bravo! Acum facem pauză.',
     wait: { one: 'Se poate juca din nou peste un minut.', few: 'Se poate juca din nou peste {n} minute.', other: 'Se poate juca din nou peste {n} de minute.' }, again: 'Hai din nou!', sum: 'Pentru părinți: {a} + {b} = ?' },
-  settings: { time: 'Timp de joc', minutes: '{n} min', timeHint: 'Spre final aplicația spune „Încă trei și gata!”, apoi face pauză cel puțin {rest} minute. Ca să deblochezi mai devreme: ține apăsat 🔒 {hold} secunde.', used: 'Folosit: {used} din {limit}', title: 'Setări', voice: 'Voce', pron: 'Pronunție', pronSub: 'Găsește și corectează un cuvânt',
+  settings: { speed: 'Viteza vocii', speeds: ['Încet', 'Normal', 'Repede'], time: 'Timp de joc', minutes: '{n} min', timeHint: 'Spre final aplicația spune „Încă trei și gata!”, apoi face pauză cel puțin {rest} minute. Ca să deblochezi mai devreme: ține apăsat 🔒 {hold} secunde.', used: 'Folosit: {used} din {limit}', title: 'Setări', voice: 'Voce', pron: 'Pronunție', pronSub: 'Găsește și corectează un cuvânt',
     search: 'Caută un cuvânt…', searchHint: 'Caută cuvântul care sună greșit.', showAll: 'Arată toate cuvintele ({n})', noResult: 'Niciun cuvânt găsit.',
     forms: 'Formele cuvântului', fix: 'Corectează', which: 'Care sună corect?', asNow: 'Ca acum', version: 'Varianta {n}', noneRight: 'Niciuna nu e corectă',
     write: 'Scrie cum ar trebui să sune', use: 'Folosește', saved: 'Salvat. Pe acest telefon se spune acum așa.', fixed: 'Corectat', restore: 'Revino la original',

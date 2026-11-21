@@ -17,7 +17,7 @@ STRINGS('en', {
   installBtn: 'Install',
   session: { left: ['Last one!', 'Two more!', "Three more and we're done!"], almost: 'Almost time for a break!', done: "Great playing! Time for a break. Let's go play!", title: 'Great playing! Time for a break.',
     wait: { one: 'You can play again in a minute.', other: 'You can play again in {n} minutes.' }, again: 'Play again!', sum: 'For grown-ups: {a} + {b} = ?' },
-  settings: { time: 'Play time', minutes: '{n} min', timeHint: 'Near the end the app says "Three more and we\'re done!", then takes a break of at least {rest} minutes. To unlock sooner: hold 🔒 for {hold} seconds.', used: 'Used: {used} of {limit}', title: 'Settings', voice: 'Voice', pron: 'Pronunciation', pronSub: 'Find and fix a word',
+  settings: { speed: 'Voice speed', speeds: ['Slow', 'Normal', 'Fast'], time: 'Play time', minutes: '{n} min', timeHint: 'Near the end the app says "Three more and we\'re done!", then takes a break of at least {rest} minutes. To unlock sooner: hold 🔒 for {hold} seconds.', used: 'Used: {used} of {limit}', title: 'Settings', voice: 'Voice', pron: 'Pronunciation', pronSub: 'Find and fix a word',
     search: 'Search a word…', searchHint: 'Search for the word that sounds wrong.', showAll: 'Show all words ({n})', noResult: 'No word found.',
     forms: 'Forms of this word', fix: 'Fix', which: 'Which one sounds right?', asNow: 'As now', version: 'Version {n}', noneRight: 'None sounds right',
     write: 'Write it the way it should sound', use: 'Use this', saved: 'Saved. This phone now says it like this.', fixed: 'Fixed', restore: 'Restore original',

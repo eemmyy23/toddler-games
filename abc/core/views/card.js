@@ -34,8 +34,8 @@
       $('parts').innerHTML = strip ? P.map((x, i) => `<button class="card pt" data-part="${i}" aria-label="${esc(x.say)}" style="--i:${i};--c:${x.color}"></button>`).join('')
         + `<span class="tip">${APP.icon('drag')}</span>` : '';
       if (strip) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }
-      const tl = APP.tallyOf(it), pics = tl.pics; said = tl.line ? `${it.say} ${tl.line}` : it.say; $('pics').hidden = !pics.length; $('word').hidden = !it.word;
-      $('word').textContent = it.word || '';
+      const tl = APP.tallyOf(it), pics = tl.pics, shown = tl.words || it.word; said = tl.line || it.say; $('pics').hidden = !pics.length; $('word').hidden = !shown;
+      $('word').textContent = shown || '';
       $('also').innerHTML = APP.synonyms(it); $('also').hidden = !$('also').innerHTML; if (!$('also').hidden) APP.fitText($('also'));
       $('pics').innerHTML = pics.map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
       $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="card ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color
@@ -45,7 +45,7 @@
       APP.fitText(g);
       APP.fit($('learn'), 'tight');
       APP.shown();
-      if (sayIt) speak(said, PAUSE.line);
+      if (sayIt) speak(said, PAUSE.line, $('word'));
     },
     step(d) { APP.step(d); sfx.pop(); this.show(true); },
     line: () => said,
