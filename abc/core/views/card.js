@@ -15,6 +15,7 @@
     const it = APP.item(), p = e.target.closest && e.target.closest('.part');
     if (p && it.parts) { APP.celebrate(p); part(+p.dataset.part); }
     else if (it.parts) { part((at + 1) % it.parts.length); APP.celebrate(big(at)); }
+    else if (it.tally) { APP.celebrate(e.target); APP.fresh(); VIEW_CARD.show(true); }
     else { APP.celebrate(e.target); speak(said); }
   }
   onTap('glyph', tapBig);

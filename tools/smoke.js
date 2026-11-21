@@ -68,9 +68,9 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const slot = KARAOKE.slot(), cap = slot.classList.contains('sub') && slot.id !== 'sub' && slot.textContent === I18N.shown(APP.item().say) && KARAOKE.marks.filter(Boolean).length >= 2; KARAOKE.stop(); KARAOKE.hide();
     return [tab && tab.classList.contains('tl'), card && card.id, cap]; });
   const again = await ev(() => { openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const w0 = $('word').textContent; __said.length = 0;
-    $('glyph').click(); $('word').click(); const w1 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, $('word').textContent]; });
+    $('word').click(); const w1 = $('word').textContent; const others = new Set(); for (let k = 0; k < 8; k++) { $('glyph').click(); others.add($('word').textContent); } ABC.views.card.step(1); ABC.views.card.step(-1); const back = $('word').textContent; $('pics').click(); const w2 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, others.size, back === w2]; });
   await spoken();
-  ok(again[0] === again[1] && again[1] === again[2], `tapping the card says it again and keeps it; back shows the same "${again.join(' / ')}"`);
+  ok(again[0] === again[1] && again[2] >= 3 && again[3], `tapping the text says it again; tapping the number shows other things (${again[2]} kinds); back keeps the last one; tapping the things says it again (${again.join(' / ')})`);
   const fresh = await ev(() => { openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false); const seen = new Set();
     for (let k = 0; k < 12; k++) { ABC.views.card.step(1); seen.add($('word').textContent); ABC.views.card.step(-1); }
     ABC.views.card.step(1); KARAOKE.prime($('word'), ABC.views.card.line()); KARAOKE.start(KARAOKE.id, 1000); KARAOKE.at(0.1); const lit = $('word').querySelectorAll('.kw.now').length; KARAOKE.stop();
