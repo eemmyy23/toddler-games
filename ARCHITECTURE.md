@@ -40,9 +40,11 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             rendered with the target's fields replaced by the prompt (👂 / glyph / word), so karaoke maps word to word and lights 👂
                             while the hidden word is said. All speech goes through speak(): its 4th argument `how` = { voice, engine, plain, ph }
                             covers voice samples and pronunciation variants in Settings — no other code builds an utterance.
-                            A line that is not on screen (praise, "a, de la albină!", the clock's words) is shown as a caption (`#sub`, one `.sub`)
+                            A line that is not on screen (praise, "a, de la albină!", the clock's words) is written in the screen's infobox (`.sub`,
+                            a slot under the content, above the links, in Card, Game and Read; its space is reserved so nothing jumps), or in the
+                            floating `#sub` where a screen has no slot (hub, Settings) — never over the content
                             with the same karaoke, and each caption word that is also on screen (the letter, the example card) gets `.said` while
-                            it is spoken; the caption leaves `TALK.linger` ms after the line ends. Nothing is said without being written.
+                            it is spoken; the infobox keeps the last line until the next one, the floating one leaves `TALK.linger` ms after. Nothing is said without being written.
                             Hear it again: every element that was spoken carries `data-said`; tapping it (outside buttons/links) says it again with
                             karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
                             (`APP.countable(key)`), so ‹ back shows exactly what was heard.

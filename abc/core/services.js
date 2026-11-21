@@ -99,7 +99,7 @@ const KARAOKE = {
   find(text) {
     const want = this.norm(text);
     if (!want) return null;
-    const shown = e => !e.closest('[hidden], #sub') && e.getClientRects().length > 0, seen = new Set();
+    const shown = e => !e.closest('[hidden], .sub') && e.getClientRects().length > 0, seen = new Set();
     const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     while (w.nextNode()) {
       const t = this.norm(w.currentNode.data);
@@ -113,12 +113,14 @@ const KARAOKE = {
     }
     return null;
   },
+  slot: () => [...document.querySelectorAll('.sub:not(#sub)')].find(e => !e.closest('[hidden]') && e.getClientRects().length > 0) || $('sub'),
   caption(text) {
-    const s = $('sub'); clearTimeout(this.hideT);
+    this.hide();
+    const s = this.slot();
     s.textContent = text; s.hidden = false;
     return s;
   },
-  hide() { clearTimeout(this.hideT); $('sub').hidden = true; },
+  hide() { clearTimeout(this.hideT); document.querySelectorAll('.sub').forEach(s => { s.textContent = ''; delete s.dataset.said; }); $('sub').hidden = true; },
   wrap(el) {
     if (!el.querySelector('.kw')) {
       const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
@@ -136,7 +138,7 @@ const KARAOKE = {
     if (el) this.hide(); else if (this.norm(text)) el = this.caption(text);
     const words = el && el.isConnected ? this.wrap(el) : [];
     if (el) el.dataset.said = text;
-    this.marks = el && el.id === 'sub' ? words.map(k => { const t = this.find(k.textContent); return t ? t.closest('button') || t : null; }) : [];
+    this.marks = el && el.classList.contains('sub') ? words.map(k => { const t = this.find(k.textContent); return t ? t.closest('button') || t : null; }) : [];
     if (!words.length) return;
     const cut = ws => { const lens = ws.map(w => I18N.graphemes(w, SPEECH.bcp47).length), tot = lens.reduce((a, b) => a + b, 0); let c = 0; return lens.map(l => (c += l) / tot); };
     const said = text.split(/\s+/).filter(Boolean);
