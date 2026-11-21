@@ -19,7 +19,7 @@
   }
   onTap('glyph', tapBig);
   onTap('pics', () => { if (APP.screen() === 'card') speak(said); });
-  onTap('word', e => { if (APP.screen() === 'card' && APP.item().parts) tapBig(e); });
+  onTap('word', e => { if (APP.screen() !== 'card') return; if (APP.item().parts) tapBig(e); else speak(said); });
   onScrub('parts', '.pt', b => part(+b.dataset.part));
   onTapIn('examples', '.ex', b => APP.sequence('examples', [{ light: b, say: APP.item().examples[+b.dataset.i][0], pop: true }]));
   const VIEW_CARD = {
