@@ -82,7 +82,8 @@ tools/fast.js               layout check, no server (needs playwright): every la
                             item; Read: 6 longest words), games, Settings (home, voice, pronunciation) × 7 sizes (phones, tablet portrait/landscape,
                             desktop), oldest profile; fails when a bar item leaves the content column or a `.on` ring is cut by a clipping ancestor
                             (scrollers give it `--ring-room`); on phone widths it also opens every index and fails when a tile's face is
-                            wider than the tile (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
+                            wider than the tile; on every screen, any component box (button, card, pill, bubble, chip, infobox, tile) whose
+                            content spills out of it or whose text is clipped fails the run — one rule instead of per-screen checks (index faces shrink to fit via `--fit`; swatches/rainbows use small `--swatch`/`--rainbow` there) (CI)
 tools/smoke.js              browser test: every language, every game, choice rules, speech, keys, background, search, offline, clock (hour cycle per
                             language, spoken times, dragging and tapping the dial, day/night backdrop and its contrast) (CI)
 ```
