@@ -94,7 +94,7 @@ const SPEECH = {
 let speakTimer = null, speakDone = null;
 const liveUtts = new Set();
 const KARAOKE = {
-  el: null, cuts: [], marks: [], raf: 0, t0: 0, est: 0, real: false, id: 0, sub: null, hideT: 0,
+  el: null, cuts: [], marks: [], words: [], raf: 0, t0: 0, est: 0, real: false, id: 0, sub: null, hideT: 0,
   norm: t => (t || '').toLocaleLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim(),
   find(text) {
     const want = this.norm(text);
@@ -124,25 +124,35 @@ const KARAOKE = {
   wrap(el) {
     if (!el.querySelector('.kw')) {
       const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
-      while (w.nextNode()) if (/\S/.test(w.currentNode.data)) nodes.push(w.currentNode);
-      for (const n of nodes) {
+      while (w.nextNode()) if (w.currentNode.data) nodes.push(w.currentNode);
+      let n = -1, open = false;
+      for (const t of nodes) {
         const f = document.createDocumentFragment();
-        for (const part of n.data.split(/(\s+)/)) if (part) { if (/^\s+$/.test(part)) f.append(part); else { const k = document.createElement('span'); k.className = 'kw'; k.textContent = part; f.append(k); } }
-        n.replaceWith(f);
+        for (const part of t.data.split(/(\s+)/)) {
+          if (!part) continue;
+          if (/^\s+$/.test(part)) { f.append(part); open = false; continue; }
+          if (!open) n++;
+          const k = document.createElement('span'); k.className = 'kw'; k.dataset.w = n; k.textContent = part; f.append(k); open = true;
+        }
+        t.replaceWith(f);
       }
     }
-    return [...el.querySelectorAll('.kw')];
+    const groups = [];
+    el.querySelectorAll('.kw').forEach(k => { (groups[+k.dataset.w] = groups[+k.dataset.w] || []).push(k); });
+    return groups.filter(Boolean);
   },
-  prime(el, text) {
+  prime(el, text, line = text) {
     this.stop(); this.id++;
     if (el) this.hide(); else if (this.norm(text)) el = this.caption(text);
     const words = el && el.isConnected ? this.wrap(el) : [];
-    if (el) el.dataset.said = text;
-    this.marks = el && el.classList.contains('sub') ? words.map(k => { const t = this.find(k.textContent); return t ? t.closest('button') || t : null; }) : [];
+    if (el) el.dataset.said = line;
+    const word = g => g.map(k => k.textContent).join('');
+    this.words = words;
+    this.marks = el && el.classList.contains('sub') ? words.map(g => { const t = this.find(word(g)); return t ? t.closest('button') || t : null; }) : [];
     if (!words.length) return;
     const cut = ws => { const lens = ws.map(w => I18N.graphemes(w, SPEECH.bcp47).length), tot = lens.reduce((a, b) => a + b, 0); let c = 0; return lens.map(l => (c += l) / tot); };
     const said = text.split(/\s+/).filter(Boolean);
-    this.cuts = cut(said.length === words.length ? said : words.map(k => k.textContent));
+    this.cuts = cut(said.length === words.length ? said : words.map(word));
     this.el = el; this.real = false; this.est = I18N.graphemes(text, SPEECH.bcp47).length * TALK.karaoke / SPEECH.rate;
   },
   start(id) {
@@ -153,8 +163,8 @@ const KARAOKE = {
   },
   boundary(id, i, len) { if (!this.el || !len || id !== this.id) return; this.real = true; this.at(Math.min(0.999, (i + 1) / len)); },
   at(p) {
-    const ks = this.el.querySelectorAll('.kw'), n = this.cuts.findIndex(c => p < c);
-    ks.forEach((k, i) => k.classList.toggle('now', i === n));
+    const n = this.cuts.findIndex(c => p < c);
+    this.words.forEach((g, i) => g.forEach(k => k.classList.toggle('now', i === n)));
     this.marks.forEach((m, i) => m && m.classList.toggle('said', i === n || (m === this.marks[n])));
   },
   stop(id) {
@@ -190,9 +200,10 @@ function makeUtt(text, onDone, how = {}) {
   fallback = setTimeout(fin, TALK.base + I18N.graphemes(text, SPEECH.bcp47).length * TALK.perChar);
   return u;
 }
-function speak(text, delay = 0, el = KARAOKE.find(text), how = {}) {
+function speak(line, delay = 0, el = KARAOKE.find(I18N.shown(line)), how = {}) {
+  const text = I18N.said(line), shown = I18N.shown(line);
   const E = 'engine' in how ? how.engine : how.voice ? null : SPEECH.engine;
-  KARAOKE.prime(el, text);
+  KARAOKE.prime(el, shown, line);
   const kid = KARAOKE.id;
   if (!E && (!('speechSynthesis' in window) || (SPEECH.noVoice && !how.voice))) { setTimeout(() => KARAOKE.start(kid), delay); setTimeout(() => KARAOKE.stop(kid), delay + KARAOKE.est); return wait(TALK.silent + delay); }
   if ('speechSynthesis' in window) speechSynthesis.cancel();

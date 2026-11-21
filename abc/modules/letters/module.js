@@ -17,7 +17,7 @@
         const ex = examples(L, words, u.lower, false), [w, , inside] = ex[0] || [u.upper, '🔤', false];
         const name = A.name(u), color = A.color(u.id);
         return CONTENT.glyph(code, { id: u.id, text: u.upper, name, color, small: u.cased ? u.lower : null },
-          { key: u.lower.length === 1 ? u.lower : null, say: L.sayLetter(name, low(w), inside), examples: ex, lower: u.cased ? u.lower : null, unit: u, sound: sound(u) });
+          { key: u.lower.length === 1 ? u.lower : null, say: L.sayLetter(I18N.sayAs(u.lower, name), low(w), inside), examples: ex, lower: u.cased ? u.lower : null, unit: u, sound: sound(u) });
       });
       const groups = (L.groups || '').split(/\s+/).filter(Boolean).map((g, i, a) => {
         const ex = examples(L, words, g, true), [w] = ex[0] || [g];

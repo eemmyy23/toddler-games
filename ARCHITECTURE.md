@@ -49,6 +49,9 @@ abc/core/services.js has KARAOKE — rule: whatever is said and is on screen lig
                             Hear it again: every element that was spoken carries `data-said`; tapping it (outside buttons/links) says it again with
                             karaoke, the caption included. Tapping a card never moves on or re-draws it; the counted object is kept per item
                             (`APP.countable(key)`), so ‹ back shows exactly what was heard.
+                            Words split over several elements (a coloured first letter: <b>z</b>ebră) light up as one word. A line may say a
+                            part differently than it is written: `I18N.sayAs(shown, said)` (letter names: written "z", said "zî"); captions
+                            and karaoke use `I18N.shown`, the voice `I18N.said`.
                             So a view only has to SHOW what it SAYS (a tally card shows and says "cinci uși").
                             Voice speed: `config.speech` (rate 0.85 default; Slow/Normal/Fast 0.7/0.85/1 in Settings → Voice, stored as `rate`; Piper scales length by config rate ÷ it).
 abc/core/session.js         SESSION: play-time limit, spoken wind-down, break screen and grown-up unlock (see "Play time"); `start()` runs after the first render
