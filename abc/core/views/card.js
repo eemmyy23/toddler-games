@@ -41,7 +41,8 @@
       if (strip) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }
       const tl = APP.tallyOf(it), pics = tl.pics, shown = tl.words || it.word; said = tl.line || it.say; $('pics').hidden = !pics.length; $('word').hidden = !shown;
       $('word').textContent = shown || '';
-      $('alts').hidden = !it.tally; $('altback').disabled = !APP.canVaryBack();
+      const [pp, np] = APP.variantPics();
+      $('alts').hidden = !it.tally; $('altback').disabled = !pp; $('altback').innerHTML = pp || APP.icon('altBack'); $('altnext').innerHTML = np || APP.icon('altNext');
       $('also').innerHTML = APP.synonyms(it); $('also').hidden = !$('also').innerHTML; if (!$('also').hidden) APP.fitText($('also'));
       $('pics').innerHTML = pics.map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
       $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="card ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color
