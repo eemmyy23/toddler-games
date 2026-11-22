@@ -60,7 +60,7 @@ const APP = {
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
   variant(d, fresh) { if (d < 0 && alt.at > 0) alt.at--; else if (d > 0 && !fresh && alt.at < alt.list.length - 1) alt.at++; else if (d > 0) { alt.at = alt.list.length - 1; alt.next = true; } },
-  canVaryBack: () => alt.at > 0,
+  variantPics() { const xs = CONTENT.countable(lang), at = i => xs[alt.list[i]] && xs[alt.list[i]].pic; return [at(alt.at - 1), at(alt.at + 1)]; },
   saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
   reveal(el) { if (el) el.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); },
