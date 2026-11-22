@@ -57,26 +57,10 @@ const APP = {
   gameItems: () => gameItemsOf(tileOf()),
   screen: () => atHub ? 'hub' : mode === 'play' ? GAME_VIEW : tileOf().view,
   indexOf: id => APP.items().findIndex(it => it.id === id),
-  step(d) {
-    const n = APP.items().length, to = trail.at + d, counted = !!(APP.item() && APP.item().tally);
-    if (counted && to >= 0 && to < trail.list.length) { trail.at = to; const e = trail.list[to]; APP.idx = e.idx; trail.nav = { restore: e.pick, hist: true }; return APP.item(); }
-    APP.idx = (APP.idx + d + n) % n; trail.nav = { back: d < 0 && trail.at === 0 };
-    return APP.items()[APP.idx];
-  },
-  fresh() { trail.nav = {}; },
-  neighbors() {
-    const L = APP.items(), n = L.length, counted = !!(APP.item() && APP.item().tally), at = (k, d) => (counted && k >= 0 && k < trail.list.length && L[trail.list[k].idx]) || L[(APP.idx + d + n) % n];
-    return [at(trail.at - 1, -1), at(trail.at + 1, 1)];
-  },
-  visit() {
-    const nav = trail.nav; trail.nav = null;
-    if (!APP.item() || !APP.item().tally || !trail.cur || (nav && nav.hist)) return;
-    const e = { idx: APP.idx, pick: trail.cur.pick }, now = trail.list[trail.at];
-    if (now && now.idx === e.idx && now.pick === e.pick) return;
-    if (!nav) { trail.list = [e]; trail.at = 0; return; }
-    if (nav.back) { trail.list.unshift(e); trail.at = 0; return; }
-    trail.list.splice(trail.at + 1); trail.list.push(e); trail.at = trail.list.length - 1;
-  },
+  step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
+  neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
+  variant(d) { if (d < 0 && alt.at > 0) alt.at--; else if (d > 0) alt.next = true; },
+  canVaryBack: () => alt.at > 0,
   saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
   reveal(el) { if (el) el.scrollIntoView({ block: 'nearest', behavior: calm() ? 'auto' : 'smooth' }); },
@@ -109,7 +93,6 @@ const APP = {
   },
   shown() {
     APP.saveIdx(); const v = view(); $('act').hidden = !canPlay(v); if (!v || !v.arrows) return;
-    APP.visit();
     const [pv, nx] = APP.neighbors(), face = v.navFace || (x => x.nav);
     $('prev').innerHTML = APP.icon('prev') + face(pv); $('next').innerHTML = face(nx) + APP.icon('next'); APP.fitText($('prev')); APP.fitText($('next'));
   },
@@ -155,14 +138,13 @@ const APP = {
     el.style.transformOrigin = `50% ${top - r.top}px`; el.style.transform = `translateY(${lim0 - top}px) scale(${k})`;
   },
   countable(key) {
-    const xs = CONTENT.countable(lang), k = key && `${lang}:${key}`, c = trail.cur;
+    const xs = CONTENT.countable(lang), k = key && `${lang}:${key}`;
     if (!k) return xs[Math.random() * xs.length | 0];
-    if (c && c.k === k && (!trail.nav || trail.nav.done) && xs[c.pick]) return xs[c.pick];
-    const nav = trail.nav || {}, last = c && c.k === k ? c.pick : -1;
-    let pick = nav.restore;
-    if (!xs[pick]) do pick = Math.random() * xs.length | 0; while (xs.length > 1 && pick === last);
-    trail.cur = { k, pick };
-    if (trail.nav) trail.nav.done = true;
+    if (alt.k !== k) { alt.k = k; alt.list = []; alt.at = -1; alt.next = true; }
+    if (!alt.next && xs[alt.list[alt.at]]) return xs[alt.list[alt.at]];
+    const cur = alt.list[alt.at];
+    let pick; do pick = Math.random() * xs.length | 0; while (xs.length > 1 && pick === cur);
+    alt.list.splice(alt.at + 1); alt.list.push(pick); alt.at = alt.list.length - 1; alt.next = false;
     return xs[pick];
   },
   tallyOf(it) {
@@ -178,7 +160,7 @@ const APP = {
   },
   addStar() { APP.stars++; store.set('stars', APP.stars); const s = $('stars'); s.innerHTML = APP.icon('star') + APP.stars; if (!calm()) s.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400 }); }
 };
-const tileOf = () => TILE[tileId], trail = { list: [], at: -1, nav: null, cur: null }, clearTrail = () => { trail.list = []; trail.at = -1; trail.nav = null; trail.cur = null; };
+const tileOf = () => TILE[tileId], alt = { k: null, list: [], at: -1, next: true };
 const itemsOf = t => Tiles.items(t, lang);
 const gameItemsOf = t => Tiles.gameItems(t, lang);
 const learnOk = t => Tiles.learnOk(t, lang);
@@ -215,7 +197,7 @@ function renderHub() {
 function openTile(id, play, quiet, itemId) {
   const t = TILE[id]; if (!usable(t, play)) return false;
   leaveView();
-  if (id !== tileId || (play ? 'play' : 'view') !== mode) { Object.values(ABC.views).forEach(v => v.reset && v.reset()); clearTrail(); }
+  if (id !== tileId || (play ? 'play' : 'view') !== mode) { Object.values(ABC.views).forEach(v => v.reset && v.reset()); }
   tileId = id; mode = play ? 'play' : 'view'; atHub = false; APP.streak = 0;
   store.set('tile', id); store.set('mode', mode); store.set('athub', false);
   loadIdx(); const at = itemId == null ? -1 : APP.indexOf(itemId); if (at >= 0) { APP.idx = at; APP.saveIdx(); }
@@ -261,7 +243,7 @@ function render() {
   if (sc === 'hub') renderHub(); else v.show(started);
 }
 
-function setLang(code) { clearTrail();
+function setLang(code) {
   if (code === lang) { sfx.pop(); announce(); return; }
   const v0 = !atHub && view(), cur = v0 && APP.item();
   if (v0) leaveView();
