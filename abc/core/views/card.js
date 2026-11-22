@@ -15,11 +15,14 @@
     const it = APP.item(), p = e.target.closest && e.target.closest('.part');
     if (p && it.parts) { APP.celebrate(p); part(+p.dataset.part); }
     else if (it.parts) { part((at + 1) % it.parts.length); APP.celebrate(big(at)); }
-    else if (it.tally) { APP.celebrate(e.target); APP.fresh(); VIEW_CARD.show(true); }
+    else if (it.tally) { APP.celebrate(e.target); APP.variant(1); VIEW_CARD.show(true); }
     else { APP.celebrate(e.target); speak(said); }
   }
   onTap('glyph', tapBig);
   onTap('pics', () => { if (APP.screen() === 'card') speak(said); });
+  onTap('altsay', () => speak(said));
+  onTap('altnext', () => { APP.variant(1); VIEW_CARD.show(true); });
+  onTap('altback', () => { APP.variant(-1); VIEW_CARD.show(true); });
   onTap('word', e => { if (APP.screen() !== 'card') return; if (APP.item().parts) tapBig(e); else speak(said); });
   onScrub('parts', '.pt', b => part(+b.dataset.part));
   onTapIn('examples', '.ex', b => APP.sequence('examples', [{ light: b, say: APP.item().examples[+b.dataset.i][0], pop: true }]));
@@ -38,6 +41,7 @@
       if (strip) { void $('parts').offsetWidth; $('parts').classList.add('hint'); }
       const tl = APP.tallyOf(it), pics = tl.pics, shown = tl.words || it.word; said = tl.line || it.say; $('pics').hidden = !pics.length; $('word').hidden = !shown;
       $('word').textContent = shown || '';
+      $('alts').hidden = !it.tally; $('altback').disabled = !APP.canVaryBack();
       $('also').innerHTML = APP.synonyms(it); $('also').hidden = !$('also').innerHTML; if (!$('also').hidden) APP.fitText($('also'));
       $('pics').innerHTML = pics.map((pc, i) => `<span style="--i:${i}">${pc}</span>`).join('');
       $('examples').innerHTML = ex.map(([w, pic], i) => `<button class="card ex" data-i="${i}"><span class="ep">${pic}</span><span class="ew">${it.color

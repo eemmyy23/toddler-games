@@ -28,6 +28,6 @@ STRINGS('ro', {
     piper: 'Piper', piperTag: 'Merge fără internet · la fel pe orice telefon', download: 'Descarcă · {mb} MB', progress: '{p}% · {got} din {total} MB',
     downloading: 'Se descarcă… {p}%', cancel: 'Anulează', retry: 'Încearcă din nou', failed: 'Fără internet. Descărcarea s-a oprit.', full: 'Nu e destul spațiu (trebuie {mb} MB).',
     offline: 'Conectează-te la internet pentru descărcare.', del: 'Șterge', delAsk: 'Ștergi vocea? Eliberează 63 MB.', switched: 'Am trecut la vocea telefonului.', sample: 'Bună! Eu sunt vocea ta.' },
-  aria: { parent: 'Pentru părinți', settings: 'Setări', ages: 'Vârsta', search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
+  aria: { altBack: 'Obiectul de dinainte', again: 'Ascultă din nou', altNext: 'Alt obiect', parent: 'Pentru părinți', settings: 'Setări', ages: 'Vârsta', search: 'Caută', back: 'Înapoi', index: 'Toate', prev: 'Precedentul', next: 'Înainte', play: 'Pornește', close: 'Închide', clear: 'Șterge',
     objects: 'Obiecte', fingers: 'Degete', leftHand: 'mâna stângă', rightHand: 'mâna dreaptă', dismiss: 'Nu acum' }
 });

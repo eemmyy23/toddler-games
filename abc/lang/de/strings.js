@@ -28,6 +28,6 @@ STRINGS('de', {
     piper: 'Piper', piperTag: 'Funktioniert offline · auf jedem Handy gleich', download: 'Herunterladen · {mb} MB', progress: '{p}% · {got} von {total} MB',
     downloading: 'Wird geladen… {p}%', cancel: 'Abbrechen', retry: 'Erneut versuchen', failed: 'Kein Internet. Download gestoppt.', full: 'Nicht genug Speicher ({mb} MB nötig).',
     offline: 'Für den Download mit dem Internet verbinden.', del: 'Löschen', delAsk: 'Stimme löschen? Gibt 63 MB frei.', switched: 'Zur Handystimme gewechselt.', sample: 'Hallo! Ich bin deine Stimme.' },
-  aria: { parent: 'Für Erwachsene', settings: 'Einstellungen', ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
+  aria: { altBack: 'Vorheriges Ding', again: 'Nochmal hören', altNext: 'Anderes Ding', parent: 'Für Erwachsene', settings: 'Einstellungen', ages: 'Alter', search: 'Suchen', back: 'Zurück', index: 'Alle', prev: 'Vorheriges', next: 'Weiter', play: 'Abspielen', close: 'Schließen', clear: 'Löschen',
     objects: 'Dinge', fingers: 'Finger', leftHand: 'linke Hand', rightHand: 'rechte Hand', dismiss: 'Nicht jetzt' }
 });

@@ -67,21 +67,14 @@ const ok = (cond, msg) => { console.log((cond ? '  ok   ' : '  FAIL ') + msg); i
     const card = KARAOKE.find(ABC.views.card.line()); openTile('letters', false, true); KARAOKE.prime(null, I18N.shown(APP.item().say));
     const slot = KARAOKE.slot(), cap = slot.classList.contains('sub') && slot.id !== 'sub' && slot.textContent === I18N.shown(APP.item().say) && KARAOKE.marks.filter(Boolean).length >= 2; KARAOKE.stop(); KARAOKE.hide();
     return [tab && tab.classList.contains('tl'), card && card.id, cap]; });
-  const again = await ev(() => { openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const w0 = $('word').textContent; __said.length = 0;
-    $('word').click(); const w1 = $('word').textContent; const others = new Set(); for (let k = 0; k < 8; k++) { $('glyph').click(); others.add($('word').textContent); } ABC.views.card.step(1); ABC.views.card.step(-1); const back = $('word').textContent; $('pics').click(); const w2 = $('word').textContent; ABC.views.card.step(1); ABC.views.card.step(-1); return [w0, w1, others.size, back === w2]; });
+  const vary = await ev(() => { openTile('read', false, true); openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const w = () => $('word').textContent, a = w(), r = {};
+    r.backOff = $('altback').disabled; $('altnext').click(); const b = w(); $('glyph').click(); const c = w(); r.backOn = !$('altback').disabled;
+    $('altback').click(); r.back1 = w() === b; $('altback').click(); r.back2 = w() === a; __said.length = 0; $('altsay').click(); r.again = w() === a; $('word').click(); $('pics').click();
+    r.differ = new Set([a, b, c]).size === 3; ABC.views.card.step(1); r.next = /^șase /.test(w()) && $('altback').disabled; ABC.views.card.step(-1); r.prev = /^cinci /.test(w()) && $('altback').disabled && /4/.test($('prev').textContent);
+    KARAOKE.prime($('word'), ABC.views.card.line()); KARAOKE.start(KARAOKE.id, 1000); KARAOKE.at(0.1); r.lit = $('word').querySelectorAll('.kw.now').length > 0; KARAOKE.stop();
+    return r; });
   await spoken();
-  ok(again[0] === again[1] && again[2] >= 3 && again[3], `tapping the text says it again; tapping the number shows other things (${again[2]} kinds); back keeps the last one; tapping the things says it again (${again.join(' / ')})`);
-  const hist = await ev(() => { openTile('read', false, true); openTile('digits', false, true); APP.idx = 4; ABC.views.card.show(false); const seen = [$('word').textContent];
-    for (let k = 0; k < 2; k++) { $('glyph').click(); seen.push($('word').textContent); }
-    const label = $('prev').textContent, back = []; for (let k = 0; k < 3; k++) { ABC.views.card.step(-1); back.push($('word').textContent); }
-    ABC.views.card.step(1); const fwd = $('word').textContent; return { ok: back[0] === seen[1] && back[1] === seen[0] && /^patru /.test(back[2]) && fwd === seen[0] && /5/.test(label), seen, back, label, fwd }; });
-  ok(hist.ok, `‹ goes back through what was seen on the same number, then to the previous number (${hist.seen.join(' → ')} ‹ ${hist.back.join(' ‹ ')}; label "${hist.label}")`);
-  const fresh = await ev(() => { const seen = new Set();
-    for (let k = 0; k < 12; k++) { openTile('read', false, true); openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false); ABC.views.card.step(1); seen.add($('word').textContent); }
-    openTile('digits', false, true); APP.idx = 3; ABC.views.card.show(false);
-    ABC.views.card.step(1); KARAOKE.prime($('word'), ABC.views.card.line()); KARAOKE.start(KARAOKE.id, 1000); KARAOKE.at(0.1); const lit = $('word').querySelectorAll('.kw.now').length; KARAOKE.stop();
-    return [seen.size, lit]; });
-  ok(fresh[0] >= 3 && fresh[1] >= 1, `forward picks a new thing each time (${fresh[0]} kinds over 12 visits), the spoken word on the card lights up (${fresh[1]})`);
+  ok(Object.values(vary).every(Boolean), `counted card: ↷ and the number give other things, ↶ goes back through them, 🔊/text/things say it again, arrows go 4·5·6 and start a fresh thing, the spoken word lights up (${JSON.stringify(vary)})`);
   ok(kar[0] === true && kar[1] === 'word' && kar[2] === true, `on-screen text lights up; a line not on screen shows as a caption that also lights the letter and the word (${kar})`);
   console.log('learn card');
   await ev(() => openTile('letters', false, true)); await show(0);
