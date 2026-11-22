@@ -59,7 +59,7 @@ const APP = {
   indexOf: id => APP.items().findIndex(it => it.id === id),
   step(d) { const n = APP.items().length; APP.idx = (APP.idx + d + n) % n; return APP.items()[APP.idx]; },
   neighbors() { const L = APP.items(), n = L.length; return [L[(APP.idx - 1 + n) % n], L[(APP.idx + 1) % n]]; },
-  variant(d) { if (d < 0 && alt.at > 0) alt.at--; else if (d > 0) alt.next = true; },
+  variant(d, fresh) { if (d < 0 && alt.at > 0) alt.at--; else if (d > 0 && !fresh && alt.at < alt.list.length - 1) alt.at++; else if (d > 0) { alt.at = alt.list.length - 1; alt.next = true; } },
   canVaryBack: () => alt.at > 0,
   saveIdx() { const it = APP.item(); if (it) store.set('pos_' + tileId, it.id); },
   light(scope, els) { const root = typeof scope === 'string' ? $(scope) : scope; root.querySelectorAll('.on').forEach(x => x.classList.remove('on')); [].concat(els || []).forEach(e => e && e.classList.add('on')); },
