@@ -135,6 +135,7 @@ body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 .tab:not(.on) .ti{filter:saturate(.75)}
 
 #learn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:var(--learn-gap)}
+#learn>*,#play>*,.rcol>*{flex-shrink:0}
 #glyph{font-size:calc(var(--glyph) * var(--fit,1));max-width:100%;white-space:nowrap;line-height:1.1;font-weight:700;cursor:pointer;text-shadow:var(--shadow-text);transition:transform var(--t-fast)}
 #glyph.grp{font-size:calc(var(--glyph-grp) * var(--fit,1))}
 #glyph small{font-size:.5em;opacity:.85;margin-left:.06em}
@@ -161,7 +162,7 @@ body.lownav #count{bottom:calc(var(--bot) + var(--low-h))}
 .strip:has(.on) .pt:not(.on){opacity:.35}
 .strip.hint .pt{animation:nudge var(--t-hint) ease-in-out calc(var(--t-hint-wait) + var(--i) * var(--t-stagger)) 3}
 @keyframes nudge{0%,8%,100%{transform:none}4%{transform:translateY(calc(-1 * var(--sp-3)))}}
-.tip{position:absolute;top:50%;inset-inline-start:0;font-size:var(--part-fs);pointer-events:none;animation:slide var(--t-hint) ease-in-out var(--t-hint-wait) 3 both}
+.tip{position:absolute;inset-block:0;display:flex;align-items:center;inset-inline-start:0;font-size:var(--part-fs);pointer-events:none;animation:slide var(--t-hint) ease-in-out var(--t-hint-wait) 3 both}
 @keyframes slide{0%{inset-inline-start:0;opacity:0}3%{opacity:1}22%{opacity:1}25%,100%{inset-inline-start:85%;opacity:0}}
 #learn.tight{--learn-gap:var(--sp-1);--link-gap:var(--sp-1);--ex-pad:var(--sp-1) var(--sp-2);--ex-pic:var(--fs-l);--ex-fs:var(--fs-s)}
 #word{font-size:var(--word-fs);font-weight:600;text-align:center;min-height:1.2em}

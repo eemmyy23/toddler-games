@@ -33,6 +33,15 @@ async function audit() {
     }
     return out;
   };
+  const stacked = root => {
+    const out = [];
+    for (const col of [root, ...root.querySelectorAll('.rcol')]) {
+      const rows = [...col.children].filter(k => vis(k) && getComputedStyle(k).position !== 'absolute');
+      const reach = k => { const rs = [k, ...k.querySelectorAll('*')].filter(vis).map(R); return { top: Math.min(...rs.map(r => r.top)), bottom: Math.max(...rs.map(r => r.bottom)) }; };
+      for (let i = 1; i < rows.length; i++) { const a = reach(rows[i - 1]), b = reach(rows[i]); if (a.bottom > b.top + 1) out.push(`${rows[i - 1].id || rows[i - 1].className.split(' ')[0]} runs ${Math.round(a.bottom - b.top)}px into ${rows[i].id || rows[i].className.split(' ')[0]}`); }
+    }
+    return out;
+  };
   const screens = [];
   for (const s of ABC.config.sections) screens.push([`hub:${s.id}`, () => { APP.set({ section: s.id }); APP.set({ hub: true }); render(); }]);
   for (const t of TILES) {
@@ -51,6 +60,7 @@ async function audit() {
     await go();
     if (name.startsWith('rest')) { const box = R(document.getElementById('restbody')); for (const e of document.querySelectorAll('#rest button, #rest p, #restpic')) { if (!vis(e)) continue; const r = R(e); if (r.left < box.left - 1 || r.right > box.right + 1 || r.bottom > innerHeight + 1 || r.top < 0) bad.push(`${name}: ${e.id || e.tagName} outside the screen`); } }
     for (const m of escapes(document.body)) bad.push(`${name}: ${m}`);
+    if (!/^(settings|rest)/.test(name) && !name.endsWith(':index')) { const v = atHub ? null : document.getElementById(view().el); if (v) for (const m of stacked(v)) bad.push(`${name}: ${m}`); }
     for (const e of document.querySelectorAll('.on')) { const c = vis(e) && ringCut(e); if (c) bad.push(`${name}: ${e.id || e.className.split(' ')[0]} ring cut by ${c}`); }
     if (name.endsWith(':index')) { for (const b of document.querySelectorAll('#ixgrid .ix')) if (b.scrollWidth > b.clientWidth + 1) { bad.push(`${name}: ${b.textContent.trim()} wider than its tile`); break; } closeIndex(); continue; }
     if (/^(settings|rest)/.test(name)) continue;
